@@ -6,6 +6,10 @@ x-twenty-environment: &twenty-environment
   SERVER_URL: ${SERVER_URL:?set a non-production SERVER_URL}
   ENCRYPTION_KEY: ${ENCRYPTION_KEY:?set a new ENCRYPTION_KEY}
   STORAGE_TYPE: local
+  EMAIL_DRIVER: smtp
+  EMAIL_SMTP_HOST: mailpit
+  EMAIL_SMTP_PORT: 1025
+  EMAIL_SMTP_NO_TLS: "true"
 
 services:
   db:
@@ -31,6 +35,10 @@ services:
       interval: 5s
       timeout: 5s
       retries: 20
+  mailpit:
+    image: axllent/mailpit:v1.20.3
+    ports: ["127.0.0.1:${MAILPIT_PORT:-8026}:8025"]
+    networks: [private]
   server:
     image: ${TWENTY_IMAGE:?set immutable TWENTY_IMAGE digest}
     environment: *twenty-environment
@@ -39,6 +47,7 @@ services:
     depends_on:
       db: {condition: service_healthy}
       redis: {condition: service_healthy}
+      mailpit: {condition: service_started}
     networks: [private]
     healthcheck:
       test: ["CMD-SHELL", "curl --fail http://localhost:3000/healthz"]
