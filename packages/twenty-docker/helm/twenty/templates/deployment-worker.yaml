@@ -71,6 +71,10 @@ spec:
           env:
             - name: SERVER_URL
               value: {{ include "twenty.serverUrl" . | quote }}
+            - name: PRODUCT_BRAND_PRESET
+              value: {{ include "twenty.productBrandPreset" . | quote }}
+            - name: PRODUCT_BRAND_DEPLOYMENT_ORIGIN
+              value: {{ include "twenty.productBrandOrigin" . | quote }}
             {{- if eq (include "twenty.db.useExternalSecret" .) "true" }}
             - name: DB_PASSWORD
               valueFrom:

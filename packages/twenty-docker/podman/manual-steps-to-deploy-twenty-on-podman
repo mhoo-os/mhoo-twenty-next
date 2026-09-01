@@ -6,6 +6,9 @@ if [ ! -f "$(dirname "$0")/.env" ]; then
 fi
 source "$(dirname "$0")/.env"
 
+PRODUCT_BRAND_PRESET="${PRODUCT_BRAND_PRESET:-mhoo}"
+PRODUCT_BRAND_DEPLOYMENT_ORIGIN="${PRODUCT_BRAND_DEPLOYMENT_ORIGIN:-$SERVER_URL}"
+
 ## steps to cleanup and start over from scratch - useful when testing
 #podman pod stop twenty-pod
 #podman pod rm twenty-pod
@@ -32,6 +35,8 @@ podman run -d --pod twenty-pod --name twenty-redis \
 podman run -d --pod twenty-pod --name twenty-server \
   -e NODE_PORT=3000 \
   -e SERVER_URL="$SERVER_URL" \
+  -e PRODUCT_BRAND_PRESET="$PRODUCT_BRAND_PRESET" \
+  -e PRODUCT_BRAND_DEPLOYMENT_ORIGIN="$PRODUCT_BRAND_DEPLOYMENT_ORIGIN" \
   -e PG_DATABASE_URL="postgresql://twenty:$POSTGRES_PASSWORD@twenty-db:5432/twenty" \
   -e REDIS_URL="redis://twenty-redis:6379" \
   -e APP_SECRET="$APP_SECRET" \
@@ -43,6 +48,8 @@ podman run -d --pod twenty-pod --name twenty-server \
 podman run -d --pod twenty-pod --name twenty-worker \
   --init \
   -e SERVER_URL="$SERVER_URL" \
+  -e PRODUCT_BRAND_PRESET="$PRODUCT_BRAND_PRESET" \
+  -e PRODUCT_BRAND_DEPLOYMENT_ORIGIN="$PRODUCT_BRAND_DEPLOYMENT_ORIGIN" \
   -e PG_DATABASE_URL="postgresql://twenty:$POSTGRES_PASSWORD@twenty-db:5432/twenty" \
   -e REDIS_URL="redis://twenty-redis:6379" \
   -e APP_SECRET="$APP_SECRET" \
@@ -68,4 +75,3 @@ cp twentycrm.service ~/.config/systemd/user
 systemctl --user daemon-reload
 systemctl --user enable twentycrm.service
 systemctl --user start twentycrm.service
-

@@ -1,7 +1,7 @@
 {
   "name": "twenty-codex-plugin",
   "version": "0.1.0",
-  "description": "Codex plugin for creating, managing, developing, publishing, and querying Twenty apps through Codex.",
+  "description": "Codex plugin for creating, managing, developing, publishing, and querying Twenty apps, used by the Mhoo distribution.",
   "private": true,
   "license": "AGPL-3.0",
   "scripts": {

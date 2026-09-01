@@ -1,6 +1,6 @@
 {
   "$schema": "https://mintlify.com/schema.json",
-  "name": "Twenty Documentation",
+  "name": "Mhoo documentation (built on Twenty)",
   "theme": "almond",
   "logo": {
     "light": "/logo.svg",
@@ -18,7 +18,7 @@
   "navbar": {
     "primary": {
       "type": "button",
-      "label": "Try Twenty",
+      "label": "Upstream Twenty",
       "href": "https://app.twenty.com/welcome"
     }
   },

@@ -37,6 +37,10 @@ spec:
               value: 3000
             - name: SERVER_URL
               value: "https://crm.example.com:443"
+            - name: PRODUCT_BRAND_PRESET
+              value: "mhoo"
+            - name: PRODUCT_BRAND_DEPLOYMENT_ORIGIN
+              value: "https://crm.example.com:443"
             - name: "PG_DATABASE_URL"
               value: "postgres://postgres:postgres@twentycrm-db.twentycrm.svc.cluster.local/default"
             - name: "REDIS_URL"

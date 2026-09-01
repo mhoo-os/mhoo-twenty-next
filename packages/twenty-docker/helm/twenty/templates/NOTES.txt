@@ -1,4 +1,4 @@
-Thank you for installing Twenty!
+Thank you for installing Mhoo, built on the governed Twenty foundation!
 
 To access the application:
 
@@ -12,6 +12,8 @@ To access the application:
 - If ingress disabled: expose the service as needed (e.g., `kubectl port-forward svc/{{ include "twenty.fullname" . }}-server 3000:{{ .Values.server.service.port }}` or create a LoadBalancer/NodePort).
 
 Configuration:
+- Product brand preset: {{ include "twenty.productBrandPreset" . }}
+- Product brand origin: {{ include "twenty.productBrandOrigin" . }}
 - Using internal DB: {{ ternary "yes" "no" .Values.db.enabled }}
 - Using external DB: {{ ternary "yes" "no" (not .Values.db.enabled) }}
 - Using internal Redis: {{ ternary "yes" "no" .Values.redisInternal.enabled }}

@@ -1,3 +1,7 @@
+# Compatibility wrapper retained from upstream Twenty. It is not an Mhoo
+# release or publication path; use the governed Mhoo source overlay for that.
+echo "ℹ️ This compatibility wrapper uses upstream Twenty installer assets."
+
 pull_version=${VERSION:-$(curl -s https://api.github.com/repos/twentyhq/twenty/tags | grep '"name":' | head -n 1 | cut -d '"' -f 4)}
 
 if [[ -z "$pull_version" ]]; then

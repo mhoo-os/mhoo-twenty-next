@@ -15,6 +15,15 @@
 {{ .Release.Namespace }}
 {{- end -}}
 
+{{/* Product presentation settings; technical chart names remain Twenty. */}}
+{{- define "twenty.productBrandPreset" -}}
+{{- .Values.brand.preset | default "mhoo" -}}
+{{- end -}}
+
+{{- define "twenty.productBrandOrigin" -}}
+{{- .Values.brand.deploymentOrigin | default (include "twenty.serverUrl" .) -}}
+{{- end -}}
+
 {{/* Server image fields merged with globals */}}
 {{- define "twenty.server.image" -}}
 {{- $repo := default $.Values.image.repository (index $.Values.server.image "repository" | default "") -}}

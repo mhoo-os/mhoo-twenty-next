@@ -1,0 +1,60 @@
+suite: product brand configuration
+templates:
+  - templates/deployment-server.yaml
+  - templates/deployment-worker.yaml
+release:
+  name: my-twenty
+  namespace: default
+tests:
+  - it: defaults the server to Mhoo and the ingress origin
+    template: templates/deployment-server.yaml
+    set:
+      server.ingress.enabled: true
+      server.ingress.hosts:
+        - host: crm.example.com
+          paths:
+            - path: /
+              pathType: Prefix
+      server.ingress.tls:
+        - secretName: crm-tls
+          hosts:
+            - crm.example.com
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: PRODUCT_BRAND_PRESET
+            value: mhoo
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: PRODUCT_BRAND_DEPLOYMENT_ORIGIN
+            value: https://crm.example.com:443
+
+  - it: passes the same Mhoo settings to the worker
+    template: templates/deployment-worker.yaml
+    set:
+      brand.deploymentOrigin: https://crm.example.com
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: PRODUCT_BRAND_PRESET
+            value: mhoo
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: PRODUCT_BRAND_DEPLOYMENT_ORIGIN
+            value: https://crm.example.com
+
+  - it: supports the explicit upstream compatibility preset
+    template: templates/deployment-server.yaml
+    set:
+      brand.preset: twenty
+      brand.deploymentOrigin: https://crm.example.com
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: PRODUCT_BRAND_PRESET
+            value: twenty

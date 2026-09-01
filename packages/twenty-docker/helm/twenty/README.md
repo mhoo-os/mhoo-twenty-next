@@ -1,9 +1,11 @@
-# Twenty Helm Chart
+# Mhoo Helm distribution (built on Twenty)
 
-Deploy Twenty CRM on Kubernetes with server, worker, PostgreSQL, and Redis components.
+Deploy the Mhoo distribution on Kubernetes with the existing Twenty server,
+worker, PostgreSQL, and Redis components. The chart name, release examples,
+resource names, and technical package paths remain `twenty` for compatibility.
 
 ## Features
-- Server and worker deployments with full env exposure via `values.yaml`.
+- Server and worker deployments with product brand settings and full env exposure via `values.yaml`.
 - Internal PostgreSQL (Spilo) and Redis deployments included.
 - PVC-based persistence using dynamic storage classes (no static PV manifests).
 - Ingress with configurable annotations, hosts, and TLS.
@@ -24,6 +26,17 @@ helm install my-twenty ./packages/twenty-docker/helm/twenty \
   --namespace twentycrm --create-namespace
 ```
 
+The chart defaults to the reviewed Mhoo product preset. Set
+`brand.deploymentOrigin` when the public origin cannot be derived from the
+ingress configuration:
+
+```bash
+helm install my-twenty ./packages/twenty-docker/helm/twenty \
+  --namespace twentycrm --create-namespace \
+  --set brand.preset=mhoo \
+  --set brand.deploymentOrigin=https://crm.example.com
+```
+
 External DB/Redis:
 ```bash
 helm install my-twenty ./packages/twenty-docker/helm/twenty \
@@ -35,13 +48,17 @@ helm install my-twenty ./packages/twenty-docker/helm/twenty \
 
 ## Key Values
 
-
 See `values.yaml` for a comprehensive list.
+
+- `brand.preset`: `mhoo` by default; `twenty` is reserved for an explicit upstream-compatibility fixture.
+- `brand.deploymentOrigin`: an `http(s)` origin without a path, query, or fragment. If empty, the chart derives it from `SERVER_URL` or ingress.
+- `image.repository` and `image.tag`: the image is an explicit release input. Existing upstream `twentycrm/twenty` defaults are retained until a reviewed Mhoo release artifact is selected.
 
 ## Notes
 
 - Database URL and Redis URL are composed automatically from chart settings
 - Database `twenty` and schema `core` are created automatically by server init container
+- Kubernetes resource names, selectors, PVC names, and migration behavior retain their technical Twenty identity for upgrade compatibility.
 - No optional jobs: the chart no longer provides separate Jobs for DB or migrations.
 - Access token auto-generated (32 chars) if not provided; reuses existing secret if present
   - For production, provide a strong `secrets.tokens.accessToken` value via a secure values file; the auto-generated token is a convenience fallback.
@@ -82,5 +99,7 @@ helm install my-twenty ./packages/twenty-docker/helm/twenty -f values-secrets.ya
 ## Production Tips
 
 - **Image versioning:** The chart defaults to `Chart.yaml`'s `appVersion` (currently v1.14.0). Override via `image.tag` in values to pin a different version or use `latest` for rolling updates.
+- **Mhoo release input:** Before a release, set `image.repository` and `image.tag` to the reviewed Mhoo-built artifact. Source work does not invent or retag an immutable release digest.
+- **Product origin:** Keep `brand.deploymentOrigin` aligned with the public `SERVER_URL` origin so relative Mhoo assets and links resolve safely.
 - **Keep secrets secure:** Avoid `--set` for sensitive values; use `-f values-secrets.yaml` or reference existing Kubernetes Secrets via `server.extraEnvFrom`.
   - S3 credentials can be referenced via `storage.s3.secretName + accessKeyIdKey/secretAccessKeyKey` to avoid embedding them in pod specs.

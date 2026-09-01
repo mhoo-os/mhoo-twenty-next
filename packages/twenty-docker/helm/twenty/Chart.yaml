@@ -1,7 +1,15 @@
 apiVersion: v2
 name: twenty
-description: A Helm chart to deploy Twenty CRM (server + worker) with optional PostgreSQL and Redis dependencies.
+description: The Mhoo distribution Helm chart, built on Twenty, with optional PostgreSQL and Redis dependencies.
 type: application
 version: 0.1.0
 appVersion: "v1.14.0"
 icon: https://raw.githubusercontent.com/twentyhq/twenty/2f25922f4cd5bd61e1427c57c4f8ea224e1d552c/packages/twenty-website/public/images/core/logo.svg
+annotations:
+  org.opencontainers.image.title: Mhoo built on Twenty
+  org.opencontainers.image.source: https://github.com/mhoo-os/mhoo-twenty-next
+  org.opencontainers.image.upstream.source: https://github.com/twentyhq/twenty
+  org.opencontainers.image.upstream.version: v2.37.0
+  org.opencontainers.image.upstream.revision: 6da524b8903ec16a3eeea4b2e4a5fb63dbfc1c58
+  org.opencontainers.image.upstream.tree: 3ce4ef3eac3604ee52b6b8ee0f1a4766d7f533ca
+  org.opencontainers.image.licenses: AGPL-3.0
