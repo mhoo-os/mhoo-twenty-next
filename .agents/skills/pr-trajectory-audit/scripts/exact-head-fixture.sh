@@ -3,7 +3,7 @@ set -euo pipefail
 
 base="${1:-$(sed -n 's/^TWENTY_UPSTREAM_COMMIT=//p' .twenty-source)}"
 head="${2:-HEAD}"
-allowed='^(\.twenty-source|CLAUDE\.md|AGENTS\.md|docs/provenance/clean-foundation-overlay\.md|scripts/provenance/verify-source\.sh|\.agents/skills/pr-trajectory-audit/|\.github/workflows/(trajectory-eval|clean-foundation-ci|clean-foundation-image)\.yml|deploy/twenty-next/)'
+allowed='^(\.twenty-source|CLAUDE\.md|AGENTS\.md|docs/provenance/clean-foundation-overlay\.md|scripts/provenance/verify-source\.sh|\.agents/trajectory-review\.json|\.agents/skills/pr-trajectory-audit/|\.github/workflows/(trajectory-eval|clean-foundation-ci|clean-foundation-image)\.yml|deploy/twenty-next/)'
 
 git diff --name-only "$base" "$head" | while IFS= read -r path; do
   [[ "$path" =~ $allowed ]] || { printf 'trajectory fixture rejected: %s\n' "$path" >&2; exit 1; }
