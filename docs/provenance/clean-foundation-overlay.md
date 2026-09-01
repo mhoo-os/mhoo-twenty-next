@@ -17,3 +17,10 @@ Initial permitted overlay paths:
 
 Later overlay commits append trajectory evaluation and the clean runtime CI to
 this list. Nothing else is implicitly permitted.
+
+Trajectory-eval paths:
+
+- `.agents/skills/pr-trajectory-audit/SKILL.md`
+- `.agents/skills/pr-trajectory-audit/references/failure-patterns.md`
+- `.agents/skills/pr-trajectory-audit/scripts/exact-head-fixture.sh`
+- `.github/workflows/trajectory-eval.yml`
