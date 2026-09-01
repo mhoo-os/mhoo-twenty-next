@@ -2006,10 +2006,75 @@ type ClientConfigMaintenanceMode {
   link: String
 }
 
+type ClientConfigBrandDocument {
+  status: String!
+  url: String
+}
+
+type ClientConfigBrandAsset {
+  path: String!
+  mimeType: String!
+  dimensions: [Float!]!
+  purpose: String!
+  maskable: Boolean
+}
+
+type ClientConfigBrandAssetFamily {
+  productMark: ClientConfigBrandAsset!
+  emailMark: ClientConfigBrandAsset!
+  favicon: ClientConfigBrandAsset!
+  pwaIcons: [ClientConfigBrandAsset!]!
+  workspaceDefault: ClientConfigBrandAsset!
+  monochrome: ClientConfigBrandAsset
+}
+
+type ClientConfigBrandLegal {
+  legalEntity: String!
+  legalEntityStatus: String!
+  senderDisplayName: String!
+  privacy: ClientConfigBrandDocument!
+  terms: ClientConfigBrandDocument!
+  dpa: ClientConfigBrandDocument!
+}
+
+type ClientConfigBrandUrls {
+  websiteUrl: String!
+  supportUrl: String!
+  statusUrl: String!
+  documentationUrl: String!
+  contactUrl: String!
+}
+
+type ClientConfigBrandAttribution {
+  label: String!
+  url: String
+  status: String!
+}
+
+type ClientConfigBrandAccessibility {
+  logoAltText: String!
+  minimumRenderedSize: Float!
+  safeArea: String!
+  contrastGuidance: String!
+}
+
+type ClientConfigBrand {
+  preset: String!
+  productName: String!
+  productShortName: String!
+  legal: ClientConfigBrandLegal!
+  urls: ClientConfigBrandUrls!
+  assets: ClientConfigBrandAssetFamily!
+  documentTitleTemplate: String!
+  attribution: ClientConfigBrandAttribution!
+  accessibility: ClientConfigBrandAccessibility!
+}
+
 type ClientConfig {
   appVersion: String
   authProviders: AuthProviders!
   billing: Billing!
+  brand: ClientConfigBrand!
   aiModels: [ClientAiModelConfig!]!
   signInPrefilled: Boolean!
   isMultiWorkspaceEnabled: Boolean!

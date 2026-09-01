@@ -16,6 +16,7 @@ import {
 import { DomainServerConfigService } from 'src/engine/core-modules/domain/domain-server-config/services/domain-server-config.service';
 import { EmailingDomainDriver } from 'src/engine/core-modules/emailing-domain/drivers/types/emailing-domain-driver.type';
 import { PUBLIC_FEATURE_FLAGS } from 'src/engine/core-modules/feature-flag/constants/public-feature-flag.const';
+import { ProductBrandResolverService } from 'src/engine/core-modules/twenty-config/services/product-brand-resolver.service';
 import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
 import { toDisplayCredits } from 'src/engine/core-modules/usage/utils/to-display-credits.util';
 import {
@@ -34,6 +35,7 @@ export class ClientConfigService {
     private domainServerConfigService: DomainServerConfigService,
     private aiModelRegistryService: AiModelRegistryService,
     private maintenanceModeService: MaintenanceModeService,
+    private productBrandResolverService: ProductBrandResolverService,
   ) {}
 
   private isCloudflareIntegrationEnabled(): boolean {
@@ -190,6 +192,7 @@ export class ClientConfigService {
           },
         ],
       },
+      brand: this.productBrandResolverService.resolve(),
       aiModels,
       authProviders: {
         google: this.twentyConfigService.get('AUTH_GOOGLE_ENABLED'),

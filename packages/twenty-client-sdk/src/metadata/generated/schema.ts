@@ -1642,10 +1642,83 @@ export interface ClientConfigMaintenanceMode {
     __typename: 'ClientConfigMaintenanceMode'
 }
 
+export interface ClientConfigBrandDocument {
+    status: Scalars['String']
+    url?: Scalars['String']
+    __typename: 'ClientConfigBrandDocument'
+}
+
+export interface ClientConfigBrandAsset {
+    path: Scalars['String']
+    mimeType: Scalars['String']
+    dimensions: Scalars['Float'][]
+    purpose: Scalars['String']
+    maskable?: Scalars['Boolean']
+    __typename: 'ClientConfigBrandAsset'
+}
+
+export interface ClientConfigBrandAssetFamily {
+    productMark: ClientConfigBrandAsset
+    emailMark: ClientConfigBrandAsset
+    favicon: ClientConfigBrandAsset
+    pwaIcons: ClientConfigBrandAsset[]
+    workspaceDefault: ClientConfigBrandAsset
+    monochrome?: ClientConfigBrandAsset
+    __typename: 'ClientConfigBrandAssetFamily'
+}
+
+export interface ClientConfigBrandLegal {
+    legalEntity: Scalars['String']
+    legalEntityStatus: Scalars['String']
+    senderDisplayName: Scalars['String']
+    privacy: ClientConfigBrandDocument
+    terms: ClientConfigBrandDocument
+    dpa: ClientConfigBrandDocument
+    __typename: 'ClientConfigBrandLegal'
+}
+
+export interface ClientConfigBrandUrls {
+    websiteUrl: Scalars['String']
+    supportUrl: Scalars['String']
+    statusUrl: Scalars['String']
+    documentationUrl: Scalars['String']
+    contactUrl: Scalars['String']
+    __typename: 'ClientConfigBrandUrls'
+}
+
+export interface ClientConfigBrandAttribution {
+    label: Scalars['String']
+    url?: Scalars['String']
+    status: Scalars['String']
+    __typename: 'ClientConfigBrandAttribution'
+}
+
+export interface ClientConfigBrandAccessibility {
+    logoAltText: Scalars['String']
+    minimumRenderedSize: Scalars['Float']
+    safeArea: Scalars['String']
+    contrastGuidance: Scalars['String']
+    __typename: 'ClientConfigBrandAccessibility'
+}
+
+export interface ClientConfigBrand {
+    preset: Scalars['String']
+    productName: Scalars['String']
+    productShortName: Scalars['String']
+    legal: ClientConfigBrandLegal
+    urls: ClientConfigBrandUrls
+    assets: ClientConfigBrandAssetFamily
+    documentTitleTemplate: Scalars['String']
+    attribution: ClientConfigBrandAttribution
+    accessibility: ClientConfigBrandAccessibility
+    __typename: 'ClientConfigBrand'
+}
+
 export interface ClientConfig {
     appVersion?: Scalars['String']
     authProviders: AuthProviders
     billing: Billing
+    brand: ClientConfigBrand
     aiModels: ClientAiModelConfig[]
     signInPrefilled: Scalars['Boolean']
     isMultiWorkspaceEnabled: Scalars['Boolean']
@@ -5058,10 +5131,91 @@ export interface ClientConfigMaintenanceModeGenqlSelection{
     __scalar?: boolean | number
 }
 
+export interface ClientConfigBrandDocumentGenqlSelection{
+    status?: boolean | number
+    url?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+export interface ClientConfigBrandAssetGenqlSelection{
+    path?: boolean | number
+    mimeType?: boolean | number
+    dimensions?: boolean | number
+    purpose?: boolean | number
+    maskable?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+export interface ClientConfigBrandAssetFamilyGenqlSelection{
+    productMark?: ClientConfigBrandAssetGenqlSelection
+    emailMark?: ClientConfigBrandAssetGenqlSelection
+    favicon?: ClientConfigBrandAssetGenqlSelection
+    pwaIcons?: ClientConfigBrandAssetGenqlSelection
+    workspaceDefault?: ClientConfigBrandAssetGenqlSelection
+    monochrome?: ClientConfigBrandAssetGenqlSelection
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+export interface ClientConfigBrandLegalGenqlSelection{
+    legalEntity?: boolean | number
+    legalEntityStatus?: boolean | number
+    senderDisplayName?: boolean | number
+    privacy?: ClientConfigBrandDocumentGenqlSelection
+    terms?: ClientConfigBrandDocumentGenqlSelection
+    dpa?: ClientConfigBrandDocumentGenqlSelection
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+export interface ClientConfigBrandUrlsGenqlSelection{
+    websiteUrl?: boolean | number
+    supportUrl?: boolean | number
+    statusUrl?: boolean | number
+    documentationUrl?: boolean | number
+    contactUrl?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+export interface ClientConfigBrandAttributionGenqlSelection{
+    label?: boolean | number
+    url?: boolean | number
+    status?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+export interface ClientConfigBrandAccessibilityGenqlSelection{
+    logoAltText?: boolean | number
+    minimumRenderedSize?: boolean | number
+    safeArea?: boolean | number
+    contrastGuidance?: boolean | number
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
+export interface ClientConfigBrandGenqlSelection{
+    preset?: boolean | number
+    productName?: boolean | number
+    productShortName?: boolean | number
+    legal?: ClientConfigBrandLegalGenqlSelection
+    urls?: ClientConfigBrandUrlsGenqlSelection
+    assets?: ClientConfigBrandAssetFamilyGenqlSelection
+    documentTitleTemplate?: boolean | number
+    attribution?: ClientConfigBrandAttributionGenqlSelection
+    accessibility?: ClientConfigBrandAccessibilityGenqlSelection
+    __typename?: boolean | number
+    __scalar?: boolean | number
+}
+
 export interface ClientConfigGenqlSelection{
     appVersion?: boolean | number
     authProviders?: AuthProvidersGenqlSelection
     billing?: BillingGenqlSelection
+    brand?: ClientConfigBrandGenqlSelection
     aiModels?: ClientAiModelConfigGenqlSelection
     signInPrefilled?: boolean | number
     isMultiWorkspaceEnabled?: boolean | number
@@ -8411,6 +8565,70 @@ export interface LogicFunctionLogsInput {applicationId?: (Scalars['UUID'] | null
     export const isClientConfigMaintenanceMode = (obj?: { __typename?: any } | null): obj is ClientConfigMaintenanceMode => {
       if (!obj?.__typename) throw new Error('__typename is missing in "isClientConfigMaintenanceMode"')
       return ClientConfigMaintenanceMode_possibleTypes.includes(obj.__typename)
+    }
+    
+
+
+    const ClientConfigBrandDocument_possibleTypes: string[] = ['ClientConfigBrandDocument']
+    export const isClientConfigBrandDocument = (obj?: { __typename?: any } | null): obj is ClientConfigBrandDocument => {
+      if (!obj?.__typename) throw new Error('__typename is missing in "isClientConfigBrandDocument"')
+      return ClientConfigBrandDocument_possibleTypes.includes(obj.__typename)
+    }
+    
+
+
+    const ClientConfigBrandAsset_possibleTypes: string[] = ['ClientConfigBrandAsset']
+    export const isClientConfigBrandAsset = (obj?: { __typename?: any } | null): obj is ClientConfigBrandAsset => {
+      if (!obj?.__typename) throw new Error('__typename is missing in "isClientConfigBrandAsset"')
+      return ClientConfigBrandAsset_possibleTypes.includes(obj.__typename)
+    }
+    
+
+
+    const ClientConfigBrandAssetFamily_possibleTypes: string[] = ['ClientConfigBrandAssetFamily']
+    export const isClientConfigBrandAssetFamily = (obj?: { __typename?: any } | null): obj is ClientConfigBrandAssetFamily => {
+      if (!obj?.__typename) throw new Error('__typename is missing in "isClientConfigBrandAssetFamily"')
+      return ClientConfigBrandAssetFamily_possibleTypes.includes(obj.__typename)
+    }
+    
+
+
+    const ClientConfigBrandLegal_possibleTypes: string[] = ['ClientConfigBrandLegal']
+    export const isClientConfigBrandLegal = (obj?: { __typename?: any } | null): obj is ClientConfigBrandLegal => {
+      if (!obj?.__typename) throw new Error('__typename is missing in "isClientConfigBrandLegal"')
+      return ClientConfigBrandLegal_possibleTypes.includes(obj.__typename)
+    }
+    
+
+
+    const ClientConfigBrandUrls_possibleTypes: string[] = ['ClientConfigBrandUrls']
+    export const isClientConfigBrandUrls = (obj?: { __typename?: any } | null): obj is ClientConfigBrandUrls => {
+      if (!obj?.__typename) throw new Error('__typename is missing in "isClientConfigBrandUrls"')
+      return ClientConfigBrandUrls_possibleTypes.includes(obj.__typename)
+    }
+    
+
+
+    const ClientConfigBrandAttribution_possibleTypes: string[] = ['ClientConfigBrandAttribution']
+    export const isClientConfigBrandAttribution = (obj?: { __typename?: any } | null): obj is ClientConfigBrandAttribution => {
+      if (!obj?.__typename) throw new Error('__typename is missing in "isClientConfigBrandAttribution"')
+      return ClientConfigBrandAttribution_possibleTypes.includes(obj.__typename)
+    }
+    
+
+
+    const ClientConfigBrandAccessibility_possibleTypes: string[] = ['ClientConfigBrandAccessibility']
+    export const isClientConfigBrandAccessibility = (obj?: { __typename?: any } | null): obj is ClientConfigBrandAccessibility => {
+      if (!obj?.__typename) throw new Error('__typename is missing in "isClientConfigBrandAccessibility"')
+      return ClientConfigBrandAccessibility_possibleTypes.includes(obj.__typename)
+    }
+    
+
+
+    const ClientConfigBrand_possibleTypes: string[] = ['ClientConfigBrand']
+    export const isClientConfigBrand = (obj?: { __typename?: any } | null): obj is ClientConfigBrand => {
+      if (!obj?.__typename) throw new Error('__typename is missing in "isClientConfigBrand"')
+      return ClientConfigBrand_possibleTypes.includes(obj.__typename)
     }
     
 

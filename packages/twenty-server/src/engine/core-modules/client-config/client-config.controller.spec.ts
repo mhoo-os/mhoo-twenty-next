@@ -5,6 +5,7 @@ import { SupportDriver } from 'src/engine/core-modules/twenty-config/interfaces/
 import { ClientConfigService } from 'src/engine/core-modules/client-config/services/client-config.service';
 import { ModelFamily } from 'src/engine/metadata-modules/ai/ai-models/types/model-family.enum';
 import { type ModelId } from 'src/engine/metadata-modules/ai/ai-models/types/model-id.type';
+import { resolveProductBrand } from 'src/engine/core-modules/twenty-config/services/product-brand-resolver.service';
 import { ENTERPRISE_INSTANCE_TYPE } from 'twenty-shared/constants';
 
 import { ClientConfigController } from './client-config.controller';
@@ -47,6 +48,10 @@ describe('ClientConfigController', () => {
             },
           ],
         },
+        brand: resolveProductBrand({
+          preset: 'twenty',
+          deploymentOrigin: 'http://localhost:3000',
+        }),
         aiModels: [
           {
             modelId: 'openai/gpt-4o' as ModelId,
