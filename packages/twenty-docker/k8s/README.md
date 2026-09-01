@@ -1,11 +1,17 @@
-# Kubernetes for Twenty CRM (Helm)
-DISCLAIMER: The k8s and podman deployments are not maintained by the core team.
-These files are provided and maintained by the community. Twenty core team
-maintains support for docker deployment.
+# Kubernetes for Mhoo (built on Twenty)
+
+These deployment recipes present the Mhoo distribution on the governed Twenty
+foundation. The chart, namespace, resource, selector, and package names that
+contain `twenty` or `twentycrm` remain technical compatibility identifiers.
+
+DISCLAIMER: The Kubernetes and Podman recipes are community-maintained source
+examples. They do not constitute a live Mhoo deployment or release proof.
 
 ## Overview
 
-This repository contains a world-class Helm chart and (legacy) raw Kubernetes manifests plus Terraform files to help you deploy and manage the Twenty CRM application. The chart is located at `packages/twenty-docker/helm/twenty` and supersedes the manifests in `packages/twenty-docker/k8s/manifests`.
+This directory contains the Helm chart at `packages/twenty-docker/helm/twenty`,
+legacy raw Kubernetes manifests, and Terraform files for the Mhoo distribution.
+The chart supersedes the manifests in `packages/twenty-docker/k8s/manifests`.
 
 ## Prerequisites
 
@@ -27,7 +33,9 @@ helm install my-twenty packages/twenty-docker/helm/twenty \
   --set server.ingress.hosts[0].host=$DOMAIN \
   --set server.ingress.hosts[0].paths[0].path=/ \
   --set server.ingress.hosts[0].paths[0].pathType=Prefix \
-  --set server.ingress.tls[0].hosts[0]=$DOMAIN
+  --set server.ingress.tls[0].hosts[0]=$DOMAIN \
+  --set brand.preset=mhoo \
+  --set brand.deploymentOrigin=https://$DOMAIN
 ```
 
 See [QUICKSTART](../helm/twenty/QUICKSTART.md) and [chart README](../helm/twenty/README.md) for details.
@@ -39,8 +47,8 @@ See [QUICKSTART](../helm/twenty/QUICKSTART.md) and [chart README](../helm/twenty
 Clone the repository to your local machine:
 
 ``` bash
-git clone https://github.com/twentyhq/twenty.git
-cd twenty/packages/twenty-docker/k8s
+git clone https://github.com/mhoo-os/mhoo-twenty-next.git
+cd mhoo-twenty-next/packages/twenty-docker/k8s
 ```
 
 ### Step 2: Customize the Manifests and Terraform Files
@@ -80,7 +88,7 @@ cd twenty/packages/twenty-docker/k8s
 1. Navigate to the Kubernetes manifests directory:
 
     ```bash
-    cd ../k8s
+    cd ../manifests
     ```
 
 2. Create Server Secret
@@ -102,6 +110,7 @@ cd twenty/packages/twenty-docker/k8s
 - **Namespace:** Update the `namespace` in the manifests as needed.
 - **Resource Limits:** Adjust the resource limits and requests according to your application's requirements.
 - **Environment Variables:** Configure server tokens in the `Secret` command above.
+- **Product presentation:** Keep `PRODUCT_BRAND_PRESET=mhoo` and set `PRODUCT_BRAND_DEPLOYMENT_ORIGIN` to the same public origin as `SERVER_URL`. The `twentycrm` names in these manifests are retained for compatibility.
 
 ### Terraform Files
 
@@ -125,7 +134,9 @@ cd twenty/packages/twenty-docker/k8s
 
 ## Conclusion
 
-This setup provides a basic structure for deploying the TwentyCRM application using Kubernetes and Terraform. Ensure you thoroughly customize the manifests and Terraform files to suit your specific needs. For any issues or questions, please refer to the official documentation of Kubernetes and Terraform or seek support from your cloud provider.
+This setup provides source examples for deploying Mhoo using Kubernetes and
+Terraform. Customize the manifests for your environment and perform release,
+runtime, recovery, and production checks through the governed release process.
 
 ---
 

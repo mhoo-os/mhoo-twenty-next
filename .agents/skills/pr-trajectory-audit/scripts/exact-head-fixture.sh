@@ -7,8 +7,10 @@ allowed='^(\.twenty-source|CLAUDE\.md|AGENTS\.md|docs/provenance/(clean-foundati
 
 email_allowed='^(packages/twenty-front/src/locales/([^/]+\.po|generated/[^/]+\.ts)|docs/provenance/transactional-email-branding-ledger\.md|packages/twenty-emails/src/(components/.*|emails/.*|index\.ts|locales/([^/]+\.po|generated/[^/]+\.ts)|utils/(brand|preview-brand)\.ts|constants/DefaultWorkspaceLogo\.ts)|packages/twenty-server/src/engine/core-modules/i18n/locales/([^/]+\.po|generated/[^/]+\.ts)|packages/twenty-server/src/engine/core-modules/email/(utils/(build-email-sender\.ts|__tests__/build-email-sender\.util\.spec\.ts)|__tests__/email-templates-rendering\.spec\.ts)|packages/twenty-server/src/engine/core-modules/admin-panel/services/admin-panel-server-admin\.service\.ts|packages/twenty-server/src/engine/core-modules/approved-access-domain/services/approved-access-domain\.(service|spec)\.ts|packages/twenty-server/src/engine/core-modules/auth/services/(auth|reset-password)\.service\.ts|packages/twenty-server/src/engine/core-modules/billing/reminders/services/billing-reminder\.service\.ts|packages/twenty-server/src/engine/core-modules/email-verification/services/email-verification\.service\.ts|packages/twenty-server/src/engine/core-modules/workspace-invitation/services/workspace-invitation\.service\.ts|packages/twenty-server/src/engine/workspace-manager/workspace-cleaner/services/cleaner\.workspace-service\.ts)$'
 
+distribution_allowed='^(README\.md|docs/provenance/distribution-display-ledger\.md|packages/twenty-docker/.*|packages/twenty-docs/(README\.md|docs\.json|package\.json)|packages/twenty-codex-plugin/(README\.md|package\.json))$'
+
 git diff --name-only "$base" "$head" | while IFS= read -r path; do
-  [[ "$path" =~ $allowed || "$path" =~ $email_allowed ]] || { printf 'trajectory fixture rejected: %s\n' "$path" >&2; exit 1; }
+  [[ "$path" =~ $allowed || "$path" =~ $email_allowed || "$path" =~ $distribution_allowed ]] || { printf 'trajectory fixture rejected: %s\n' "$path" >&2; exit 1; }
 done
 
 assert_manual_only_workflow() {

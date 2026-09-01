@@ -1,24 +1,28 @@
-# Twenty Documentation
+# Mhoo documentation package (built on Twenty)
 
-Official documentation for Twenty CRM, powered by [Mintlify](https://mintlify.com).
+This package contains the inherited Twenty documentation surface used by the
+Mhoo distribution, powered by [Mintlify](https://mintlify.com). The package
+name and Nx target remain `twenty-docs` for compatibility.
 
 ## 🌐 Live Site
 
-Visit the documentation at [docs.twenty.com](https://docs.twenty.com)
+The public site at [docs.twenty.com](https://docs.twenty.com) is the upstream
+Twenty documentation destination. No Mhoo-owned public documentation URL is
+invented by this source overlay.
 
 ## 📚 Content
 
 This repository contains:
-- **User Guide** (46 pages) - Complete guide for Twenty users
+- **User Guide** (46 pages) - Complete guide for Twenty users, retained as upstream content
 - **Developers** (24 pages) - Technical documentation for developers
-- **Twenty UI** (25 pages) - UI component library documentation
+- **Twenty UI** (25 pages) - technical UI component library documentation
 
 ## 🚀 Local Development
 
 To run the documentation locally:
 
 ```bash
-# From the twenty monorepo root
+# From the Twenty monorepo root (technical repository name)
 npx nx run twenty-docs:dev
 ```
 
@@ -81,8 +85,8 @@ npx nx run twenty-docs:validate
 
 ## 🔗 Links
 
-- [Twenty Website](https://twenty.com)
-- [GitHub Repository](https://github.com/twentyhq/twenty)
+- [Upstream Twenty website](https://twenty.com)
+- [Upstream Twenty repository](https://github.com/twentyhq/twenty)
 - [Mintlify Documentation](https://mintlify.com/docs)
 
 ## 🤝 Contributing
@@ -96,4 +100,4 @@ To contribute to the documentation:
 
 ## 📄 License
 
-This documentation is part of the Twenty project and is licensed under [AGPL-3.0](../../LICENSE).
+This documentation remains part of the inherited Twenty project and is licensed under [AGPL-3.0](../../LICENSE).

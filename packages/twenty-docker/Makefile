@@ -1,4 +1,5 @@
-# Makefile for building and running Twenty CRM docker containers.
+# Makefile for building and running the Mhoo distribution Docker containers.
+# The target and local image names remain technical Twenty identifiers.
 # Set the tag and/or target build platform using make command-line variables assignments.
 #
 # Optional make variables:
@@ -21,7 +22,11 @@ prod-build:
 	@cd ../.. && docker build --target twenty -f ./packages/twenty-docker/twenty/Dockerfile --platform $(PLATFORM) --tag twenty:$(TAG) . && cd -
 
 prod-run:
-	@docker run -d -p 3000:3000 --name twenty twenty:$(TAG)
+	@docker run -d -p 3000:3000 --name twenty \
+		-e SERVER_URL=http://localhost:3000 \
+		-e PRODUCT_BRAND_PRESET=mhoo \
+		-e PRODUCT_BRAND_DEPLOYMENT_ORIGIN=http://localhost:3000 \
+		twenty:$(TAG)
 
 prod-postgres-run:
 	@docker run -d -p 5432:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres --name twenty-postgres twenty-postgres:$(TAG)

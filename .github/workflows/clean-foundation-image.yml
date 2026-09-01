@@ -28,5 +28,13 @@ jobs:
           tags: ghcr.io/mhoo-os/mhoo-twenty-next:${{ github.sha }}
           build-args: APP_VERSION=${{ github.sha }}
           labels: |
+            org.opencontainers.image.title=Mhoo built on Twenty
+            org.opencontainers.image.vendor=Mhoo
             org.opencontainers.image.source=https://github.com/mhoo-os/mhoo-twenty-next
             org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.description=Mhoo distribution image built from the governed Twenty v2.37.0 foundation.
+            org.opencontainers.image.upstream.source=https://github.com/twentyhq/twenty
+            org.opencontainers.image.upstream.version=v2.37.0
+            org.opencontainers.image.upstream.revision=6da524b8903ec16a3eeea4b2e4a5fb63dbfc1c58
+            org.opencontainers.image.upstream.tree=3ce4ef3eac3604ee52b6b8ee0f1a4766d7f533ca
+            org.opencontainers.image.licenses=AGPL-3.0

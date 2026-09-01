@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Compatibility installer retained from upstream Twenty. It downloads the
+# upstream compose assets and is not an Mhoo release or publication path.
+echo "ℹ️ This compatibility installer uses upstream Twenty Docker assets."
+
 echo "🔧 Checking dependencies..."
 if ! command -v docker &>/dev/null; then
   echo -e "\t❌ Docker is not installed or not in PATH. Please install Docker first.\n\t\tSee https://docs.docker.com/get-docker/"
