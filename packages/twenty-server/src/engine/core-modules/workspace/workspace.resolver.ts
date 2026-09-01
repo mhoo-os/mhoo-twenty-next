@@ -9,6 +9,10 @@ import { Args, Mutation, Parent, Query, ResolveField } from '@nestjs/graphql';
 
 import assert from 'assert';
 
+import {
+  resolveWorkspacePresentation,
+  type WorkspacePresentationContext,
+} from 'twenty-shared/branding';
 import { PermissionFlagType } from 'twenty-shared/constants';
 import { FeatureFlagKey, FileFolder } from 'twenty-shared/types';
 import { assertIsDefinedOrThrow, isDefined } from 'twenty-shared/utils';
@@ -35,6 +39,7 @@ import { FileUrlService } from 'src/engine/core-modules/file/file-url/file-url.s
 import { PreventNestToAutoLogGraphqlErrorsFilter } from 'src/engine/core-modules/graphql/filters/prevent-nest-to-auto-log-graphql-errors.filter';
 import { ResolverValidationPipe } from 'src/engine/core-modules/graphql/pipes/resolver-validation.pipe';
 import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
+import { ProductBrandResolverService } from 'src/engine/core-modules/twenty-config/services/product-brand-resolver.service';
 import { UserWorkspaceService } from 'src/engine/core-modules/user-workspace/user-workspace.service';
 import { ActivateWorkspaceInput } from 'src/engine/core-modules/workspace/dtos/activate-workspace-input';
 import {
@@ -91,6 +96,7 @@ export class WorkspaceResolver {
     private readonly workspaceDomainsService: WorkspaceDomainsService,
     private readonly userWorkspaceService: UserWorkspaceService,
     private readonly twentyConfigService: TwentyConfigService,
+    private readonly productBrandResolverService: ProductBrandResolverService,
     private readonly fileUrlService: FileUrlService,
     private readonly billingSubscriptionService: BillingSubscriptionService,
     private readonly featureFlagService: FeatureFlagService,
@@ -393,10 +399,15 @@ export class WorkspaceResolver {
       };
 
       if (!origin) {
+        const presentation = resolveWorkspacePresentation(
+          this.productBrandResolverService.resolve(),
+          { kind: 'global' },
+        );
+
         return {
           id: 'default-workspace',
-          logo: '',
-          displayName: 'Default Workspace',
+          logo: presentation.workspace.logoUrl,
+          displayName: presentation.workspace.name,
           workspaceUrls: {
             subdomainUrl: originHeader,
             customUrl: originHeader,
@@ -422,10 +433,22 @@ export class WorkspaceResolver {
         });
       }
 
+      const presentationContext: WorkspacePresentationContext = {
+        kind: 'resolved-workspace',
+        workspace: {
+          displayName: workspace.displayName,
+          logo: workspaceLogoWithToken || workspace.logo,
+        },
+      };
+      const presentation = resolveWorkspacePresentation(
+        this.productBrandResolverService.resolve(),
+        presentationContext,
+      );
+
       return {
         id: workspace.id,
-        logo: workspaceLogoWithToken,
-        displayName: workspace.displayName,
+        logo: presentation.workspace.logoUrl,
+        displayName: presentation.workspace.name,
         workspaceUrls: this.workspaceDomainsService.getWorkspaceUrls(workspace),
         authProviders: getAuthProvidersByWorkspace({
           workspace,
@@ -462,12 +485,22 @@ export class WorkspaceResolver {
             workspaceId: workspace.id,
             fileFolder: FileFolder.CorePicture,
           })
-        : (workspace.logo ?? '');
+        : workspace.logo;
+      const presentation = resolveWorkspacePresentation(
+        this.productBrandResolverService.resolve(),
+        {
+          kind: 'resolved-workspace',
+          workspace: {
+            displayName: workspace.displayName,
+            logo,
+          },
+        },
+      );
 
       return {
         id: workspace.id,
-        logo,
-        displayName: workspace.displayName,
+        logo: presentation.workspace.logoUrl,
+        displayName: presentation.workspace.name,
       };
     } catch (err) {
       workspaceGraphqlApiExceptionHandler(err);

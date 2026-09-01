@@ -60,5 +60,12 @@ Rebrand source paths authorized by the accepted MHO-153 contract:
 - `packages/twenty-client-sdk/src/metadata/generated/`
 - `packages/twenty-front/src/testing/mock-data/config.ts`
 
+Workspace presentation policy paths:
+
+- `packages/twenty-shared/src/branding/workspace-presentation.ts`
+- `packages/twenty-shared/src/branding/__tests__/brand-presets.test.ts`
+- `packages/twenty-server/src/engine/core-modules/workspace/workspace.resolver.ts`
+- `docs/provenance/workspace-presentation-policy.md`
+
 These paths authorize source-level branding work only. They do not authorize
 runtime deployment, publication, legal approval, or production mutation.
