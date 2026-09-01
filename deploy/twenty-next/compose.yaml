@@ -16,24 +16,47 @@ services:
       POSTGRES_DB: ${PG_DATABASE_NAME:-twenty}
     volumes: [db-data:/var/lib/postgresql/data]
     networks: [private]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${PG_DATABASE_USER} -d $${PG_DATABASE_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
   redis:
     image: redis:7
     command: redis-server --appendonly yes
     volumes: [redis-data:/data]
     networks: [private]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
   server:
     image: ${TWENTY_IMAGE:?set immutable TWENTY_IMAGE digest}
     environment: *twenty-environment
     ports: ["127.0.0.1:${TWENTY_NEXT_PORT:-3101}:3000"]
     volumes: [server-files:/app/packages/twenty-server/.local-storage]
-    depends_on: [db, redis]
+    depends_on:
+      db: {condition: service_healthy}
+      redis: {condition: service_healthy}
     networks: [private]
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://localhost:3000/healthz"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
   worker:
     image: ${TWENTY_IMAGE:?set immutable TWENTY_IMAGE digest}
-    command: [yarn, nx, run, twenty-server:worker]
-    environment: *twenty-environment
+    command: [yarn, worker:prod]
+    environment:
+      <<: *twenty-environment
+      DISABLE_DB_MIGRATIONS: "true"
+      DISABLE_CRON_JOBS_REGISTRATION: "true"
     volumes: [server-files:/app/packages/twenty-server/.local-storage]
-    depends_on: [db, redis]
+    depends_on:
+      db: {condition: service_healthy}
+      redis: {condition: service_healthy}
+      server: {condition: service_healthy}
     networks: [private]
 
 networks:
