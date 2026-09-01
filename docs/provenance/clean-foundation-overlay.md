@@ -46,6 +46,19 @@ Rebrand source paths authorized by the accepted MHO-153 contract:
 - `packages/twenty-server/src/engine/core-modules/twenty-config/twenty-config.module.ts`
 - `packages/twenty-server/src/engine/core-modules/twenty-config/services/product-brand-resolver.service.ts`
 - `packages/twenty-server/src/engine/core-modules/twenty-config/services/product-brand-resolver.service.spec.ts`
+- `packages/twenty-server/src/engine/core-modules/client-config/client-config.entity.ts`
+- `packages/twenty-server/src/engine/core-modules/client-config/client-config.controller.spec.ts`
+- `packages/twenty-server/src/engine/core-modules/client-config/services/client-config.service.ts`
+- `packages/twenty-front/src/modules/client-config/components/ClientConfigProviderEffect.tsx`
+- `packages/twenty-front/src/modules/client-config/components/__tests__/ClientConfigProviderEffect.test.tsx`
+- `packages/twenty-front/src/modules/client-config/hooks/useClientConfig.ts`
+- `packages/twenty-front/src/modules/client-config/hooks/__tests__/useClientConfig.test.tsx`
+- `packages/twenty-front/src/modules/client-config/states/brandState.ts`
+- `packages/twenty-front/src/modules/client-config/states/clientConfigApiStatusState.ts`
+- `packages/twenty-front/src/modules/client-config/types/ClientConfig.ts`
+- `packages/twenty-front/src/generated-metadata/graphql.ts`
+- `packages/twenty-client-sdk/src/metadata/generated/`
+- `packages/twenty-front/src/testing/mock-data/config.ts`
 
 Workspace presentation policy paths:
 

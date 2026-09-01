@@ -986,6 +986,7 @@ export type ClientConfig = {
   appVersion?: Maybe<Scalars['String']['output']>;
   authProviders: AuthProviders;
   billing: Billing;
+  brand: ClientConfigBrand;
   calendarBookingPageId?: Maybe<Scalars['String']['output']>;
   canManageFeatureFlags: Scalars['Boolean']['output'];
   captcha: Captcha;
@@ -1015,6 +1016,78 @@ export type ClientConfig = {
   sentry: Sentry;
   signInPrefilled: Scalars['Boolean']['output'];
   support: Support;
+};
+
+export type ClientConfigBrand = {
+  __typename?: 'ClientConfigBrand';
+  accessibility: ClientConfigBrandAccessibility;
+  assets: ClientConfigBrandAssetFamily;
+  attribution: ClientConfigBrandAttribution;
+  documentTitleTemplate: Scalars['String']['output'];
+  legal: ClientConfigBrandLegal;
+  preset: Scalars['String']['output'];
+  productName: Scalars['String']['output'];
+  productShortName: Scalars['String']['output'];
+  urls: ClientConfigBrandUrls;
+};
+
+export type ClientConfigBrandAccessibility = {
+  __typename?: 'ClientConfigBrandAccessibility';
+  contrastGuidance: Scalars['String']['output'];
+  logoAltText: Scalars['String']['output'];
+  minimumRenderedSize: Scalars['Float']['output'];
+  safeArea: Scalars['String']['output'];
+};
+
+export type ClientConfigBrandAsset = {
+  __typename?: 'ClientConfigBrandAsset';
+  dimensions: Array<Scalars['Float']['output']>;
+  maskable?: Maybe<Scalars['Boolean']['output']>;
+  mimeType: Scalars['String']['output'];
+  path: Scalars['String']['output'];
+  purpose: Scalars['String']['output'];
+};
+
+export type ClientConfigBrandAssetFamily = {
+  __typename?: 'ClientConfigBrandAssetFamily';
+  emailMark: ClientConfigBrandAsset;
+  favicon: ClientConfigBrandAsset;
+  monochrome?: Maybe<ClientConfigBrandAsset>;
+  productMark: ClientConfigBrandAsset;
+  pwaIcons: Array<ClientConfigBrandAsset>;
+  workspaceDefault: ClientConfigBrandAsset;
+};
+
+export type ClientConfigBrandAttribution = {
+  __typename?: 'ClientConfigBrandAttribution';
+  label: Scalars['String']['output'];
+  status: Scalars['String']['output'];
+  url?: Maybe<Scalars['String']['output']>;
+};
+
+export type ClientConfigBrandDocument = {
+  __typename?: 'ClientConfigBrandDocument';
+  status: Scalars['String']['output'];
+  url?: Maybe<Scalars['String']['output']>;
+};
+
+export type ClientConfigBrandLegal = {
+  __typename?: 'ClientConfigBrandLegal';
+  dpa: ClientConfigBrandDocument;
+  legalEntity: Scalars['String']['output'];
+  legalEntityStatus: Scalars['String']['output'];
+  privacy: ClientConfigBrandDocument;
+  senderDisplayName: Scalars['String']['output'];
+  terms: ClientConfigBrandDocument;
+};
+
+export type ClientConfigBrandUrls = {
+  __typename?: 'ClientConfigBrandUrls';
+  contactUrl: Scalars['String']['output'];
+  documentationUrl: Scalars['String']['output'];
+  statusUrl: Scalars['String']['output'];
+  supportUrl: Scalars['String']['output'];
+  websiteUrl: Scalars['String']['output'];
 };
 
 export type ClientConfigMaintenanceMode = {

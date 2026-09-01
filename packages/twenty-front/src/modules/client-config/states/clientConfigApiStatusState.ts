@@ -6,6 +6,7 @@ type ClientConfigApiStatus = {
   isLoading: boolean;
   isErrored: boolean;
   isSaved: boolean;
+  lastSuccessfulFetchAt?: number;
   error?: Error;
   data?: { clientConfig: ClientConfig };
 };
@@ -18,6 +19,7 @@ export const clientConfigApiStatusState =
       isLoading: false,
       isErrored: false,
       isSaved: false,
+      lastSuccessfulFetchAt: undefined,
       error: undefined,
       data: undefined,
     },

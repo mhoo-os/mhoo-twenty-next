@@ -6,6 +6,17 @@ import {
 } from '@nestjs/graphql';
 
 import { type AiSdkPackage } from 'twenty-shared/ai';
+import {
+  type BrandAccessibility,
+  type BrandAsset,
+  type BrandAssetFamily,
+  type BrandAttribution,
+  type BrandDocument,
+  type BrandDocumentStatus,
+  type LegalBrand,
+  type ResolvedBrand,
+  type ResolvedBrandUrlSet,
+} from 'twenty-shared/branding';
 import { FeatureFlagKey } from 'twenty-shared/types';
 
 import { SupportDriver } from 'src/engine/core-modules/twenty-config/interfaces/support.interface';
@@ -258,6 +269,150 @@ export class ClientConfigMaintenanceMode {
 }
 
 @ObjectType()
+export class ClientConfigBrandDocument implements BrandDocument {
+  @Field(() => String)
+  status: BrandDocumentStatus;
+
+  @Field(() => String, { nullable: true })
+  url: string | null;
+}
+
+@ObjectType()
+export class ClientConfigBrandAsset implements BrandAsset {
+  @Field(() => String)
+  path: string;
+
+  @Field(() => String)
+  mimeType: BrandAsset['mimeType'];
+
+  @Field(() => [Number])
+  dimensions: BrandAsset['dimensions'];
+
+  @Field(() => String)
+  purpose: string;
+
+  @Field(() => Boolean, { nullable: true })
+  maskable?: boolean;
+}
+
+@ObjectType()
+export class ClientConfigBrandAssetFamily implements BrandAssetFamily {
+  @Field(() => ClientConfigBrandAsset)
+  productMark: ClientConfigBrandAsset;
+
+  @Field(() => ClientConfigBrandAsset)
+  emailMark: ClientConfigBrandAsset;
+
+  @Field(() => ClientConfigBrandAsset)
+  favicon: ClientConfigBrandAsset;
+
+  @Field(() => [ClientConfigBrandAsset])
+  pwaIcons: readonly ClientConfigBrandAsset[];
+
+  @Field(() => ClientConfigBrandAsset)
+  workspaceDefault: ClientConfigBrandAsset;
+
+  @Field(() => ClientConfigBrandAsset, { nullable: true })
+  monochrome?: ClientConfigBrandAsset;
+}
+
+@ObjectType()
+export class ClientConfigBrandLegal implements LegalBrand {
+  @Field(() => String)
+  legalEntity: string;
+
+  @Field(() => String)
+  legalEntityStatus: BrandDocumentStatus;
+
+  @Field(() => String)
+  senderDisplayName: string;
+
+  @Field(() => ClientConfigBrandDocument)
+  privacy: ClientConfigBrandDocument;
+
+  @Field(() => ClientConfigBrandDocument)
+  terms: ClientConfigBrandDocument;
+
+  @Field(() => ClientConfigBrandDocument)
+  dpa: ClientConfigBrandDocument;
+}
+
+@ObjectType()
+export class ClientConfigBrandUrls implements ResolvedBrandUrlSet {
+  @Field(() => String)
+  websiteUrl: string;
+
+  @Field(() => String)
+  supportUrl: string;
+
+  @Field(() => String)
+  statusUrl: string;
+
+  @Field(() => String)
+  documentationUrl: string;
+
+  @Field(() => String)
+  contactUrl: string;
+}
+
+@ObjectType()
+export class ClientConfigBrandAttribution implements BrandAttribution {
+  @Field(() => String)
+  label: string;
+
+  @Field(() => String, { nullable: true })
+  url: string | null;
+
+  @Field(() => String)
+  status: BrandDocumentStatus;
+}
+
+@ObjectType()
+export class ClientConfigBrandAccessibility implements BrandAccessibility {
+  @Field(() => String)
+  logoAltText: string;
+
+  @Field(() => Number)
+  minimumRenderedSize: number;
+
+  @Field(() => String)
+  safeArea: string;
+
+  @Field(() => String)
+  contrastGuidance: string;
+}
+
+@ObjectType()
+export class ClientConfigBrand implements ResolvedBrand {
+  @Field(() => String)
+  preset: ResolvedBrand['preset'];
+
+  @Field(() => String)
+  productName: string;
+
+  @Field(() => String)
+  productShortName: string;
+
+  @Field(() => ClientConfigBrandLegal)
+  legal: ClientConfigBrandLegal;
+
+  @Field(() => ClientConfigBrandUrls)
+  urls: ClientConfigBrandUrls;
+
+  @Field(() => ClientConfigBrandAssetFamily)
+  assets: ClientConfigBrandAssetFamily;
+
+  @Field(() => String)
+  documentTitleTemplate: string;
+
+  @Field(() => ClientConfigBrandAttribution)
+  attribution: ClientConfigBrandAttribution;
+
+  @Field(() => ClientConfigBrandAccessibility)
+  accessibility: ClientConfigBrandAccessibility;
+}
+
+@ObjectType()
 export class ClientConfig {
   @Field(() => String, { nullable: true })
   appVersion?: string;
@@ -267,6 +422,9 @@ export class ClientConfig {
 
   @Field(() => Billing, { nullable: false })
   billing: Billing;
+
+  @Field(() => ClientConfigBrand)
+  brand: ClientConfigBrand;
 
   @Field(() => [ClientAiModelConfig])
   aiModels: ClientAiModelConfig[];
