@@ -57,6 +57,7 @@ Rebrand source paths authorized by the accepted MHO-153 contract:
 - `packages/twenty-front/src/modules/client-config/states/clientConfigApiStatusState.ts`
 - `packages/twenty-front/src/modules/client-config/types/ClientConfig.ts`
 - `packages/twenty-front/src/generated-metadata/graphql.ts`
+- `packages/twenty-client-sdk/src/metadata/generated/`
 - `packages/twenty-front/src/testing/mock-data/config.ts`
 
 These paths authorize source-level branding work only. They do not authorize
