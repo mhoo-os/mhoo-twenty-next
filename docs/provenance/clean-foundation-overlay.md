@@ -90,5 +90,19 @@ Workspace presentation policy paths:
 - `packages/twenty-server/src/engine/core-modules/workspace/workspace.resolver.ts`
 - `docs/provenance/workspace-presentation-policy.md`
 
+Auth, onboarding, and pre-auth presentation paths:
+
+- `docs/provenance/auth-onboarding-touchpoint-ledger.md`
+- `packages/twenty-front/src/locales/`
+- `packages/twenty-front/src/locales/generated/`
+- `packages/twenty-front/src/modules/auth/components/Logo.tsx`
+- `packages/twenty-front/src/modules/auth/sign-in-up/components/FooterNote.tsx`
+- `packages/twenty-front/src/modules/auth/sign-in-up/components/__tests__/FooterNote.test.tsx`
+- `packages/twenty-front/src/modules/onboarding/components/OnboardingHeader.tsx`
+- `packages/twenty-front/src/modules/onboarding/components/OnboardingPulsingLogo.tsx`
+- `packages/twenty-front/src/modules/onboarding/components/import-contacts/OnboardingImportPreviewSyncBadge.tsx`
+- `packages/twenty-front/src/pages/auth/SignInUp.tsx`
+- `packages/twenty-front/src/pages/not-found/NotFound.tsx`
+
 These paths authorize source-level branding work only. They do not authorize
 runtime deployment, publication, legal approval, or production mutation.

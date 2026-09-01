@@ -3378,10 +3378,11 @@ msgstr "Knap"
 msgid "by {author}"
 msgstr "af {author}"
 
-#. js-lingui-id: 8Pfllj
+#. js-lingui-id: vGW+VY
+#. placeholder {0}: brand.productName
 #: src/modules/auth/sign-in-up/components/FooterNote.tsx
-msgid "By using Twenty, you agree to the"
-msgstr "Ved at bruge Twenty accepterer du"
+msgid "By using {0}, you agree to the"
+msgstr ""
 
 #. js-lingui-id: Yx41df
 #: src/modules/auth/sign-in-up/components/FooterNote.tsx
@@ -11415,6 +11416,12 @@ msgstr "Ældre HS256-verificeringer på tværs af alle tokens"
 msgid "Legal"
 msgstr "Juridisk"
 
+#. js-lingui-id: OaVrtJ
+#: src/modules/auth/sign-in-up/components/FooterNote.tsx
+#: src/modules/auth/sign-in-up/components/FooterNote.tsx
+msgid "Legal documents are currently unavailable."
+msgstr ""
+
 #. js-lingui-id: nc/jNe
 #: src/pages/settings/legal/SettingsLegalDpaNew.tsx
 msgid "Legal entity name"
@@ -14667,10 +14674,11 @@ msgstr "Sidelayouts"
 msgid "Page name"
 msgstr "Sidenavn"
 
-#. js-lingui-id: NRvxzv
+#. js-lingui-id: skPhWs
+#. placeholder {0}: brand.productName
 #: src/pages/not-found/NotFound.tsx
-msgid "Page Not Found | Twenty"
-msgstr "Side ikke fundet | Twenty"
+msgid "Page Not Found | {0}"
+msgstr ""
 
 #. js-lingui-id: oIhFvf
 #: src/modules/side-panel/pages/email-block-settings/components/EmailPageStyleSection.tsx
@@ -16630,6 +16638,11 @@ msgstr "Rettigheder"
 #: src/pages/settings/ai/components/SettingsAgentLogsTab.tsx
 #: src/pages/settings/ai/SettingsAgentTurnDetail.tsx
 msgid "Score"
+msgstr ""
+
+#. js-lingui-id: oOi11l
+#: src/modules/ai/components/AiChatScrollToBottomButton.tsx
+msgid "Scroll to bottom"
 msgstr ""
 
 #. js-lingui-id: hJjXGo
@@ -21537,10 +21550,11 @@ msgstr ""
 msgid "Weight"
 msgstr "Vægt"
 
-#. js-lingui-id: nTuObL
+#. js-lingui-id: /Qpb88
+#. placeholder {0}: brand.productName
 #: src/pages/auth/SignInUp.tsx
-msgid "Welcome to Twenty"
-msgstr "Velkommen til Twenty"
+msgid "Welcome to {0}"
+msgstr ""
 
 #. js-lingui-id: t8ZvkC
 #: src/modules/onboarding/constants/WelcomeTitleMessage.ts

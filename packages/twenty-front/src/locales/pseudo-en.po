@@ -3373,9 +3373,10 @@ msgstr ""
 msgid "by {author}"
 msgstr ""
 
-#. js-lingui-id: 8Pfllj
+#. js-lingui-id: vGW+VY
+#. placeholder {0}: brand.productName
 #: src/modules/auth/sign-in-up/components/FooterNote.tsx
-msgid "By using Twenty, you agree to the"
+msgid "By using {0}, you agree to the"
 msgstr ""
 
 #. js-lingui-id: Yx41df
@@ -11387,6 +11388,12 @@ msgstr ""
 msgid "Legal"
 msgstr ""
 
+#. js-lingui-id: OaVrtJ
+#: src/modules/auth/sign-in-up/components/FooterNote.tsx
+#: src/modules/auth/sign-in-up/components/FooterNote.tsx
+msgid "Legal documents are currently unavailable."
+msgstr ""
+
 #. js-lingui-id: nc/jNe
 #: src/pages/settings/legal/SettingsLegalDpaNew.tsx
 msgid "Legal entity name"
@@ -14639,9 +14646,10 @@ msgstr ""
 msgid "Page name"
 msgstr ""
 
-#. js-lingui-id: NRvxzv
+#. js-lingui-id: skPhWs
+#. placeholder {0}: brand.productName
 #: src/pages/not-found/NotFound.tsx
-msgid "Page Not Found | Twenty"
+msgid "Page Not Found | {0}"
 msgstr ""
 
 #. js-lingui-id: oIhFvf
@@ -16602,6 +16610,11 @@ msgstr ""
 #: src/pages/settings/ai/components/SettingsAgentLogsTab.tsx
 #: src/pages/settings/ai/SettingsAgentTurnDetail.tsx
 msgid "Score"
+msgstr ""
+
+#. js-lingui-id: oOi11l
+#: src/modules/ai/components/AiChatScrollToBottomButton.tsx
+msgid "Scroll to bottom"
 msgstr ""
 
 #. js-lingui-id: hJjXGo
@@ -21477,9 +21490,10 @@ msgstr ""
 msgid "Weight"
 msgstr ""
 
-#. js-lingui-id: nTuObL
+#. js-lingui-id: /Qpb88
+#. placeholder {0}: brand.productName
 #: src/pages/auth/SignInUp.tsx
-msgid "Welcome to Twenty"
+msgid "Welcome to {0}"
 msgstr ""
 
 #. js-lingui-id: t8ZvkC

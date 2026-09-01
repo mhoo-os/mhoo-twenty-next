@@ -1,6 +1,10 @@
 import { styled } from '@linaria/react';
+import { MHO_BRAND } from 'twenty-shared/branding';
 import { IconArrowRight, IconGoogle, IconMicrosoft } from 'twenty-ui/icon';
 import { themeCssVariables, useTheme } from 'twenty-ui/theme-constants';
+
+import { brandState } from '@/client-config/states/brandState';
+import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 
 const SYNC_BADGE_LOGO_SIZE = 16;
 
@@ -28,7 +32,7 @@ const StyledDivider = styled.div`
   width: 1px;
 `;
 
-const StyledTwentyLogo = styled.img`
+const StyledProductLogo = styled.img`
   border-radius: ${themeCssVariables.border.radius.xs};
   height: ${SYNC_BADGE_LOGO_SIZE}px;
   width: ${SYNC_BADGE_LOGO_SIZE}px;
@@ -36,6 +40,7 @@ const StyledTwentyLogo = styled.img`
 
 export const OnboardingImportPreviewSyncBadge = () => {
   const theme = useTheme();
+  const brand = useAtomStateValue(brandState) ?? MHO_BRAND;
 
   return (
     <StyledBadge>
@@ -46,7 +51,10 @@ export const OnboardingImportPreviewSyncBadge = () => {
         size={theme.icon.size.md}
         color={themeCssVariables.font.color.tertiary}
       />
-      <StyledTwentyLogo src="/images/integrations/twenty-logo.svg" alt="" />
+      <StyledProductLogo
+        src={brand.assets.productMark.path}
+        alt={brand.accessibility.logoAltText}
+      />
     </StyledBadge>
   );
 };
