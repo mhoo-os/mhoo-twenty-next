@@ -24,3 +24,9 @@ Trajectory-eval paths:
 - `.agents/skills/pr-trajectory-audit/references/failure-patterns.md`
 - `.agents/skills/pr-trajectory-audit/scripts/exact-head-fixture.sh`
 - `.github/workflows/trajectory-eval.yml`
+
+Clean runtime paths:
+
+- `.github/workflows/clean-foundation-ci.yml`
+- `deploy/twenty-next/compose.yaml`
+- `deploy/twenty-next/env/validation.env.example`

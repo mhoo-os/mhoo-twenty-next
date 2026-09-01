@@ -1,0 +1,44 @@
+name: mhoo_twenty_next
+
+x-twenty-environment: &twenty-environment
+  PG_DATABASE_URL: postgres://${PG_DATABASE_USER:-twenty}:${PG_DATABASE_PASSWORD:?set PG_DATABASE_PASSWORD}@db:5432/${PG_DATABASE_NAME:-twenty}
+  REDIS_URL: redis://redis:6379
+  SERVER_URL: ${SERVER_URL:?set a non-production SERVER_URL}
+  ENCRYPTION_KEY: ${ENCRYPTION_KEY:?set a new ENCRYPTION_KEY}
+  STORAGE_TYPE: local
+
+services:
+  db:
+    image: postgres:18
+    environment:
+      POSTGRES_USER: ${PG_DATABASE_USER:-twenty}
+      POSTGRES_PASSWORD: ${PG_DATABASE_PASSWORD:?set PG_DATABASE_PASSWORD}
+      POSTGRES_DB: ${PG_DATABASE_NAME:-twenty}
+    volumes: [db-data:/var/lib/postgresql/data]
+    networks: [private]
+  redis:
+    image: redis:7
+    command: redis-server --appendonly yes
+    volumes: [redis-data:/data]
+    networks: [private]
+  server:
+    image: ${TWENTY_IMAGE:?set immutable TWENTY_IMAGE digest}
+    environment: *twenty-environment
+    ports: ["127.0.0.1:${TWENTY_NEXT_PORT:-3101}:3000"]
+    volumes: [server-files:/app/packages/twenty-server/.local-storage]
+    depends_on: [db, redis]
+    networks: [private]
+  worker:
+    image: ${TWENTY_IMAGE:?set immutable TWENTY_IMAGE digest}
+    command: [yarn, nx, run, twenty-server:worker]
+    environment: *twenty-environment
+    volumes: [server-files:/app/packages/twenty-server/.local-storage]
+    depends_on: [db, redis]
+    networks: [private]
+
+networks:
+  private: {}
+volumes:
+  db-data: {name: mhoo_twenty_next_db_20260901}
+  redis-data: {name: mhoo_twenty_next_redis_20260901}
+  server-files: {name: mhoo_twenty_next_files_20260901}

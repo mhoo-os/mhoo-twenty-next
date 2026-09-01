@@ -1,0 +1,25 @@
+name: Clean foundation CI
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  custody-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - run: corepack enable
+      - run: yarn install --immutable
+      - run: scripts/provenance/verify-source.sh
+      - run: npx nx build twenty-shared
+      - run: npx nx build twenty-server
+      - run: npx nx build twenty-front
+      - run: npx nx build twenty-sdk
+      - run: docker compose --env-file deploy/twenty-next/env/validation.env.example -f deploy/twenty-next/compose.yaml config --quiet
