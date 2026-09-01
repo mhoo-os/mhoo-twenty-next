@@ -1,5 +1,14 @@
 import { type TopicOptOutState } from 'src/engine/core-modules/emailing-domain/types/topic-opt-out-state.type';
+import { resolveEmailingPublicPageBrand } from 'src/engine/core-modules/emailing-domain/types/emailing-public-page-brand.type';
 import { buildUnsubscribePreferencesPage } from 'src/engine/core-modules/emailing-domain/utils/build-unsubscribe-preferences-page.util';
+import { resolveProductBrand } from 'src/engine/core-modules/twenty-config/services/product-brand-resolver.service';
+
+const brand = resolveEmailingPublicPageBrand(
+  resolveProductBrand({
+    preset: 'mhoo',
+    deploymentOrigin: 'https://mhoo.example',
+  }),
+);
 
 const buildPage = (topics: TopicOptOutState[]) =>
   buildUnsubscribePreferencesPage({
@@ -7,6 +16,7 @@ const buildPage = (topics: TopicOptOutState[]) =>
     topics,
     updatePath: '/unsubscribe/update',
     unsubscribeAllPath: '/unsubscribe/all',
+    brand,
   });
 
 describe('buildUnsubscribePreferencesPage', () => {
@@ -16,6 +26,9 @@ describe('buildUnsubscribePreferencesPage', () => {
 
       expect(page).toContain('>Unsubscribe</button>');
       expect(page).toContain('action="/unsubscribe/all"');
+      expect(page).toContain('>Mhoo</span>');
+      expect(page).toContain('Legal documents are currently unavailable.');
+      expect(page).not.toContain('twenty.com');
       expect(page.match(/<button/g)).toHaveLength(1);
     });
 
@@ -76,6 +89,7 @@ describe('buildUnsubscribePreferencesPage', () => {
       ],
       updatePath: '/unsubscribe/update',
       unsubscribeAllPath: '/unsubscribe/all',
+      brand,
     });
 
     expect(page).not.toContain('<script>');

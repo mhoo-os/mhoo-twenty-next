@@ -1,0 +1,52 @@
+import { resolveEmailingPublicPageBrand } from 'src/engine/core-modules/emailing-domain/types/emailing-public-page-brand.type';
+import {
+  buildEmailingPublicPageFooter,
+  buildEmailingPublicPageHeader,
+} from 'src/engine/core-modules/emailing-domain/utils/build-emailing-public-page-markup.util';
+import { resolveProductBrand } from 'src/engine/core-modules/twenty-config/services/product-brand-resolver.service';
+
+describe('emailing public page markup', () => {
+  it('escapes configurable brand values in attributes and text', () => {
+    const brand = resolveEmailingPublicPageBrand({
+      ...resolveProductBrand({
+        preset: 'mhoo',
+        deploymentOrigin: 'https://mhoo.example',
+      }),
+      productName: 'Mhoo <script>alert(1)</script>',
+      accessibility: {
+        ...resolveProductBrand({
+          preset: 'mhoo',
+          deploymentOrigin: 'https://mhoo.example',
+        }).accessibility,
+        logoAltText: '" onerror="alert(1)',
+      },
+    });
+
+    const header = buildEmailingPublicPageHeader(brand);
+    const footer = buildEmailingPublicPageFooter(brand);
+
+    expect(header).not.toContain('<script>');
+    expect(header).not.toContain('onerror="alert(1)"');
+    expect(footer).not.toContain('<script>');
+    expect(footer).toContain(
+      'Contact Mhoo &lt;script&gt;alert(1)&lt;/script&gt; support',
+    );
+  });
+
+  it('does not create links for unavailable legal documents', () => {
+    const brand = resolveEmailingPublicPageBrand(
+      resolveProductBrand({
+        preset: 'mhoo',
+        deploymentOrigin: 'https://mhoo.example',
+      }),
+    );
+
+    const footer = buildEmailingPublicPageFooter(brand);
+
+    expect(footer).toContain('Legal documents are currently unavailable.');
+    expect(footer).not.toContain('Privacy</a>');
+    expect(footer).not.toContain('Terms</a>');
+    expect(footer).not.toContain('DPA</a>');
+    expect(footer).not.toContain('twenty.com');
+  });
+});

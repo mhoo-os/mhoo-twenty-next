@@ -4,6 +4,8 @@ import { isNonEmptyString } from '@sniptt/guards';
 
 import { type EmailingDomainSendEmailInput } from 'src/engine/core-modules/emailing-domain/drivers/types/emailing-domain-send-email-input.type';
 import { UnsubscribeTokenService } from 'src/engine/core-modules/emailing-domain/services/unsubscribe-token.service';
+import { ProductBrandResolverService } from 'src/engine/core-modules/twenty-config/services/product-brand-resolver.service';
+import { resolveEmailingPublicPageBrand } from 'src/engine/core-modules/emailing-domain/types/emailing-public-page-brand.type';
 import { buildUnsubscribeHeaders } from 'src/engine/core-modules/emailing-domain/utils/build-unsubscribe-headers.util';
 import { appendHtmlFooter } from 'src/engine/core-modules/emailing-domain/utils/append-html-footer.util';
 import { buildUnsubscribeHtmlFooter } from 'src/engine/core-modules/emailing-domain/utils/build-unsubscribe-html-footer.util';
@@ -14,6 +16,7 @@ import { buildUnsubscribeUrls } from 'src/engine/core-modules/emailing-domain/ut
 export class UnsubscribeContentService {
   constructor(
     private readonly unsubscribeTokenService: UnsubscribeTokenService,
+    private readonly productBrandResolverService: ProductBrandResolverService,
   ) {}
 
   addTo(
@@ -37,14 +40,20 @@ export class UnsubscribeContentService {
       domain: email.domain,
       token,
     });
+    const brand = resolveEmailingPublicPageBrand(
+      this.productBrandResolverService.resolve(),
+    );
 
     return {
       ...email,
-      text: `${email.text}${buildUnsubscribeTextFooter(unsubscribeUrls.webUrl)}`,
+      text: `${email.text}${buildUnsubscribeTextFooter(
+        unsubscribeUrls.webUrl,
+        brand,
+      )}`,
       html: isNonEmptyString(email.html)
         ? appendHtmlFooter(
             email.html,
-            buildUnsubscribeHtmlFooter(unsubscribeUrls.webUrl),
+            buildUnsubscribeHtmlFooter(unsubscribeUrls.webUrl, brand),
           )
         : email.html,
       headers: [
