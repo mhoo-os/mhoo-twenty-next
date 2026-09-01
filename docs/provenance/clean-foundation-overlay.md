@@ -28,5 +28,6 @@ Trajectory-eval paths:
 Clean runtime paths:
 
 - `.github/workflows/clean-foundation-ci.yml`
+- `.github/workflows/clean-foundation-image.yml`
 - `deploy/twenty-next/compose.yaml`
 - `deploy/twenty-next/env/validation.env.example`
