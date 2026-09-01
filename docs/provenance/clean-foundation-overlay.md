@@ -182,5 +182,20 @@ Transactional email branding and sender identity paths:
 - `packages/twenty-server/src/engine/core-modules/workspace-invitation/services/workspace-invitation.service.ts`
 - `packages/twenty-server/src/engine/workspace-manager/workspace-cleaner/services/cleaner.workspace-service.ts`
 
+Server-public presentation paths:
+
+- `docs/provenance/server-public-presentation-ledger.md`
+- `packages/twenty-server/src/engine/core-modules/emailing-domain/services/unsubscribe-content.service.ts`
+- `packages/twenty-server/src/engine/core-modules/emailing-domain/types/emailing-public-page-brand.type.ts`
+- `packages/twenty-server/src/engine/core-modules/emailing-domain/types/__tests__/emailing-public-page-brand.type.spec.ts`
+- `packages/twenty-server/src/engine/core-modules/emailing-domain/utils/build-emailing-public-page-markup.util.ts`
+- `packages/twenty-server/src/engine/core-modules/emailing-domain/utils/__tests__/build-emailing-public-page-markup.util.spec.ts`
+- `packages/twenty-server/src/engine/core-modules/emailing-domain/utils/build-unsubscribe-html-footer.util.ts`
+- `packages/twenty-server/src/engine/core-modules/emailing-domain/utils/build-unsubscribe-preferences-page.util.ts`
+- `packages/twenty-server/src/engine/core-modules/emailing-domain/utils/__tests__/build-unsubscribe-preferences-page.util.spec.ts`
+- `packages/twenty-server/src/engine/core-modules/emailing-domain/utils/build-unsubscribe-result-page.util.ts`
+- `packages/twenty-server/src/engine/core-modules/emailing-domain/utils/build-unsubscribe-text-footer.util.ts`
+- `packages/twenty-server/src/modules/emailing/controllers/unsubscribe.controller.ts`
+
 These paths authorize source-level branding work only. They do not authorize
 runtime deployment, publication, legal approval, or production mutation.
