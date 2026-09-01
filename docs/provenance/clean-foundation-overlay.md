@@ -197,5 +197,12 @@ Server-public presentation paths:
 - `packages/twenty-server/src/engine/core-modules/emailing-domain/utils/build-unsubscribe-text-footer.util.ts`
 - `packages/twenty-server/src/modules/emailing/controllers/unsubscribe.controller.ts`
 
+Customer-brand residue gate paths:
+
+- `docs/provenance/brand-touchpoint-ledger.json`
+- `docs/provenance/brand-residue-gate.md`
+- `scripts/branding/`
+- `.github/workflows/ci-brand-residue.yml`
+
 These paths authorize source-level branding work only. They do not authorize
 runtime deployment, publication, legal approval, or production mutation.
