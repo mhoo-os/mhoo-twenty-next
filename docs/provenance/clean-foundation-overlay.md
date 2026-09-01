@@ -46,6 +46,18 @@ Rebrand source paths authorized by the accepted MHO-153 contract:
 - `packages/twenty-server/src/engine/core-modules/twenty-config/twenty-config.module.ts`
 - `packages/twenty-server/src/engine/core-modules/twenty-config/services/product-brand-resolver.service.ts`
 - `packages/twenty-server/src/engine/core-modules/twenty-config/services/product-brand-resolver.service.spec.ts`
+
+Browser shell paths:
+
+- `packages/twenty-front/index.html`
+- `packages/twenty-front/public/manifest.json`
+- `packages/twenty-front/src/modules/ui/utilities/page-title/components/PageTitle.tsx`
+- `packages/twenty-front/src/modules/ui/utilities/page-title/components/__tests__/PageTitle.test.ts`
+- `packages/twenty-front/src/modules/ui/utilities/page-favicon/components/PageFavicon.tsx`
+- `packages/twenty-front/src/modules/ui/utilities/page-favicon/components/__tests__/PageFavicon.test.ts`
+- `packages/twenty-front/src/utils/title-utils.ts`
+- `packages/twenty-front/src/utils/__tests__/title-utils.test.ts`
+- `docs/provenance/browser-shell-policy.md`
 - `packages/twenty-server/src/engine/core-modules/client-config/client-config.entity.ts`
 - `packages/twenty-server/src/engine/core-modules/client-config/client-config.controller.spec.ts`
 - `packages/twenty-server/src/engine/core-modules/client-config/services/client-config.service.ts`
