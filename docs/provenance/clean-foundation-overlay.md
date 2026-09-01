@@ -83,6 +83,12 @@ Browser shell paths:
 - `packages/twenty-front/src/modules/client-config/types/ClientConfig.ts`
 - `packages/twenty-front/src/generated-metadata/graphql.ts`
 - `packages/twenty-front/src/testing/mock-data/config.ts`
+Workspace presentation policy paths:
+
+- `packages/twenty-shared/src/branding/workspace-presentation.ts`
+- `packages/twenty-shared/src/branding/__tests__/brand-presets.test.ts`
+- `packages/twenty-server/src/engine/core-modules/workspace/workspace.resolver.ts`
+- `docs/provenance/workspace-presentation-policy.md`
 
 These paths authorize source-level branding work only. They do not authorize
 runtime deployment, publication, legal approval, or production mutation.

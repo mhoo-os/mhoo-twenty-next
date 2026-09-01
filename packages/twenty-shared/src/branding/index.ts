@@ -36,3 +36,8 @@ export type {
   BrandResolverInput,
 } from './brand.types';
 export { BRAND_PRESET_IDS, BRAND_DOCUMENT_STATUSES } from './brand.types';
+export type {
+  WorkspacePresentationContext,
+  WorkspacePresentation,
+} from './workspace-presentation';
+export { resolveWorkspacePresentation } from './workspace-presentation';
