@@ -78,6 +78,11 @@
       "import": "./dist/application.mjs",
       "require": "./dist/application.cjs"
     },
+    "./branding": {
+      "types": "./dist/branding/index.d.ts",
+      "import": "./dist/branding.mjs",
+      "require": "./dist/branding.cjs"
+    },
     "./constants": {
       "types": "./dist/constants/index.d.ts",
       "import": "./dist/constants.mjs",
@@ -148,6 +153,7 @@
     "dist",
     "ai",
     "application",
+    "branding",
     "constants",
     "database-events",
     "i18n",
@@ -169,6 +175,9 @@
       ],
       "application": [
         "dist/application/index.d.ts"
+      ],
+      "branding": [
+        "dist/branding/index.d.ts"
       ],
       "constants": [
         "dist/constants/index.d.ts"
