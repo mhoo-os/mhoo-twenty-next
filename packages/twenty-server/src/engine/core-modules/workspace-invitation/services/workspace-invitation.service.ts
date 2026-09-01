@@ -30,11 +30,13 @@ import {
 } from 'src/engine/core-modules/auth/auth.exception';
 import { WorkspaceDomainsService } from 'src/engine/core-modules/domain/workspace-domains/services/workspace-domains.service';
 import { EmailService } from 'src/engine/core-modules/email/email.service';
+import { buildEmailSender } from 'src/engine/core-modules/email/utils/build-email-sender';
 import { FileUrlService } from 'src/engine/core-modules/file/file-url/file-url.service';
 import { I18nService } from 'src/engine/core-modules/i18n/i18n.service';
 import { OnboardingService } from 'src/engine/core-modules/onboarding/onboarding.service';
 import { ThrottlerService } from 'src/engine/core-modules/throttler/throttler.service';
 import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
+import { ProductBrandResolverService } from 'src/engine/core-modules/twenty-config/services/product-brand-resolver.service';
 import { UserWorkspaceEntity } from 'src/engine/core-modules/user-workspace/user-workspace.entity';
 import { type SendInvitationsDTO } from 'src/engine/core-modules/workspace-invitation/dtos/send-invitations.dto';
 import { castAppTokenToWorkspaceInvitationUtil } from 'src/engine/core-modules/workspace-invitation/utils/cast-app-token-to-workspace-invitation.util';
@@ -56,6 +58,7 @@ export class WorkspaceInvitationService {
     private readonly userWorkspaceRepository: Repository<UserWorkspaceEntity>,
     private readonly roleValidationService: RoleValidationService,
     private readonly twentyConfigService: TwentyConfigService,
+    private readonly productBrandResolverService: ProductBrandResolverService,
     private readonly emailService: EmailService,
     private readonly onboardingService: OnboardingService,
     private readonly workspaceDomainsService: WorkspaceDomainsService,
@@ -381,6 +384,7 @@ export class WorkspaceInvitationService {
               fileFolder: FileFolder.CorePicture,
             })
           : undefined;
+        const brand = this.productBrandResolverService.resolve();
 
         const emailData = {
           link: link.toString(),
@@ -395,6 +399,7 @@ export class WorkspaceInvitationService {
           },
           serverUrl: this.twentyConfigService.get('SERVER_URL'),
           locale: sender.locale,
+          brand,
         };
 
         const emailTemplate = SendInviteLinkEmail(emailData);
@@ -403,12 +408,16 @@ export class WorkspaceInvitationService {
           plainText: true,
         });
 
-        const joinTeamMsg = msg`Join your team on Twenty`;
+        const joinTeamMsg = msg`Join your team on ${brand.productName}`;
         const i18n = this.i18nService.getI18nInstance(sender.locale);
         const subject = i18n._(joinTeamMsg);
 
         await this.emailService.send({
-          from: `${sender.name.firstName} ${sender.name.lastName} (via Twenty) <${this.twentyConfigService.get('EMAIL_FROM_ADDRESS')}>`,
+          from: buildEmailSender({
+            brand,
+            address: this.twentyConfigService.get('EMAIL_FROM_ADDRESS'),
+            senderName: `${sender.name.firstName} ${sender.name.lastName}`,
+          }),
           to: invitation.value.email,
           subject,
           text,

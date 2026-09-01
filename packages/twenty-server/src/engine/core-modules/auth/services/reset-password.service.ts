@@ -7,6 +7,7 @@ import { msg } from '@lingui/core/macro';
 import { addMilliseconds, differenceInMilliseconds } from 'date-fns';
 import ms from 'ms';
 import { PasswordResetLinkEmail, renderEmail } from 'twenty-emails';
+import { type ResolvedBrand } from 'twenty-shared/branding';
 import { type APP_LOCALES } from 'twenty-shared/translations';
 import { AppPath } from 'twenty-shared/types';
 import { getAppPath, isDefined } from 'twenty-shared/utils';
@@ -27,8 +28,10 @@ import { type PasswordResetToken } from 'src/engine/core-modules/auth/types/pass
 import { type PasswordResetTokenGenerationResult } from 'src/engine/core-modules/auth/types/password-reset-token-generation-result.type';
 import { WorkspaceDomainsService } from 'src/engine/core-modules/domain/workspace-domains/services/workspace-domains.service';
 import { EmailService } from 'src/engine/core-modules/email/email.service';
+import { buildEmailSender } from 'src/engine/core-modules/email/utils/build-email-sender';
 import { I18nService } from 'src/engine/core-modules/i18n/i18n.service';
 import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
+import { ProductBrandResolverService } from 'src/engine/core-modules/twenty-config/services/product-brand-resolver.service';
 import { UserService } from 'src/engine/core-modules/user/services/user.service';
 import { type UserEntity } from 'src/engine/core-modules/user/user.entity';
 import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
@@ -39,6 +42,7 @@ export class ResetPasswordService {
 
   constructor(
     private readonly twentyConfigService: TwentyConfigService,
+    private readonly productBrandResolverService: ProductBrandResolverService,
     private readonly workspaceDomainsService: WorkspaceDomainsService,
     @InjectRepository(WorkspaceEntity)
     private readonly workspaceRepository: Repository<WorkspaceEntity>,
@@ -225,7 +229,9 @@ export class ResetPasswordService {
       ),
       hasPassword,
       locale,
+      brand: this.productBrandResolverService.resolve(),
     };
+    const brand: ResolvedBrand = emailData.brand;
 
     const emailTemplate = PasswordResetLinkEmail(emailData);
 
@@ -239,9 +245,10 @@ export class ResetPasswordService {
     const subject = i18n._(subjectTemplate);
 
     await this.emailService.send({
-      from: `${this.twentyConfigService.get(
-        'EMAIL_FROM_NAME',
-      )} <${this.twentyConfigService.get('EMAIL_FROM_ADDRESS')}>`,
+      from: buildEmailSender({
+        brand,
+        address: this.twentyConfigService.get('EMAIL_FROM_ADDRESS'),
+      }),
       to: user.email,
       subject,
       text,

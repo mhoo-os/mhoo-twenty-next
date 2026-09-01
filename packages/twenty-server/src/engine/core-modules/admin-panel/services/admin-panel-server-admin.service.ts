@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { msg } from '@lingui/core/macro';
 import { isNonEmptyString } from '@sniptt/guards';
 import { ServerAdminAccessChangedEmail, renderEmail } from 'twenty-emails';
+import { type ResolvedBrand } from 'twenty-shared/branding';
 import { SOURCE_LOCALE } from 'twenty-shared/translations';
 import { isDefined } from 'twenty-shared/utils';
 import { Repository } from 'typeorm';
@@ -12,12 +13,14 @@ import { CoreEntityCacheService } from 'src/engine/core-entity-cache/services/co
 import { type ServerAdminDTO } from 'src/engine/core-modules/admin-panel/dtos/server-admin.dto';
 import { type AuthContextUser } from 'src/engine/core-modules/auth/types/auth-context.type';
 import { EmailService } from 'src/engine/core-modules/email/email.service';
+import { buildEmailSender } from 'src/engine/core-modules/email/utils/build-email-sender';
 import { EventLogEmitterService } from 'src/engine/core-modules/event-logs/emit/event-log-emitter.service';
 import { SERVER_ADMIN_ACCESS_CHANGED_EVENT } from 'src/engine/core-modules/event-logs/emit/events/workspace-event/server-admin/server-admin-access-changed';
 import { UserInputError } from 'src/engine/core-modules/graphql/utils/graphql-errors.util';
 import { I18nService } from 'src/engine/core-modules/i18n/i18n.service';
 import { NodeEnvironment } from 'src/engine/core-modules/twenty-config/interfaces/node-environment.interface';
 import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
+import { ProductBrandResolverService } from 'src/engine/core-modules/twenty-config/services/product-brand-resolver.service';
 import { TwoFactorAuthenticationService } from 'src/engine/core-modules/two-factor-authentication/two-factor-authentication.service';
 import { twoFactorAuthenticationMethodsValidator } from 'src/engine/core-modules/two-factor-authentication/two-factor-authentication.validation';
 import { UserWorkspaceEntity } from 'src/engine/core-modules/user-workspace/user-workspace.entity';
@@ -37,6 +40,7 @@ export class AdminPanelServerAdminService {
     private readonly emailService: EmailService,
     private readonly i18nService: I18nService,
     private readonly twentyConfigService: TwentyConfigService,
+    private readonly productBrandResolverService: ProductBrandResolverService,
     private readonly eventLogEmitterService: EventLogEmitterService,
   ) {}
 
@@ -225,7 +229,11 @@ export class AdminPanelServerAdminService {
       const actorName = `${actor.firstName} ${actor.lastName}`.trim();
       const targetName =
         `${targetUser.firstName} ${targetUser.lastName}`.trim();
-      const from = `${this.twentyConfigService.get('EMAIL_FROM_NAME')} <${this.twentyConfigService.get('EMAIL_FROM_ADDRESS')}>`;
+      const brand: ResolvedBrand = this.productBrandResolverService.resolve();
+      const from = buildEmailSender({
+        brand,
+        address: this.twentyConfigService.get('EMAIL_FROM_ADDRESS'),
+      });
 
       const recipientsByLocale = new Map<UserEntity['locale'], UserEntity[]>();
 
@@ -247,6 +255,7 @@ export class AdminPanelServerAdminService {
               canAccessFullAdminPanel: targetUser.canAccessFullAdminPanel,
               canImpersonate: targetUser.canImpersonate,
               locale,
+              brand,
             });
             const html = await renderEmail(emailTemplate, { pretty: true });
             const text = await renderEmail(emailTemplate, { plainText: true });

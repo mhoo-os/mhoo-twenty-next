@@ -7,6 +7,7 @@ import { msg } from '@lingui/core/macro';
 import { addMilliseconds } from 'date-fns';
 import ms from 'ms';
 import { PasswordUpdateNotifyEmail, renderEmail } from 'twenty-emails';
+import { type ResolvedBrand } from 'twenty-shared/branding';
 import { PermissionFlagType } from 'twenty-shared/constants';
 import { AppPath, ConnectedAccountProvider } from 'twenty-shared/types';
 import { isNonEmptyString } from '@sniptt/guards';
@@ -61,10 +62,12 @@ import { UserSessionRevokedReason } from 'src/engine/core-modules/user-session/t
 import { WorkspaceDomainsService } from 'src/engine/core-modules/domain/workspace-domains/services/workspace-domains.service';
 import { WorkspaceDomainConfig } from 'src/engine/core-modules/domain/workspace-domains/types/workspace-domain-config.type';
 import { EmailService } from 'src/engine/core-modules/email/email.service';
+import { buildEmailSender } from 'src/engine/core-modules/email/utils/build-email-sender';
 import { FeatureFlagService } from 'src/engine/core-modules/feature-flag/services/feature-flag.service';
 import { GuardRedirectService } from 'src/engine/core-modules/guard-redirect/services/guard-redirect.service';
 import { I18nService } from 'src/engine/core-modules/i18n/i18n.service';
 import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
+import { ProductBrandResolverService } from 'src/engine/core-modules/twenty-config/services/product-brand-resolver.service';
 import { UserWorkspaceService } from 'src/engine/core-modules/user-workspace/user-workspace.service';
 import { UserService } from 'src/engine/core-modules/user/services/user.service';
 import { UserEntity } from 'src/engine/core-modules/user/user.entity';
@@ -98,6 +101,7 @@ export class AuthService {
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
     private readonly twentyConfigService: TwentyConfigService,
+    private readonly productBrandResolverService: ProductBrandResolverService,
     private readonly emailService: EmailService,
     @InjectRepository(AppTokenEntity)
     private readonly appTokenRepository: Repository<AppTokenEntity>,
@@ -735,11 +739,13 @@ export class AuthService {
       reason: UserSessionRevokedReason.PasswordChanged,
     });
 
+    const brand: ResolvedBrand = this.productBrandResolverService.resolve();
     const emailTemplate = PasswordUpdateNotifyEmail({
       userName: `${user.firstName} ${user.lastName}`,
       email: user.email,
       link: this.domainServerConfigService.getBaseUrl().toString(),
       locale: firstUserWorkspace.locale,
+      brand,
     });
 
     const html = await renderEmail(emailTemplate, { pretty: true });
@@ -750,9 +756,10 @@ export class AuthService {
     const subject = i18n._(passwordChangedMsg);
 
     await this.emailService.send({
-      from: `${this.twentyConfigService.get(
-        'EMAIL_FROM_NAME',
-      )} <${this.twentyConfigService.get('EMAIL_FROM_ADDRESS')}>`,
+      from: buildEmailSender({
+        brand,
+        address: this.twentyConfigService.get('EMAIL_FROM_ADDRESS'),
+      }),
       to: user.email,
       subject,
       text,

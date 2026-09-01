@@ -5,6 +5,7 @@ import { msg } from '@lingui/core/macro';
 import { addMilliseconds, differenceInMilliseconds } from 'date-fns';
 import ms from 'ms';
 import { SendEmailVerificationLinkEmail, renderEmail } from 'twenty-emails';
+import { type ResolvedBrand } from 'twenty-shared/branding';
 import { type APP_LOCALES } from 'twenty-shared/translations';
 import { AppPath } from 'twenty-shared/types';
 import { assertIsDefinedOrThrow, isDefined } from 'twenty-shared/utils';
@@ -24,8 +25,10 @@ import {
   EmailVerificationExceptionCode,
 } from 'src/engine/core-modules/email-verification/email-verification.exception';
 import { EmailService } from 'src/engine/core-modules/email/email.service';
+import { buildEmailSender } from 'src/engine/core-modules/email/utils/build-email-sender';
 import { I18nService } from 'src/engine/core-modules/i18n/i18n.service';
 import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
+import { ProductBrandResolverService } from 'src/engine/core-modules/twenty-config/services/product-brand-resolver.service';
 import { UserEntity } from 'src/engine/core-modules/user/user.entity';
 
 @Injectable()
@@ -39,6 +42,7 @@ export class EmailVerificationService {
     private readonly domainsServerConfigService: DomainServerConfigService,
     private readonly emailService: EmailService,
     private readonly twentyConfigService: TwentyConfigService,
+    private readonly productBrandResolverService: ProductBrandResolverService,
     private readonly emailVerificationTokenService: EmailVerificationTokenService,
     private readonly i18nService: I18nService,
   ) {}
@@ -89,7 +93,9 @@ export class EmailVerificationService {
       locale,
       isEmailUpdate:
         verificationTrigger === EmailVerificationTrigger.EMAIL_UPDATE,
+      brand: this.productBrandResolverService.resolve(),
     };
+    const brand: ResolvedBrand = emailData.brand;
 
     const emailTemplate = SendEmailVerificationLinkEmail(emailData);
 
@@ -102,14 +108,15 @@ export class EmailVerificationService {
     const emailVerificationMsg =
       verificationTrigger === EmailVerificationTrigger.EMAIL_UPDATE
         ? msg`Please confirm your updated email`
-        : msg`Welcome to Twenty: Please Confirm Your Email`;
+        : msg`Welcome to ${brand.productName}: Please Confirm Your Email`;
     const i18n = this.i18nService.getI18nInstance(locale);
     const subject = i18n._(emailVerificationMsg);
 
     await this.emailService.send({
-      from: `${this.twentyConfigService.get(
-        'EMAIL_FROM_NAME',
-      )} <${this.twentyConfigService.get('EMAIL_FROM_ADDRESS')}>`,
+      from: buildEmailSender({
+        brand,
+        address: this.twentyConfigService.get('EMAIL_FROM_ADDRESS'),
+      }),
       to: email,
       subject,
       text,

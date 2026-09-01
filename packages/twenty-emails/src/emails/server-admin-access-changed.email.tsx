@@ -3,6 +3,8 @@ import { BaseEmail } from 'src/components/BaseEmail';
 import { MainText } from 'src/components/MainText';
 import { Title } from 'src/components/Title';
 import { createI18nInstance } from 'src/utils/i18n.utils';
+import { PREVIEW_BRAND } from 'src/utils/preview-brand';
+import { type ResolvedBrand } from 'twenty-shared/branding';
 import { type APP_LOCALES } from 'twenty-shared/translations';
 
 type ServerAdminAccessChangedEmailProps = {
@@ -12,6 +14,7 @@ type ServerAdminAccessChangedEmailProps = {
   canAccessFullAdminPanel: boolean;
   canImpersonate: boolean;
   locale: keyof typeof APP_LOCALES;
+  brand: ResolvedBrand;
 };
 
 export const ServerAdminAccessChangedEmail = ({
@@ -21,6 +24,7 @@ export const ServerAdminAccessChangedEmail = ({
   canAccessFullAdminPanel,
   canImpersonate,
   locale,
+  brand,
 }: ServerAdminAccessChangedEmailProps) => {
   const i18n = createI18nInstance(locale);
   const enabledLabel = i18n._('Enabled');
@@ -31,7 +35,7 @@ export const ServerAdminAccessChangedEmail = ({
   const impersonateStatus = canImpersonate ? enabledLabel : disabledLabel;
 
   return (
-    <BaseEmail locale={locale}>
+    <BaseEmail locale={locale} brand={brand}>
       <Title value={i18n._('Server administrator access changed')} />
       <MainText>
         <Trans
@@ -73,6 +77,7 @@ ServerAdminAccessChangedEmail.PreviewProps = {
   canAccessFullAdminPanel: true,
   canImpersonate: false,
   locale: 'en',
+  brand: PREVIEW_BRAND,
 } as ServerAdminAccessChangedEmailProps;
 
 export default ServerAdminAccessChangedEmail;
