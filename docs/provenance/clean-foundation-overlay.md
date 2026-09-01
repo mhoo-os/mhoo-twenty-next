@@ -32,3 +32,15 @@ Clean runtime paths:
 - `.github/workflows/clean-foundation-image.yml`
 - `deploy/twenty-next/compose.yaml`
 - `deploy/twenty-next/env/validation.env.example`
+
+Rebrand source paths authorized by the accepted MHO-153 contract:
+
+- `packages/twenty-front/public/images/mhoo/`
+- `packages/twenty-shared/src/branding/`
+- `packages/twenty-shared/package.json`
+- `packages/twenty-shared/project.json`
+- `scripts/generate_mhoo_assets.py`
+- `scripts/verify_mhoo_assets.py`
+
+These paths authorize source-level branding work only. They do not authorize
+runtime deployment, publication, legal approval, or production mutation.
