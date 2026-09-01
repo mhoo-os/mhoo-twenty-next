@@ -47,7 +47,6 @@ describe('brand presets', () => {
     expect(Object.isFrozen(MHO_BRAND.assets)).toBe(true);
     expect(Object.isFrozen(MHO_BRAND.assets.pwaIcons)).toBe(true);
   });
-
   it.each([
     {
       name: 'global signup',
