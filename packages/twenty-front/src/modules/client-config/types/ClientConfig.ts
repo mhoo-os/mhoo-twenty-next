@@ -10,6 +10,7 @@ import {
   type Support,
 } from '~/generated-metadata/graphql';
 import { type EnterpriseInstanceType } from 'twenty-shared/constants';
+import { type ResolvedBrand } from 'twenty-shared/branding';
 import { type OnboardingConfig } from '@/client-config/types/OnboardingConfig';
 
 export type ClientConfig = {
@@ -19,6 +20,7 @@ export type ClientConfig = {
   api: ApiConfig;
   authProviders: AuthProviders;
   billing: Billing;
+  brand: ResolvedBrand;
   calendarBookingPageId?: string;
   isBookCallOnboardingStepEnabled: boolean;
   isCompanyEnrichmentEnabled: boolean;

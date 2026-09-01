@@ -31,6 +31,7 @@ import { labPublicFeatureFlagsState } from '@/client-config/states/labPublicFeat
 import { sentryConfigState } from '@/client-config/states/sentryConfigState';
 import { supportChatState } from '@/client-config/states/supportChatState';
 import { type ClientConfig } from '@/client-config/types/ClientConfig';
+import { brandState } from '@/client-config/states/brandState';
 import { domainConfigurationState } from '@/domain-manager/states/domainConfigurationState';
 import { useCallback } from 'react';
 import { clientConfigApiStatusState } from '@/client-config/states/clientConfigApiStatusState';
@@ -50,6 +51,7 @@ type UseClientConfigResult = {
 
 export const useClientConfig = (): UseClientConfigResult => {
   const setIsAnalyticsEnabled = useSetAtomState(isAnalyticsEnabledState);
+  const setBrand = useSetAtomState(brandState);
   const setDomainConfiguration = useSetAtomState(domainConfigurationState);
   const setAuthProviders = useSetAtomState(authProvidersState);
   const setAiModels = useSetAtomState(aiModelsState);
@@ -150,6 +152,8 @@ export const useClientConfig = (): UseClientConfigResult => {
   const setAppVersion = useSetAtomState(appVersionState);
 
   const fetchClientConfig = useCallback(async () => {
+    if (clientConfigApiStatus.isLoading) return;
+
     setClientConfigApiStatus((prev) => ({
       ...prev,
       isLoading: true,
@@ -163,8 +167,10 @@ export const useClientConfig = (): UseClientConfigResult => {
         isLoadedOnce: true,
         isErrored: false,
         error: undefined,
+        lastSuccessfulFetchAt: Date.now(),
         data: { clientConfig },
       }));
+      setBrand(clientConfig.brand);
       setClientConfigApiStatus((currentStatus) => ({
         ...currentStatus,
         isErrored: false,
@@ -258,6 +264,8 @@ export const useClientConfig = (): UseClientConfigResult => {
     }
   }, [
     setAiModels,
+    setBrand,
+    clientConfigApiStatus.isLoading,
     setApiConfig,
     setOnboardingConfig,
     setAppVersion,

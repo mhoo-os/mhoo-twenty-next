@@ -1,5 +1,17 @@
 import { type ClientConfig } from '@/client-config/types/ClientConfig';
 import { CaptchaDriverType, SupportDriver } from '~/generated-metadata/graphql';
+import { MHO_BRAND, type ResolvedBrand } from 'twenty-shared/branding';
+
+const mockedBrand: ResolvedBrand = {
+  ...MHO_BRAND,
+  urls: {
+    websiteUrl: 'http://localhost:3000/',
+    supportUrl: 'http://localhost:3000/support',
+    statusUrl: 'http://localhost:3000/status',
+    documentationUrl: 'http://localhost:3000/docs',
+    contactUrl: 'http://localhost:3000/contact',
+  },
+};
 
 export const mockedClientConfig: ClientConfig = {
   aiModels: [],
@@ -39,6 +51,7 @@ export const mockedClientConfig: ClientConfig = {
       },
     ],
   },
+  brand: mockedBrand,
   captcha: {
     provider: CaptchaDriverType.GOOGLE_RECAPTCHA,
     siteKey: 'MOCKED_SITE_KEY',
