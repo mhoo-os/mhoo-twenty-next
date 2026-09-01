@@ -542,6 +542,10 @@ def ico_dimensions(data: bytes) -> list[tuple[int, int]] | None:
 
 def scan_assets(root: Path) -> list[dict[str, Any]]:
     violations: list[dict[str, Any]] = []
+    expected_mime_by_suffix = {
+        ".ico": "image/x-icon",
+        ".png": "image/png",
+    }
     manifest_path = root / "packages/twenty-front/public/images/mhoo/asset-manifest.json"
     if not manifest_path.is_file():
         return [contract_violation(manifest_path.as_posix(), "missing", "Mhoo asset manifest")]
@@ -575,6 +579,9 @@ def scan_assets(root: Path) -> list[dict[str, Any]]:
             violations.append(contract_violation(path.as_posix(), "asset SHA-256 mismatch", "manifest-custodied asset bytes"))
         if asset.get("source_sha256") != source.get("sha256"):
             violations.append(contract_violation(manifest_path.as_posix(), f"source mismatch for {relative}", "all derivatives point to the custodied source"))
+        expected_mime = expected_mime_by_suffix.get(path.suffix.lower())
+        if asset.get("mime_type") != expected_mime:
+            violations.append(contract_violation(path.as_posix(), f"manifest MIME type {asset.get('mime_type')}", f"{expected_mime} for {path.suffix.lower()}"))
         dimensions = ico_dimensions(data) if path.suffix.lower() == ".ico" else png_dimensions(data)
         expected_dimensions = asset.get("dimensions")
         if expected_dimensions and isinstance(expected_dimensions[0], list):
