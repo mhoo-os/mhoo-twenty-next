@@ -14,6 +14,7 @@ import { isNonEmptyString } from '@sniptt/guards';
 import { ApiPath } from 'twenty-shared/types';
 
 import { UnsubscribeTokenService } from 'src/engine/core-modules/emailing-domain/services/unsubscribe-token.service';
+import { resolveEmailingPublicPageBrand } from 'src/engine/core-modules/emailing-domain/types/emailing-public-page-brand.type';
 import { MessageSuppressionReason } from 'src/engine/core-modules/emailing-domain/types/message-suppression-reason.type';
 import { MessageSuppressionSource } from 'src/engine/core-modules/emailing-domain/types/message-suppression-source.type';
 import { type UnsubscribeTokenPayload } from 'src/engine/core-modules/emailing-domain/types/unsubscribe-token-payload.type';
@@ -21,6 +22,7 @@ import { buildUnsubscribePreferencesPage } from 'src/engine/core-modules/emailin
 import { buildUnsubscribeResultPage } from 'src/engine/core-modules/emailing-domain/utils/build-unsubscribe-result-page.util';
 import { NoPermissionGuard } from 'src/engine/guards/no-permission.guard';
 import { PublicEndpointGuard } from 'src/engine/guards/public-endpoint.guard';
+import { ProductBrandResolverService } from 'src/engine/core-modules/twenty-config/services/product-brand-resolver.service';
 import { MessageSuppressionService } from 'src/modules/emailing/services/message-suppression.service';
 
 const UNSUBSCRIBE_TOKEN_FORMAT = /^[A-Za-z0-9_-]{1,1024}$/;
@@ -29,11 +31,6 @@ const UPDATE_PREFERENCES_PATH = `/${ApiPath.Emailing}/unsubscribe/preferences`;
 const UNSUBSCRIBE_ALL_PATH = `/${ApiPath.Emailing}/unsubscribe/all`;
 
 const HTML_CONTENT_TYPE = 'text/html; charset=utf-8';
-
-const PREVIEW_RESULT_PAGE = buildUnsubscribeResultPage(
-  'Preview',
-  'This is a preview — no changes were saved.',
-);
 
 type UnsubscribeFormBody = {
   t?: string;
@@ -46,6 +43,7 @@ export class UnsubscribeController {
   constructor(
     private readonly unsubscribeTokenService: UnsubscribeTokenService,
     private readonly messageSuppressionService: MessageSuppressionService,
+    private readonly productBrandResolverService: ProductBrandResolverService,
   ) {}
 
   @Post()
@@ -76,11 +74,16 @@ export class UnsubscribeController {
       emailAddress: payload.emailAddress,
     });
 
+    const brand = resolveEmailingPublicPageBrand(
+      this.productBrandResolverService.resolve(),
+    );
+
     return buildUnsubscribePreferencesPage({
       token,
       topics,
       updatePath: UPDATE_PREFERENCES_PATH,
       unsubscribeAllPath: UNSUBSCRIBE_ALL_PATH,
+      brand,
     });
   }
 
@@ -92,7 +95,13 @@ export class UnsubscribeController {
     const payload = this.verifyTokenOrThrow(body.t);
 
     if (payload.preview === true) {
-      return PREVIEW_RESULT_PAGE;
+      return buildUnsubscribeResultPage({
+        title: 'Preview',
+        message: 'This is a preview — no changes were saved.',
+        brand: resolveEmailingPublicPageBrand(
+          this.productBrandResolverService.resolve(),
+        ),
+      });
     }
 
     await this.messageSuppressionService.setTopicOptOuts({
@@ -101,10 +110,13 @@ export class UnsubscribeController {
       keptTopicIds: this.normalizeTopicIds(body.unsubscribeTopicId),
     });
 
-    return buildUnsubscribeResultPage(
-      'Preferences updated',
-      'Your email preferences have been saved.',
-    );
+    return buildUnsubscribeResultPage({
+      title: 'Preferences updated',
+      message: 'Your email preferences have been saved.',
+      brand: resolveEmailingPublicPageBrand(
+        this.productBrandResolverService.resolve(),
+      ),
+    });
   }
 
   @Post('all')
@@ -115,7 +127,13 @@ export class UnsubscribeController {
     const payload = this.verifyTokenOrThrow(body.t);
 
     if (payload.preview === true) {
-      return PREVIEW_RESULT_PAGE;
+      return buildUnsubscribeResultPage({
+        title: 'Preview',
+        message: 'This is a preview — no changes were saved.',
+        brand: resolveEmailingPublicPageBrand(
+          this.productBrandResolverService.resolve(),
+        ),
+      });
     }
 
     await this.messageSuppressionService.suppress({
@@ -125,10 +143,13 @@ export class UnsubscribeController {
       source: MessageSuppressionSource.SYSTEM,
     });
 
-    return buildUnsubscribeResultPage(
-      'You have been unsubscribed',
-      'You will no longer receive marketing emails from this sender.',
-    );
+    return buildUnsubscribeResultPage({
+      title: 'You have been unsubscribed',
+      message: 'You will no longer receive marketing emails from this sender.',
+      brand: resolveEmailingPublicPageBrand(
+        this.productBrandResolverService.resolve(),
+      ),
+    });
   }
 
   private normalizeTopicIds(
