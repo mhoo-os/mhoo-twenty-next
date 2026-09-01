@@ -60,6 +60,29 @@ Rebrand source paths authorized by the accepted MHO-153 contract:
 - `packages/twenty-client-sdk/src/metadata/generated/`
 - `packages/twenty-front/src/testing/mock-data/config.ts`
 
+Browser shell paths:
+
+- `packages/twenty-front/index.html`
+- `packages/twenty-front/public/manifest.json`
+- `packages/twenty-front/src/modules/ui/utilities/page-title/components/PageTitle.tsx`
+- `packages/twenty-front/src/modules/ui/utilities/page-title/components/__tests__/PageTitle.test.ts`
+- `packages/twenty-front/src/modules/ui/utilities/page-favicon/components/PageFavicon.tsx`
+- `packages/twenty-front/src/modules/ui/utilities/page-favicon/components/__tests__/PageFavicon.test.ts`
+- `packages/twenty-front/src/utils/title-utils.ts`
+- `packages/twenty-front/src/utils/__tests__/title-utils.test.ts`
+- `docs/provenance/browser-shell-policy.md`
+- `packages/twenty-server/src/engine/core-modules/client-config/client-config.entity.ts`
+- `packages/twenty-server/src/engine/core-modules/client-config/client-config.controller.spec.ts`
+- `packages/twenty-server/src/engine/core-modules/client-config/services/client-config.service.ts`
+- `packages/twenty-front/src/modules/client-config/components/ClientConfigProviderEffect.tsx`
+- `packages/twenty-front/src/modules/client-config/components/__tests__/ClientConfigProviderEffect.test.tsx`
+- `packages/twenty-front/src/modules/client-config/hooks/useClientConfig.ts`
+- `packages/twenty-front/src/modules/client-config/hooks/__tests__/useClientConfig.test.tsx`
+- `packages/twenty-front/src/modules/client-config/states/brandState.ts`
+- `packages/twenty-front/src/modules/client-config/states/clientConfigApiStatusState.ts`
+- `packages/twenty-front/src/modules/client-config/types/ClientConfig.ts`
+- `packages/twenty-front/src/generated-metadata/graphql.ts`
+- `packages/twenty-front/src/testing/mock-data/config.ts`
 Workspace presentation policy paths:
 
 - `packages/twenty-shared/src/branding/workspace-presentation.ts`
