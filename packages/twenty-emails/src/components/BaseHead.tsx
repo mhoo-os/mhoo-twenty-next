@@ -1,11 +1,14 @@
 import { Font, Head } from 'react-email';
 
 import { canvasTheme } from 'src/common-style';
+import { type ResolvedBrand } from 'twenty-shared/branding';
 
-export const BaseHead = () => {
+export const BaseHead = ({ brand }: { brand: ResolvedBrand }) => {
+  const title = `${brand.productName} email`;
+
   return (
     <Head>
-      <title>Twenty email</title>
+      <title>{title}</title>
       <Font
         fontFamily={canvasTheme.font.family}
         fallbackFontFamily="sans-serif"

@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 import { msg } from '@lingui/core/macro';
 import { SendApprovedAccessDomainValidation, renderEmail } from 'twenty-emails';
+import { type ResolvedBrand } from 'twenty-shared/branding';
 import { FileFolder, SettingsPath } from 'twenty-shared/types';
 import { getSettingsPath, isDefined } from 'twenty-shared/utils';
 import { Repository } from 'typeorm';
@@ -19,11 +20,13 @@ import { type ApprovedAccessDomainJwtPayload } from 'src/engine/core-modules/aut
 import { JwtTokenTypeEnum } from 'src/engine/core-modules/auth/types/jwt-token-type.enum';
 import { WorkspaceDomainsService } from 'src/engine/core-modules/domain/workspace-domains/services/workspace-domains.service';
 import { EmailService } from 'src/engine/core-modules/email/email.service';
+import { buildEmailSender } from 'src/engine/core-modules/email/utils/build-email-sender';
 import { FileUrlService } from 'src/engine/core-modules/file/file-url/file-url.service';
 import { JwtWrapperService } from 'src/engine/core-modules/jwt/services/jwt-wrapper.service';
 import { decodeJwtHeader } from 'src/engine/core-modules/jwt/utils/decode-jwt-header.util';
 import { isAsymmetricJwtHeader } from 'src/engine/core-modules/jwt/utils/is-asymmetric-jwt-header.util';
 import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
+import { ProductBrandResolverService } from 'src/engine/core-modules/twenty-config/services/product-brand-resolver.service';
 import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
 import { WorkspaceMemberWorkspaceEntity } from 'src/modules/workspace-member/standard-objects/workspace-member.workspace-entity';
 import { getDomainFromEmail } from 'src/utils/get-domain-from-email';
@@ -44,6 +47,7 @@ export class ApprovedAccessDomainService {
     private readonly approvedAccessDomainRepositoryUnscoped: Repository<ApprovedAccessDomainEntity>,
     private readonly emailService: EmailService,
     private readonly twentyConfigService: TwentyConfigService,
+    private readonly productBrandResolverService: ProductBrandResolverService,
     private readonly fileUrlService: FileUrlService,
     private readonly workspaceDomainsService: WorkspaceDomainsService,
     private readonly jwtWrapperService: JwtWrapperService,
@@ -100,6 +104,7 @@ export class ApprovedAccessDomainService {
         })
       : undefined;
 
+    const brand: ResolvedBrand = this.productBrandResolverService.resolve();
     const emailTemplate = SendApprovedAccessDomainValidation({
       link: link.toString(),
       workspace: {
@@ -114,6 +119,7 @@ export class ApprovedAccessDomainService {
       },
       serverUrl: this.twentyConfigService.get('SERVER_URL'),
       locale: sender.locale,
+      brand,
     });
     const html = await renderEmail(emailTemplate);
     const text = await renderEmail(emailTemplate, {
@@ -121,7 +127,11 @@ export class ApprovedAccessDomainService {
     });
 
     await this.emailService.send({
-      from: `${sender.name.firstName} ${sender.name.lastName} (via Twenty) <${this.twentyConfigService.get('EMAIL_FROM_ADDRESS')}>`,
+      from: buildEmailSender({
+        brand,
+        address: this.twentyConfigService.get('EMAIL_FROM_ADDRESS'),
+        senderName: `${sender.name.firstName} ${sender.name.lastName}`,
+      }),
       to,
       subject: 'Approve your access domain',
       text,

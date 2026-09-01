@@ -9,9 +9,11 @@ import { HighlightedText } from 'src/components/HighlightedText';
 import { Link } from 'src/components/Link';
 import { MainText } from 'src/components/MainText';
 import { Title } from 'src/components/Title';
-import { WhatIsTwenty } from 'src/components/WhatIsTwenty';
+import { WhatIsProduct } from 'src/components/WhatIsTwenty';
 import { capitalize } from 'src/utils/capitalize';
 import { createI18nInstance } from 'src/utils/i18n.utils';
+import { PREVIEW_BRAND } from 'src/utils/preview-brand';
+import { type ResolvedBrand } from 'twenty-shared/branding';
 import { type APP_LOCALES } from 'twenty-shared/translations';
 import { getImageAbsoluteURI } from 'twenty-shared/utils';
 
@@ -25,6 +27,7 @@ type SendInviteLinkEmailProps = {
   };
   serverUrl: string;
   locale: keyof typeof APP_LOCALES;
+  brand: ResolvedBrand;
 };
 
 export const SendInviteLinkEmail = ({
@@ -33,6 +36,7 @@ export const SendInviteLinkEmail = ({
   sender,
   serverUrl,
   locale,
+  brand,
 }: SendInviteLinkEmailProps) => {
   const i18n = createI18nInstance(locale);
   const workspaceLogo = workspace.logo
@@ -44,8 +48,15 @@ export const SendInviteLinkEmail = ({
   const workspaceName = workspace.name;
 
   return (
-    <BaseEmail width={333} locale={locale}>
-      <Title value={i18n._('Join your team on Twenty')} />
+    <BaseEmail width={333} locale={locale} brand={brand}>
+      <Title
+        value={
+          <Trans
+            id="Join your team on {productName}"
+            values={{ productName: brand.productName }}
+          />
+        }
+      />
       <MainText>
         <Trans
           id="{senderName} (<0>{senderEmail}</0>) has invited you to join a workspace called <1>{workspaceName}</1>."
@@ -77,7 +88,7 @@ export const SendInviteLinkEmail = ({
         {workspace.name ? <HighlightedText value={workspace.name} /> : <></>}
         <CallToAction href={link} value={i18n._('Accept invite')} />
       </HighlightedContainer>
-      <WhatIsTwenty i18n={i18n} />
+      <WhatIsProduct i18n={i18n} brand={brand} />
     </BaseEmail>
   );
 };
@@ -91,6 +102,7 @@ SendInviteLinkEmail.PreviewProps = {
   sender: { email: 'john.doe@example.com', firstName: 'John', lastName: 'Doe' },
   serverUrl: 'https://app.twenty.com',
   locale: 'en',
+  brand: PREVIEW_BRAND,
 } as SendInviteLinkEmailProps;
 
 export default SendInviteLinkEmail;

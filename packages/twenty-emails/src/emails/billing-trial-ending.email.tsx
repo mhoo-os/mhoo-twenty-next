@@ -4,6 +4,8 @@ import { CallToAction } from 'src/components/CallToAction';
 import { MainText } from 'src/components/MainText';
 import { Title } from 'src/components/Title';
 import { createI18nInstance } from 'src/utils/i18n.utils';
+import { PREVIEW_BRAND } from 'src/utils/preview-brand';
+import { type ResolvedBrand } from 'twenty-shared/branding';
 import { type APP_LOCALES } from 'twenty-shared/translations';
 
 type BillingTrialEndingEmailProps = {
@@ -13,6 +15,7 @@ type BillingTrialEndingEmailProps = {
   dataRetentionDays: number;
   link: string;
   locale: keyof typeof APP_LOCALES;
+  brand: ResolvedBrand;
 };
 
 // Sent the day before a trial WITHOUT a credit card ends. Goal: get the user to
@@ -25,6 +28,7 @@ export const BillingTrialEndingEmail = ({
   dataRetentionDays,
   link,
   locale,
+  brand,
 }: BillingTrialEndingEmailProps) => {
   const i18n = createI18nInstance(locale);
   const formattedDate = i18n.date(trialEndsAt, {
@@ -34,7 +38,7 @@ export const BillingTrialEndingEmail = ({
   });
 
   return (
-    <BaseEmail width={333} locale={locale}>
+    <BaseEmail width={333} locale={locale} brand={brand}>
       <Title value={i18n._('Your trial is ending soon')} />
       <MainText>
         {userName?.length > 1 ? (
@@ -74,6 +78,7 @@ BillingTrialEndingEmail.PreviewProps = {
   dataRetentionDays: 14,
   link: 'https://acme.twenty.com/settings/billing',
   locale: 'en',
+  brand: PREVIEW_BRAND,
 } as BillingTrialEndingEmailProps;
 
 export default BillingTrialEndingEmail;

@@ -9,9 +9,11 @@ import { HighlightedText } from 'src/components/HighlightedText';
 import { Link } from 'src/components/Link';
 import { MainText } from 'src/components/MainText';
 import { Title } from 'src/components/Title';
-import { DEFAULT_WORKSPACE_LOGO } from 'src/constants/DefaultWorkspaceLogo';
 import { capitalize } from 'src/utils/capitalize';
+import { getBrandAssetUrl } from 'src/utils/brand';
 import { createI18nInstance } from 'src/utils/i18n.utils';
+import { PREVIEW_BRAND } from 'src/utils/preview-brand';
+import { type ResolvedBrand } from 'twenty-shared/branding';
 import { type APP_LOCALES } from 'twenty-shared/translations';
 import { getImageAbsoluteURI } from 'twenty-shared/utils';
 
@@ -26,6 +28,7 @@ type SendApprovedAccessDomainValidationProps = {
   };
   serverUrl: string;
   locale: keyof typeof APP_LOCALES;
+  brand: ResolvedBrand;
 };
 
 export const SendApprovedAccessDomainValidation = ({
@@ -35,6 +38,7 @@ export const SendApprovedAccessDomainValidation = ({
   sender,
   serverUrl,
   locale,
+  brand,
 }: SendApprovedAccessDomainValidationProps) => {
   const i18n = createI18nInstance(locale);
   const workspaceLogo = workspace.logo
@@ -45,7 +49,7 @@ export const SendApprovedAccessDomainValidation = ({
   const senderEmail = sender.email;
 
   return (
-    <BaseEmail width={333} locale={locale}>
+    <BaseEmail width={333} locale={locale} brand={brand}>
       <Title value={i18n._('Validate domain')} />
       <MainText>
         <Trans
@@ -66,7 +70,10 @@ export const SendApprovedAccessDomainValidation = ({
       </MainText>
       <HighlightedContainer>
         <Img
-          src={workspaceLogo ?? DEFAULT_WORKSPACE_LOGO}
+          src={
+            workspaceLogo ??
+            getBrandAssetUrl(brand, brand.assets.workspaceDefault)
+          }
           width={40}
           height={40}
           alt={workspace.name ?? 'Workspace logo'}
@@ -93,6 +100,7 @@ SendApprovedAccessDomainValidation.PreviewProps = {
   },
   serverUrl: 'https://app.twenty.com',
   locale: 'en',
+  brand: PREVIEW_BRAND,
 };
 
 export default SendApprovedAccessDomainValidation;
