@@ -4,6 +4,7 @@ import { ConfigVariables } from 'src/engine/core-modules/twenty-config/config-va
 import { CONFIG_VARIABLES_INSTANCE_TOKEN } from 'src/engine/core-modules/twenty-config/constants/config-variables-instance-tokens.constants';
 import { DatabaseConfigModule } from 'src/engine/core-modules/twenty-config/drivers/database-config.module';
 import { ConfigGroupHashService } from 'src/engine/core-modules/twenty-config/services/config-group-hash.service';
+import { ProductBrandResolverService } from 'src/engine/core-modules/twenty-config/services/product-brand-resolver.service';
 import { ConfigurableModuleClass } from 'src/engine/core-modules/twenty-config/twenty-config.module-definition';
 import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
 
@@ -24,12 +25,17 @@ export class TwentyConfigModule extends ConfigurableModuleClass {
       providers: [
         TwentyConfigService,
         ConfigGroupHashService,
+        ProductBrandResolverService,
         {
           provide: CONFIG_VARIABLES_INSTANCE_TOKEN,
           useValue: new ConfigVariables(),
         },
       ],
-      exports: [TwentyConfigService, ConfigGroupHashService],
+      exports: [
+        TwentyConfigService,
+        ConfigGroupHashService,
+        ProductBrandResolverService,
+      ],
     };
   }
 }

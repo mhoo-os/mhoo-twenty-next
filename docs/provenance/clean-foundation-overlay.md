@@ -41,6 +41,11 @@ Rebrand source paths authorized by the accepted MHO-153 contract:
 - `packages/twenty-shared/project.json`
 - `scripts/generate_mhoo_assets.py`
 - `scripts/verify_mhoo_assets.py`
+- `packages/twenty-server/.env.example`
+- `packages/twenty-server/src/engine/core-modules/twenty-config/config-variables.ts`
+- `packages/twenty-server/src/engine/core-modules/twenty-config/twenty-config.module.ts`
+- `packages/twenty-server/src/engine/core-modules/twenty-config/services/product-brand-resolver.service.ts`
+- `packages/twenty-server/src/engine/core-modules/twenty-config/services/product-brand-resolver.service.spec.ts`
 
 These paths authorize source-level branding work only. They do not authorize
 runtime deployment, publication, legal approval, or production mutation.
