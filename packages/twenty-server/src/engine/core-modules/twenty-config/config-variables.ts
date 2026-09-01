@@ -20,6 +20,7 @@ import {
   ENTERPRISE_INSTANCE_TYPE,
   type EnterpriseInstanceType,
 } from 'twenty-shared/constants';
+import { BRAND_PRESET_IDS, type BrandPresetId } from 'twenty-shared/branding';
 import { isDefined } from 'twenty-shared/utils';
 import { type LoggerOptions } from 'typeorm/logger/LoggerOptions';
 
@@ -1083,6 +1084,28 @@ export class ConfigVariables {
   @IsUrl({ require_tld: false, require_protocol: true })
   @IsOptional()
   FRONTEND_URL: string;
+
+  @ConfigVariablesMetadata({
+    group: ConfigVariablesGroup.SERVER_CONFIG,
+    description:
+      'Reviewed product brand preset used for server-side presentation surfaces',
+    isEnvOnly: true,
+    options: BRAND_PRESET_IDS,
+    type: ConfigVariableType.ENUM,
+  })
+  @IsOptional()
+  PRODUCT_BRAND_PRESET: BrandPresetId = 'twenty';
+
+  @ConfigVariablesMetadata({
+    group: ConfigVariablesGroup.SERVER_CONFIG,
+    description:
+      'Deployment origin used to resolve relative product brand URLs',
+    isEnvOnly: true,
+    type: ConfigVariableType.STRING,
+  })
+  @IsUrl({ require_tld: false, require_protocol: true })
+  @IsOptional()
+  PRODUCT_BRAND_DEPLOYMENT_ORIGIN = 'http://localhost:3000';
 
   @ConfigVariablesMetadata({
     group: ConfigVariablesGroup.SERVER_CONFIG,
