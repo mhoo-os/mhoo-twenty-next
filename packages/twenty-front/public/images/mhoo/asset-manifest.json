@@ -1,0 +1,1534 @@
+{
+  "schema_version": 1,
+  "asset_family": "mhoo-snout",
+  "source": {
+    "path": "mhoo-snout-source.png",
+    "filename": "Codex Image Aug 30, 2026, 05_53_07 AM.png",
+    "sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+    "bytes": 1058452,
+    "dimensions": [
+      1470,
+      1070
+    ],
+    "mime_type": "image/png",
+    "color_profile": "RGB with alpha channel",
+    "transparency": "present"
+  },
+  "asset_root": "/images/mhoo/",
+  "vector_export": {
+    "status": "not-produced",
+    "reason": "The supplied raster is retained without tracing drift; no vector-compatible export is claimed."
+  },
+  "assets": [
+    {
+      "path": "mhoo-snout-source.png",
+      "purpose": "immutable supplied source and transparent master input",
+      "dimensions": [
+        1470,
+        1070
+      ],
+      "mime_type": "image/png",
+      "sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "none; original bytes preserved"
+    },
+    {
+      "path": "mhoo-snout-transparent-1024.png",
+      "purpose": "transparent product mark",
+      "dimensions": [
+        1024,
+        1024
+      ],
+      "mime_type": "image/png",
+      "sha256": "e72da30dfa00577bd42ee520ed8275d31bfa3dc1ed746efd0aaf6a1727e782f9",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.06 safe-area padding, background=None"
+    },
+    {
+      "path": "mhoo-snout-light-1024.png",
+      "purpose": "product mark on a fixed light surface",
+      "dimensions": [
+        1024,
+        1024
+      ],
+      "mime_type": "image/png",
+      "sha256": "807ef4d9df4ed86c66784899f92f5d22a6599d337b646dea42240f6b42e38892",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.06 safe-area padding, background=(255, 255, 255, 255)"
+    },
+    {
+      "path": "mhoo-snout-dark-1024.png",
+      "purpose": "product mark on a fixed dark surface",
+      "dimensions": [
+        1024,
+        1024
+      ],
+      "mime_type": "image/png",
+      "sha256": "e56e9617ed014299ffeeca71e2f926e1566c3c19c533adcad069197dbfa05881",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.06 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "mhoo-email-600x436.png",
+      "purpose": "email-safe raster mark",
+      "dimensions": [
+        600,
+        436
+      ],
+      "mime_type": "image/png",
+      "sha256": "867a8cbae661d48781c4f79cf663c238f0f3837fa507a87066815edec2b655e6",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.00 safe-area padding, background=(255, 255, 255, 255)"
+    },
+    {
+      "path": "mhoo-workspace-96.png",
+      "purpose": "default workspace/avatar mark",
+      "dimensions": [
+        96,
+        96
+      ],
+      "mime_type": "image/png",
+      "sha256": "c3e9becd5a1f94c0737493e11d145235070466160459b1e13bb8ac16d2bbb5ba",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.06 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "favicon/mhoo-favicon-16.png",
+      "purpose": "browser favicon",
+      "dimensions": [
+        16,
+        16
+      ],
+      "mime_type": "image/png",
+      "sha256": "0d0519f9ae3ced116640c9cd76591f3fe2fb23410e48f6b0fd7d922c2c94c25d",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.06 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "favicon/mhoo-favicon-32.png",
+      "purpose": "browser favicon",
+      "dimensions": [
+        32,
+        32
+      ],
+      "mime_type": "image/png",
+      "sha256": "672f81b11ea790ab2bcc96c9a9278cbb69df8935820cfc08b2d4731227d219ea",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.06 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "favicon/mhoo-favicon-48.png",
+      "purpose": "browser favicon",
+      "dimensions": [
+        48,
+        48
+      ],
+      "mime_type": "image/png",
+      "sha256": "f94d27333745e957a70dec3f78583a6d56cda72adbda265aa6840aa5a61213d3",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.06 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "pwa/mhoo-pwa-192.png",
+      "purpose": "PWA install icon",
+      "dimensions": [
+        192,
+        192
+      ],
+      "mime_type": "image/png",
+      "sha256": "fb5cf28368c26f82cee9241b66e094888c768eb5045e8649ea615a7940c13b4c",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.06 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "pwa/mhoo-pwa-512.png",
+      "purpose": "PWA install icon",
+      "dimensions": [
+        512,
+        512
+      ],
+      "mime_type": "image/png",
+      "sha256": "93170ee7737370015b9aab9f9b09138648dba8301093de30c94494f11b2eff10",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.06 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "pwa/mhoo-pwa-maskable-512.png",
+      "purpose": "maskable PWA install icon",
+      "dimensions": [
+        512,
+        512
+      ],
+      "mime_type": "image/png",
+      "sha256": "13453f89891a38d03be94293e2e29923303ca4d7e8d81f4a888d388286c7bfaa",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.20 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "android/android-launchericon-48-48.png",
+      "purpose": "Android launcher icon",
+      "dimensions": [
+        48,
+        48
+      ],
+      "mime_type": "image/png",
+      "sha256": "f94d27333745e957a70dec3f78583a6d56cda72adbda265aa6840aa5a61213d3",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.06 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "android/android-launchericon-72-72.png",
+      "purpose": "Android launcher icon",
+      "dimensions": [
+        72,
+        72
+      ],
+      "mime_type": "image/png",
+      "sha256": "59dfc302837646d9a414f38e9f34b2c38e63f52cd2f5b1ec36eaa9fec133e56b",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.06 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "android/android-launchericon-96-96.png",
+      "purpose": "Android launcher icon",
+      "dimensions": [
+        96,
+        96
+      ],
+      "mime_type": "image/png",
+      "sha256": "c3e9becd5a1f94c0737493e11d145235070466160459b1e13bb8ac16d2bbb5ba",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.06 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "android/android-launchericon-144-144.png",
+      "purpose": "Android launcher icon",
+      "dimensions": [
+        144,
+        144
+      ],
+      "mime_type": "image/png",
+      "sha256": "501e1320a1219cd272553304ce74d3a2005e0448f5f34892f9f5821de8467f05",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.06 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "android/android-launchericon-192-192.png",
+      "purpose": "Android launcher icon",
+      "dimensions": [
+        192,
+        192
+      ],
+      "mime_type": "image/png",
+      "sha256": "fb5cf28368c26f82cee9241b66e094888c768eb5045e8649ea615a7940c13b4c",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.06 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "android/android-launchericon-512-512.png",
+      "purpose": "Android launcher icon",
+      "dimensions": [
+        512,
+        512
+      ],
+      "mime_type": "image/png",
+      "sha256": "93170ee7737370015b9aab9f9b09138648dba8301093de30c94494f11b2eff10",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.06 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "ios/16.png",
+      "purpose": "Apple touch icon matrix",
+      "dimensions": [
+        16,
+        16
+      ],
+      "mime_type": "image/png",
+      "sha256": "0d0519f9ae3ced116640c9cd76591f3fe2fb23410e48f6b0fd7d922c2c94c25d",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.06 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "ios/20.png",
+      "purpose": "Apple touch icon matrix",
+      "dimensions": [
+        20,
+        20
+      ],
+      "mime_type": "image/png",
+      "sha256": "1bd42a4d383b26f7992dfef9f09289f9b0fd506fe936901a0c062a2f07a6ee6c",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.06 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "ios/29.png",
+      "purpose": "Apple touch icon matrix",
+      "dimensions": [
+        29,
+        29
+      ],
+      "mime_type": "image/png",
+      "sha256": "b94dd160366dd2ad196eefe661844989e8f5d92a5be7a1d041ebbcf4343a06a4",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.06 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "ios/32.png",
+      "purpose": "Apple touch icon matrix",
+      "dimensions": [
+        32,
+        32
+      ],
+      "mime_type": "image/png",
+      "sha256": "672f81b11ea790ab2bcc96c9a9278cbb69df8935820cfc08b2d4731227d219ea",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.06 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "ios/40.png",
+      "purpose": "Apple touch icon matrix",
+      "dimensions": [
+        40,
+        40
+      ],
+      "mime_type": "image/png",
+      "sha256": "781a89c7f6c977d06fcdc7ed4dedbc4c8c9a0fcfc150d33e1efaa1f707e5cc65",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.06 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "ios/50.png",
+      "purpose": "Apple touch icon matrix",
+      "dimensions": [
+        50,
+        50
+      ],
+      "mime_type": "image/png",
+      "sha256": "3bd38d099e069c7d356ad280610436a3d011558078f55c8fbe43a2c930b4daf8",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.06 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "ios/57.png",
+      "purpose": "Apple touch icon matrix",
+      "dimensions": [
+        57,
+        57
+      ],
+      "mime_type": "image/png",
+      "sha256": "6dd54e55a821a7b4dc47ab335b2de22113a43448edb031fc9f6bb6cb922c7ae4",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.06 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "ios/58.png",
+      "purpose": "Apple touch icon matrix",
+      "dimensions": [
+        58,
+        58
+      ],
+      "mime_type": "image/png",
+      "sha256": "64712c5537448ef4dcf32310c69731a8277c2bb569dc333bf540b72b5510b35a",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.06 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "ios/60.png",
+      "purpose": "Apple touch icon matrix",
+      "dimensions": [
+        60,
+        60
+      ],
+      "mime_type": "image/png",
+      "sha256": "4a988e5c4f2edce5be648e39c444bdb09f86d5636e65a8ce2f53b3e847b6fa38",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.06 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "ios/64.png",
+      "purpose": "Apple touch icon matrix",
+      "dimensions": [
+        64,
+        64
+      ],
+      "mime_type": "image/png",
+      "sha256": "808a2a031af73aa8bf69c470685b41484254d753c64b573cd5037a0b0d4ad850",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.06 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "ios/72.png",
+      "purpose": "Apple touch icon matrix",
+      "dimensions": [
+        72,
+        72
+      ],
+      "mime_type": "image/png",
+      "sha256": "59dfc302837646d9a414f38e9f34b2c38e63f52cd2f5b1ec36eaa9fec133e56b",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.06 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "ios/76.png",
+      "purpose": "Apple touch icon matrix",
+      "dimensions": [
+        76,
+        76
+      ],
+      "mime_type": "image/png",
+      "sha256": "e5353d1109202c1264d86b57a9f429f2165d07a173bcc7045e90487e6b343c3b",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.06 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "ios/80.png",
+      "purpose": "Apple touch icon matrix",
+      "dimensions": [
+        80,
+        80
+      ],
+      "mime_type": "image/png",
+      "sha256": "49fa19eb4164880903fe6e841b37edbe10a1989f3d56ab697018831a928c1fe4",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.06 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "ios/87.png",
+      "purpose": "Apple touch icon matrix",
+      "dimensions": [
+        87,
+        87
+      ],
+      "mime_type": "image/png",
+      "sha256": "02716f8f39880518c9a70acaee84a2d6583e3460f86c8be3ee24ebe9111c9340",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.06 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "ios/100.png",
+      "purpose": "Apple touch icon matrix",
+      "dimensions": [
+        100,
+        100
+      ],
+      "mime_type": "image/png",
+      "sha256": "345e2cf73410a1c93219a0459e90a2403f50aec5922b9a882431be8634ba24fb",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.06 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "ios/114.png",
+      "purpose": "Apple touch icon matrix",
+      "dimensions": [
+        114,
+        114
+      ],
+      "mime_type": "image/png",
+      "sha256": "de04f122bd3ec9979142757d347192db40eed65c45dbea00f23f2e056c809352",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.06 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "ios/120.png",
+      "purpose": "Apple touch icon matrix",
+      "dimensions": [
+        120,
+        120
+      ],
+      "mime_type": "image/png",
+      "sha256": "3b31ccccff28f0a82bd498e5fdf65eaa328afcf5c2f584e85e7a362e27e88f8a",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.06 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "ios/128.png",
+      "purpose": "Apple touch icon matrix",
+      "dimensions": [
+        128,
+        128
+      ],
+      "mime_type": "image/png",
+      "sha256": "d2245b8e860640c9ac130f47a626ebce4845647fae6c54814a672acd9b867152",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.06 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "ios/144.png",
+      "purpose": "Apple touch icon matrix",
+      "dimensions": [
+        144,
+        144
+      ],
+      "mime_type": "image/png",
+      "sha256": "501e1320a1219cd272553304ce74d3a2005e0448f5f34892f9f5821de8467f05",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.06 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "ios/152.png",
+      "purpose": "Apple touch icon matrix",
+      "dimensions": [
+        152,
+        152
+      ],
+      "mime_type": "image/png",
+      "sha256": "8331fc1f0eaea5002777acbbb7bbb43fb1800c9b160bc4c217228eace63329ee",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.06 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "ios/167.png",
+      "purpose": "Apple touch icon matrix",
+      "dimensions": [
+        167,
+        167
+      ],
+      "mime_type": "image/png",
+      "sha256": "c316d082e0ab50716c66e69fe5ead5b663c91a3e5ef0843254c9445971dd824c",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.06 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "ios/180.png",
+      "purpose": "Apple touch icon matrix",
+      "dimensions": [
+        180,
+        180
+      ],
+      "mime_type": "image/png",
+      "sha256": "631cb82ce9f45a9b30ffb76b0a30fb4f067e60728ae34e88cbaf303d61b00efa",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.06 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "ios/192.png",
+      "purpose": "Apple touch icon matrix",
+      "dimensions": [
+        192,
+        192
+      ],
+      "mime_type": "image/png",
+      "sha256": "fb5cf28368c26f82cee9241b66e094888c768eb5045e8649ea615a7940c13b4c",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.06 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "ios/256.png",
+      "purpose": "Apple touch icon matrix",
+      "dimensions": [
+        256,
+        256
+      ],
+      "mime_type": "image/png",
+      "sha256": "765dd7c24c82f5a81652b64486a90e1ba8d71e87b9249e220ced3bd177778212",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.06 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "ios/512.png",
+      "purpose": "Apple touch icon matrix",
+      "dimensions": [
+        512,
+        512
+      ],
+      "mime_type": "image/png",
+      "sha256": "93170ee7737370015b9aab9f9b09138648dba8301093de30c94494f11b2eff10",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.06 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "ios/1024.png",
+      "purpose": "Apple touch icon matrix",
+      "dimensions": [
+        1024,
+        1024
+      ],
+      "mime_type": "image/png",
+      "sha256": "e56e9617ed014299ffeeca71e2f926e1566c3c19c533adcad069197dbfa05881",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.06 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/SmallTile.scale-100.png",
+      "purpose": "Windows application icon matrix",
+      "dimensions": [
+        71,
+        71
+      ],
+      "mime_type": "image/png",
+      "sha256": "785a992d9edb1a7ab99078d6f5b0a81b76969102c8413746f37ef7d1352de16c",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/SmallTile.scale-125.png",
+      "purpose": "Windows application icon matrix",
+      "dimensions": [
+        89,
+        89
+      ],
+      "mime_type": "image/png",
+      "sha256": "21c04f1682d5cd458636f556af6b967ab69ee5cae728773c1db85c977bf21261",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/SmallTile.scale-150.png",
+      "purpose": "Windows application icon matrix",
+      "dimensions": [
+        107,
+        107
+      ],
+      "mime_type": "image/png",
+      "sha256": "0d77aff7c73a6e1f87e83bac2044f39f9e81c1ab2d850c5c760946a3858c4ddf",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/SmallTile.scale-200.png",
+      "purpose": "Windows application icon matrix",
+      "dimensions": [
+        142,
+        142
+      ],
+      "mime_type": "image/png",
+      "sha256": "7a6774fd8de6bb09d8162859cba86f69d44bf43480f7fceba7367ea8531ea51d",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/SmallTile.scale-400.png",
+      "purpose": "Windows application icon matrix",
+      "dimensions": [
+        284,
+        284
+      ],
+      "mime_type": "image/png",
+      "sha256": "93993628fbb48357af9c5454360f37dcd0232f18972ec7f590f3cb3e349e41b3",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/Square150x150Logo.scale-100.png",
+      "purpose": "Windows application icon matrix",
+      "dimensions": [
+        150,
+        150
+      ],
+      "mime_type": "image/png",
+      "sha256": "e57a0a563c607333cf4ada97a3bb5c4fbb27ec8306f064fa18c2029b7a47c510",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/Square150x150Logo.scale-125.png",
+      "purpose": "Windows application icon matrix",
+      "dimensions": [
+        188,
+        188
+      ],
+      "mime_type": "image/png",
+      "sha256": "c26eecf1ba8cfe36246de4e79592a44a9e00c993406bea823797685137feb7db",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/Square150x150Logo.scale-150.png",
+      "purpose": "Windows application icon matrix",
+      "dimensions": [
+        225,
+        225
+      ],
+      "mime_type": "image/png",
+      "sha256": "d538843edd8ccbc320c6eb92735b3dcda0d55340ab28c6eae8821a2468325e22",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/Square150x150Logo.scale-200.png",
+      "purpose": "Windows application icon matrix",
+      "dimensions": [
+        300,
+        300
+      ],
+      "mime_type": "image/png",
+      "sha256": "5a7ff98e5ceb724cb9d152ce7f3c753fcf48deeec7430ad556084f3f7cad79ff",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/Square150x150Logo.scale-400.png",
+      "purpose": "Windows application icon matrix",
+      "dimensions": [
+        600,
+        600
+      ],
+      "mime_type": "image/png",
+      "sha256": "ecf03293b5dfd8aaba79f03cb4bb348cb0fe66549fa2f9077d6dd7a61057f79b",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/Wide310x150Logo.scale-100.png",
+      "purpose": "Windows application icon matrix",
+      "dimensions": [
+        310,
+        150
+      ],
+      "mime_type": "image/png",
+      "sha256": "4b3440bda59b10b705c7ba77fb32ab9879ffd10af8daa4ebc18d049b00654dc0",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/Wide310x150Logo.scale-125.png",
+      "purpose": "Windows application icon matrix",
+      "dimensions": [
+        388,
+        188
+      ],
+      "mime_type": "image/png",
+      "sha256": "a7433c836f7627e607ca65f12560ea93f5694e446b43040ef3ae1497dfee6c77",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/Wide310x150Logo.scale-150.png",
+      "purpose": "Windows application icon matrix",
+      "dimensions": [
+        465,
+        225
+      ],
+      "mime_type": "image/png",
+      "sha256": "a56985b5bf62ea79e0e991c573bd282c29902fd833680d3023f5a5c31b3b4d2a",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/Wide310x150Logo.scale-200.png",
+      "purpose": "Windows application icon matrix",
+      "dimensions": [
+        620,
+        300
+      ],
+      "mime_type": "image/png",
+      "sha256": "b952b9df9c225bc15e239db336d5635bd8c3225c1876bcedac4c12efa0837454",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/Wide310x150Logo.scale-400.png",
+      "purpose": "Windows application icon matrix",
+      "dimensions": [
+        1240,
+        600
+      ],
+      "mime_type": "image/png",
+      "sha256": "2c085a00edb903510fa43a412626e004fe50c16e769e336233c5d422893635cb",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/LargeTile.scale-100.png",
+      "purpose": "Windows application icon matrix",
+      "dimensions": [
+        310,
+        310
+      ],
+      "mime_type": "image/png",
+      "sha256": "ad84282fb6c3072bd43efd6afffdedb8bf8266d2bff6d9fbe0a6f1e4b0df1f0a",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/LargeTile.scale-125.png",
+      "purpose": "Windows application icon matrix",
+      "dimensions": [
+        388,
+        388
+      ],
+      "mime_type": "image/png",
+      "sha256": "9e92e14b167d374ac7834c481e4a1fc9d4dc4cb2cd3f7a89b4f0affd751c754d",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/LargeTile.scale-150.png",
+      "purpose": "Windows application icon matrix",
+      "dimensions": [
+        465,
+        465
+      ],
+      "mime_type": "image/png",
+      "sha256": "c2725237813629c8b180825c1ebca3a28b61bc94ef22ec6aecc9a55ad3c0bdbd",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/LargeTile.scale-200.png",
+      "purpose": "Windows application icon matrix",
+      "dimensions": [
+        620,
+        620
+      ],
+      "mime_type": "image/png",
+      "sha256": "97e0a089f24c1ba05e2825179409e17249909a6ad18372db5985b4b13397d1c0",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/LargeTile.scale-400.png",
+      "purpose": "Windows application icon matrix",
+      "dimensions": [
+        1240,
+        1240
+      ],
+      "mime_type": "image/png",
+      "sha256": "74647ab28663cde8e57544628323a4f6e38ff652ea8d841a2e2c789ae1742f16",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.scale-100.png",
+      "purpose": "Windows application icon matrix",
+      "dimensions": [
+        44,
+        44
+      ],
+      "mime_type": "image/png",
+      "sha256": "591fe2d812e8fe6c45494262db69864fe1f0db60e2e779a80668f39d4dac9524",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.scale-125.png",
+      "purpose": "Windows application icon matrix",
+      "dimensions": [
+        55,
+        55
+      ],
+      "mime_type": "image/png",
+      "sha256": "bddb848ebcdba0bc27d123d3aa4b77a41d3cb720e6446926b2c943fda8a1260f",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.scale-150.png",
+      "purpose": "Windows application icon matrix",
+      "dimensions": [
+        66,
+        66
+      ],
+      "mime_type": "image/png",
+      "sha256": "fb5b1600ae72b8b8b502ebfa2e04c6856b55e6ca59d5a027fa161ea792b8e690",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.scale-200.png",
+      "purpose": "Windows application icon matrix",
+      "dimensions": [
+        88,
+        88
+      ],
+      "mime_type": "image/png",
+      "sha256": "cc913b1189fec4980483091f9404a1ff43d17ecc329b67986d6cf1c05a71f0d6",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.scale-400.png",
+      "purpose": "Windows application icon matrix",
+      "dimensions": [
+        176,
+        176
+      ],
+      "mime_type": "image/png",
+      "sha256": "5cf20daea15b6bf115058f7c8ca236d3030c072e6262d088e2cd83627c4d0ae2",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/StoreLogo.scale-100.png",
+      "purpose": "Windows application icon matrix",
+      "dimensions": [
+        50,
+        50
+      ],
+      "mime_type": "image/png",
+      "sha256": "6cb1d9a0816d526af6f351994bee1868e3c99b6095a1f01be693f5879db11ea6",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/StoreLogo.scale-125.png",
+      "purpose": "Windows application icon matrix",
+      "dimensions": [
+        63,
+        63
+      ],
+      "mime_type": "image/png",
+      "sha256": "f0088e0150c37537e205f33f43c63283dec49a658555591c1a27ecd2fadb136d",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/StoreLogo.scale-150.png",
+      "purpose": "Windows application icon matrix",
+      "dimensions": [
+        75,
+        75
+      ],
+      "mime_type": "image/png",
+      "sha256": "c54fe04312fe8690aa198525640ad31c489c8bf3a16cb48f749df920ddf8c6d3",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/StoreLogo.scale-200.png",
+      "purpose": "Windows application icon matrix",
+      "dimensions": [
+        100,
+        100
+      ],
+      "mime_type": "image/png",
+      "sha256": "aee075c0216d78558b0945215d3fd0d5bb75255e816347f11244c462682fc995",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/StoreLogo.scale-400.png",
+      "purpose": "Windows application icon matrix",
+      "dimensions": [
+        200,
+        200
+      ],
+      "mime_type": "image/png",
+      "sha256": "6f3ef72055400bc9e277dee6905e4580beca3dc4f6b96512f3196087352a48b5",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/SplashScreen.scale-100.png",
+      "purpose": "Windows application icon matrix",
+      "dimensions": [
+        620,
+        300
+      ],
+      "mime_type": "image/png",
+      "sha256": "b952b9df9c225bc15e239db336d5635bd8c3225c1876bcedac4c12efa0837454",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/SplashScreen.scale-125.png",
+      "purpose": "Windows application icon matrix",
+      "dimensions": [
+        775,
+        375
+      ],
+      "mime_type": "image/png",
+      "sha256": "79f8896498793a92b5123b089545ab3345cdf49bce7475c7a16a9d4f4900b379",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/SplashScreen.scale-150.png",
+      "purpose": "Windows application icon matrix",
+      "dimensions": [
+        930,
+        450
+      ],
+      "mime_type": "image/png",
+      "sha256": "4ae57276264493510fb6dcc148052764c473305915cbd513083c79459dbcfe87",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/SplashScreen.scale-200.png",
+      "purpose": "Windows application icon matrix",
+      "dimensions": [
+        1240,
+        600
+      ],
+      "mime_type": "image/png",
+      "sha256": "2c085a00edb903510fa43a412626e004fe50c16e769e336233c5d422893635cb",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/SplashScreen.scale-400.png",
+      "purpose": "Windows application icon matrix",
+      "dimensions": [
+        2480,
+        1200
+      ],
+      "mime_type": "image/png",
+      "sha256": "884e4d8f8cc69468790660ebef2cd3e74b734e5778c819c94b66444750fc9632",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.targetsize-16.png",
+      "purpose": "Windows application icon target size",
+      "dimensions": [
+        16,
+        16
+      ],
+      "mime_type": "image/png",
+      "sha256": "d5cf6fee8a0594c58ea704065f300fd62990fd383ce87f9ead05d8504005b866",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.targetsize-20.png",
+      "purpose": "Windows application icon target size",
+      "dimensions": [
+        20,
+        20
+      ],
+      "mime_type": "image/png",
+      "sha256": "b7c9c1557fedc595d57e267e9e0613352957ffe0385fee01e408d092304857e3",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.targetsize-24.png",
+      "purpose": "Windows application icon target size",
+      "dimensions": [
+        24,
+        24
+      ],
+      "mime_type": "image/png",
+      "sha256": "58db0d8120d2c390fdbe4e6c8fa9ede116e25eb05d418396c599bfcec38689b6",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.targetsize-30.png",
+      "purpose": "Windows application icon target size",
+      "dimensions": [
+        30,
+        30
+      ],
+      "mime_type": "image/png",
+      "sha256": "b584aed08cb41316cc3355280c738d4bef1b76aa72adf95064f257d3d0f50036",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.targetsize-32.png",
+      "purpose": "Windows application icon target size",
+      "dimensions": [
+        32,
+        32
+      ],
+      "mime_type": "image/png",
+      "sha256": "428106efca119b1a692541b389115a46f760970aaaaa42f642c74c971938f8b0",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.targetsize-36.png",
+      "purpose": "Windows application icon target size",
+      "dimensions": [
+        36,
+        36
+      ],
+      "mime_type": "image/png",
+      "sha256": "ee083d47d3c2a57ec4b6852f8f9825d222164d3146cf8c8087e46c9afac2192e",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.targetsize-40.png",
+      "purpose": "Windows application icon target size",
+      "dimensions": [
+        40,
+        40
+      ],
+      "mime_type": "image/png",
+      "sha256": "3d5e4667caca4015a7e2441753bf7ef58806e939aea0b3cfe03e1f1244487514",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.targetsize-44.png",
+      "purpose": "Windows application icon target size",
+      "dimensions": [
+        44,
+        44
+      ],
+      "mime_type": "image/png",
+      "sha256": "591fe2d812e8fe6c45494262db69864fe1f0db60e2e779a80668f39d4dac9524",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.targetsize-48.png",
+      "purpose": "Windows application icon target size",
+      "dimensions": [
+        48,
+        48
+      ],
+      "mime_type": "image/png",
+      "sha256": "4f065ff1eee8741e225b2266d3457b2477b569db00e07fdfb64e326b56b24a65",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.targetsize-60.png",
+      "purpose": "Windows application icon target size",
+      "dimensions": [
+        60,
+        60
+      ],
+      "mime_type": "image/png",
+      "sha256": "bc38d4d9607edfda70c5df89dd46d08c013eb6eaf6e9cee9473320ad79296c08",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.targetsize-64.png",
+      "purpose": "Windows application icon target size",
+      "dimensions": [
+        64,
+        64
+      ],
+      "mime_type": "image/png",
+      "sha256": "3fa7bc7312c9af45231a0dbbc207532ed3895dd51c7821697274678f8678ce5a",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.targetsize-72.png",
+      "purpose": "Windows application icon target size",
+      "dimensions": [
+        72,
+        72
+      ],
+      "mime_type": "image/png",
+      "sha256": "57ccf18253581af37d2a325838aad1069dbdf09da26d7058706acea0ff9e2480",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.targetsize-80.png",
+      "purpose": "Windows application icon target size",
+      "dimensions": [
+        80,
+        80
+      ],
+      "mime_type": "image/png",
+      "sha256": "67143c4a9dac9f93c1ce3c4fab19675bfdd9246c2085db9281895da6d3da009a",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.targetsize-96.png",
+      "purpose": "Windows application icon target size",
+      "dimensions": [
+        96,
+        96
+      ],
+      "mime_type": "image/png",
+      "sha256": "437fc25621327c017868ae2669e8d993d3b5c297c4788ad5551e164b7f6a7bc9",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.targetsize-256.png",
+      "purpose": "Windows application icon target size",
+      "dimensions": [
+        256,
+        256
+      ],
+      "mime_type": "image/png",
+      "sha256": "a8b76802fab21523e4a4221565f44af9d2b5278f1b1f4c0cf3bab3cf32f64899",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.altform-unplated_targetsize-16.png",
+      "purpose": "Windows application icon target size",
+      "dimensions": [
+        16,
+        16
+      ],
+      "mime_type": "image/png",
+      "sha256": "d5cf6fee8a0594c58ea704065f300fd62990fd383ce87f9ead05d8504005b866",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.altform-unplated_targetsize-20.png",
+      "purpose": "Windows application icon target size",
+      "dimensions": [
+        20,
+        20
+      ],
+      "mime_type": "image/png",
+      "sha256": "b7c9c1557fedc595d57e267e9e0613352957ffe0385fee01e408d092304857e3",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.altform-unplated_targetsize-24.png",
+      "purpose": "Windows application icon target size",
+      "dimensions": [
+        24,
+        24
+      ],
+      "mime_type": "image/png",
+      "sha256": "58db0d8120d2c390fdbe4e6c8fa9ede116e25eb05d418396c599bfcec38689b6",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.altform-unplated_targetsize-30.png",
+      "purpose": "Windows application icon target size",
+      "dimensions": [
+        30,
+        30
+      ],
+      "mime_type": "image/png",
+      "sha256": "b584aed08cb41316cc3355280c738d4bef1b76aa72adf95064f257d3d0f50036",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.altform-unplated_targetsize-32.png",
+      "purpose": "Windows application icon target size",
+      "dimensions": [
+        32,
+        32
+      ],
+      "mime_type": "image/png",
+      "sha256": "428106efca119b1a692541b389115a46f760970aaaaa42f642c74c971938f8b0",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.altform-unplated_targetsize-36.png",
+      "purpose": "Windows application icon target size",
+      "dimensions": [
+        36,
+        36
+      ],
+      "mime_type": "image/png",
+      "sha256": "ee083d47d3c2a57ec4b6852f8f9825d222164d3146cf8c8087e46c9afac2192e",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.altform-unplated_targetsize-40.png",
+      "purpose": "Windows application icon target size",
+      "dimensions": [
+        40,
+        40
+      ],
+      "mime_type": "image/png",
+      "sha256": "3d5e4667caca4015a7e2441753bf7ef58806e939aea0b3cfe03e1f1244487514",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.altform-unplated_targetsize-44.png",
+      "purpose": "Windows application icon target size",
+      "dimensions": [
+        44,
+        44
+      ],
+      "mime_type": "image/png",
+      "sha256": "591fe2d812e8fe6c45494262db69864fe1f0db60e2e779a80668f39d4dac9524",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.altform-unplated_targetsize-48.png",
+      "purpose": "Windows application icon target size",
+      "dimensions": [
+        48,
+        48
+      ],
+      "mime_type": "image/png",
+      "sha256": "4f065ff1eee8741e225b2266d3457b2477b569db00e07fdfb64e326b56b24a65",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.altform-unplated_targetsize-60.png",
+      "purpose": "Windows application icon target size",
+      "dimensions": [
+        60,
+        60
+      ],
+      "mime_type": "image/png",
+      "sha256": "bc38d4d9607edfda70c5df89dd46d08c013eb6eaf6e9cee9473320ad79296c08",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.altform-unplated_targetsize-64.png",
+      "purpose": "Windows application icon target size",
+      "dimensions": [
+        64,
+        64
+      ],
+      "mime_type": "image/png",
+      "sha256": "3fa7bc7312c9af45231a0dbbc207532ed3895dd51c7821697274678f8678ce5a",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.altform-unplated_targetsize-72.png",
+      "purpose": "Windows application icon target size",
+      "dimensions": [
+        72,
+        72
+      ],
+      "mime_type": "image/png",
+      "sha256": "57ccf18253581af37d2a325838aad1069dbdf09da26d7058706acea0ff9e2480",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.altform-unplated_targetsize-80.png",
+      "purpose": "Windows application icon target size",
+      "dimensions": [
+        80,
+        80
+      ],
+      "mime_type": "image/png",
+      "sha256": "67143c4a9dac9f93c1ce3c4fab19675bfdd9246c2085db9281895da6d3da009a",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.altform-unplated_targetsize-96.png",
+      "purpose": "Windows application icon target size",
+      "dimensions": [
+        96,
+        96
+      ],
+      "mime_type": "image/png",
+      "sha256": "437fc25621327c017868ae2669e8d993d3b5c297c4788ad5551e164b7f6a7bc9",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.altform-unplated_targetsize-256.png",
+      "purpose": "Windows application icon target size",
+      "dimensions": [
+        256,
+        256
+      ],
+      "mime_type": "image/png",
+      "sha256": "a8b76802fab21523e4a4221565f44af9d2b5278f1b1f4c0cf3bab3cf32f64899",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(14, 14, 17, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.altform-lightunplated_targetsize-16.png",
+      "purpose": "Windows application icon target size",
+      "dimensions": [
+        16,
+        16
+      ],
+      "mime_type": "image/png",
+      "sha256": "4173799daf5f0eac8705649578c6e2edd1423141a8bc0fa698a093e80c43a4c6",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(255, 255, 255, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.altform-lightunplated_targetsize-20.png",
+      "purpose": "Windows application icon target size",
+      "dimensions": [
+        20,
+        20
+      ],
+      "mime_type": "image/png",
+      "sha256": "096eb0e9777030fd396863b480e6a19a870b6b7f1788254d67f5015b337fb743",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(255, 255, 255, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.altform-lightunplated_targetsize-24.png",
+      "purpose": "Windows application icon target size",
+      "dimensions": [
+        24,
+        24
+      ],
+      "mime_type": "image/png",
+      "sha256": "4ed96f7f8996d15cf9bded72b8f87b9ce4c32e8b87daf31e151b240fdb0dd9fa",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(255, 255, 255, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.altform-lightunplated_targetsize-30.png",
+      "purpose": "Windows application icon target size",
+      "dimensions": [
+        30,
+        30
+      ],
+      "mime_type": "image/png",
+      "sha256": "94d4819b72bc059c5bc0ca23629068bd5ddec2fd4b8d5e51b9e7820955287847",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(255, 255, 255, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.altform-lightunplated_targetsize-32.png",
+      "purpose": "Windows application icon target size",
+      "dimensions": [
+        32,
+        32
+      ],
+      "mime_type": "image/png",
+      "sha256": "56cb2e08cb9e2645743a4705b8526aaef01ba22f3b7fae90e3cc45466a72e266",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(255, 255, 255, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.altform-lightunplated_targetsize-36.png",
+      "purpose": "Windows application icon target size",
+      "dimensions": [
+        36,
+        36
+      ],
+      "mime_type": "image/png",
+      "sha256": "781c041a321058cbdaaaebeb8ef582a99de30b8ca0235c7e5428c4654780f680",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(255, 255, 255, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.altform-lightunplated_targetsize-40.png",
+      "purpose": "Windows application icon target size",
+      "dimensions": [
+        40,
+        40
+      ],
+      "mime_type": "image/png",
+      "sha256": "8c64fc8380544859f3699c46a34caf719280f9b2ccd5338220f03f332636281c",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(255, 255, 255, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.altform-lightunplated_targetsize-44.png",
+      "purpose": "Windows application icon target size",
+      "dimensions": [
+        44,
+        44
+      ],
+      "mime_type": "image/png",
+      "sha256": "e0c977d1a69feb12bd6bf80201c7e49d9c0678c93e56275434cbaf8570536e91",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(255, 255, 255, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.altform-lightunplated_targetsize-48.png",
+      "purpose": "Windows application icon target size",
+      "dimensions": [
+        48,
+        48
+      ],
+      "mime_type": "image/png",
+      "sha256": "540f7a39709e8c1573e53246aade61ca4faf6e001650c799ec2d46e007adb00c",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(255, 255, 255, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.altform-lightunplated_targetsize-60.png",
+      "purpose": "Windows application icon target size",
+      "dimensions": [
+        60,
+        60
+      ],
+      "mime_type": "image/png",
+      "sha256": "ca507057bd255235b6944796dccb30be5050a6e5fc09885972a89c110841abba",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(255, 255, 255, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.altform-lightunplated_targetsize-64.png",
+      "purpose": "Windows application icon target size",
+      "dimensions": [
+        64,
+        64
+      ],
+      "mime_type": "image/png",
+      "sha256": "8e8c0c3907c288c66880edcdb91ef25aaf08a49951b37faa55d7d469943e5b6a",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(255, 255, 255, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.altform-lightunplated_targetsize-72.png",
+      "purpose": "Windows application icon target size",
+      "dimensions": [
+        72,
+        72
+      ],
+      "mime_type": "image/png",
+      "sha256": "260ab85c108a307fdd27bca32d863f524b018c869389b7f4c69e0eebc1306d55",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(255, 255, 255, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.altform-lightunplated_targetsize-80.png",
+      "purpose": "Windows application icon target size",
+      "dimensions": [
+        80,
+        80
+      ],
+      "mime_type": "image/png",
+      "sha256": "d3bc6e19fd0426f7f21cd2e6b3d9655e9da5a0b6fddca37a021d79c03bb6b2fd",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(255, 255, 255, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.altform-lightunplated_targetsize-96.png",
+      "purpose": "Windows application icon target size",
+      "dimensions": [
+        96,
+        96
+      ],
+      "mime_type": "image/png",
+      "sha256": "0a0babd35a15fc749b255b92b8e928b311b1b1ea1395fba81c010bce2d376150",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(255, 255, 255, 255)"
+    },
+    {
+      "path": "windows11/Square44x44Logo.altform-lightunplated_targetsize-256.png",
+      "purpose": "Windows application icon target size",
+      "dimensions": [
+        256,
+        256
+      ],
+      "mime_type": "image/png",
+      "sha256": "ce7fa5dc5f9a6f848b134732e1ff5341c05c751be1d63edb552863805d20c3ff",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize, contain with 0.08 safe-area padding, background=(255, 255, 255, 255)"
+    },
+    {
+      "path": "favicon/mhoo-favicon.ico",
+      "purpose": "multi-resolution browser favicon",
+      "dimensions": [
+        [
+          16,
+          16
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          48,
+          48
+        ]
+      ],
+      "mime_type": "image/x-icon",
+      "sha256": "5d0cbfdcb260040b7321521faa763f22c51074e8e23ff5ab3001fa0c51ddc4d5",
+      "source_sha256": "6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa",
+      "transformation": "RGBA Lanczos resize into a dark 512px canvas, encoded at 16/32/48px"
+    }
+  ]
+}
