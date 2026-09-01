@@ -3,6 +3,8 @@ import { SettingsDiscoveryHeroCard } from '@/settings/components/SettingsDiscove
 import { SettingsPageContainer } from '@/settings/components/SettingsPageContainer';
 import { SettingsLabContent } from '@/settings/lab/components/SettingsLabContent';
 import { SettingsPageLayout } from '@/settings/components/layout/SettingsPageLayout';
+import { useResolvedBrand } from '@/client-config/hooks/useResolvedBrand';
+import { getBrandUrl } from '@/client-config/utils/getBrandUrl';
 import { styled } from '@linaria/react';
 import { t } from '@lingui/core/macro';
 import { useContext } from 'react';
@@ -59,19 +61,25 @@ export const SettingsCommunity = () => {
   const { theme } = useContext(ThemeContext);
   const { getIcon } = useIcons();
   const IconBrandDiscord = getIcon('IconBrandDiscord');
+  const brand = useResolvedBrand();
+  const isUpstreamBrand = brand.preset === 'twenty';
 
   const socialLinks: SettingsCommunityLink[] = [
     {
       href: 'https://discord.com/invite/cx5n4Jzs57',
       Icon: IconBrandDiscord,
       iconColor: themeCssVariables.color.blue9,
-      cardTitle: t`Join our Discord`,
+      cardTitle: isUpstreamBrand
+        ? t`Join our Discord`
+        : t`Join the upstream Twenty Discord`,
     },
     {
       href: 'https://x.com/twentycrm',
       Icon: IconBrandX,
       iconColor: themeCssVariables.font.color.primary,
-      cardTitle: t`Follow us on X`,
+      cardTitle: isUpstreamBrand
+        ? t`Follow us on X`
+        : t`Follow upstream Twenty on X`,
     },
   ];
 
@@ -124,37 +132,47 @@ export const SettingsCommunity = () => {
           </StyledCardsGrid>
         </Section>
 
-        <Section>
-          <H2Title
-            title={t`Partners`}
-            description={t`Hire a partner to help you implement and customize Twenty.`}
-          />
-          <StyledCardLink
-            href="https://twenty.com/partners/list"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <SettingsCard
-              Icon={
-                <IconBriefcase
-                  size={theme.icon.size.md}
-                  stroke={theme.icon.stroke.sm}
-                />
-              }
-              title={t`Browse partners`}
+        {isUpstreamBrand && (
+          <Section>
+            <H2Title
+              title={t`Partners`}
+              description={t`Hire a partner to help you implement and customize Twenty.`}
             />
-          </StyledCardLink>
-        </Section>
+            <StyledCardLink
+              href="https://twenty.com/partners/list"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <SettingsCard
+                Icon={
+                  <IconBriefcase
+                    size={theme.icon.size.md}
+                    stroke={theme.icon.stroke.sm}
+                  />
+                }
+                title={t`Browse partners`}
+              />
+            </StyledCardLink>
+          </Section>
+        )}
 
         <Section>
           <H2Title
             title={t`Features`}
-            description={t`Try our upcoming features. Note they are still in beta. Please bear with us and report any issues you find.`}
+            description={
+              isUpstreamBrand
+                ? t`Try our upcoming features. Note they are still in beta. Please bear with us and report any issues you find.`
+                : t`Explore ${brand.productName} documentation and current capabilities.`
+            }
           />
           <StyledFeaturesContent>
             <SettingsLabContent />
             <StyledCardLink
-              href="https://twenty.com/releases"
+              href={
+                isUpstreamBrand
+                  ? 'https://twenty.com/releases'
+                  : getBrandUrl(brand, 'documentationUrl')
+              }
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -165,7 +183,9 @@ export const SettingsCommunity = () => {
                     stroke={theme.icon.stroke.sm}
                   />
                 }
-                title={t`Read changelog`}
+                title={
+                  isUpstreamBrand ? t`Read changelog` : t`Read documentation`
+                }
               />
             </StyledCardLink>
           </StyledFeaturesContent>

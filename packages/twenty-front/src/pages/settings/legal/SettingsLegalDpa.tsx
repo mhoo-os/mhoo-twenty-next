@@ -9,6 +9,7 @@ import { UndecoratedLink } from 'twenty-ui/navigation';
 import { H2Title } from 'twenty-ui/typography';
 
 import { useApolloCoreClient } from '@/object-metadata/hooks/useApolloCoreClient';
+import { useResolvedBrand } from '@/client-config/hooks/useResolvedBrand';
 import { DpaDocumentPreview } from '@/settings/legal/components/DpaDocumentPreview';
 import { DpaNotice } from '@/settings/legal/components/DpaNotice';
 import { SettingsDpaAgreementsTable } from '@/settings/legal/components/SettingsDpaAgreementsTable';
@@ -24,12 +25,18 @@ import { SettingsSkeletonLoader } from '@/settings/components/SettingsSkeletonLo
 
 export const SettingsLegalDpa = () => {
   const { t } = useLingui();
+  const brand = useResolvedBrand();
+  const isDpaAvailable =
+    brand.legal.dpa.status === 'approved' && brand.legal.dpa.url !== null;
   // DPA queries are served by the core (/graphql) schema, not the default /metadata client.
   const apolloCoreClient = useApolloCoreClient();
 
   const { data: agreementsData, loading: agreementsLoading } = useQuery<{
     dpaAgreements: DpaAgreement[];
-  }>(GET_DPA_AGREEMENTS, { client: apolloCoreClient });
+  }>(GET_DPA_AGREEMENTS, {
+    client: apolloCoreClient,
+    skip: !isDpaAvailable,
+  });
 
   const agreements = agreementsData?.dpaAgreements ?? [];
   const hasAgreements = agreements.length > 0;
@@ -38,12 +45,14 @@ export const SettingsLegalDpa = () => {
     dpaPreview: DpaDocument;
   }>(GET_DPA_PREVIEW, {
     client: apolloCoreClient,
-    skip: agreementsLoading || hasAgreements,
+    skip: !isDpaAvailable || agreementsLoading || hasAgreements,
   });
 
   const preview = previewData?.dpaPreview;
   const isPreviewSettled = isDefined(previewData) || isDefined(previewError);
-  const isLoading = agreementsLoading || (!hasAgreements && !isPreviewSettled);
+  const isLoading =
+    isDpaAvailable &&
+    (agreementsLoading || (!hasAgreements && !isPreviewSettled));
 
   return (
     <SettingsPageLayout
@@ -53,18 +62,26 @@ export const SettingsLegalDpa = () => {
         { children: t`Legal` },
       ]}
       actionButton={
-        <UndecoratedLink to={getSettingsPath(SettingsPath.LegalDpaNew)}>
-          <Button
-            Icon={IconPlus}
-            title={t`Generate DPA`}
-            accent="blue"
-            size="small"
-          />
-        </UndecoratedLink>
+        isDpaAvailable ? (
+          <UndecoratedLink to={getSettingsPath(SettingsPath.LegalDpaNew)}>
+            <Button
+              Icon={IconPlus}
+              title={t`Generate DPA`}
+              accent="blue"
+              size="small"
+            />
+          </UndecoratedLink>
+        ) : undefined
       }
     >
       <SettingsPageContainer>
-        {isLoading ? (
+        {!isDpaAvailable ? (
+          <Section>
+            <DpaNotice
+              text={t`${brand.productName} data processing agreement is currently unavailable.`}
+            />
+          </Section>
+        ) : isLoading ? (
           <SettingsSkeletonLoader />
         ) : hasAgreements ? (
           <Section>

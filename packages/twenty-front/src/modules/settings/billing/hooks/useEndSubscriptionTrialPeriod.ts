@@ -1,4 +1,5 @@
 import { currentWorkspaceState } from '@/auth/states/currentWorkspaceState';
+import { useResolvedBrand } from '@/client-config/hooks/useResolvedBrand';
 import { useRedirect } from '@/domain-manager/hooks/useRedirect';
 import { START_SUBSCRIPTION_AFTER_PAYMENT_METHOD_QUERY_PARAM } from '@/settings/billing/constants/StartSubscriptionAfterPaymentMethodQueryParam';
 import { useApplyCurrentWorkspaceBillingUpdate } from '@/settings/billing/hooks/useApplyCurrentWorkspaceBillingUpdate';
@@ -16,6 +17,7 @@ import {
 } from '~/generated-metadata/graphql';
 
 export const useEndSubscriptionTrialPeriod = () => {
+  const brand = useResolvedBrand();
   const { enqueueSuccessSnackBar, enqueueErrorSnackBar, enqueueInfoSnackBar } =
     useSnackBar();
   const [endSubscriptionTrialPeriod] = useMutation(
@@ -159,7 +161,7 @@ export const useEndSubscriptionTrialPeriod = () => {
       return { success: true, hasPaymentMethod: true };
     } catch {
       enqueueErrorSnackBar({
-        message: t`Error while ending trial period. Please contact Twenty team.`,
+        message: t`Error while ending trial period. Please contact ${brand.productName} support.`,
       });
       return { success: false };
     } finally {

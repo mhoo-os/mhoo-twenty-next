@@ -122,12 +122,6 @@ msgstr ""
 msgid "(no icon selected)"
 msgstr ""
 
-#. js-lingui-id: 6Ux0ik
-#: src/modules/ui/navigation/navigation-drawer/components/MultiWorkspaceDropdown/internal/components/AvailableWorkspaceItem.tsx
-#: src/modules/ui/navigation/navigation-drawer/components/MultiWorkspaceDropdown/internal/MultiWorkspaceDropdownDefaultComponents.tsx
-msgid "(No name)"
-msgstr ""
-
 #. js-lingui-id: p35p2M
 #: src/modules/ui/input/components/IconPicker.tsx
 msgid "(selected: {selectedIconKey})"
@@ -206,6 +200,13 @@ msgstr ""
 msgid "{0} credits"
 msgstr ""
 
+#. js-lingui-id: Ej3KaG
+#. placeholder {0}: brand.productName
+#: src/pages/settings/legal/SettingsLegalDpa.tsx
+#: src/pages/settings/legal/SettingsLegalDpaNew.tsx
+msgid "{0} data processing agreement is currently unavailable."
+msgstr ""
+
 #. js-lingui-id: QpgBEp
 #. placeholder {0}: withoutCreditCardTrialPeriod.duration
 #: src/pages/onboarding/UpgradeFreeTrial.tsx
@@ -220,7 +221,9 @@ msgstr ""
 
 #. js-lingui-id: stCODw
 #. placeholder {0}: appObject.fields.length
+#. placeholder {0}: brand.productName
 #: src/modules/settings/applications/hooks/useComputeObjectAndFieldsContentForApplication.ts
+#: src/modules/spreadsheet-import/steps/components/MatchColumnsStep/components/ColumnGrid.tsx
 msgid "{0} fields"
 msgstr ""
 
@@ -977,14 +980,15 @@ msgstr ""
 msgid "Access Key ID"
 msgstr ""
 
+#. js-lingui-id: WV3Yat
+#. placeholder {0}: brand.productName
+#: src/modules/settings/mcp-and-apis/components/SettingsMcpSetup.tsx
+msgid "Access your {0} workspace data from your favorite MCP client like Claude, Codex or Cursor."
+msgstr ""
+
 #. js-lingui-id: CrjDqe
 #: src/pages/auth/Authorize.tsx
 msgid "Access your workspace data"
-msgstr ""
-
-#. js-lingui-id: IF4QNM
-#: src/modules/settings/mcp-and-apis/components/SettingsMcpSetup.tsx
-msgid "Access your workspace data from your favorite MCP client like Claude, Codex or Cursor."
 msgstr ""
 
 #. js-lingui-id: AeXO77
@@ -1147,6 +1151,11 @@ msgstr ""
 #. js-lingui-id: QXX2VR
 #: src/modules/settings/data-model/fields/forms/select/components/AddSelectOptionMenuItem.tsx
 msgid "Add \"{trimmedName}\" to options"
+msgstr ""
+
+#. js-lingui-id: dUOV5o
+#: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
+msgid "Add {productName} as a Streamable HTTP extension in Goose."
 msgstr ""
 
 #. js-lingui-id: 9CHcSG
@@ -1500,34 +1509,34 @@ msgstr ""
 msgid "Add test input for evaluation (e.g., \"Find all customers in NY\")"
 msgstr ""
 
-#. js-lingui-id: FKGcEL
+#. js-lingui-id: zTPzKF
 #: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
-msgid "Add the Twenty MCP server as a remote context server in Zed."
+msgid "Add the {productName} MCP server as a remote context server in Zed."
 msgstr ""
 
-#. js-lingui-id: iA2nHX
+#. js-lingui-id: RCi0de
 #: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
-msgid "Add the Twenty MCP server from Augment Code settings."
+msgid "Add the {productName} MCP server from Augment Code settings."
 msgstr ""
 
-#. js-lingui-id: l+NzAk
+#. js-lingui-id: VdmSXN
 #: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
-msgid "Add the Twenty MCP server from Raycast's MCP commands or settings."
+msgid "Add the {productName} MCP server from Raycast's MCP commands or settings."
 msgstr ""
 
-#. js-lingui-id: j6G/yI
+#. js-lingui-id: Zsp+Qq
 #: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
-msgid "Add the Twenty MCP server in Gemini CLI settings."
+msgid "Add the {productName} MCP server in Gemini CLI settings."
 msgstr ""
 
-#. js-lingui-id: /OyhlM
+#. js-lingui-id: BqUpn9
 #: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
-msgid "Add the Twenty MCP server to your LibreChat configuration file."
+msgid "Add the {productName} MCP server to your LibreChat configuration file."
 msgstr ""
 
-#. js-lingui-id: K0DXoj
+#. js-lingui-id: YpuC5t
 #: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
-msgid "Add the Twenty remote server with LM Studio's install link."
+msgid "Add the {productName} remote server with LM Studio's install link."
 msgstr ""
 
 #. js-lingui-id: 5+ttxv
@@ -1543,11 +1552,6 @@ msgstr ""
 #. js-lingui-id: hKNhfF
 #: src/modules/settings/unsubscribe-topics/components/SettingsWorkspaceUnsubscribeTopicSection.tsx
 msgid "Add topic"
-msgstr ""
-
-#. js-lingui-id: 4D/zWv
-#: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
-msgid "Add Twenty as a Streamable HTTP extension in Goose."
 msgstr ""
 
 #. js-lingui-id: XnwceV
@@ -3182,9 +3186,10 @@ msgstr ""
 msgid "Billing period"
 msgstr ""
 
-#. js-lingui-id: xF/NXI
+#. js-lingui-id: nt1Pg9
+#. placeholder {0}: brand.productName
 #: src/modules/settings/billing/hooks/useBillingPortalSession.ts
-msgid "Billing portal session error. Please retry or contact Twenty team"
+msgid "Billing portal session error. Please retry or contact {0} support"
 msgstr ""
 
 #. js-lingui-id: 8kIU+G
@@ -3888,10 +3893,11 @@ msgstr ""
 msgid "Check your inbox to verify your new email address."
 msgstr ""
 
-#. js-lingui-id: SxwQE8
+#. js-lingui-id: RwgnEX
+#. placeholder {0}: brand.productName
 #: src/modules/settings/billing/hooks/useHandleCheckoutSession.ts
 #: src/modules/settings/billing/hooks/useHandleCheckoutSession.ts
-msgid "Checkout session error. Please retry or contact Twenty team"
+msgid "Checkout session error. Please retry or contact {0} support"
 msgstr ""
 
 #. js-lingui-id: SviKkE
@@ -4549,6 +4555,16 @@ msgstr ""
 msgid "Configure SMTP settings to send emails from your account."
 msgstr ""
 
+#. js-lingui-id: x6Jukq
+#: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
+msgid "Configure the {productName} MCP server manually in Cascade."
+msgstr ""
+
+#. js-lingui-id: fzhFzO
+#: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
+msgid "Configure the {productName} MCP server manually in Cline."
+msgstr ""
+
 #. js-lingui-id: TiCmQz
 #: src/modules/settings/admin-panel/ai/components/SettingsAdminAI.tsx
 msgid "Configure the default AI models for all workspaces"
@@ -4562,16 +4578,6 @@ msgstr ""
 #. js-lingui-id: pHIR4s
 #: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
 msgid "Configure the remote server in Amazon Q Developer's MCP settings."
-msgstr ""
-
-#. js-lingui-id: g1/8jH
-#: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
-msgid "Configure the Twenty MCP server manually in Cascade."
-msgstr ""
-
-#. js-lingui-id: XiyvRh
-#: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
-msgid "Configure the Twenty MCP server manually in Cline."
 msgstr ""
 
 #. js-lingui-id: qA9AGQ
@@ -8032,9 +8038,10 @@ msgstr ""
 msgid "Error while cancelling plan switching."
 msgstr ""
 
-#. js-lingui-id: QmR+2U
+#. js-lingui-id: BLe2o6
+#. placeholder {0}: brand.productName
 #: src/modules/settings/billing/hooks/useEndSubscriptionTrialPeriod.ts
-msgid "Error while ending trial period. Please contact Twenty team."
+msgid "Error while ending trial period. Please contact {0} support."
 msgstr ""
 
 #. js-lingui-id: 5g78zo
@@ -8339,6 +8346,12 @@ msgstr ""
 #. js-lingui-id: 1RvVK1
 #: src/modules/settings/developers/utils/formatExpiration.ts
 msgid "Expires in {dateDiff}"
+msgstr ""
+
+#. js-lingui-id: dvJ/SB
+#. placeholder {0}: brand.productName
+#: src/pages/settings/community/SettingsCommunity.tsx
+msgid "Explore {0} documentation and current capabilities."
 msgstr ""
 
 #. js-lingui-id: GS+Mus
@@ -9165,6 +9178,11 @@ msgstr ""
 msgid "Folders"
 msgstr ""
 
+#. js-lingui-id: pklV8q
+#: src/pages/settings/community/SettingsCommunity.tsx
+msgid "Follow upstream Twenty on X"
+msgstr ""
+
 #. js-lingui-id: I7Exsw
 #: src/pages/settings/community/SettingsCommunity.tsx
 msgid "Follow us on X"
@@ -9390,11 +9408,13 @@ msgstr ""
 
 #. js-lingui-id: ziAjHi
 #: src/pages/settings/legal/SettingsLegalDpaNew.tsx
+#: src/pages/settings/legal/SettingsLegalDpaNew.tsx
 msgid "Generate"
 msgstr ""
 
 #. js-lingui-id: H3rta9
 #: src/pages/settings/legal/SettingsLegalDpa.tsx
+#: src/pages/settings/legal/SettingsLegalDpaNew.tsx
 #: src/pages/settings/legal/SettingsLegalDpaNew.tsx
 msgid "Generate DPA"
 msgstr ""
@@ -9873,7 +9893,7 @@ msgstr ""
 msgid "Horizontal separator line"
 msgstr ""
 
-#. js-lingui-id: WOXdI6
+#. js-lingui-id: jgFA31
 #: src/pages/settings/applications/utils/getCustomApplicationDescription.ts
 msgid ""
 "Host your workspace's customizations and overrides.\n"
@@ -9898,7 +9918,7 @@ msgid ""
 "npx create-twenty-app@latest my-twenty-app\n"
 "```\n"
 "\n"
-"See the [Getting Started guide](https://twenty.com/developers/extend/apps/getting-started) for the full walkthrough, and [Building Apps](https://twenty.com/developers/extend/apps/building) for the `defineApplication` / `defineEntity` APIs."
+"See the [{productName} documentation]({documentationUrl}) for the full walkthrough, including the `defineApplication` / `defineEntity` APIs."
 msgstr ""
 
 #. js-lingui-id: yY8wAv
@@ -10922,6 +10942,11 @@ msgstr ""
 msgid "Join the community"
 msgstr ""
 
+#. js-lingui-id: aSkpme
+#: src/pages/settings/community/SettingsCommunity.tsx
+msgid "Join the upstream Twenty Discord"
+msgstr ""
+
 #. js-lingui-id: ffWso3
 #: src/modules/activities/calendar/components/CalendarEventCallRecorderAvatar.tsx
 msgid "Joining"
@@ -11384,6 +11409,7 @@ msgstr ""
 
 #. js-lingui-id: vifyyw
 #: src/pages/settings/legal/SettingsLegalDpa.tsx
+#: src/pages/settings/legal/SettingsLegalDpaNew.tsx
 #: src/pages/settings/legal/SettingsLegalDpaNew.tsx
 msgid "Legal"
 msgstr ""
@@ -14195,9 +14221,10 @@ msgstr ""
 msgid "One or more filters reference deactivated or deleted fields and will be automatically removed on save."
 msgstr ""
 
-#. js-lingui-id: 2l4SGU
+#. js-lingui-id: nIWaE5
+#. placeholder {0}: brand.productName
 #: src/pages/settings/enterprise/SettingsEnterprise.tsx
-msgid "One subscription provides one enterprise key that powers one production instance and one potential staging or test instance. To run a staging or test environment, install Twenty on a second server, activate it with this same enterprise key, then register that server as a development instance. Development instances unlock enterprise features without extra billing and do not count toward your production seats."
+msgid "One subscription provides one enterprise key that powers one production instance and one potential staging or test instance. To run a staging or test environment, install {0} on a second server, activate it with this same enterprise key, then register that server as a development instance. Development instances unlock enterprise features without extra billing and do not count toward your production seats."
 msgstr ""
 
 #. js-lingui-id: oFTo3P
@@ -14291,14 +14318,14 @@ msgstr ""
 msgid "Open as link"
 msgstr ""
 
-#. js-lingui-id: n0vVgf
+#. js-lingui-id: BAb8aW
 #: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
-msgid "Open Claude with the Twenty connector name and MCP URL prefilled."
+msgid "Open Claude with the {productName} connector name and MCP URL prefilled."
 msgstr ""
 
-#. js-lingui-id: +n2jpB
+#. js-lingui-id: I+yg+J
 #: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
-msgid "Open Cursor's MCP installer with the Twenty remote server config."
+msgid "Open Cursor's MCP installer with the {productName} remote server config."
 msgstr ""
 
 #. js-lingui-id: pZZH4Q
@@ -14338,9 +14365,14 @@ msgstr ""
 msgid "Open records on a dedicated page"
 msgstr ""
 
-#. js-lingui-id: q170S2
+#. js-lingui-id: i9ZD6n
 #: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
-msgid "Open Replit with the Twenty remote server config."
+msgid "Open Replit with the {productName} remote server config."
+msgstr ""
+
+#. js-lingui-id: XZmZ1V
+#: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
+msgid "Open the upstream Twenty ChatGPT integration for your workspace."
 msgstr ""
 
 #. js-lingui-id: sBd/cl
@@ -15478,6 +15510,7 @@ msgstr ""
 #. js-lingui-id: ibPuCP
 #: src/pages/settings/applications/components/SettingsClaimApplicationSection.tsx
 #: src/pages/settings/applications/tabs/SettingsApplicationsDeveloperTab.tsx
+#: src/pages/settings/community/SettingsCommunity.tsx
 msgid "Read documentation"
 msgstr ""
 
@@ -18275,9 +18308,9 @@ msgstr ""
 msgid "Subdomain"
 msgstr ""
 
-#. js-lingui-id: Sv4BSp
+#. js-lingui-id: vkXMsX
 #: src/modules/settings/billing/constants/SettingsBillingPlanComparisonRows.ts
-msgid "Subdomain (yourco.twenty.com)"
+msgid "Subdomain (yourco.example.com)"
 msgstr ""
 
 #. js-lingui-id: mGO3xy
@@ -18369,12 +18402,13 @@ msgstr ""
 msgid "Subscription activated."
 msgstr ""
 
-#. js-lingui-id: 0okvpx
+#. js-lingui-id: FrYxRN
+#. placeholder {0}: brand.productName
 #: src/modules/settings/billing/components/AddPaymentMethodForm.tsx
 #: src/modules/settings/billing/components/AddPaymentMethodForm.tsx
 #: src/modules/settings/billing/hooks/useSubmitSubscriptionPayment.ts
 #: src/modules/settings/billing/hooks/useSubmitSubscriptionPayment.ts
-msgid "Subscription error. Please retry or contact Twenty team"
+msgid "Subscription error. Please retry or contact {0} support"
 msgstr ""
 
 #. js-lingui-id: FooJUj
@@ -18778,14 +18812,14 @@ msgstr ""
 msgid "The AWS region for Bedrock"
 msgstr ""
 
-#. js-lingui-id: HP7per
+#. js-lingui-id: 7Zymz0
 #: src/pages/settings/applications/utils/getStandardApplicationDescription.ts
 msgid ""
-"The base data model every Twenty workspace runs on.\n"
+"The base data model every {productName} workspace runs on.\n"
 "\n"
 "#### What \"foundation\" means\n"
 "\n"
-"Every Twenty workspace starts with this set of objects. They define the shape of your CRM, including relationships, activity, and reporting. Everything else, including marketplace apps, AI agents, and custom objects, plugs into them.\n"
+"Every {productName} workspace starts with this set of objects. They define the shape of your CRM, including relationships, activity, and reporting. Everything else, including marketplace apps, AI agents, and custom objects, plugs into them.\n"
 "\n"
 "#### Included objects\n"
 "- **People & Companies**: contact and account records\n"
@@ -18793,11 +18827,11 @@ msgid ""
 "- **Notes & Tasks**: activity and follow-ups\n"
 "- **Workflows & Dashboards**: automation and reporting\n"
 "\n"
-"Remove this app and the rest of Twenty has nothing to hang off.\n"
+"Remove this app and the rest of {productName} has nothing to hang off.\n"
 "\n"
 "#### Build your own app\n"
 "\n"
-"Extend Twenty with your own objects, fields, logic functions, or AI skills. Scaffold a new app in one command:\n"
+"Extend {productName} with your own objects, fields, logic functions, or AI skills. Scaffold a new app in one command:\n"
 "\n"
 "```bash\n"
 "npx create-twenty-app@latest my-twenty-app\n"
@@ -18810,7 +18844,7 @@ msgid ""
 "yarn twenty dev\n"
 "```\n"
 "\n"
-"See the [Getting Started guide](https://twenty.com/developers/extend/apps/getting-started) for the full walkthrough, and [Building Apps](https://twenty.com/developers/extend/apps/building) for the `defineApplication` / `defineEntity` APIs."
+"See the [{productName} documentation]({documentationUrl}) for the full walkthrough, including the `defineApplication` / `defineEntity` APIs."
 msgstr ""
 
 #. js-lingui-id: VsxjzF
@@ -18920,9 +18954,10 @@ msgstr ""
 msgid "The page you're seeking is either gone or never was. Let's get you back on track"
 msgstr ""
 
-#. js-lingui-id: Ya1wb4
+#. js-lingui-id: TTVffO
+#. placeholder {0}: brand.legal.senderDisplayName
 #: src/pages/settings/legal/SettingsLegalDpaNew.tsx
-msgid "The PDF is pre-signed by Twenty and executed with your legal entity and authorized signatory."
+msgid "The PDF is pre-signed by {0} and executed with your legal entity and authorized signatory."
 msgstr ""
 
 #. js-lingui-id: 8vRPIJ
@@ -19893,11 +19928,6 @@ msgstr ""
 msgid "Turquoise"
 msgstr ""
 
-#. js-lingui-id: JnaRPe
-#: src/modules/spreadsheet-import/steps/components/MatchColumnsStep/components/ColumnGrid.tsx
-msgid "Twenty fields"
-msgstr ""
-
 #. js-lingui-id: YIjS4q
 #: src/modules/ai/components/SettingsAgentModelCapabilities.tsx
 msgid "Twitter/X Search"
@@ -20640,6 +20670,11 @@ msgstr ""
 #. js-lingui-id: QaPv0m
 #: src/modules/ai/constants/crud-tool-operation-verbs.constant.ts
 msgid "Upserting {objectLabel}"
+msgstr ""
+
+#. js-lingui-id: i3x8Rj
+#: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
+msgid "Upstream app"
 msgstr ""
 
 #. js-lingui-id: 87NUzq
@@ -21749,6 +21784,7 @@ msgstr ""
 #: src/pages/settings/layout/components/SettingsLayoutDetailScaffold.tsx
 #: src/pages/settings/layout/SettingsLayout.tsx
 #: src/pages/settings/legal/SettingsLegalDpa.tsx
+#: src/pages/settings/legal/SettingsLegalDpaNew.tsx
 #: src/pages/settings/legal/SettingsLegalDpaNew.tsx
 #: src/pages/settings/logic-functions/SettingsLogicFunctionDetail.tsx
 #: src/pages/settings/logic-functions/SettingsLogicFunctionDetail.tsx

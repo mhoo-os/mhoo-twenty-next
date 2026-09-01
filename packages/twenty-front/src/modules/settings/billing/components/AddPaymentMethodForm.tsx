@@ -1,4 +1,5 @@
 import { currentUserState } from '@/auth/states/currentUserState';
+import { useResolvedBrand } from '@/client-config/hooks/useResolvedBrand';
 import { START_SUBSCRIPTION_AFTER_PAYMENT_METHOD_QUERY_PARAM } from '@/settings/billing/constants/StartSubscriptionAfterPaymentMethodQueryParam';
 import { useStripeAppearance } from '@/settings/billing/hooks/useStripeAppearance';
 import { useStripePromise } from '@/settings/billing/hooks/useStripePromise';
@@ -42,6 +43,7 @@ const AddPaymentMethodFormContent = ({
 }: AddPaymentMethodFormContentProps) => {
   const stripe = useStripe();
   const elements = useElements();
+  const brand = useResolvedBrand();
   const { enqueueErrorSnackBar } = useSnackBar();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const location = useLocation();
@@ -92,7 +94,7 @@ const AddPaymentMethodFormContent = ({
         data?.createBillingPaymentMethodSetupIntent?.clientSecret;
       if (!isDefined(clientSecret)) {
         enqueueErrorSnackBar({
-          message: t`Subscription error. Please retry or contact Twenty team`,
+          message: t`Subscription error. Please retry or contact ${brand.productName} support`,
         });
         setIsSubmitting(false);
         return;
@@ -123,7 +125,7 @@ const AddPaymentMethodFormContent = ({
         enqueueErrorSnackBar({ apolloError: error });
       } else {
         enqueueErrorSnackBar({
-          message: t`Subscription error. Please retry or contact Twenty team`,
+          message: t`Subscription error. Please retry or contact ${brand.productName} support`,
         });
       }
       setIsSubmitting(false);

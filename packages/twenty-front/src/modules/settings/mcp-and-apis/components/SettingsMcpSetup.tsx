@@ -3,6 +3,7 @@ import { t } from '@lingui/core/macro';
 import { Fragment } from 'react';
 
 import { LightCopyIconButton } from '@/object-record/record-field/ui/components/LightCopyIconButton';
+import { useResolvedBrand } from '@/client-config/hooks/useResolvedBrand';
 import ModelContextProtocolLogo from '@/settings/mcp-and-apis/assets/model-context-protocol-logo.svg?react';
 import { SettingsMcpSetupCard } from '@/settings/mcp-and-apis/components/SettingsMcpSetupCard';
 import { buildMcpSetupCategories } from '@/settings/mcp-and-apis/utils/buildMcpSetupCategories';
@@ -47,11 +48,13 @@ const StyledCardsGrid = styled.div`
 `;
 
 export const SettingsMcpSetup = () => {
+  const brand = useResolvedBrand();
   const mcpServerUrl = buildMcpServerUrl(REACT_APP_SERVER_BASE_URL);
   const mcpConfig = buildMcpConfig(mcpServerUrl);
   const categories = buildMcpSetupCategories({
     isHttpsInstallLinkEnabled: isHttpsUrl(mcpServerUrl),
     mcpServerUrl,
+    brand,
   });
 
   return (
@@ -74,7 +77,7 @@ export const SettingsMcpSetup = () => {
             <Section>
               <H2Title
                 title={t`Manual configuration`}
-                description={t`Access your workspace data from your favorite MCP client like Claude, Codex or Cursor.`}
+                description={t`Access your ${brand.productName} workspace data from your favorite MCP client like Claude, Codex or Cursor.`}
               />
               <CoreEditorHeader
                 leftNodes={[

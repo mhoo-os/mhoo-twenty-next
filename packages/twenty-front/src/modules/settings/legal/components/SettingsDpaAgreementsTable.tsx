@@ -13,6 +13,7 @@ import { TableHeader } from '@/ui/layout/table/components/TableHeader';
 import { TableRow } from '@/ui/layout/table/components/TableRow';
 import { useSnackBar } from '@/ui/feedback/snack-bar-manager/hooks/useSnackBar';
 import { downloadFile } from '@/activities/files/utils/downloadFile';
+import { useResolvedBrand } from '@/client-config/hooks/useResolvedBrand';
 
 const StyledTableBodyContainer = styled.div`
   border-bottom: 1px solid ${themeCssVariables.border.color.light};
@@ -26,6 +27,7 @@ export const SettingsDpaAgreementsTable = ({
   agreements,
 }: SettingsDpaAgreementsTableProps) => {
   const { t } = useLingui();
+  const brand = useResolvedBrand();
   const { enqueueErrorSnackBar } = useSnackBar();
 
   const handleDownload = async (agreement: DpaAgreement) => {
@@ -36,7 +38,7 @@ export const SettingsDpaAgreementsTable = ({
     try {
       await downloadFile(
         agreement.downloadUrl,
-        `Twenty-DPA-${agreement.templateVersion}-${agreement.customerLegalEntityName ?? 'copy'}.pdf`,
+        `${brand.productName}-DPA-${agreement.templateVersion}-${agreement.customerLegalEntityName ?? 'copy'}.pdf`,
       );
     } catch {
       enqueueErrorSnackBar({ message: t`Could not download the document.` });

@@ -7,6 +7,7 @@ import { Section } from 'twenty-ui/layout';
 import { H2Title } from 'twenty-ui/typography';
 
 import { useApolloCoreClient } from '@/object-metadata/hooks/useApolloCoreClient';
+import { useResolvedBrand } from '@/client-config/hooks/useResolvedBrand';
 import { DpaDocumentPreview } from '@/settings/legal/components/DpaDocumentPreview';
 import { DpaNotice } from '@/settings/legal/components/DpaNotice';
 import { GENERATE_SIGNED_DPA } from '@/settings/legal/graphql/mutations/generateSignedDpa';
@@ -27,6 +28,9 @@ import { useNavigateSettings } from '~/hooks/useNavigateSettings';
 
 export const SettingsLegalDpaNew = () => {
   const { t } = useLingui();
+  const brand = useResolvedBrand();
+  const isDpaAvailable =
+    brand.legal.dpa.status === 'approved' && brand.legal.dpa.url !== null;
   const navigateSettings = useNavigateSettings();
   const { enqueueSuccessSnackBar, enqueueErrorSnackBar } = useSnackBar();
   // DPA operations live on the core (/graphql) schema, not the default /metadata client.
@@ -39,7 +43,7 @@ export const SettingsLegalDpaNew = () => {
 
   const { data: previewData, loading: previewLoading } = useQuery<{
     dpaPreview: DpaDocument;
-  }>(GET_DPA_PREVIEW, { client: apolloCoreClient });
+  }>(GET_DPA_PREVIEW, { client: apolloCoreClient, skip: !isDpaAvailable });
 
   const [generateSignedDpa] = useMutation<{
     generateSignedDpa: GenerateSignedDpaResult;
@@ -52,6 +56,7 @@ export const SettingsLegalDpaNew = () => {
   const preview = previewData?.dpaPreview;
 
   const canSave =
+    isDpaAvailable &&
     customerLegalEntityName.trim() !== '' &&
     signatoryName.trim() !== '' &&
     signatoryTitle.trim() !== '' &&
@@ -93,7 +98,7 @@ export const SettingsLegalDpaNew = () => {
 
       await downloadFile(
         result.downloadUrl,
-        `Twenty-DPA-${result.agreement.templateVersion}-${safeLegalEntityName}.pdf`,
+        `${brand.productName}-DPA-${result.agreement.templateVersion}-${safeLegalEntityName}.pdf`,
       );
 
       enqueueSuccessSnackBar({
@@ -111,6 +116,30 @@ export const SettingsLegalDpaNew = () => {
 
   if (previewLoading) {
     return <SettingsSkeletonLoader />;
+  }
+
+  if (!isDpaAvailable) {
+    return (
+      <SettingsPageLayout
+        title={t`Generate DPA`}
+        links={[
+          {
+            children: t`Workspace`,
+            href: getSettingsPath(SettingsPath.General),
+          },
+          { children: t`Legal`, href: getSettingsPath(SettingsPath.LegalDpa) },
+          { children: t`Generate` },
+        ]}
+      >
+        <SettingsPageContainer>
+          <Section>
+            <DpaNotice
+              text={t`${brand.productName} data processing agreement is currently unavailable.`}
+            />
+          </Section>
+        </SettingsPageContainer>
+      </SettingsPageLayout>
+    );
   }
 
   return (
@@ -140,7 +169,7 @@ export const SettingsLegalDpaNew = () => {
         <Section>
           <H2Title
             title={t`Your details`}
-            description={t`The PDF is pre-signed by Twenty and executed with your legal entity and authorized signatory.`}
+            description={t`The PDF is pre-signed by ${brand.legal.senderDisplayName} and executed with your legal entity and authorized signatory.`}
           />
           <SettingsTextInput
             instanceId="dpa-legal-entity-name"

@@ -127,12 +127,6 @@ msgstr "(${currentCreditPriceDisplay}/{intervalLabel})"
 msgid "(no icon selected)"
 msgstr "(nicio pictogramă selectată)"
 
-#. js-lingui-id: 6Ux0ik
-#: src/modules/ui/navigation/navigation-drawer/components/MultiWorkspaceDropdown/internal/components/AvailableWorkspaceItem.tsx
-#: src/modules/ui/navigation/navigation-drawer/components/MultiWorkspaceDropdown/internal/MultiWorkspaceDropdownDefaultComponents.tsx
-msgid "(No name)"
-msgstr "(Fără nume)"
-
 #. js-lingui-id: p35p2M
 #: src/modules/ui/input/components/IconPicker.tsx
 msgid "(selected: {selectedIconKey})"
@@ -211,6 +205,13 @@ msgstr "{0, plural, one {Nu aveți permisiunea de a accesa câmpul {fieldsList}}
 msgid "{0} credits"
 msgstr "{0} credite"
 
+#. js-lingui-id: Ej3KaG
+#. placeholder {0}: brand.productName
+#: src/pages/settings/legal/SettingsLegalDpa.tsx
+#: src/pages/settings/legal/SettingsLegalDpaNew.tsx
+msgid "{0} data processing agreement is currently unavailable."
+msgstr ""
+
 #. js-lingui-id: QpgBEp
 #. placeholder {0}: withoutCreditCardTrialPeriod.duration
 #: src/pages/onboarding/UpgradeFreeTrial.tsx
@@ -225,7 +226,9 @@ msgstr "{0} duplicat"
 
 #. js-lingui-id: stCODw
 #. placeholder {0}: appObject.fields.length
+#. placeholder {0}: brand.productName
 #: src/modules/settings/applications/hooks/useComputeObjectAndFieldsContentForApplication.ts
+#: src/modules/spreadsheet-import/steps/components/MatchColumnsStep/components/ColumnGrid.tsx
 msgid "{0} fields"
 msgstr "{0} câmpuri"
 
@@ -982,15 +985,16 @@ msgstr "DPA-uri acceptate și semnate pentru acest spațiu de lucru, cu versiune
 msgid "Access Key ID"
 msgstr "ID-ul cheii de acces"
 
+#. js-lingui-id: WV3Yat
+#. placeholder {0}: brand.productName
+#: src/modules/settings/mcp-and-apis/components/SettingsMcpSetup.tsx
+msgid "Access your {0} workspace data from your favorite MCP client like Claude, Codex or Cursor."
+msgstr ""
+
 #. js-lingui-id: CrjDqe
 #: src/pages/auth/Authorize.tsx
 msgid "Access your workspace data"
 msgstr "Accesați datele spațiului dvs. de lucru"
-
-#. js-lingui-id: IF4QNM
-#: src/modules/settings/mcp-and-apis/components/SettingsMcpSetup.tsx
-msgid "Access your workspace data from your favorite MCP client like Claude, Codex or Cursor."
-msgstr "Accesați datele din spațiul dvs. de lucru de pe clientul MCP favorit, cum ar fi Claude, Codex sau Cursor."
 
 #. js-lingui-id: AeXO77
 #: src/modules/settings/accounts/components/SettingsConnectedAccountsTableHeader.tsx
@@ -1153,6 +1157,11 @@ msgstr "Adaugă"
 #: src/modules/settings/data-model/fields/forms/select/components/AddSelectOptionMenuItem.tsx
 msgid "Add \"{trimmedName}\" to options"
 msgstr "Adaugă \"{trimmedName}\" la opțiuni"
+
+#. js-lingui-id: dUOV5o
+#: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
+msgid "Add {productName} as a Streamable HTTP extension in Goose."
+msgstr ""
 
 #. js-lingui-id: 9CHcSG
 #: src/modules/object-record/record-table/empty-state/components/RecordTableEmptyStateNoRecordFoundForFilter.tsx
@@ -1505,35 +1514,35 @@ msgstr "Adaugă Furnizor de Identitate SSO"
 msgid "Add test input for evaluation (e.g., \"Find all customers in NY\")"
 msgstr ""
 
-#. js-lingui-id: FKGcEL
+#. js-lingui-id: zTPzKF
 #: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
-msgid "Add the Twenty MCP server as a remote context server in Zed."
-msgstr "Adăugați serverul Twenty MCP ca server de context la distanță în Zed."
+msgid "Add the {productName} MCP server as a remote context server in Zed."
+msgstr ""
 
-#. js-lingui-id: iA2nHX
+#. js-lingui-id: RCi0de
 #: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
-msgid "Add the Twenty MCP server from Augment Code settings."
-msgstr "Adăugați serverul Twenty MCP din setările Augment Code."
+msgid "Add the {productName} MCP server from Augment Code settings."
+msgstr ""
 
-#. js-lingui-id: l+NzAk
+#. js-lingui-id: VdmSXN
 #: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
-msgid "Add the Twenty MCP server from Raycast's MCP commands or settings."
-msgstr "Adăugați serverul Twenty MCP din comenzile sau setările MCP ale Raycast."
+msgid "Add the {productName} MCP server from Raycast's MCP commands or settings."
+msgstr ""
 
-#. js-lingui-id: j6G/yI
+#. js-lingui-id: Zsp+Qq
 #: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
-msgid "Add the Twenty MCP server in Gemini CLI settings."
-msgstr "Adăugați serverul Twenty MCP în setările Gemini CLI."
+msgid "Add the {productName} MCP server in Gemini CLI settings."
+msgstr ""
 
-#. js-lingui-id: /OyhlM
+#. js-lingui-id: BqUpn9
 #: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
-msgid "Add the Twenty MCP server to your LibreChat configuration file."
-msgstr "Adăugați serverul Twenty MCP în fișierul dvs. de configurare LibreChat."
+msgid "Add the {productName} MCP server to your LibreChat configuration file."
+msgstr ""
 
-#. js-lingui-id: K0DXoj
+#. js-lingui-id: YpuC5t
 #: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
-msgid "Add the Twenty remote server with LM Studio's install link."
-msgstr "Adăugați serverul Twenty la distanță cu linkul de instalare al LM Studio."
+msgid "Add the {productName} remote server with LM Studio's install link."
+msgstr ""
 
 #. js-lingui-id: 5+ttxv
 #: src/modules/settings/accounts/components/SettingsAccountsBlocklistInput.tsx
@@ -1549,11 +1558,6 @@ msgstr "Adaugă la favorite"
 #: src/modules/settings/unsubscribe-topics/components/SettingsWorkspaceUnsubscribeTopicSection.tsx
 msgid "Add topic"
 msgstr "Adăugați subiect"
-
-#. js-lingui-id: 4D/zWv
-#: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
-msgid "Add Twenty as a Streamable HTTP extension in Goose."
-msgstr "Adăugați Twenty ca extensie Streamable HTTP în Goose."
 
 #. js-lingui-id: XnwceV
 #: src/pages/settings/applications/components/SettingsApplicationRegistrationRedirectURIsInput.tsx
@@ -3187,10 +3191,11 @@ msgstr "Interval de facturare"
 msgid "Billing period"
 msgstr "Perioadă de facturare"
 
-#. js-lingui-id: xF/NXI
+#. js-lingui-id: nt1Pg9
+#. placeholder {0}: brand.productName
 #: src/modules/settings/billing/hooks/useBillingPortalSession.ts
-msgid "Billing portal session error. Please retry or contact Twenty team"
-msgstr "Eroare de sesiune în portalul de facturare. Te rog să încerci din nou sau contactează echipa Twenty"
+msgid "Billing portal session error. Please retry or contact {0} support"
+msgstr ""
 
 #. js-lingui-id: 8kIU+G
 #: src/modules/advanced-text-editor/constants/AdvancedTextEditorBlockCatalog.ts
@@ -3893,11 +3898,12 @@ msgstr "Verifică-ți e-mailurile"
 msgid "Check your inbox to verify your new email address."
 msgstr "Verificați-vă căsuța de e-mail pentru a confirma noua adresă de e-mail."
 
-#. js-lingui-id: SxwQE8
+#. js-lingui-id: RwgnEX
+#. placeholder {0}: brand.productName
 #: src/modules/settings/billing/hooks/useHandleCheckoutSession.ts
 #: src/modules/settings/billing/hooks/useHandleCheckoutSession.ts
-msgid "Checkout session error. Please retry or contact Twenty team"
-msgstr "Eroare de sesiune de checkout. Te rog să încerci din nou sau contactează echipa Twenty"
+msgid "Checkout session error. Please retry or contact {0} support"
+msgstr ""
 
 #. js-lingui-id: SviKkE
 #: src/localization/hooks/useLocaleOptions.ts
@@ -4554,6 +4560,16 @@ msgstr "Configurați setările IMAP pentru a primi și sincroniza emailurile."
 msgid "Configure SMTP settings to send emails from your account."
 msgstr "Configurează setările SMTP pentru a trimite e-mailuri de pe contul tău."
 
+#. js-lingui-id: x6Jukq
+#: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
+msgid "Configure the {productName} MCP server manually in Cascade."
+msgstr ""
+
+#. js-lingui-id: fzhFzO
+#: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
+msgid "Configure the {productName} MCP server manually in Cline."
+msgstr ""
+
 #. js-lingui-id: TiCmQz
 #: src/modules/settings/admin-panel/ai/components/SettingsAdminAI.tsx
 msgid "Configure the default AI models for all workspaces"
@@ -4568,16 +4584,6 @@ msgstr "Configurați serverul MCP la distanță prin setările agentului Warp."
 #: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
 msgid "Configure the remote server in Amazon Q Developer's MCP settings."
 msgstr "Configurați serverul la distanță în setările MCP ale Amazon Q Developer."
-
-#. js-lingui-id: g1/8jH
-#: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
-msgid "Configure the Twenty MCP server manually in Cascade."
-msgstr "Configurați manual serverul Twenty MCP în Cascade."
-
-#. js-lingui-id: XiyvRh
-#: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
-msgid "Configure the Twenty MCP server manually in Cline."
-msgstr "Configurați manual serverul Twenty MCP în Cline."
 
 #. js-lingui-id: qA9AGQ
 #: src/modules/settings/domains/components/SettingsDomainRecords.tsx
@@ -8037,10 +8043,11 @@ msgstr "Eroare la anularea schimbării intervalului."
 msgid "Error while cancelling plan switching."
 msgstr "Eroare la anularea schimbării planului."
 
-#. js-lingui-id: QmR+2U
+#. js-lingui-id: BLe2o6
+#. placeholder {0}: brand.productName
 #: src/modules/settings/billing/hooks/useEndSubscriptionTrialPeriod.ts
-msgid "Error while ending trial period. Please contact Twenty team."
-msgstr "Eroare la terminarea perioadei de probă. Vă rugăm contactaţi echipa Twenty."
+msgid "Error while ending trial period. Please contact {0} support."
+msgstr ""
 
 #. js-lingui-id: 5g78zo
 #: src/pages/settings/members/SettingsWorkspaceMember.tsx
@@ -8345,6 +8352,12 @@ msgstr "Expiră în"
 #: src/modules/settings/developers/utils/formatExpiration.ts
 msgid "Expires in {dateDiff}"
 msgstr "Expiră în {dateDiff}"
+
+#. js-lingui-id: dvJ/SB
+#. placeholder {0}: brand.productName
+#: src/pages/settings/community/SettingsCommunity.tsx
+msgid "Explore {0} documentation and current capabilities."
+msgstr ""
 
 #. js-lingui-id: GS+Mus
 #: src/modules/object-record/record-index/export/hooks/useRecordIndexExportRecords.ts
@@ -9170,6 +9183,11 @@ msgstr "Import folder/etichetă"
 msgid "Folders"
 msgstr "Foldere"
 
+#. js-lingui-id: pklV8q
+#: src/pages/settings/community/SettingsCommunity.tsx
+msgid "Follow upstream Twenty on X"
+msgstr ""
+
 #. js-lingui-id: I7Exsw
 #: src/pages/settings/community/SettingsCommunity.tsx
 msgid "Follow us on X"
@@ -9395,11 +9413,13 @@ msgstr "General - Setări"
 
 #. js-lingui-id: ziAjHi
 #: src/pages/settings/legal/SettingsLegalDpaNew.tsx
+#: src/pages/settings/legal/SettingsLegalDpaNew.tsx
 msgid "Generate"
 msgstr "Generați"
 
 #. js-lingui-id: H3rta9
 #: src/pages/settings/legal/SettingsLegalDpa.tsx
+#: src/pages/settings/legal/SettingsLegalDpaNew.tsx
 #: src/pages/settings/legal/SettingsLegalDpaNew.tsx
 msgid "Generate DPA"
 msgstr "Generați DPA"
@@ -9878,7 +9898,7 @@ msgstr ""
 msgid "Horizontal separator line"
 msgstr "Linie orizontală de separare"
 
-#. js-lingui-id: WOXdI6
+#. js-lingui-id: jgFA31
 #: src/pages/settings/applications/utils/getCustomApplicationDescription.ts
 msgid ""
 "Host your workspace's customizations and overrides.\n"
@@ -9903,31 +9923,8 @@ msgid ""
 "npx create-twenty-app@latest my-twenty-app\n"
 "```\n"
 "\n"
-"See the [Getting Started guide](https://twenty.com/developers/extend/apps/getting-started) for the full walkthrough, and [Building Apps](https://twenty.com/developers/extend/apps/building) for the `defineApplication` / `defineEntity` APIs."
+"See the [{productName} documentation]({documentationUrl}) for the full walkthrough, including the `defineApplication` / `defineEntity` APIs."
 msgstr ""
-"Găzduiește personalizările și suprascrierile spațiului tău de lucru.\n"
-"\n"
-"#### Ce include\n"
-"Fiecare extensie pe care o creezi peste aplicația standard este grupată sub Custom. Păstrează modificările de schemă, modificările de interfață și logica specifică spațiului de lucru într-un singur loc.\n"
-"\n"
-"- Obiecte și câmpuri personalizate pentru propriul tău model de date\n"
-"- Vizualizări, elemente de navigare și machete ale înregistrărilor care modelează modul în care lucrează echipa ta\n"
-"- Funcții logice, componente front-end și agenți care automatizează sau extind spațiul de lucru\n"
-"\n"
-"#### De ce există\n"
-"Folosește această aplicație pentru personalizări specifice spațiului de lucru care ar trebui să rămână locale acestui spațiu de lucru.\n"
-"\n"
-"Dacă modelezi un singur spațiu de lucru pentru o singură afacere, păstrează-l aici. Dacă construiești o aplicație de business reutilizabilă, cu propriul model de date, interfață (UI) și automatizări care trebuie versiunate, partajate sau instalate în mai multe spații de lucru, creează în schimb o aplicație dedicată.\n"
-"\n"
-"#### Construiește-ți propria aplicație\n"
-"\n"
-"Inițializează o aplicație nouă cu o singură comandă:\n"
-"\n"
-"```bash\n"
-"npx create-twenty-app@latest my-twenty-app\n"
-"```\n"
-"\n"
-"Vezi [Ghidul de pornire](https://twenty.com/developers/extend/apps/getting-started) pentru parcursul complet, și [Construirea aplicațiilor](https://twenty.com/developers/extend/apps/building) pentru API-urile `defineApplication` / `defineEntity`."
 
 #. js-lingui-id: yY8wAv
 #: src/modules/workflow/workflow-steps/workflow-actions/delay-actions/components/WorkflowEditActionDelay.tsx
@@ -10950,6 +10947,11 @@ msgstr "Alăturați-vă pe Discord."
 msgid "Join the community"
 msgstr "Alăturați-vă comunității"
 
+#. js-lingui-id: aSkpme
+#: src/pages/settings/community/SettingsCommunity.tsx
+msgid "Join the upstream Twenty Discord"
+msgstr ""
+
 #. js-lingui-id: ffWso3
 #: src/modules/activities/calendar/components/CalendarEventCallRecorderAvatar.tsx
 msgid "Joining"
@@ -11412,6 +11414,7 @@ msgstr "Verificări HS256 de tip Legacy pentru toate tokenurile"
 
 #. js-lingui-id: vifyyw
 #: src/pages/settings/legal/SettingsLegalDpa.tsx
+#: src/pages/settings/legal/SettingsLegalDpaNew.tsx
 #: src/pages/settings/legal/SettingsLegalDpaNew.tsx
 msgid "Legal"
 msgstr "Juridic"
@@ -14223,10 +14226,11 @@ msgstr "Recompensă de introducere"
 msgid "One or more filters reference deactivated or deleted fields and will be automatically removed on save."
 msgstr "Unul sau mai multe filtre fac referire la câmpuri dezactivate sau șterse și vor fi eliminate automat la salvare."
 
-#. js-lingui-id: 2l4SGU
+#. js-lingui-id: nIWaE5
+#. placeholder {0}: brand.productName
 #: src/pages/settings/enterprise/SettingsEnterprise.tsx
-msgid "One subscription provides one enterprise key that powers one production instance and one potential staging or test instance. To run a staging or test environment, install Twenty on a second server, activate it with this same enterprise key, then register that server as a development instance. Development instances unlock enterprise features without extra billing and do not count toward your production seats."
-msgstr "Un abonament oferă o singură cheie enterprise, care alimentează o instanță de producție și o posibilă instanță de staging sau test. Pentru a rula un mediu de staging sau test, instalați Twenty pe un al doilea server, activați-l cu aceeași cheie enterprise, apoi înregistrați acel server ca instanță de dezvoltare. Instanțele de dezvoltare deblochează funcțiile enterprise fără costuri suplimentare de facturare și nu sunt luate în calcul la locurile din producție."
+msgid "One subscription provides one enterprise key that powers one production instance and one potential staging or test instance. To run a staging or test environment, install {0} on a second server, activate it with this same enterprise key, then register that server as a development instance. Development instances unlock enterprise features without extra billing and do not count toward your production seats."
+msgstr ""
 
 #. js-lingui-id: oFTo3P
 #: src/modules/settings/event-logs/components/SettingsLogs.tsx
@@ -14319,15 +14323,15 @@ msgstr "Deschideți un editor de e-mail pentru a edita setările blocului."
 msgid "Open as link"
 msgstr "Deschide ca link"
 
-#. js-lingui-id: n0vVgf
+#. js-lingui-id: BAb8aW
 #: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
-msgid "Open Claude with the Twenty connector name and MCP URL prefilled."
-msgstr "Deschideți Claude cu numele conectorului Twenty și URL-ul MCP precompletate."
+msgid "Open Claude with the {productName} connector name and MCP URL prefilled."
+msgstr ""
 
-#. js-lingui-id: +n2jpB
+#. js-lingui-id: I+yg+J
 #: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
-msgid "Open Cursor's MCP installer with the Twenty remote server config."
-msgstr "Deschideți programul de instalare MCP al Cursor cu configurația serverului Twenty la distanță."
+msgid "Open Cursor's MCP installer with the {productName} remote server config."
+msgstr ""
 
 #. js-lingui-id: pZZH4Q
 #: src/modules/auth/sign-in-up/components/EmailVerificationSent.tsx
@@ -14366,10 +14370,15 @@ msgstr "Deschideți înregistrările alături de pagina curentă"
 msgid "Open records on a dedicated page"
 msgstr "Deschideți înregistrările pe o pagină dedicată"
 
-#. js-lingui-id: q170S2
+#. js-lingui-id: i9ZD6n
 #: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
-msgid "Open Replit with the Twenty remote server config."
-msgstr "Deschideți Replit cu configurația serverului Twenty la distanță."
+msgid "Open Replit with the {productName} remote server config."
+msgstr ""
+
+#. js-lingui-id: XZmZ1V
+#: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
+msgid "Open the upstream Twenty ChatGPT integration for your workspace."
+msgstr ""
 
 #. js-lingui-id: sBd/cl
 #: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
@@ -15506,6 +15515,7 @@ msgstr "Citește jurnalul modificărilor"
 #. js-lingui-id: ibPuCP
 #: src/pages/settings/applications/components/SettingsClaimApplicationSection.tsx
 #: src/pages/settings/applications/tabs/SettingsApplicationsDeveloperTab.tsx
+#: src/pages/settings/community/SettingsCommunity.tsx
 msgid "Read documentation"
 msgstr "Citește documentația"
 
@@ -18303,10 +18313,10 @@ msgstr "Sub-câmpuri"
 msgid "Subdomain"
 msgstr "Subdomeniu"
 
-#. js-lingui-id: Sv4BSp
+#. js-lingui-id: vkXMsX
 #: src/modules/settings/billing/constants/SettingsBillingPlanComparisonRows.ts
-msgid "Subdomain (yourco.twenty.com)"
-msgstr "Subdomeniu (yourco.twenty.com)"
+msgid "Subdomain (yourco.example.com)"
+msgstr ""
 
 #. js-lingui-id: mGO3xy
 #: src/modules/auth/sign-in-up/components/internal/SignInUpWorkspaceCreationForm.tsx
@@ -18397,13 +18407,14 @@ msgstr "Abonament"
 msgid "Subscription activated."
 msgstr "Abonament activat."
 
-#. js-lingui-id: 0okvpx
+#. js-lingui-id: FrYxRN
+#. placeholder {0}: brand.productName
 #: src/modules/settings/billing/components/AddPaymentMethodForm.tsx
 #: src/modules/settings/billing/components/AddPaymentMethodForm.tsx
 #: src/modules/settings/billing/hooks/useSubmitSubscriptionPayment.ts
 #: src/modules/settings/billing/hooks/useSubmitSubscriptionPayment.ts
-msgid "Subscription error. Please retry or contact Twenty team"
-msgstr "Eroare de abonament. Vă rugăm să reîncercați sau să contactați echipa Twenty"
+msgid "Subscription error. Please retry or contact {0} support"
+msgstr ""
 
 #. js-lingui-id: FooJUj
 #. placeholder {0}: getTargetPlanLabel(targetPlanKey)
@@ -18806,14 +18817,14 @@ msgstr "Endpointul API pentru furnizorul dvs. compatibil cu OpenAI"
 msgid "The AWS region for Bedrock"
 msgstr "Regiunea AWS pentru Bedrock"
 
-#. js-lingui-id: HP7per
+#. js-lingui-id: 7Zymz0
 #: src/pages/settings/applications/utils/getStandardApplicationDescription.ts
 msgid ""
-"The base data model every Twenty workspace runs on.\n"
+"The base data model every {productName} workspace runs on.\n"
 "\n"
 "#### What \"foundation\" means\n"
 "\n"
-"Every Twenty workspace starts with this set of objects. They define the shape of your CRM, including relationships, activity, and reporting. Everything else, including marketplace apps, AI agents, and custom objects, plugs into them.\n"
+"Every {productName} workspace starts with this set of objects. They define the shape of your CRM, including relationships, activity, and reporting. Everything else, including marketplace apps, AI agents, and custom objects, plugs into them.\n"
 "\n"
 "#### Included objects\n"
 "- **People & Companies**: contact and account records\n"
@@ -18821,11 +18832,11 @@ msgid ""
 "- **Notes & Tasks**: activity and follow-ups\n"
 "- **Workflows & Dashboards**: automation and reporting\n"
 "\n"
-"Remove this app and the rest of Twenty has nothing to hang off.\n"
+"Remove this app and the rest of {productName} has nothing to hang off.\n"
 "\n"
 "#### Build your own app\n"
 "\n"
-"Extend Twenty with your own objects, fields, logic functions, or AI skills. Scaffold a new app in one command:\n"
+"Extend {productName} with your own objects, fields, logic functions, or AI skills. Scaffold a new app in one command:\n"
 "\n"
 "```bash\n"
 "npx create-twenty-app@latest my-twenty-app\n"
@@ -18838,38 +18849,8 @@ msgid ""
 "yarn twenty dev\n"
 "```\n"
 "\n"
-"See the [Getting Started guide](https://twenty.com/developers/extend/apps/getting-started) for the full walkthrough, and [Building Apps](https://twenty.com/developers/extend/apps/building) for the `defineApplication` / `defineEntity` APIs."
+"See the [{productName} documentation]({documentationUrl}) for the full walkthrough, including the `defineApplication` / `defineEntity` APIs."
 msgstr ""
-"Modelul de date de bază pe care rulează fiecare spațiu de lucru Twenty.\n"
-"\n"
-"#### Ce înseamnă „fundament”\n"
-"\n"
-"Fiecare spațiu de lucru Twenty pornește cu acest set de obiecte. Ele definesc forma CRM-ului tău, incluzând relațiile, activitatea și raportarea. Tot restul, inclusiv aplicațiile din marketplace, agenții AI și obiectele personalizate, se conectează la acestea.\n"
-"\n"
-"#### Obiecte incluse\n"
-"- **Persoane și companii**: înregistrări de contact și de cont\n"
-"- **Oportunități**: pipeline-ul tău de vânzări\n"
-"- **Note și sarcini**: activitate și urmăriri\n"
-"- **Fluxuri de lucru și Tablouri de bord**: automatizare și raportare\n"
-"\n"
-"Dacă elimini această aplicație, restul Twenty nu mai are pe ce se sprijini.\n"
-"\n"
-"#### Construiește-ți propria aplicație\n"
-"\n"
-"Extinde Twenty cu propriile obiecte, câmpuri, funcții logice sau abilități AI. Inițializează o aplicație nouă cu o singură comandă:\n"
-"\n"
-"```bash\n"
-"npx create-twenty-app@latest my-twenty-app\n"
-"```\n"
-"\n"
-"Apoi, în interiorul folderului:\n"
-"\n"
-"```bash\n"
-"cd my-twenty-app\n"
-"yarn twenty dev\n"
-"```\n"
-"\n"
-"Vezi [Ghidul de pornire](https://twenty.com/developers/extend/apps/getting-started) pentru parcursul complet, și [Construirea aplicațiilor](https://twenty.com/developers/extend/apps/building) pentru API-urile `defineApplication` / `defineEntity`."
 
 #. js-lingui-id: VsxjzF
 #: src/modules/page-layout/widgets/call-recording-summary/components/CallRecordingSummaryBody.tsx
@@ -18978,10 +18959,11 @@ msgstr "Numele pe care destinatarii îl văd lângă adresa dvs. Este setat cân
 msgid "The page you're seeking is either gone or never was. Let's get you back on track"
 msgstr "Pagina pe care o căutați a dispărut sau nu a existat niciodată. Hai să vă redirecționăm pe calea cea bună"
 
-#. js-lingui-id: Ya1wb4
+#. js-lingui-id: TTVffO
+#. placeholder {0}: brand.legal.senderDisplayName
 #: src/pages/settings/legal/SettingsLegalDpaNew.tsx
-msgid "The PDF is pre-signed by Twenty and executed with your legal entity and authorized signatory."
-msgstr "PDF-ul este pre-semnat de Twenty și executat cu entitatea dvs. juridică și semnatarul autorizat."
+msgid "The PDF is pre-signed by {0} and executed with your legal entity and authorized signatory."
+msgstr ""
 
 #. js-lingui-id: 8vRPIJ
 #: src/modules/page-layout/widgets/call-recording-transcript/components/CallRecordingVideoPlayer.tsx
@@ -19951,11 +19933,6 @@ msgstr ""
 msgid "Turquoise"
 msgstr "Turcoaz"
 
-#. js-lingui-id: JnaRPe
-#: src/modules/spreadsheet-import/steps/components/MatchColumnsStep/components/ColumnGrid.tsx
-msgid "Twenty fields"
-msgstr "Câmpuri Twenty"
-
 #. js-lingui-id: YIjS4q
 #: src/modules/ai/components/SettingsAgentModelCapabilities.tsx
 msgid "Twitter/X Search"
@@ -20699,6 +20676,11 @@ msgstr "Upsert finalizat pentru {objectLabel}"
 #: src/modules/ai/constants/crud-tool-operation-verbs.constant.ts
 msgid "Upserting {objectLabel}"
 msgstr "Se efectuează upsert pentru {objectLabel}"
+
+#. js-lingui-id: i3x8Rj
+#: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
+msgid "Upstream app"
+msgstr ""
 
 #. js-lingui-id: 87NUzq
 #: src/pages/settings/applications/components/SettingsApplicationRegistrationRedirectURIsTable.tsx
@@ -21807,6 +21789,7 @@ msgstr "Fluxuri de lucru"
 #: src/pages/settings/layout/components/SettingsLayoutDetailScaffold.tsx
 #: src/pages/settings/layout/SettingsLayout.tsx
 #: src/pages/settings/legal/SettingsLegalDpa.tsx
+#: src/pages/settings/legal/SettingsLegalDpaNew.tsx
 #: src/pages/settings/legal/SettingsLegalDpaNew.tsx
 #: src/pages/settings/logic-functions/SettingsLogicFunctionDetail.tsx
 #: src/pages/settings/logic-functions/SettingsLogicFunctionDetail.tsx

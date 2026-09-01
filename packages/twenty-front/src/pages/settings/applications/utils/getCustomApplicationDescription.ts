@@ -1,7 +1,14 @@
 import { t } from '@lingui/core/macro';
 
-export const getCustomApplicationDescription =
-  (): string => t`Host your workspace's customizations and overrides.
+type ApplicationDescriptionBrand = {
+  productName?: string;
+  documentationUrl?: string;
+};
+
+export const getCustomApplicationDescription = ({
+  productName = 'Twenty',
+  documentationUrl = 'https://twenty.com/developers/extend/apps/getting-started',
+}: ApplicationDescriptionBrand = {}): string => t`Host your workspace's customizations and overrides.
 
 #### What it includes
 Every extension you create on top of the standard app is grouped under Custom. It keeps your schema changes, interface changes, and workspace-specific logic in one place.
@@ -23,4 +30,4 @@ Scaffold a new app in one command:
 npx create-twenty-app@latest my-twenty-app
 \`\`\`
 
-See the [Getting Started guide](https://twenty.com/developers/extend/apps/getting-started) for the full walkthrough, and [Building Apps](https://twenty.com/developers/extend/apps/building) for the \`defineApplication\` / \`defineEntity\` APIs.`;
+See the [${productName} documentation](${documentationUrl}) for the full walkthrough, including the \`defineApplication\` / \`defineEntity\` APIs.`;

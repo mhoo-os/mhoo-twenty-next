@@ -1,4 +1,8 @@
-import { MHO_BRAND, TWENTY_BRAND } from 'twenty-shared/branding';
+import {
+  MHO_BRAND,
+  TWENTY_BRAND,
+  type ProductBrand,
+} from 'twenty-shared/branding';
 
 import { getApprovedLegalDocumentUrl } from '@/auth/sign-in-up/components/FooterNote';
 
@@ -15,7 +19,7 @@ describe('getApprovedLegalDocumentUrl', () => {
   });
 
   it('returns only an explicitly approved non-empty URL', () => {
-    const brand = {
+    const brand: ProductBrand = {
       ...MHO_BRAND,
       legal: {
         ...MHO_BRAND.legal,

@@ -1,4 +1,5 @@
 import { currentWorkspaceState } from '@/auth/states/currentWorkspaceState';
+import { useResolvedBrand } from '@/client-config/hooks/useResolvedBrand';
 import { useRedirect } from '@/domain-manager/hooks/useRedirect';
 import { useSnackBar } from '@/ui/feedback/snack-bar-manager/hooks/useSnackBar';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
@@ -10,6 +11,7 @@ import { BillingPortalSessionDocument } from '~/generated-metadata/graphql';
 export const useBillingPortalSession = (returnUrlPath: string) => {
   const { t } = useLingui();
   const currentWorkspace = useAtomStateValue(currentWorkspaceState);
+  const brand = useResolvedBrand();
   const { redirect } = useRedirect();
   const { enqueueErrorSnackBar } = useSnackBar();
 
@@ -25,7 +27,7 @@ export const useBillingPortalSession = (returnUrlPath: string) => {
 
   const showBillingPortalSessionError = () => {
     enqueueErrorSnackBar({
-      message: t`Billing portal session error. Please retry or contact Twenty team`,
+      message: t`Billing portal session error. Please retry or contact ${brand.productName} support`,
     });
   };
 
