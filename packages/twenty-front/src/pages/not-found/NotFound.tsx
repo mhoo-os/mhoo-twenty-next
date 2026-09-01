@@ -1,5 +1,6 @@
 import { Trans, useLingui } from '@lingui/react/macro';
 import { lazy, Suspense } from 'react';
+import { MHO_BRAND } from 'twenty-shared/branding';
 
 const BackgroundMockPage = lazy(() =>
   import('@/sign-in-background-mock/components/BackgroundMockPage').then(
@@ -10,6 +11,8 @@ import { AppPath } from 'twenty-shared/types';
 
 import { RootStackingContextZIndices } from '@/ui/layout/constants/RootStackingContextZIndices';
 import { PageTitle } from '@/ui/utilities/page-title/components/PageTitle';
+import { brandState } from '@/client-config/states/brandState';
+import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { styled } from '@linaria/react';
 import { MainButton } from 'twenty-ui/input';
 import { themeCssVariables } from 'twenty-ui/theme-constants';
@@ -43,10 +46,11 @@ const StyledButtonContainer = styled.div`
 
 export const NotFound = () => {
   const { t } = useLingui();
+  const brand = useAtomStateValue(brandState) ?? MHO_BRAND;
 
   return (
     <>
-      <PageTitle title={t`Page Not Found | Twenty`} />
+      <PageTitle title={t`Page Not Found | ${brand.productName}`} />
       <StyledBackDrop>
         <AnimatedPlaceholderErrorContainer>
           <AnimatedPlaceholder type="error404" />

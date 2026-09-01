@@ -1,12 +1,15 @@
 import { styled } from '@linaria/react';
 import { isNonEmptyString } from '@sniptt/guards';
+import { MHO_BRAND, type ResolvedBrand } from 'twenty-shared/branding';
 import { AppPath } from 'twenty-shared/types';
 import { getImageAbsoluteURI, isDefined } from 'twenty-shared/utils';
 import { Avatar } from 'twenty-ui/data-display';
 import { UndecoratedLink } from 'twenty-ui/navigation';
 import { themeCssVariables } from 'twenty-ui/theme-constants';
+import { brandState } from '@/client-config/states/brandState';
 import { REACT_APP_SERVER_BASE_URL } from '~/config';
 import { useRedirectToDefaultDomain } from '~/modules/domain-manager/hooks/useRedirectToDefaultDomain';
+import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 
 type LogoProps = {
   primaryLogo?: string | null;
@@ -51,6 +54,11 @@ const StyledPrimaryLogo = styled.div`
   width: 100%;
 `;
 
+export const getProductLogoUrl = (
+  brand: Pick<ResolvedBrand, 'assets'>,
+  origin = window.location.origin,
+): string => new URL(brand.assets.productMark.path, origin).toString();
+
 export const Logo = ({
   primaryLogo,
   secondaryLogo,
@@ -58,13 +66,16 @@ export const Logo = ({
   onClick,
   to = AppPath.SignInUp,
 }: LogoProps) => {
+  const brand = useAtomStateValue(brandState) ?? MHO_BRAND;
   const { redirectToDefaultDomain } = useRedirectToDefaultDomain();
-  const defaultPrimaryLogoUrl = `${window.location.origin}/images/icons/android/android-launchericon-192-192.png`;
+  const isUsingDefaultLogo = !isDefined(primaryLogo);
 
-  const primaryLogoUrl = getImageAbsoluteURI({
-    imageUrl: primaryLogo ?? defaultPrimaryLogoUrl,
-    baseUrl: REACT_APP_SERVER_BASE_URL,
-  });
+  const primaryLogoUrl = isUsingDefaultLogo
+    ? getProductLogoUrl(brand)
+    : getImageAbsoluteURI({
+        imageUrl: primaryLogo,
+        baseUrl: REACT_APP_SERVER_BASE_URL,
+      });
 
   const secondaryLogoUrl = isNonEmptyString(secondaryLogo)
     ? getImageAbsoluteURI({
@@ -73,13 +84,13 @@ export const Logo = ({
       })
     : null;
 
-  const isUsingDefaultLogo = !isDefined(primaryLogo);
-
   return (
     <StyledContainer onClick={() => onClick?.()}>
       {isUsingDefaultLogo ? (
         <UndecoratedLink to={to} onClick={() => redirectToDefaultDomain()}>
           <StyledPrimaryLogo
+            role="img"
+            aria-label={brand.accessibility.logoAltText}
             style={{ backgroundImage: `url(${primaryLogoUrl})` }}
           />
         </UndecoratedLink>

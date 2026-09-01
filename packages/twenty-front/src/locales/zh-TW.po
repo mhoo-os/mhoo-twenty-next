@@ -3378,10 +3378,11 @@ msgstr "按鈕"
 msgid "by {author}"
 msgstr "由 {author}"
 
-#. js-lingui-id: 8Pfllj
+#. js-lingui-id: vGW+VY
+#. placeholder {0}: brand.productName
 #: src/modules/auth/sign-in-up/components/FooterNote.tsx
-msgid "By using Twenty, you agree to the"
-msgstr "使用 Twenty 即表示您同意"
+msgid "By using {0}, you agree to the"
+msgstr ""
 
 #. js-lingui-id: Yx41df
 #: src/modules/auth/sign-in-up/components/FooterNote.tsx
@@ -11392,6 +11393,12 @@ msgstr "所有權杖中的舊版 HS256 驗證"
 msgid "Legal"
 msgstr "法務"
 
+#. js-lingui-id: OaVrtJ
+#: src/modules/auth/sign-in-up/components/FooterNote.tsx
+#: src/modules/auth/sign-in-up/components/FooterNote.tsx
+msgid "Legal documents are currently unavailable."
+msgstr ""
+
 #. js-lingui-id: nc/jNe
 #: src/pages/settings/legal/SettingsLegalDpaNew.tsx
 msgid "Legal entity name"
@@ -14644,10 +14651,11 @@ msgstr "頁面佈局"
 msgid "Page name"
 msgstr "頁面名稱"
 
-#. js-lingui-id: NRvxzv
+#. js-lingui-id: skPhWs
+#. placeholder {0}: brand.productName
 #: src/pages/not-found/NotFound.tsx
-msgid "Page Not Found | Twenty"
-msgstr "找不到頁面 | Twenty"
+msgid "Page Not Found | {0}"
+msgstr ""
 
 #. js-lingui-id: oIhFvf
 #: src/modules/side-panel/pages/email-block-settings/components/EmailPageStyleSection.tsx
@@ -16607,6 +16615,11 @@ msgstr "範圍"
 #: src/pages/settings/ai/components/SettingsAgentLogsTab.tsx
 #: src/pages/settings/ai/SettingsAgentTurnDetail.tsx
 msgid "Score"
+msgstr ""
+
+#. js-lingui-id: oOi11l
+#: src/modules/ai/components/AiChatScrollToBottomButton.tsx
+msgid "Scroll to bottom"
 msgstr ""
 
 #. js-lingui-id: hJjXGo
@@ -21482,10 +21495,11 @@ msgstr ""
 msgid "Weight"
 msgstr "權重"
 
-#. js-lingui-id: nTuObL
+#. js-lingui-id: /Qpb88
+#. placeholder {0}: brand.productName
 #: src/pages/auth/SignInUp.tsx
-msgid "Welcome to Twenty"
-msgstr "歡迎來到 Twenty"
+msgid "Welcome to {0}"
+msgstr ""
 
 #. js-lingui-id: t8ZvkC
 #: src/modules/onboarding/constants/WelcomeTitleMessage.ts

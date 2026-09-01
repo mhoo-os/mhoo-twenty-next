@@ -7,6 +7,7 @@ import {
 } from '@/auth/states/signInUpStepState';
 import { workspacePublicDataState } from '@/auth/states/workspacePublicDataState';
 import { styled } from '@linaria/react';
+import { MHO_BRAND } from 'twenty-shared/branding';
 
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { useSetAtomState } from '@/ui/utilities/state/jotai/hooks/useSetAtomState';
@@ -21,6 +22,7 @@ import { StyledOnboardingStepPage } from '@/onboarding/components/StyledOnboardi
 import { SignInUpWorkspaceCreationForm } from '@/auth/sign-in-up/components/internal/SignInUpWorkspaceCreationForm';
 import { SignInUpWorkspaceScopeFormEffect } from '@/auth/sign-in-up/components/internal/SignInUpWorkspaceScopeFormEffect';
 import { isMultiWorkspaceEnabledState } from '@/client-config/states/isMultiWorkspaceEnabledState';
+import { brandState } from '@/client-config/states/brandState';
 import { useGetPublicWorkspaceDataByDomain } from '@/domain-manager/hooks/useGetPublicWorkspaceDataByDomain';
 import { useIsCurrentLocationOnAWorkspace } from '@/domain-manager/hooks/useIsCurrentLocationOnAWorkspace';
 import { useIsCurrentLocationOnDefaultDomain } from '@/domain-manager/hooks/useIsCurrentLocationOnDefaultDomain';
@@ -61,6 +63,7 @@ export const SignInUp = () => {
   const { t } = useLingui();
   const setSignInUpStep = useSetAtomState(signInUpStepState);
   const clientConfigApiStatus = useAtomStateValue(clientConfigApiStatusState);
+  const brand = useAtomStateValue(brandState) ?? MHO_BRAND;
   const isCreatingWorkspace = useAtomStateValue(isCreatingWorkspaceState);
 
   const { form } = useSignInUpForm();
@@ -117,7 +120,7 @@ export const SignInUp = () => {
     }
 
     if (isGlobalScope) {
-      return t`Welcome to Twenty`;
+      return t`Welcome to ${brand.productName}`;
     }
 
     const workspaceName = workspacePublicData?.displayName;
@@ -133,6 +136,7 @@ export const SignInUp = () => {
     workspacePublicData?.displayName,
     isGlobalScope,
     t,
+    brand.productName,
     workspaceFromInviteHash?.displayName,
   ]);
 

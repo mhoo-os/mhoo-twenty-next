@@ -1,6 +1,7 @@
 import { ONBOARDING_CONTENT_BLOCK_WIDTH } from '@/onboarding/constants/OnboardingContentBlockWidth';
 import { styled } from '@linaria/react';
 import { useLingui } from '@lingui/react/macro';
+import { MHO_BRAND } from 'twenty-shared/branding';
 import { isDefined } from 'twenty-shared/utils';
 import { IconChevronLeft, IconCoins, IconInfoCircle } from 'twenty-ui/icon';
 import { LightIconButton } from 'twenty-ui/input';
@@ -9,6 +10,8 @@ import {
   themeCssVariables,
   useTheme,
 } from 'twenty-ui/theme-constants';
+import { brandState } from '@/client-config/states/brandState';
+import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 
 const StyledHeader = styled.div`
   align-items: flex-start;
@@ -57,10 +60,9 @@ const StyledRightSide = styled(StyledSide)`
   padding-left: ${themeCssVariables.spacing[1]};
 `;
 
-const StyledLogo = styled.div`
-  background-image: url('/images/integrations/twenty-logo.svg');
-  background-size: cover;
+const StyledLogo = styled.img`
   height: ${themeCssVariables.spacing[6]};
+  object-fit: contain;
   opacity: 0.4;
   width: ${themeCssVariables.spacing[6]};
 `;
@@ -123,6 +125,7 @@ export const OnboardingHeader = ({
 }: OnboardingHeaderProps) => {
   const { t } = useLingui();
   const theme = useTheme();
+  const brand = useAtomStateValue(brandState) ?? MHO_BRAND;
 
   return (
     <StyledHeader>
@@ -139,7 +142,10 @@ export const OnboardingHeader = ({
         )}
       </StyledLeftSide>
       <StyledCenter>
-        <StyledLogo />
+        <StyledLogo
+          src={brand.assets.productMark.path}
+          alt={brand.accessibility.logoAltText}
+        />
       </StyledCenter>
       <StyledRightSide>
         {isDefined(freeCredits) && (

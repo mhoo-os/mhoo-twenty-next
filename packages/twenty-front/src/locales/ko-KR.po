@@ -3378,10 +3378,11 @@ msgstr "버튼"
 msgid "by {author}"
 msgstr "제작: {author}"
 
-#. js-lingui-id: 8Pfllj
+#. js-lingui-id: vGW+VY
+#. placeholder {0}: brand.productName
 #: src/modules/auth/sign-in-up/components/FooterNote.tsx
-msgid "By using Twenty, you agree to the"
-msgstr "Twenty를 사용함으로써 귀하는 다음에 동의합니다"
+msgid "By using {0}, you agree to the"
+msgstr ""
 
 #. js-lingui-id: Yx41df
 #: src/modules/auth/sign-in-up/components/FooterNote.tsx
@@ -11415,6 +11416,12 @@ msgstr "모든 토큰에 대한 레거시 HS256 검증"
 msgid "Legal"
 msgstr "법무"
 
+#. js-lingui-id: OaVrtJ
+#: src/modules/auth/sign-in-up/components/FooterNote.tsx
+#: src/modules/auth/sign-in-up/components/FooterNote.tsx
+msgid "Legal documents are currently unavailable."
+msgstr ""
+
 #. js-lingui-id: nc/jNe
 #: src/pages/settings/legal/SettingsLegalDpaNew.tsx
 msgid "Legal entity name"
@@ -14667,10 +14674,11 @@ msgstr "페이지 레이아웃"
 msgid "Page name"
 msgstr "페이지 이름"
 
-#. js-lingui-id: NRvxzv
+#. js-lingui-id: skPhWs
+#. placeholder {0}: brand.productName
 #: src/pages/not-found/NotFound.tsx
-msgid "Page Not Found | Twenty"
-msgstr "페이지를 찾을 수 없음 | Twenty"
+msgid "Page Not Found | {0}"
+msgstr ""
 
 #. js-lingui-id: oIhFvf
 #: src/modules/side-panel/pages/email-block-settings/components/EmailPageStyleSection.tsx
@@ -16630,6 +16638,11 @@ msgstr "범위"
 #: src/pages/settings/ai/components/SettingsAgentLogsTab.tsx
 #: src/pages/settings/ai/SettingsAgentTurnDetail.tsx
 msgid "Score"
+msgstr ""
+
+#. js-lingui-id: oOi11l
+#: src/modules/ai/components/AiChatScrollToBottomButton.tsx
+msgid "Scroll to bottom"
 msgstr ""
 
 #. js-lingui-id: hJjXGo
@@ -21535,10 +21548,11 @@ msgstr ""
 msgid "Weight"
 msgstr "가중치"
 
-#. js-lingui-id: nTuObL
+#. js-lingui-id: /Qpb88
+#. placeholder {0}: brand.productName
 #: src/pages/auth/SignInUp.tsx
-msgid "Welcome to Twenty"
-msgstr "Twenty에 오신 것을 환영합니다"
+msgid "Welcome to {0}"
+msgstr ""
 
 #. js-lingui-id: t8ZvkC
 #: src/modules/onboarding/constants/WelcomeTitleMessage.ts
