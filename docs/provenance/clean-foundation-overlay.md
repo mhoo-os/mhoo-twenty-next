@@ -11,7 +11,7 @@ cherry-picked into this repository.
 Initial permitted overlay paths:
 
 - `.twenty-source`
-- `AGENTS.md`
+- `CLAUDE.md` (also reached through the upstream `AGENTS.md` symlink)
 - `docs/provenance/clean-foundation-overlay.md`
 - `scripts/provenance/verify-source.sh`
 
