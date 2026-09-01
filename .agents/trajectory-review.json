@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "rubric": {
+    "path": ".agents/skills/pr-trajectory-audit/references/failure-patterns.md",
+    "sha256": "af10f5c606acf325a747c50dfc2f84a97d9eb146abb1901389ef44b161ce1c4e"
+  },
+  "governing_sources": [
+    {
+      "path": "CLAUDE.md",
+      "sha256": "1c3b1e0b89bba7270129600d000145d022c898e6939649c81f5ead88e2950c40"
+    }
+  ]
+}
