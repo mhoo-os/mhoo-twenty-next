@@ -143,5 +143,10 @@ Authenticated UI and customer-copy presentation paths:
 - `packages/twenty-front/src/modules/settings/billing/constants/SettingsBillingPlanComparisonRows.ts`
 - `packages/twenty-front/src/modules/spreadsheet-import/steps/components/MatchColumnsStep/components/ColumnGrid.tsx`
 
-These paths authorize source-level branding work only. They do not authorize
-runtime deployment, publication, legal approval, or production mutation.
+MHO-146 Finance App Phase A source and evidence paths:
+
+- packages/twenty-apps/internal/mhoo-finance/
+
+These paths authorize only the source-level changes named above. They do not
+authorize runtime deployment, publication, legal approval, or production
+mutation.

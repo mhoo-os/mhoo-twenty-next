@@ -1,0 +1,43 @@
+{
+  "generatedAt": "2026-09-01T00:00:00.000Z",
+  "source": "src/__tests__/rendered-state-receipt.test.ts",
+  "states": [
+    {
+      "state": "populated",
+      "htmlLength": 19408,
+      "htmlSha256": "1eda726cd42daeab74a25b2cac5f3e307b57fea0990643963589d069762351b6"
+    },
+    {
+      "state": "loading",
+      "htmlLength": 1664,
+      "htmlSha256": "e4fc458c972900623118f027912b85a6cc6e90ef758643245c95c34b6978959b"
+    },
+    {
+      "state": "empty",
+      "htmlLength": 1682,
+      "htmlSha256": "c31a80a293d063980c69ba3f7f3efd6b7e364866aa34a8baff65d293acbe4a7c"
+    },
+    {
+      "state": "partial",
+      "htmlLength": 18285,
+      "htmlSha256": "ac1a8c3032811c7968e612dbfbe15a41332e0e68f791d50f9f93a5a1e8b4dfe8"
+    },
+    {
+      "state": "stale",
+      "htmlLength": 18276,
+      "htmlSha256": "ad9b2aabc20d9ecbea4c051a2a5f534f17dfc982b79155ff16f2667d9d6da058"
+    },
+    {
+      "state": "failed",
+      "htmlLength": 1731,
+      "htmlSha256": "97e6cd830cb1079862ff2262ab9954dc639b92a362c678e39d03fe653e2625a1"
+    },
+    {
+      "state": "denied",
+      "htmlLength": 1696,
+      "htmlSha256": "268c3ca6daa50778a6e1539035f4beeb95655fc502be5f45d91d705966df67f6"
+    }
+  ],
+  "documentSha256": "8c8227bbf7a2e032e73925c4ba476a96ead839dbfa940c20dfd84f3dfc5133f0",
+  "liveWorkspaceProof": "NOT_CLAIMED"
+}

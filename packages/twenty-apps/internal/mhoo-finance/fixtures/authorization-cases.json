@@ -1,0 +1,30 @@
+[
+  {
+    "caseKey": "reviewer-reads-fixture-workspace",
+    "principal": "finance-reviewer",
+    "workspace": "synthetic-workspace-a",
+    "operation": "READ",
+    "expected": "ALLOW_READ"
+  },
+  {
+    "caseKey": "reviewer-cannot-write-fixture-workspace",
+    "principal": "finance-reviewer",
+    "workspace": "synthetic-workspace-a",
+    "operation": "WRITE",
+    "expected": "DENY"
+  },
+  {
+    "caseKey": "unassigned-user-cannot-read",
+    "principal": "unassigned-user",
+    "workspace": "synthetic-workspace-a",
+    "operation": "READ",
+    "expected": "DENY"
+  },
+  {
+    "caseKey": "reviewer-cannot-cross-workspace",
+    "principal": "finance-reviewer",
+    "workspace": "synthetic-workspace-b",
+    "operation": "READ",
+    "expected": "DENY"
+  }
+]
