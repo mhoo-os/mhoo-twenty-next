@@ -27,14 +27,14 @@ const isApprovedDocument = (
 
 type BrandDimensions = ResolvedBrand['assets']['emailMark']['dimensions'];
 type DimensionPair = readonly [number, number];
-type DimensionMatrix = readonly [DimensionPair, ...DimensionPair[]];
 
-const isDimensionMatrix = (
+const isSimpleDimensions = (
   dimensions: BrandDimensions,
-): dimensions is DimensionMatrix => Array.isArray(dimensions[0]);
+): dimensions is DimensionPair => typeof dimensions[0] === 'number';
 
-const getAssetDimensions = (dimensions: BrandDimensions): DimensionPair =>
-  isDimensionMatrix(dimensions) ? dimensions[0] : dimensions;
+const getAssetDimensions = (dimensions: BrandDimensions): DimensionPair => {
+  return isSimpleDimensions(dimensions) ? dimensions : dimensions[0];
+};
 
 /**
  * Reduce the full resolved brand contract to the values safe for public
