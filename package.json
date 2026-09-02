@@ -57,6 +57,8 @@
     "docs:generate-navigation-template": "tsx packages/twenty-docs/scripts/generate-navigation-template.ts",
     "docs:generate-paths": "tsx packages/twenty-docs/scripts/generate-documentation-paths.ts",
     "docs:prune-orphans": "tsx packages/twenty-docs/scripts/prune-orphan-translations.ts",
+    "test:legal-packet": "node --test scripts/legal/verify_mhoo_legal_packet.test.mjs",
+    "verify:legal-packet": "node scripts/legal/verify_mhoo_legal_packet.mjs",
     "start": "npx concurrently --kill-others 'npx nx run-many -t start -p twenty-server twenty-front' 'npx wait-on tcp:3000 && npx nx run twenty-server:worker'"
   },
   "workspaces": {

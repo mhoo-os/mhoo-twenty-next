@@ -45,9 +45,9 @@ and which upstream technical identifiers remain intentionally unchanged.
 - Upstream developer documentation links embedded in technical scaffold
   instructions remain truthful technical references; customer-facing links
   now come from the brand contract.
-- DPA/legal publication behavior remains fail-closed and governed by MHO-181.
-  This source change does not approve, publish, or rename an Mhoo legal
-  document.
+- DPA/legal behavior remains fail-closed. MHO-226 integrates the approved
+  packet routes, but the Mhoo DPA remains unavailable and MHO-183 still gates
+  final candidate/runtime/release proof.
 - Demo records and test fixtures retain upstream values where they are data
   examples rather than product identity; they are not used as product or
   workspace defaults.
@@ -63,7 +63,7 @@ and which upstream technical identifiers remain intentionally unchanged.
 | Workspace metadata is empty | Only the product fallback is used; no host, route, query, token, or other workspace is consulted |
 | Upstream integration is retained | The destination and label explicitly identify the upstream Twenty integration |
 | MCP configuration is generated | JSON key remains `twenty`; human-readable client labels use the selected product name |
-| Legal publication is unavailable | No legal URL is synthesized or approved by MHO-173; MHO-181 remains the publication gate |
+| Legal publication is unavailable | No URL is synthesized for the unavailable DPA; approved packet routes remain limited to the MHO-226 contract |
 
 This is source-level evidence for MHO-173. It does not claim disposable
 runtime, release, recovery, production, or cutover proof; those remain

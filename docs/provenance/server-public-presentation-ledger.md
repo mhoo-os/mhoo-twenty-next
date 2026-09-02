@@ -26,20 +26,20 @@ resolved-brand adapter used by customer-facing HTML and unsubscribe text.
 | Approved-access-domain notifications | Transactional notification already passes the resolved brand to `twenty-emails` | Workspace name/logo and validation link remain authorized data inputs |
 | Authentication, reset, verification, billing, admin, and workspace-cleanup notifications | Existing server senders route through the resolved `twenty-emails` contract | Operational addresses, links, provider names, and technical identifiers remain unchanged |
 | Server-rendered HTML inventory | The unsubscribe builders are the product-facing server HTML builders found in the audited scope. Apollo Playground is a technical developer tool, and route-trigger HTML is caller-provided response content; neither is a Mhoo product shell | Technical upstream names and caller-owned response bodies are not rewritten as customer branding |
-| Authenticated DPA preview/signing surface | DPA preview and signed-document generation remain an upstream legal/provenance capability. The Mhoo preset keeps the DPA unavailable, while the existing self-hosted preview notice and signing guard retain the explicit Twenty legal identity and prevent execution | The settings UI queries this surface only for an explicitly approved DPA; no upstream DPA is exposed through Mhoo public links or presented as an Mhoo agreement. MHO-181 remains the publication/approval gate |
+| Authenticated DPA preview/signing surface | DPA preview and signed-document generation remain an upstream legal/provenance capability. The Mhoo preset keeps the DPA unavailable, while the existing self-hosted preview notice and signing guard retain the explicit Twenty legal identity and prevent execution | The settings UI queries this surface only for an explicitly approved DPA; no upstream DPA is exposed through Mhoo public links or presented as an Mhoo agreement. MHO-183 remains the exact-candidate/runtime/release gate |
 | API, callback, maintenance, access-denied, and public-function failures | No additional server-owned product HTML shell was found in the audited source; JSON/errors preserve their existing status and technical contract | Error details remain bounded by their existing authorization and transport behavior |
 
 ## Legal and attribution behavior
 
-The adapter emits a Privacy, Terms, or DPA link only when that document is
-explicitly `approved` and has a non-empty URL. Missing or unapproved documents
-are represented by the visible `Legal documents are currently unavailable.`
-state on public HTML pages and by no generated legal link in email footers.
-The Mhoo preset therefore exposes neither the unapproved Mhoo legal entity nor
-an upstream Twenty DPA through product branding. The separately authenticated
-DPA resolver remains upstream legal/provenance content, is visibly marked as
-not applicable for self-hosted deployments, and cannot sign in that mode.
-Approved upstream attribution is emitted only by the explicit upstream preset.
+The adapter emits a Privacy, Terms, Acceptable Use, or Open Source link only
+when that document is explicitly `approved` and has a non-empty URL. The Mhoo
+preset exposes the approved Mhoo LLC identity and those four packet links; its
+DPA remains `UNAVAILABLE_FAIL_CLOSED` and is omitted from actionable links.
+The separately authenticated DPA resolver remains upstream legal/provenance
+content and cannot be presented as an Mhoo agreement. Approved upstream
+attribution is emitted only by the explicit upstream preset; the Mhoo packet's
+bounded `Powered by Twenty` attribution is rendered only from its approved
+contract entry.
 
 ## Safety and compatibility proof
 
@@ -52,6 +52,6 @@ Approved upstream attribution is emitted only by the explicit upstream preset.
 - The exact-head trajectory fixture permits only the bounded server-public
   paths listed in the clean-foundation overlay.
 
-This is source and focused-render evidence for MHO-177. It does not claim
-runtime, release, recovery, production, or legal-publication approval; those
-remain downstream gates.
+This is source and focused-render evidence for MHO-177 plus the MHO-226 legal
+surface update. It does not claim runtime, final-candidate, release, recovery,
+production, or cutover approval; those remain downstream gates.

@@ -1,1 +1,7 @@
-Mhoo legal documents unavailable
+MHOO-LEGAL-2026-v2.0
+APPROVED_FINAL
+Terms: /legal/terms
+Privacy: /legal/privacy
+Acceptable Use: /legal/acceptable-use
+Open Source: /legal/open-source
+DPA: UNAVAILABLE_FAIL_CLOSED

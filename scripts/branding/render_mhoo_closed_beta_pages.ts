@@ -19,7 +19,7 @@ const resolvedBrand = resolveProductBrand({
 const brand = {
   ...resolveEmailingPublicPageBrand(resolvedBrand),
   previewNotice:
-    'Private beta preview — legal documents are DRAFT / UNAPPROVED.',
+    'Private beta preview — production release remains gated by MHO-183.',
 };
 
 const preferences = buildUnsubscribePreferencesPage({
@@ -53,8 +53,10 @@ for (const [name, html] of [
   if (
     !html.includes('Mhoo') ||
     !html.includes('Private beta preview') ||
-    !html.includes('DRAFT / UNAPPROVED') ||
-    !html.includes('Legal documents are currently unavailable.') ||
+    !html.includes('production release remains gated by MHO-183') ||
+    !html.includes('https://beta.mhoo.app/legal/terms') ||
+    !html.includes('https://beta.mhoo.app/legal/privacy') ||
+    html.includes('>DPA</a>') ||
     !html.includes('/images/mhoo/mhoo-email-600x436.png')
   ) {
     throw new Error(`Mhoo preview markers are missing from ${name}`);
@@ -68,7 +70,7 @@ writeFileSync(
   JSON.stringify(
     {
       kind: 'mhoo-closed-beta-public-page-preview',
-      status: 'DRAFT / UNAPPROVED — PRIVATE LOCAL PREVIEW',
+      status: 'PRIVATE LOCAL PREVIEW — MHO-183 RELEASE GATED',
       production: false,
       previewMutation: false,
       receipts: ['unsubscribe-preferences.html', 'unsubscribe-result.html'],

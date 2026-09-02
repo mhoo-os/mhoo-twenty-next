@@ -32,11 +32,11 @@ intentionally unchanged.
 
 ## Legal and attribution behavior
 
-The Mhoo preset currently carries an unapproved legal entity, unapproved
-Privacy/Terms documents, an unavailable DPA, and unapproved attribution. Email
-footers therefore omit those claims and links until MHO-181 records named human
-approval and publication destinations. No upstream legal or DPA destination is
-substituted for an Mhoo document.
+The Mhoo preset carries the approved Mhoo LLC legal entity, approved
+Privacy/Terms/Acceptable Use/Open Source packet links, an unavailable DPA, and
+approved bounded attribution. Email footers render the four approved links
+from the resolved contract and never add an actionable DPA link. No upstream
+legal or DPA destination is substituted for an Mhoo document.
 
 The explicit upstream preset retains its approved upstream legal identity and
 bounded `Powered by Twenty` attribution. The Mhoo preset does not render that
@@ -60,7 +60,7 @@ attribution merely because the label exists in the shared preset.
 
 | Case | Expected proof |
 | --- | --- |
-| Mhoo HTML and plain text | Product identity and approved public URLs use Mhoo; unapproved legal and attribution claims are absent |
+| Mhoo HTML and plain text | Product identity and four approved packet URLs use Mhoo; DPA remains unavailable and no upstream DPA is substituted |
 | Upstream HTML and plain text | Twenty identity, upstream asset, documentation, legal, and bounded attribution behavior remain coherent |
 | Relative Mhoo asset path | URL is absolute, uses the resolved deployment origin, and preserves the governed asset path |
 | Human invitation sender | Display name is scoped as `Sender (via Product)` and uses the existing configured envelope address |

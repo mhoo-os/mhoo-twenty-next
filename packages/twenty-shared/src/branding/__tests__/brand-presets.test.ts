@@ -14,7 +14,29 @@ describe('brand presets', () => {
     expect(getProductBrandValidationErrors(TWENTY_BRAND)).toEqual([]);
     expect(MHO_BRAND.productName).toBe('Mhoo');
     expect(TWENTY_BRAND.productName).toBe('Twenty');
+    expect(MHO_BRAND.legal.terms).toEqual({
+      status: 'approved',
+      url: '/legal/terms',
+    });
+    expect(MHO_BRAND.legal.privacy).toEqual({
+      status: 'approved',
+      url: '/legal/privacy',
+    });
+    expect(MHO_BRAND.legal.acceptableUse).toEqual({
+      status: 'approved',
+      url: '/legal/acceptable-use',
+    });
+    expect(MHO_BRAND.legal.openSource).toEqual({
+      status: 'approved',
+      url: '/legal/open-source',
+    });
+    expect(MHO_BRAND.legal.legalEntity).toBe('Mhoo LLC');
     expect(MHO_BRAND.legal.dpa).toEqual({ status: 'unavailable', url: null });
+    expect(MHO_BRAND.attribution).toEqual({
+      label: 'Powered by Twenty',
+      url: 'https://twenty.com',
+      status: 'approved',
+    });
   });
 
   it('rejects a public legal URL while the document is unavailable', () => {

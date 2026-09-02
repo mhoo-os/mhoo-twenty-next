@@ -16,7 +16,7 @@ type FooterProps = {
 };
 
 export const Footer = ({ i18n, brand }: FooterProps) => {
-  const links =
+  const productLinks =
     brand.preset === 'twenty'
       ? [
           {
@@ -62,6 +62,35 @@ export const Footer = ({ i18n, brand }: FooterProps) => {
             ariaLabel: i18n._('Contact the product team'),
           },
         ];
+  const legalLinks = [
+    {
+      document: brand.legal.privacy,
+      value: i18n._('Privacy Policy'),
+      ariaLabel: i18n._('Read the privacy policy'),
+    },
+    {
+      document: brand.legal.terms,
+      value: i18n._('Terms of Service'),
+      ariaLabel: i18n._('Read the terms of service'),
+    },
+    {
+      document: brand.legal.acceptableUse,
+      value: i18n._('Acceptable Use Policy'),
+      ariaLabel: i18n._('Read the acceptable use policy'),
+    },
+    {
+      document: brand.legal.openSource,
+      value: i18n._('Open Source & Upstream License Notice'),
+      ariaLabel: i18n._('Read the open source and upstream license notice'),
+    },
+  ]
+    .filter(({ document }) => isApprovedBrandDocument(document))
+    .map(({ document, value, ariaLabel }) => ({
+      href: document.url as string,
+      value,
+      ariaLabel,
+    }));
+  const links = [...productLinks, ...legalLinks];
   const hasLegalEntity =
     brand.legal.legalEntityStatus === 'approved' &&
     brand.legal.legalEntity.trim().length > 0;

@@ -92,6 +92,10 @@ export const getProductBrandValidationErrors = (
 
   errors.push(...validateDocument(brand.legal.privacy, 'legal.privacy'));
   errors.push(...validateDocument(brand.legal.terms, 'legal.terms'));
+  errors.push(
+    ...validateDocument(brand.legal.acceptableUse, 'legal.acceptableUse'),
+  );
+  errors.push(...validateDocument(brand.legal.openSource, 'legal.openSource'));
   errors.push(...validateDocument(brand.legal.dpa, 'legal.dpa'));
 
   if (!isValidStatus(brand.attribution.status)) {

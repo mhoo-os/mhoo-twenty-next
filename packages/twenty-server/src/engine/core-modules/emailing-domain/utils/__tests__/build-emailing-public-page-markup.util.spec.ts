@@ -33,7 +33,7 @@ describe('emailing public page markup', () => {
     );
   });
 
-  it('does not create links for unavailable legal documents', () => {
+  it('renders approved legal links and does not create a DPA link', () => {
     const brand = resolveEmailingPublicPageBrand(
       resolveProductBrand({
         preset: 'mhoo',
@@ -43,11 +43,21 @@ describe('emailing public page markup', () => {
 
     const footer = buildEmailingPublicPageFooter(brand);
 
-    expect(footer).toContain('Legal documents are currently unavailable.');
-    expect(footer).not.toContain('Privacy</a>');
-    expect(footer).not.toContain('Terms</a>');
+    expect(footer).toContain(
+      'href="https://mhoo.example/legal/privacy">Privacy</a>',
+    );
+    expect(footer).toContain(
+      'href="https://mhoo.example/legal/terms">Terms</a>',
+    );
+    expect(footer).toContain(
+      'href="https://mhoo.example/legal/acceptable-use">Acceptable Use</a>',
+    );
+    expect(footer).toContain(
+      'href="https://mhoo.example/legal/open-source">Open Source</a>',
+    );
     expect(footer).not.toContain('DPA</a>');
-    expect(footer).not.toContain('twenty.com');
+    expect(footer).toContain('Mhoo LLC');
+    expect(footer).toContain('Powered by Twenty');
   });
 
   it('renders an explicit notice only when a preview supplies one', () => {

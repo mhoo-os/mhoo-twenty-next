@@ -136,6 +136,12 @@ const NotFound = lazy(() =>
   })),
 );
 
+const LegalPage = lazy(() =>
+  import('~/pages/legal/LegalPage').then((module) => ({
+    default: module.LegalPage,
+  })),
+);
+
 const preloadOnboardingPages = () => {
   WorkspaceActivation.preload();
   CreateProfile.preload();
@@ -251,6 +257,46 @@ const createWorkspaceAppRouter = ({
             </Route>
           </Route>
         </Route>
+        <Route
+          path={AppPath.LegalTerms}
+          element={
+            <LazyRoute fallback={null}>
+              <LegalPage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={AppPath.LegalPrivacy}
+          element={
+            <LazyRoute fallback={null}>
+              <LegalPage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={AppPath.LegalAcceptableUse}
+          element={
+            <LazyRoute fallback={null}>
+              <LegalPage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={AppPath.LegalOpenSource}
+          element={
+            <LazyRoute fallback={null}>
+              <LegalPage />
+            </LazyRoute>
+          }
+        />
+        <Route
+          path={AppPath.LegalDpa}
+          element={
+            <LazyRoute fallback={null}>
+              <LegalPage />
+            </LazyRoute>
+          }
+        />
         <Route element={<AuthFlowLayout />}>
           <Route path={AppPath.VerifyEmail} element={<VerifyEmail />} />
           <Route

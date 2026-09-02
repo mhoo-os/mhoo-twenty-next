@@ -19,6 +19,8 @@ jobs:
       - run: corepack enable
       - run: yarn install --immutable
       - run: scripts/provenance/verify-source.sh
+      - run: node scripts/legal/verify_mhoo_legal_packet.mjs --json
+      - run: node --test scripts/legal/verify_mhoo_legal_packet.test.mjs
       - run: npx nx build twenty-shared
       - run: npx nx build twenty-server
       - run: npx nx build twenty-front

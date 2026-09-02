@@ -2,6 +2,7 @@ import {
   MHO_BRAND,
   TWENTY_BRAND,
   type BrandUrlReference,
+  type BrandDocument,
   type ProductBrand,
   type ResolvedBrand,
 } from 'twenty-shared/branding';
@@ -13,6 +14,14 @@ const resolveUrlReference = (
   reference.kind === 'relative'
     ? new URL(reference.value, origin).toString()
     : reference.value;
+
+const resolveLegalDocument = (
+  document: BrandDocument,
+  origin: string,
+): BrandDocument =>
+  document.url === null
+    ? document
+    : { ...document, url: new URL(document.url, origin).toString() };
 
 /**
  * Email previews are static and cannot resolve server configuration. Production
@@ -30,6 +39,14 @@ export const resolvePreviewBrand = (
     statusUrl: resolveUrlReference(brand.urls.statusUrl, origin),
     documentationUrl: resolveUrlReference(brand.urls.documentationUrl, origin),
     contactUrl: resolveUrlReference(brand.urls.contactUrl, origin),
+  },
+  legal: {
+    ...brand.legal,
+    privacy: resolveLegalDocument(brand.legal.privacy, origin),
+    terms: resolveLegalDocument(brand.legal.terms, origin),
+    acceptableUse: resolveLegalDocument(brand.legal.acceptableUse, origin),
+    openSource: resolveLegalDocument(brand.legal.openSource, origin),
+    dpa: resolveLegalDocument(brand.legal.dpa, origin),
   },
 });
 
@@ -50,7 +67,7 @@ export type EmailPreviewBrand = ResolvedBrand & {
 export const MHO_PREVIEW_BRAND: EmailPreviewBrand = Object.freeze({
   ...resolvePreviewBrand(MHO_BRAND, 'https://beta.mhoo.app/'),
   previewNotice:
-    'Private beta preview — legal documents are DRAFT / UNAPPROVED.',
+    'Private beta preview — production release remains gated by MHO-183.',
 });
 
 export const getPreviewNotice = (brand: ResolvedBrand): string | null => {

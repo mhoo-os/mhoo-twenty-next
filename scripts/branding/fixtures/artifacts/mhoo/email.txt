@@ -2,3 +2,5 @@ Mhoo
 
 Your account notification is ready.
 Manage unsubscribe preferences: /unsubscribe
+Terms: /legal/terms
+Privacy: /legal/privacy

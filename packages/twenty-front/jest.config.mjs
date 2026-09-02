@@ -55,6 +55,7 @@ const jestConfig = {
   moduleNameMapper: {
     '\\.(jpg|jpeg|png|gif|webp|svg|svg\\?react)$':
       '<rootDir>/__mocks__/imageMockFront.js',
+    '\\.(md|json)\\?raw$': '<rootDir>/__mocks__/rawTextMock.js',
     '\\.css$': '<rootDir>/__mocks__/styleMock.js',
     '\\?worker$': '<rootDir>/__mocks__/workerMock.js',
     ...pathsToModuleNameMapper(tsConfig.compilerOptions.paths, {

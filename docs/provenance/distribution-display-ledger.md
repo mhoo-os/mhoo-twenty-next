@@ -16,9 +16,9 @@ path, and the Twenty identities that remain intentionally unchanged.
 - Origin rule: `PRODUCT_BRAND_DEPLOYMENT_ORIGIN` is an `http(s)` origin without
   credentials, a path, a query, or a fragment; relative Mhoo links and assets
   resolve against it
-- Release authority: MHO-181 remains the human legal/publication gate and
-  MHO-183 remains the final disposable-runtime, release, and recovery proof
-  gate
+- Release authority: MHO-226 records the approved legal packet integration;
+  MHO-183 remains the exact-candidate, disposable-runtime, release, recovery,
+  and rollback proof gate
 
 ## Generic configuration
 
@@ -44,7 +44,7 @@ operator exposes through `SERVER_URL`.
 | Helm, Kubernetes, and Podman guides | Say “Mhoo, built on Twenty”; explain retained technical names and source-only status | Operator display; `twenty`, `twentycrm`, `my-twenty`, and file paths stay because renaming them would change compatibility expectations |
 | Helm notes and values schema | Report and validate the selected product preset and deployment origin | Operator metadata; no selector, PVC, migration, or release-name change |
 | Dockerfile and clean image workflow | Add Mhoo title/vendor/source/revision/description labels | Mhoo artifact identity; upstream source, version, commit, tree, and AGPL-3.0 labels are retained separately |
-| Documentation package | Uses Mhoo distribution framing while labeling `docs.twenty.com` and the Twenty repository as upstream destinations | No Mhoo documentation URL is claimed without an owned, approved destination |
+| Documentation package | The English legal entry points to the approved Mhoo packet routes; retained technical documentation and upstream destinations remain explicitly upstream | No unverified Mhoo legal text or destination is invented |
 | Codex plugin README/package description | Uses Mhoo-compatible framing while retaining technical Twenty commands and MCP keys | Developer display metadata; the stable package, command, and `twenty` MCP identifiers are not renamed |
 | Helm chart image default and upstream installer references | Retained as upstream compatibility inputs until a reviewed Mhoo immutable release artifact exists | Deliberate non-claim; MHO-179 does not invent a tag, retag an image, or publish a release |
 
@@ -59,8 +59,9 @@ operator exposes through `SERVER_URL`.
   compatibility source. Operator prose labels them as upstream rather than as
   Mhoo-owned destinations.
 - Twenty copyright, license, source, and attribution facts are not rewritten
-  into Mhoo claims. The Mhoo product preset's legal and attribution states
-  remain fail-closed until MHO-181.
+  into Mhoo claims. The Mhoo product preset exposes only the approved packet
+  documents and bounded `Powered by Twenty` attribution; DPA remains
+  unavailable and fail-closed.
 - Existing `deploy/twenty-next` remains the governed disposable overlay. No
   parallel top-level deployment hierarchy, DNS change, provider mutation,
   credential rotation, Helm install, or production cutover is part of this
@@ -91,10 +92,10 @@ it does not change the upstream commit or tree identity.
 | Helm render | Default Mhoo preset and derived/explicit origin appear in both deployments; explicit Twenty fallback also renders |
 | Kubernetes/Terraform parse | Existing resource addresses/selectors/volumes remain present and brand variables are additive |
 | OCI metadata | Dockerfile and workflow contain Mhoo source/revision labels plus exact upstream provenance labels |
-| Documentation audit | Customer/operator-facing Mhoo text does not point to an unverified Mhoo destination; retained Twenty destinations are labeled upstream |
+| Documentation audit | English legal links use the approved Mhoo routes; retained Twenty destinations are labeled upstream |
 | Technical identity diff | No package, import, command, route, schema, migration, resource, selector, or volume rename is introduced |
 | Source custody | Upstream tree, lockfile, Dockerfile digest, and exact-head fixture pass |
 
 This is source, template, metadata, and parse evidence for MHO-179. It does
 not claim registry publication, disposable-runtime behavior, recovery,
-production readiness, legal approval, or cutover.
+production readiness, final-candidate approval, or cutover.

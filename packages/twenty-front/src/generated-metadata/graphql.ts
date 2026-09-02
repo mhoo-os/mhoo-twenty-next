@@ -1073,9 +1073,11 @@ export type ClientConfigBrandDocument = {
 
 export type ClientConfigBrandLegal = {
   __typename?: 'ClientConfigBrandLegal';
+  acceptableUse: ClientConfigBrandDocument;
   dpa: ClientConfigBrandDocument;
   legalEntity: Scalars['String']['output'];
   legalEntityStatus: Scalars['String']['output'];
+  openSource: ClientConfigBrandDocument;
   privacy: ClientConfigBrandDocument;
   senderDisplayName: Scalars['String']['output'];
   terms: ClientConfigBrandDocument;

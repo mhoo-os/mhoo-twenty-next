@@ -38,7 +38,10 @@ const renderPreview = async (preview: (typeof previews)[number]) => {
   if (
     !html.includes('Mhoo') ||
     !html.includes('Private beta preview') ||
-    !html.includes('DRAFT / UNAPPROVED') ||
+    !html.includes('production release remains gated by MHO-183') ||
+    !html.includes('https://beta.mhoo.app/legal/terms') ||
+    !html.includes('https://beta.mhoo.app/legal/privacy') ||
+    html.includes('>DPA</a>') ||
     !html.includes('/images/mhoo/mhoo-email-600x436.png')
   ) {
     throw new Error(`Mhoo preview markers are missing from ${preview.name}`);
@@ -48,7 +51,11 @@ const renderPreview = async (preview: (typeof previews)[number]) => {
   return {
     name: preview.name,
     file: `${preview.name}.html`,
-    markers: ['Mhoo', 'DRAFT / UNAPPROVED', 'mhoo-email-600x436.png'],
+    markers: [
+      'Mhoo',
+      'https://beta.mhoo.app/legal/terms',
+      'mhoo-email-600x436.png',
+    ],
   };
 };
 
@@ -63,7 +70,7 @@ const main = async () => {
     JSON.stringify(
       {
         kind: 'mhoo-closed-beta-email-preview',
-        status: 'DRAFT / UNAPPROVED — PRIVATE LOCAL PREVIEW',
+        status: 'PRIVATE LOCAL PREVIEW — MHO-183 RELEASE GATED',
         production: false,
         receipts,
       },

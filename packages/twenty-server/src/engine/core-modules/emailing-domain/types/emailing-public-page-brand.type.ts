@@ -48,6 +48,8 @@ export const resolveEmailingPublicPageBrand = (
   const legalDocuments = [
     ['Privacy', brand.legal.privacy],
     ['Terms', brand.legal.terms],
+    ['Acceptable Use', brand.legal.acceptableUse],
+    ['Open Source', brand.legal.openSource],
     ['DPA', brand.legal.dpa],
   ] as const;
 

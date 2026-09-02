@@ -4,6 +4,7 @@ import {
   getProductBrand,
   isBrandPresetId,
   type BrandPresetId,
+  type BrandDocument,
   type BrandResolverInput,
   type BrandUrlSet,
   type BrandUrlReference,
@@ -115,6 +116,37 @@ const resolveBrandUrls = (urls: BrandUrlSet, deploymentOrigin: string) => ({
   contactUrl: resolveBrandUrl(urls.contactUrl, deploymentOrigin),
 });
 
+const resolveBrandDocument = (
+  document: BrandDocument,
+  deploymentOrigin: string,
+): BrandDocument => {
+  if (document.url === null) {
+    return document;
+  }
+
+  return {
+    ...document,
+    url: resolveBrandUrl(
+      document.url.startsWith('/')
+        ? { kind: 'relative', value: document.url }
+        : { kind: 'absolute', value: document.url },
+      deploymentOrigin,
+    ),
+  };
+};
+
+const resolveBrandLegal = (
+  legal: ResolvedBrand['legal'],
+  deploymentOrigin: string,
+): ResolvedBrand['legal'] => ({
+  ...legal,
+  privacy: resolveBrandDocument(legal.privacy, deploymentOrigin),
+  terms: resolveBrandDocument(legal.terms, deploymentOrigin),
+  acceptableUse: resolveBrandDocument(legal.acceptableUse, deploymentOrigin),
+  openSource: resolveBrandDocument(legal.openSource, deploymentOrigin),
+  dpa: resolveBrandDocument(legal.dpa, deploymentOrigin),
+});
+
 export const resolveProductBrand = ({
   preset,
   deploymentOrigin,
@@ -130,6 +162,7 @@ export const resolveProductBrand = ({
 
   return deepFreeze({
     ...productBrand,
+    legal: resolveBrandLegal(productBrand.legal, normalizedOrigin),
     urls: resolveBrandUrls(productBrand.urls, normalizedOrigin),
   });
 };

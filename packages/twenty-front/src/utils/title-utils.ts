@@ -37,6 +37,16 @@ export const getPageTitleFromPath = (pathname: string): string => {
       return t`Create Workspace`;
     case AppPath.CreateProfile:
       return t`Create Profile`;
+    case AppPath.LegalTerms:
+      return t`Terms of Service`;
+    case AppPath.LegalPrivacy:
+      return t`Privacy Policy`;
+    case AppPath.LegalAcceptableUse:
+      return t`Acceptable Use Policy`;
+    case AppPath.LegalOpenSource:
+      return t`Open Source & Upstream License Notice`;
+    case AppPath.LegalDpa:
+      return t`DPA Availability Notice`;
     case SettingsPathPrefixes.Experience:
       return t`Experience - Settings`;
     case SettingsPathPrefixes.Accounts:

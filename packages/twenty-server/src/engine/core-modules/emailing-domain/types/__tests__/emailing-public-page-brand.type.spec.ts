@@ -2,7 +2,7 @@ import { resolveEmailingPublicPageBrand } from 'src/engine/core-modules/emailing
 import { resolveProductBrand } from 'src/engine/core-modules/twenty-config/services/product-brand-resolver.service';
 
 describe('resolveEmailingPublicPageBrand', () => {
-  it('hides unapproved Mhoo legal identity and documents', () => {
+  it('exposes only approved Mhoo legal documents and keeps DPA unavailable', () => {
     const brand = resolveEmailingPublicPageBrand(
       resolveProductBrand({
         preset: 'mhoo',
@@ -14,14 +14,24 @@ describe('resolveEmailingPublicPageBrand', () => {
     expect(brand.emailMarkUrl).toBe(
       'https://mhoo.example/images/mhoo/mhoo-email-600x436.png',
     );
-    expect(brand.legalLinks).toEqual([]);
-    expect(brand.legalEntity).toBeNull();
-    expect(brand.attribution).toBeNull();
-    expect(brand.unavailableLegalDocuments).toEqual([
-      'Privacy',
-      'Terms',
-      'DPA',
+    expect(brand.legalLinks).toEqual([
+      { label: 'Privacy', url: 'https://mhoo.example/legal/privacy' },
+      { label: 'Terms', url: 'https://mhoo.example/legal/terms' },
+      {
+        label: 'Acceptable Use',
+        url: 'https://mhoo.example/legal/acceptable-use',
+      },
+      {
+        label: 'Open Source',
+        url: 'https://mhoo.example/legal/open-source',
+      },
     ]);
+    expect(brand.legalEntity).toBe('Mhoo LLC');
+    expect(brand.attribution).toEqual({
+      label: 'Powered by Twenty',
+      url: 'https://twenty.com',
+    });
+    expect(brand.unavailableLegalDocuments).toEqual(['DPA']);
   });
 
   it('preserves only approved upstream identity and attribution', () => {

@@ -39,6 +39,13 @@ export enum AppPath {
   // Deep link for twenty.com/dpa → in-app DPA generator (login-gated redirect).
   Dpa = '/dpa',
 
+  // Mhoo closed-beta legal packet routes.
+  LegalTerms = '/legal/terms',
+  LegalPrivacy = '/legal/privacy',
+  LegalAcceptableUse = '/legal/acceptable-use',
+  LegalOpenSource = '/legal/open-source',
+  LegalDpa = '/legal/dpa',
+
   // 404 page not found
   NotFoundWildcard = '*',
   NotFound = '/not-found',

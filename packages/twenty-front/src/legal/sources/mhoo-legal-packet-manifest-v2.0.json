@@ -1,0 +1,63 @@
+{
+  "approval_timestamp": "2026-09-02T20:43:58Z",
+  "approver": "Tanyawit Nilnavarat",
+  "canonicalization": {
+    "encoding": "UTF-8",
+    "hash_algorithm": "SHA-256",
+    "line_endings": "LF",
+    "terminal_newline": true
+  },
+  "contracting_entity": "Mhoo LLC",
+  "dpa_state": "UNAVAILABLE_FAIL_CLOSED",
+  "effective_date": "2026-09-02",
+  "files": [
+    {
+      "bytes": 6059,
+      "media_type": "text/markdown; charset=utf-8",
+      "path": "01-mhoo-master-terms-v2.0.md",
+      "sha256": "f8bfeb104b2b09064ef74a1f7e6bbae747ed9443fdc0d654a88d433b17daff16"
+    },
+    {
+      "bytes": 2155,
+      "media_type": "text/markdown; charset=utf-8",
+      "path": "02-mhoo-privacy-policy-v2.0.md",
+      "sha256": "d997c7fe762f8fe02043124ce6e43f482c77f5ac976649df37dcfad8d104867e"
+    },
+    {
+      "bytes": 1217,
+      "media_type": "text/markdown; charset=utf-8",
+      "path": "03-mhoo-acceptable-use-policy-v2.0.md",
+      "sha256": "28c063f526be1752fa997529af80d105dfbfbb68a7e5ec4bea2c5ea770557ce8"
+    },
+    {
+      "bytes": 807,
+      "media_type": "text/markdown; charset=utf-8",
+      "path": "04-mhoo-open-source-notice-v2.0.md",
+      "sha256": "dd442db563d3472fe6ea57d899fa11bb2f1b4072f0de8282a63ba0971f1f70ee"
+    },
+    {
+      "bytes": 799,
+      "media_type": "text/markdown; charset=utf-8",
+      "path": "05-mhoo-dpa-availability-notice-v2.0.md",
+      "sha256": "1836355ef5e2e65bb68c0943e8b7f9034d043dbf4b692151addab08d0edb81ce"
+    },
+    {
+      "bytes": 5054,
+      "media_type": "text/markdown; charset=utf-8",
+      "path": "06-mhoo-legal-approval-record-v2.0.md",
+      "sha256": "96040a0a179eee3cf93b7a570febdc4bc42c39f8d1a1d971988e4a304e52f35c"
+    }
+  ],
+  "packet_id": "MHOO-LEGAL-2026-v2.0",
+  "packet_version": "2.0",
+  "release_boundary": "Approved legal text; production release still requires MHO-183 exact candidate and runtime/rollback authorization.",
+  "schema": "mhoo-legal-packet-manifest/v1",
+  "status": "APPROVED_FINAL",
+  "supersedes": [
+    "Mhoo Legal & Governance Stack v2.0 — PRIVATE REVIEW / DRAFT UNAPPROVED",
+    "TOS-MHOO-2026-v2.0-DRAFT",
+    "PRIVACY-MHOO-2026-v2.0-DRAFT",
+    "AUP-MHOO-2026-v2.0-DRAFT",
+    "OS-MHOO-2026-v2.0-DRAFT"
+  ]
+}

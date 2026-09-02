@@ -40,6 +40,8 @@ export type LegalBrand = Readonly<{
   senderDisplayName: string;
   privacy: BrandDocument;
   terms: BrandDocument;
+  acceptableUse: BrandDocument;
+  openSource: BrandDocument;
   dpa: BrandDocument;
 }>;
 

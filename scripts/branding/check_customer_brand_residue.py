@@ -465,16 +465,28 @@ def scan_contract(root: Path) -> list[dict[str, Any]]:
         twenty_block = twenty_match.group(1)
 
     required_mhoo_patterns = (
-        r"legalEntityStatus: 'unapproved'",
-        r"privacy:\s*\{\s*status: 'unapproved',\s*url: null\s*\}",
-        r"terms:\s*\{\s*status: 'unapproved',\s*url: null\s*\}",
+        r"legalEntityStatus: 'approved'",
+        r"legalEntity: 'Mhoo LLC'",
+        r"privacy:\s*\{\s*status: 'approved',\s*url: '/legal/privacy'\s*\}",
+        r"terms:\s*\{\s*status: 'approved',\s*url: '/legal/terms'\s*\}",
+        r"acceptableUse:\s*\{\s*status: 'approved',\s*url: '/legal/acceptable-use'\s*\}",
+        r"openSource:\s*\{\s*status: 'approved',\s*url: '/legal/open-source'\s*\}",
         r"dpa:\s*\{\s*status: 'unavailable',\s*url: null\s*\}",
+        r"label: 'Powered by Twenty'",
+        r"url: 'https://twenty\.com'",
     )
     for pattern in required_mhoo_patterns:
         if not re.search(pattern, mhoo_block, re.S):
             violations.append(contract_violation(preset_path.as_posix(), pattern, "fail-closed Mhoo legal state"))
-    if re.search(r"https?://", mhoo_block):
-        violations.append(contract_violation(preset_path.as_posix(), "absolute URL in Mhoo preset", "origin-neutral relative Mhoo URLs"))
+    absolute_mhoo_urls = re.findall(r"https?://[^'\"\s]+", mhoo_block)
+    if any(url.rstrip("/") != "https://twenty.com" for url in absolute_mhoo_urls):
+        violations.append(
+            contract_violation(
+                preset_path.as_posix(),
+                "unapproved absolute URL in Mhoo preset",
+                "relative Mhoo URLs plus approved https://twenty.com attribution",
+            )
+        )
     for pattern in (r"preset: 'twenty'", r"https://twenty\.com/", r"status: 'approved'"):
         if not re.search(pattern, twenty_block):
             violations.append(contract_violation(preset_path.as_posix(), pattern, "explicit upstream fallback preset"))

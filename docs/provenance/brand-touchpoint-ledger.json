@@ -45,8 +45,30 @@
       "matchType": "prefix",
       "disposition": "customer-facing resolves Mhoo",
       "owner": "MHO-177",
-      "reason": "Legal settings must fail closed when Mhoo documents are not approved.",
+      "reason": "Legal settings continue to fail closed for the unavailable DPA while approved Mhoo packet routes are exposed separately.",
       "scopeJustification": "This directory owns the customer-facing DPA availability and agreement surfaces.",
+      "checks": ["residue", "contract"],
+      "scan": true
+    },
+    {
+      "id": "front-legal-packet-source",
+      "match": "packages/twenty-front/src/legal/sources/",
+      "matchType": "prefix",
+      "disposition": "retained legal/provenance identity + reason",
+      "owner": "MHO-226",
+      "reason": "The attached approved packet sources and manifest are immutable legal/provenance inputs; the approval record is committed for custody but never rendered.",
+      "scopeJustification": "This narrow directory contains only the five approved public documents, the approved release record, and the canonical manifest.",
+      "checks": ["markers"],
+      "scan": false
+    },
+    {
+      "id": "front-legal-routes",
+      "match": "packages/twenty-front/src/pages/legal/",
+      "matchType": "prefix",
+      "disposition": "customer-facing resolves Mhoo",
+      "owner": "MHO-226",
+      "reason": "Closed-beta legal routes render only manifest-mapped approved text through the resolved brand contract and keep DPA navigation fail-closed.",
+      "scopeJustification": "This narrow page directory owns the public legal renderer and its focused tests.",
       "checks": ["residue", "contract"],
       "scan": true
     },
@@ -133,7 +155,7 @@
       "matchType": "prefix",
       "disposition": "retained legal/provenance identity + reason",
       "owner": "MHO-179",
-      "reason": "The inherited documentation package and its upstream destination are retained as provenance-bearing content, not relabeled as Mhoo-owned legal material.",
+      "reason": "The inherited documentation package remains provenance-bearing for technical content; its English legal entry points use the approved Mhoo packet routes while retained Trust Center references stay explicitly upstream.",
       "scopeJustification": "This package is the inherited documentation distribution surface and is separately reviewed for publication.",
       "checks": ["markers"],
       "scan": false
@@ -203,7 +225,14 @@
       "path": "packages/twenty-shared/src/branding/brand-presets.ts",
       "owner": "MHO-158",
       "reason": "Both the Mhoo contract and explicit upstream fallback must remain present in the canonical shared preset file.",
-      "markers": ["MHO_BRAND", "TWENTY_BRAND", "status: 'unavailable', url: null", "Powered by Twenty"]
+      "markers": ["MHO_BRAND", "TWENTY_BRAND", "legalEntity: 'Mhoo LLC'", "status: 'unavailable', url: null", "Powered by Twenty"]
+    },
+    {
+      "id": "mhoo-legal-packet",
+      "path": "scripts/legal/verify_mhoo_legal_packet.mjs",
+      "owner": "MHO-226",
+      "reason": "The verifier pins the approved packet identity, manifest hash, and fail-closed DPA state before frontend build.",
+      "markers": ["MHOO-LEGAL-2026-v2.0", "APPROVED_FINAL", "UNAVAILABLE_FAIL_CLOSED", "57ffc6de05f1deb3c8db7b05fd9a1b7a09f7c8bc2996e1e859fbd2238ca227f5"]
     },
     {
       "id": "mhoo-asset-custody",
@@ -247,7 +276,7 @@
       "preset": "mhoo",
       "kind": "frontend-html",
       "path": "scripts/branding/fixtures/artifacts/mhoo/frontend.html",
-      "requiredTokens": ["<title>Mhoo</title>", "/images/mhoo/", "Legal documents are currently unavailable."],
+      "requiredTokens": ["<title>Mhoo</title>", "/images/mhoo/", "/legal/terms", "/legal/privacy", "UNAVAILABLE_FAIL_CLOSED"],
       "forbiddenTokens": ["twenty.com", "/images/icons/"]
     },
     {
@@ -255,23 +284,23 @@
       "preset": "mhoo",
       "kind": "transactional-email-html",
       "path": "scripts/branding/fixtures/artifacts/mhoo/email.html",
-      "requiredTokens": ["Mhoo", "unsubscribe"],
-      "forbiddenTokens": ["twenty.com", "Powered by Twenty"]
+      "requiredTokens": ["Mhoo", "unsubscribe", "/legal/terms", "/legal/privacy"],
+      "forbiddenTokens": ["twenty.com"]
     },
     {
       "id": "mhoo-email-text",
       "preset": "mhoo",
       "kind": "transactional-email-text",
       "path": "scripts/branding/fixtures/artifacts/mhoo/email.txt",
-      "requiredTokens": ["Mhoo", "unsubscribe"],
-      "forbiddenTokens": ["twenty.com", "Powered by Twenty"]
+      "requiredTokens": ["Mhoo", "unsubscribe", "/legal/terms", "/legal/privacy"],
+      "forbiddenTokens": ["twenty.com"]
     },
     {
       "id": "mhoo-server-public",
       "preset": "mhoo",
       "kind": "server-public-html",
       "path": "scripts/branding/fixtures/artifacts/mhoo/server-unsubscribe.html",
-      "requiredTokens": ["Mhoo", "Legal documents are currently unavailable."],
+      "requiredTokens": ["Mhoo", "Mhoo LLC", "/legal/terms", "/legal/privacy", "UNAVAILABLE_FAIL_CLOSED"],
       "forbiddenTokens": ["twenty.com", "/images/icons/"]
     },
     {
@@ -288,7 +317,7 @@
       "preset": "mhoo",
       "kind": "legal-links",
       "path": "scripts/branding/fixtures/artifacts/mhoo/legal-links.txt",
-      "requiredTokens": ["Mhoo legal documents unavailable"],
+      "requiredTokens": ["MHOO-LEGAL-2026-v2.0", "APPROVED_FINAL", "Terms: /legal/terms", "Privacy: /legal/privacy", "DPA: UNAVAILABLE_FAIL_CLOSED"],
       "forbiddenTokens": ["twenty.com", "https://", "http://"]
     },
     {

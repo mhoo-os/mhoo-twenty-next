@@ -106,11 +106,13 @@ const mhooBrand: ProductBrand = {
   productName: 'Mhoo',
   productShortName: 'Mhoo',
   legal: {
-    legalEntity: 'MHOO Co., Ltd.',
-    legalEntityStatus: 'unapproved',
+    legalEntity: 'Mhoo LLC',
+    legalEntityStatus: 'approved',
     senderDisplayName: 'Mhoo',
-    privacy: { status: 'unapproved', url: null },
-    terms: { status: 'unapproved', url: null },
+    privacy: { status: 'approved', url: '/legal/privacy' },
+    terms: { status: 'approved', url: '/legal/terms' },
+    acceptableUse: { status: 'approved', url: '/legal/acceptable-use' },
+    openSource: { status: 'approved', url: '/legal/open-source' },
     dpa: { status: 'unavailable', url: null },
   },
   urls: {
@@ -124,8 +126,8 @@ const mhooBrand: ProductBrand = {
   documentTitleTemplate: '%s · Mhoo',
   attribution: {
     label: 'Powered by Twenty',
-    url: null,
-    status: 'unapproved',
+    url: 'https://twenty.com',
+    status: 'approved',
   },
   accessibility: {
     logoAltText: 'Mhoo pig snout mark',
@@ -147,6 +149,8 @@ const twentyBrand: ProductBrand = {
     senderDisplayName: 'Twenty',
     privacy: { status: 'unavailable', url: null },
     terms: { status: 'unavailable', url: null },
+    acceptableUse: { status: 'unavailable', url: null },
+    openSource: { status: 'unavailable', url: null },
     dpa: { status: 'unavailable', url: null },
   },
   urls: {

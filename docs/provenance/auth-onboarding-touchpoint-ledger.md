@@ -23,7 +23,7 @@ which upstream technical strings are intentionally retained.
 | Path | Surface | Identity before MHO-171 | Governed action | Authority rationale |
 | --- | --- | --- | --- | --- |
 | `packages/twenty-front/src/pages/auth/SignInUp.tsx` | Global sign-in/sign-up title | Literal `Welcome to Twenty` | Read the resolved product name; retain workspace and invite names | Global product identity is product configuration; workspace and invite names are existing resolved metadata |
-| `packages/twenty-front/src/modules/auth/sign-in-up/components/FooterNote.tsx` | Global and workspace legal footer | Hard-coded Twenty legal URLs and copy | Read approved document URLs only; show an explicit unavailable state otherwise | Legal publication status is part of the brand contract and must fail closed |
+| `packages/twenty-front/src/modules/auth/sign-in-up/components/FooterNote.tsx` | Global and workspace legal footer | Hard-coded Twenty legal URLs and copy | Read approved document URLs only; Mhoo uses the approved Terms/Privacy routes and keeps DPA unavailable | Legal publication status is part of the brand contract and must fail closed |
 | `packages/twenty-front/src/modules/auth/components/Logo.tsx` | Sign-in, password reset, and activation logo | Upstream default launcher icon | Use the product mark from the resolved brand when no explicit primary logo exists | An explicit primary logo remains caller-owned workspace metadata; the product fallback is brand-owned |
 | `packages/twenty-front/src/modules/onboarding/components/OnboardingHeader.tsx` | Onboarding header mark | Static Twenty SVG | Use the resolved product mark | This is product presentation and has no authority or routing behavior |
 | `packages/twenty-front/src/modules/onboarding/components/OnboardingPulsingLogo.tsx` | Verification/onboarding loading mark | Static Twenty SVG | Use the resolved product mark and preserve decorative loading semantics | Loading presentation must not infer identity from URL or state outside the brand contract |
@@ -77,11 +77,11 @@ handling, token exchange, SSO bypass, return paths, and membership behavior.
 | Case | Expected proof |
 | --- | --- |
 | No client brand has been loaded | Product presentation falls back to `MHO_BRAND`; no Twenty customer-facing default remains in the touched seams |
-| Resolved Mhoo brand | Mhoo product name and Mhoo product mark are used; unapproved/unavailable legal documents produce no links |
+| Resolved Mhoo brand | Mhoo product name and Mhoo product mark are used; approved Terms/Privacy links are exposed and DPA remains unavailable |
 | Resolved upstream fallback brand | The same seams can render the resolved Twenty preset without hard-coded Twenty assumptions |
 | Resolved workspace with custom logo/name | Existing workspace logo/name remain authoritative and are not replaced by the product fallback |
 | Provider-enabled authentication/import | Provider labels and icons remain unchanged |
-| Legal status not approved or URL absent | No URL is synthesized from website, host, query, or upstream legal paths; an explicit unavailable state is rendered |
+| Legal status not approved or URL absent | No URL is synthesized from website, host, query, or upstream legal paths; the unavailable state is rendered |
 | Auth and onboarding interaction | Tests/builds cover presentation only; no auth request, token, origin, routing, or membership behavior is changed |
 
 This is source-level evidence for MHO-171. It does not claim disposable
