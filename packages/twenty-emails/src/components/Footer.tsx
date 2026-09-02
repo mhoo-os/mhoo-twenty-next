@@ -3,6 +3,7 @@ import { Column, Container, Row } from 'react-email';
 import { Link } from 'src/components/Link';
 import { ShadowText } from 'src/components/ShadowText';
 import { isApprovedBrandDocument } from 'src/utils/brand';
+import { getPreviewNotice } from 'src/utils/preview-brand';
 import { type ResolvedBrand } from 'twenty-shared/branding';
 
 const footerContainerStyle = {
@@ -71,6 +72,7 @@ export const Footer = ({ i18n, brand }: FooterProps) => {
       status: brand.attribution.status,
       url: brand.attribution.url,
     });
+  const previewNotice = getPreviewNotice(brand);
 
   return (
     <Container style={footerContainerStyle}>
@@ -98,6 +100,7 @@ export const Footer = ({ i18n, brand }: FooterProps) => {
           />
         </ShadowText>
       ) : null}
+      {previewNotice ? <ShadowText>{previewNotice}</ShadowText> : null}
     </Container>
   );
 };

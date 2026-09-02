@@ -5,7 +5,7 @@ import { Link } from 'src/components/Link';
 import { MainText } from 'src/components/MainText';
 import { Title } from 'src/components/Title';
 import { createI18nInstance } from 'src/utils/i18n.utils';
-import { PREVIEW_BRAND } from 'src/utils/preview-brand';
+import { MHO_PREVIEW_BRAND } from 'src/utils/preview-brand';
 import { type ResolvedBrand } from 'twenty-shared/branding';
 import { type APP_LOCALES } from 'twenty-shared/translations';
 
@@ -52,9 +52,9 @@ export const PasswordResetLinkEmail = ({
 PasswordResetLinkEmail.PreviewProps = {
   duration: '24 hours',
   hasPassword: true,
-  link: 'https://app.twenty.com/reset-password/123',
+  link: 'https://beta.mhoo.app/reset-password/123',
   locale: 'en',
-  brand: PREVIEW_BRAND,
+  brand: MHO_PREVIEW_BRAND,
 } as PasswordResetLinkEmailProps;
 
 export default PasswordResetLinkEmail;

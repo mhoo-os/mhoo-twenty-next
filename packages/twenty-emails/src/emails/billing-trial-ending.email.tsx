@@ -4,7 +4,7 @@ import { CallToAction } from 'src/components/CallToAction';
 import { MainText } from 'src/components/MainText';
 import { Title } from 'src/components/Title';
 import { createI18nInstance } from 'src/utils/i18n.utils';
-import { PREVIEW_BRAND } from 'src/utils/preview-brand';
+import { MHO_PREVIEW_BRAND } from 'src/utils/preview-brand';
 import { type ResolvedBrand } from 'twenty-shared/branding';
 import { type APP_LOCALES } from 'twenty-shared/translations';
 
@@ -76,9 +76,9 @@ BillingTrialEndingEmail.PreviewProps = {
   workspaceDisplayName: 'Acme Inc.',
   trialEndsAt: new Date('2026-07-02'),
   dataRetentionDays: 14,
-  link: 'https://acme.twenty.com/settings/billing',
+  link: 'https://beta.mhoo.app/settings/billing',
   locale: 'en',
-  brand: PREVIEW_BRAND,
+  brand: MHO_PREVIEW_BRAND,
 } as BillingTrialEndingEmailProps;
 
 export default BillingTrialEndingEmail;

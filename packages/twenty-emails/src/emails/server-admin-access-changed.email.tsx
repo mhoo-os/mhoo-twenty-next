@@ -3,7 +3,7 @@ import { BaseEmail } from 'src/components/BaseEmail';
 import { MainText } from 'src/components/MainText';
 import { Title } from 'src/components/Title';
 import { createI18nInstance } from 'src/utils/i18n.utils';
-import { PREVIEW_BRAND } from 'src/utils/preview-brand';
+import { MHO_PREVIEW_BRAND } from 'src/utils/preview-brand';
 import { type ResolvedBrand } from 'twenty-shared/branding';
 import { type APP_LOCALES } from 'twenty-shared/translations';
 
@@ -77,7 +77,7 @@ ServerAdminAccessChangedEmail.PreviewProps = {
   canAccessFullAdminPanel: true,
   canImpersonate: false,
   locale: 'en',
-  brand: PREVIEW_BRAND,
+  brand: MHO_PREVIEW_BRAND,
 } as ServerAdminAccessChangedEmailProps;
 
 export default ServerAdminAccessChangedEmail;

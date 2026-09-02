@@ -16,6 +16,7 @@ export type EmailingPublicPageBrand = Readonly<{
   legalEntity: string | null;
   attribution: EmailingPublicPageLegalLink | null;
   unavailableLegalDocuments: readonly string[];
+  previewNotice?: string;
 }>;
 
 const isApprovedDocument = (

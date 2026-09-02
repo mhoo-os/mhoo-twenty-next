@@ -4,7 +4,7 @@ import { CallToAction } from 'src/components/CallToAction';
 import { MainText } from 'src/components/MainText';
 import { Title } from 'src/components/Title';
 import { createI18nInstance } from 'src/utils/i18n.utils';
-import { PREVIEW_BRAND } from 'src/utils/preview-brand';
+import { MHO_PREVIEW_BRAND } from 'src/utils/preview-brand';
 import { type ResolvedBrand } from 'twenty-shared/branding';
 import { type APP_LOCALES } from 'twenty-shared/translations';
 
@@ -20,7 +20,7 @@ type BillingTrialConvertingEmailProps = {
 
 // Sent 7 days before a trial WITH a credit card ends, i.e. before the first charge.
 // Goal: be transparent and fair — no surprise charge. The user can cancel in one click
-// before the date if Twenty is not the right fit. This is intentionally not a dark pattern.
+// before the date if Mhoo is not the right fit. This is intentionally not a dark pattern.
 export const BillingTrialConvertingEmail = ({
   userName,
   workspaceDisplayName,
@@ -84,9 +84,9 @@ BillingTrialConvertingEmail.PreviewProps = {
   workspaceDisplayName: 'Acme Inc.',
   trialEndsAt: new Date('2026-07-02'),
   interval: 'month',
-  link: 'https://acme.twenty.com/settings/billing',
+  link: 'https://beta.mhoo.app/settings/billing',
   locale: 'en',
-  brand: PREVIEW_BRAND,
+  brand: MHO_PREVIEW_BRAND,
 } as BillingTrialConvertingEmailProps;
 
 export default BillingTrialConvertingEmail;

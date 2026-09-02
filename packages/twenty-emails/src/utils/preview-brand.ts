@@ -1,4 +1,5 @@
 import {
+  MHO_BRAND,
   TWENTY_BRAND,
   type BrandUrlReference,
   type ProductBrand,
@@ -36,3 +37,25 @@ export const PREVIEW_BRAND = resolvePreviewBrand(
   TWENTY_BRAND,
   'https://app.twenty.com/',
 );
+
+export type EmailPreviewBrand = ResolvedBrand & {
+  readonly previewNotice: string;
+};
+
+/**
+ * Private closed-beta fixture for the local email gallery. This is deliberately
+ * separate from the upstream fallback and is never used by production email
+ * sends, which receive a server-resolved brand explicitly.
+ */
+export const MHO_PREVIEW_BRAND: EmailPreviewBrand = Object.freeze({
+  ...resolvePreviewBrand(MHO_BRAND, 'https://beta.mhoo.app/'),
+  previewNotice:
+    'Private beta preview — legal documents are DRAFT / UNAPPROVED.',
+});
+
+export const getPreviewNotice = (brand: ResolvedBrand): string | null => {
+  const notice = (brand as ResolvedBrand & { previewNotice?: unknown })
+    .previewNotice;
+
+  return typeof notice === 'string' && notice.trim().length > 0 ? notice : null;
+};

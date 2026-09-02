@@ -50,8 +50,11 @@ export const buildEmailingPublicPageFooter = (
         brand.attribution.label,
       )}</a></p>`
     : '';
+  const previewNoticeMarkup = brand.previewNotice
+    ? `<p class="preview-notice">${escapeHtml(brand.previewNotice)}</p>`
+    : '';
 
-  return `<footer class="brand-footer"><p><a href="${escapeHtml(
+  return `<footer class="brand-footer">${previewNoticeMarkup}<p><a href="${escapeHtml(
     brand.supportUrl,
   )}">Contact ${escapeHtml(brand.productName)} support</a></p>${legalMarkup}${legalEntityMarkup}${attributionMarkup}</footer>`;
 };
