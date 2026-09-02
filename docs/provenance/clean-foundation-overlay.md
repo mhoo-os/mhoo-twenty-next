@@ -32,3 +32,25 @@ Clean runtime paths:
 - `.github/workflows/clean-foundation-image.yml`
 - `deploy/twenty-next/compose.yaml`
 - `deploy/twenty-next/env/validation.env.example`
+
+Contract-only Finance paths:
+
+- `packages/twenty-apps/internal/mhoo-finance/package.json`
+- `packages/twenty-apps/internal/mhoo-finance/.gitignore`
+- `packages/twenty-apps/internal/mhoo-finance/yarn.lock`
+- `packages/twenty-apps/internal/mhoo-finance/.nvmrc`
+- `packages/twenty-apps/internal/mhoo-finance/.oxlintrc.json`
+- `packages/twenty-apps/internal/mhoo-finance/.yarnrc.yml`
+- `packages/twenty-apps/internal/mhoo-finance/tsconfig.json`
+- `packages/twenty-apps/internal/mhoo-finance/tsconfig.spec.json`
+- `packages/twenty-apps/internal/mhoo-finance/vitest.config.ts`
+- `packages/twenty-apps/internal/mhoo-finance/README.md`
+- `packages/twenty-apps/internal/mhoo-finance/PROVENANCE.md`
+- `packages/twenty-apps/internal/mhoo-finance/src/engagement/authority-contract.ts`
+- `packages/twenty-apps/internal/mhoo-finance/src/__tests__/authority-contract.test.ts`
+- `packages/twenty-apps/internal/mhoo-finance/src/__tests__/authority-contract.visibility.type-test.ts`
+
+These paths contain only a standalone contract evaluator and synthetic tests.
+They are not an installable Twenty App and do not authorize application
+metadata, Workspace mutation, provider access, credentials, customer data,
+imports, deployment, or production activation.

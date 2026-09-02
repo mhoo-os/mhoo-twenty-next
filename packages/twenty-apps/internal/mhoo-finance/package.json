@@ -1,0 +1,26 @@
+{
+  "name": "mhoo-finance-contract",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "description": "Contract-only Gate 0 evaluator for the proposed Mhoo Finance boundary",
+  "engines": {
+    "node": "^24.5.0",
+    "npm": "please-use-yarn",
+    "yarn": ">=4.0.2"
+  },
+  "packageManager": "yarn@4.13.0",
+  "scripts": {
+    "lint": "oxlint -c .oxlintrc.json .",
+    "test": "vitest run",
+    "test:unit": "vitest run --project unit",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "devDependencies": {
+    "@types/node": "^24.7.2",
+    "oxlint": "^0.16.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.0"
+  }
+}
