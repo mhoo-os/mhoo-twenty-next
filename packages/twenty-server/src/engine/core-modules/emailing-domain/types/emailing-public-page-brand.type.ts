@@ -33,9 +33,8 @@ const isDimensionMatrix = (
   dimensions: BrandDimensions,
 ): dimensions is DimensionMatrix => Array.isArray(dimensions[0]);
 
-const getAssetDimensions = (
-  dimensions: BrandDimensions,
-): DimensionPair => (isDimensionMatrix(dimensions) ? dimensions[0] : dimensions);
+const getAssetDimensions = (dimensions: BrandDimensions): DimensionPair =>
+  isDimensionMatrix(dimensions) ? dimensions[0] : dimensions;
 
 /**
  * Reduce the full resolved brand contract to the values safe for public
