@@ -12,7 +12,7 @@ import { Title } from 'src/components/Title';
 import { WhatIsProduct } from 'src/components/WhatIsTwenty';
 import { capitalize } from 'src/utils/capitalize';
 import { createI18nInstance } from 'src/utils/i18n.utils';
-import { PREVIEW_BRAND } from 'src/utils/preview-brand';
+import { MHO_PREVIEW_BRAND } from 'src/utils/preview-brand';
 import { type ResolvedBrand } from 'twenty-shared/branding';
 import { type APP_LOCALES } from 'twenty-shared/translations';
 import { getImageAbsoluteURI } from 'twenty-shared/utils';
@@ -94,15 +94,15 @@ export const SendInviteLinkEmail = ({
 };
 
 SendInviteLinkEmail.PreviewProps = {
-  link: 'https://app.twenty.com/invite/123',
+  link: 'https://beta.mhoo.app/invite/123',
   workspace: {
     name: 'Acme Inc.',
     logo: 'https://fakeimg.pl/200x200/?text=ACME&font=lobster',
   },
   sender: { email: 'john.doe@example.com', firstName: 'John', lastName: 'Doe' },
-  serverUrl: 'https://app.twenty.com',
+  serverUrl: 'https://beta.mhoo.app',
   locale: 'en',
-  brand: PREVIEW_BRAND,
+  brand: MHO_PREVIEW_BRAND,
 } as SendInviteLinkEmailProps;
 
 export default SendInviteLinkEmail;

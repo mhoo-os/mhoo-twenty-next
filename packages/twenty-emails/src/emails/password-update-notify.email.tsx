@@ -4,7 +4,7 @@ import { CallToAction } from 'src/components/CallToAction';
 import { MainText } from 'src/components/MainText';
 import { Title } from 'src/components/Title';
 import { createI18nInstance } from 'src/utils/i18n.utils';
-import { PREVIEW_BRAND } from 'src/utils/preview-brand';
+import { MHO_PREVIEW_BRAND } from 'src/utils/preview-brand';
 import { type ResolvedBrand } from 'twenty-shared/branding';
 import { type APP_LOCALES } from 'twenty-shared/translations';
 
@@ -65,9 +65,9 @@ export const PasswordUpdateNotifyEmail = ({
 PasswordUpdateNotifyEmail.PreviewProps = {
   userName: 'John Doe',
   email: 'john.doe@example.com',
-  link: 'https://app.twenty.com',
+  link: 'https://beta.mhoo.app',
   locale: 'en',
-  brand: PREVIEW_BRAND,
+  brand: MHO_PREVIEW_BRAND,
 } as PasswordUpdateNotifyEmailProps;
 
 export default PasswordUpdateNotifyEmail;
