@@ -18,6 +18,12 @@ Initial permitted overlay paths:
 Later overlay commits append trajectory evaluation and the clean runtime CI to
 this list. Nothing else is implicitly permitted.
 
+Documentation-drift control paths:
+
+- `.github/workflows/ci-app-docs-drift.yaml`
+- `scripts/docs/check_app_docs_drift.py`
+- `scripts/docs/test_app_docs_drift.py`
+
 Trajectory-eval paths:
 
 - `.agents/trajectory-review.json`
