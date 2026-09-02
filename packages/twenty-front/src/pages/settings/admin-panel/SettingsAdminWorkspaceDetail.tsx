@@ -2,7 +2,6 @@ import { useParams } from 'react-router-dom';
 
 import { useMutation, useQuery } from '@apollo/client/react';
 import { t } from '@lingui/core/macro';
-import { isNonEmptyString } from '@sniptt/guards';
 import { SettingsPath } from 'twenty-shared/types';
 import { getSettingsPath, isDefined } from 'twenty-shared/utils';
 
@@ -10,6 +9,7 @@ import { currentUserState } from '@/auth/states/currentUserState';
 import { currentWorkspaceState } from '@/auth/states/currentWorkspaceState';
 import { billingState } from '@/client-config/states/billingState';
 import { canManageFeatureFlagsState } from '@/client-config/states/canManageFeatureFlagsState';
+import { useResolvedBrand } from '@/client-config/hooks/useResolvedBrand';
 import { AI_ADMIN_PATH } from '@/settings/admin-panel/ai/constants/AiAdminPath';
 import { useApolloAdminClient } from '@/settings/admin-panel/apollo/hooks/useApolloAdminClient';
 import { SettingsAdminWorkspaceBillingContent } from '@/settings/admin-panel/components/SettingsAdminWorkspaceBillingContent';
@@ -30,9 +30,9 @@ import { TableBody } from '@/ui/layout/table/components/TableBody';
 import { TableCell } from '@/ui/layout/table/components/TableCell';
 import { TableHeader } from '@/ui/layout/table/components/TableHeader';
 import { TableRow } from '@/ui/layout/table/components/TableRow';
-import { DEFAULT_WORKSPACE_LOGO } from '@/ui/navigation/navigation-drawer/constants/DefaultWorkspaceLogo';
 import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateValue';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
+import { getWorkspacePresentation } from '@/workspace/utils/getWorkspacePresentation';
 import { Avatar } from 'twenty-ui/data-display';
 import {
   IconCreditCard,
@@ -68,6 +68,7 @@ const WORKSPACE_DETAIL_TAB_IDS = {
 
 export const SettingsAdminWorkspaceDetail = () => {
   const { workspaceId } = useParams<{ workspaceId: string }>();
+  const brand = useResolvedBrand();
   const apolloAdminClient = useApolloAdminClient();
 
   const activeTabId = useAtomComponentStateValue(
@@ -197,10 +198,13 @@ export const SettingsAdminWorkspaceDetail = () => {
       : []),
   ];
 
-  const workspaceName = workspace?.name || workspaceId || '';
-  const workspaceLogo = isNonEmptyString(workspace?.logo)
-    ? workspace.logo
-    : DEFAULT_WORKSPACE_LOGO;
+  const workspacePresentation = getWorkspacePresentation(
+    brand,
+    workspace ? { displayName: workspace.name, logo: workspace.logo } : null,
+  );
+  const workspaceName = workspace
+    ? workspacePresentation.workspace.name
+    : workspaceId || '';
 
   if (isLoadingWorkspace) {
     return <SettingsSkeletonLoader />;
@@ -211,7 +215,9 @@ export const SettingsAdminWorkspaceDetail = () => {
       title={workspaceName}
       icon={
         <Avatar
-          avatarUrl={getAbsoluteImageUrl(workspaceLogo)}
+          avatarUrl={getAbsoluteImageUrl(
+            workspacePresentation.workspace.logoUrl,
+          )}
           placeholder={workspaceName}
           placeholderColorSeed={workspace?.id}
           size="md"

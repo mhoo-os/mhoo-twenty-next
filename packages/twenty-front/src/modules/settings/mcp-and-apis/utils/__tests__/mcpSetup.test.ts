@@ -10,6 +10,7 @@ import {
   buildVsCodeInstallLink,
   isHttpsUrl,
 } from '@/settings/mcp-and-apis/utils/mcpSetup';
+import { MHO_BRAND } from 'twenty-shared/branding';
 
 const mcpServerUrl = 'https://api.twenty.com/mcp';
 
@@ -76,6 +77,12 @@ describe('buildClaudeInstallLink', () => {
     expect(params.get('connectorName')).toBe('Twenty');
     expect(params.get('connectorUrl')).toBe(mcpServerUrl);
   });
+
+  it('uses the configured product name for the connector label', () => {
+    const link = buildClaudeInstallLink(mcpServerUrl, MHO_BRAND.productName);
+
+    expect(new URL(link).searchParams.get('connectorName')).toBe('Mhoo');
+  });
 });
 
 describe('buildCursorInstallLink', () => {
@@ -121,6 +128,17 @@ describe('buildGooseInstallLink', () => {
     expect(params.get('url')).toBe(mcpServerUrl);
     expect(params.get('header')).toBe('Authorization=Bearer <YOUR_API_KEY>');
   });
+
+  it('uses the configured product name in the extension payload', () => {
+    const link = buildGooseInstallLink(mcpServerUrl, MHO_BRAND.productName);
+    const params = new URLSearchParams(link.split('?')[1]);
+
+    expect(params.get('id')).toBe('twenty');
+    expect(params.get('name')).toBe('Mhoo');
+    expect(params.get('description')).toBe(
+      'Access your Mhoo workspace through MCP',
+    );
+  });
 });
 
 describe('buildReplitInstallLink', () => {
@@ -138,6 +156,12 @@ describe('buildReplitInstallLink', () => {
         },
       ],
     });
+  });
+
+  it('uses the configured product name in the Replit payload', () => {
+    const link = buildReplitInstallLink(mcpServerUrl, MHO_BRAND.productName);
+
+    expect(decodeBase64JsonParam(link, 'mcp').displayName).toBe('Mhoo');
   });
 });
 

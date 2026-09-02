@@ -104,5 +104,44 @@ Auth, onboarding, and pre-auth presentation paths:
 - `packages/twenty-front/src/pages/auth/SignInUp.tsx`
 - `packages/twenty-front/src/pages/not-found/NotFound.tsx`
 
+Authenticated UI and customer-copy presentation paths:
+
+- `docs/provenance/authenticated-ui-touchpoint-ledger.md`
+- `packages/twenty-front/src/modules/client-config/hooks/useResolvedBrand.ts`
+- `packages/twenty-front/src/modules/client-config/utils/getBrandUrl.ts`
+- `packages/twenty-front/src/modules/client-config/utils/__tests__/getBrandUrl.test.ts`
+- `packages/twenty-front/src/modules/workspace/utils/getWorkspacePresentation.ts`
+- `packages/twenty-front/src/modules/workspace/utils/__tests__/getWorkspacePresentation.test.ts`
+- `packages/twenty-front/src/modules/ui/navigation/navigation-drawer/constants/DefaultWorkspaceLogo.ts`
+- `packages/twenty-front/src/modules/ui/navigation/navigation-drawer/constants/DefaultWorkspaceName.ts`
+- `packages/twenty-front/src/modules/ui/navigation/navigation-drawer/components/MultiWorkspaceDropdown/internal/MultiWorkspaceDropdownDefaultComponents.tsx`
+- `packages/twenty-front/src/modules/ui/navigation/navigation-drawer/components/MultiWorkspaceDropdown/internal/MultiWorkspaceDropdownClickableComponent.tsx`
+- `packages/twenty-front/src/modules/ui/navigation/navigation-drawer/components/MultiWorkspaceDropdown/internal/components/AvailableWorkspaceItem.tsx`
+- `packages/twenty-front/src/modules/auth/sign-in-up/components/SignInUpGlobalScopeForm.tsx`
+- `packages/twenty-front/src/pages/settings/admin-panel/SettingsAdminWorkspaceDetail.tsx`
+- `packages/twenty-front/src/pages/settings/admin-panel/SettingsAdminUserDetail.tsx`
+- `packages/twenty-front/src/modules/settings/admin-panel/components/SettingsAdminWorkspaceContent.tsx`
+- `packages/twenty-front/src/modules/applications/components/AppConnectionHeader.tsx`
+- `packages/twenty-front/src/modules/applications/hooks/useResolvedApplicationDescription.ts`
+- `packages/twenty-front/src/pages/settings/applications/utils/getStandardApplicationDescription.ts`
+- `packages/twenty-front/src/pages/settings/applications/utils/getCustomApplicationDescription.ts`
+- `packages/twenty-front/src/pages/settings/community/SettingsCommunity.tsx`
+- `packages/twenty-front/src/modules/settings/mcp-and-apis/constants/McpSetup.ts`
+- `packages/twenty-front/src/modules/settings/mcp-and-apis/utils/mcpSetup.ts`
+- `packages/twenty-front/src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx`
+- `packages/twenty-front/src/modules/settings/mcp-and-apis/utils/__tests__/mcpSetup.test.ts`
+- `packages/twenty-front/src/modules/settings/mcp-and-apis/components/SettingsMcpSetup.tsx`
+- `packages/twenty-front/src/pages/settings/legal/SettingsLegalDpa.tsx`
+- `packages/twenty-front/src/pages/settings/legal/SettingsLegalDpaNew.tsx`
+- `packages/twenty-front/src/modules/settings/legal/components/SettingsDpaAgreementsTable.tsx`
+- `packages/twenty-front/src/pages/settings/enterprise/SettingsEnterprise.tsx`
+- `packages/twenty-front/src/modules/settings/billing/hooks/useBillingPortalSession.ts`
+- `packages/twenty-front/src/modules/settings/billing/hooks/useHandleCheckoutSession.ts`
+- `packages/twenty-front/src/modules/settings/billing/hooks/useSubmitSubscriptionPayment.ts`
+- `packages/twenty-front/src/modules/settings/billing/hooks/useEndSubscriptionTrialPeriod.ts`
+- `packages/twenty-front/src/modules/settings/billing/components/AddPaymentMethodForm.tsx`
+- `packages/twenty-front/src/modules/settings/billing/constants/SettingsBillingPlanComparisonRows.ts`
+- `packages/twenty-front/src/modules/spreadsheet-import/steps/components/MatchColumnsStep/components/ColumnGrid.tsx`
+
 These paths authorize source-level branding work only. They do not authorize
 runtime deployment, publication, legal approval, or production mutation.

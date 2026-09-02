@@ -127,12 +127,6 @@ msgstr "(${currentCreditPriceDisplay}/{intervalLabel})"
 msgid "(no icon selected)"
 msgstr "(아이콘 선택되지 않음)"
 
-#. js-lingui-id: 6Ux0ik
-#: src/modules/ui/navigation/navigation-drawer/components/MultiWorkspaceDropdown/internal/components/AvailableWorkspaceItem.tsx
-#: src/modules/ui/navigation/navigation-drawer/components/MultiWorkspaceDropdown/internal/MultiWorkspaceDropdownDefaultComponents.tsx
-msgid "(No name)"
-msgstr "(이름 없음)"
-
 #. js-lingui-id: p35p2M
 #: src/modules/ui/input/components/IconPicker.tsx
 msgid "(selected: {selectedIconKey})"
@@ -211,6 +205,13 @@ msgstr "{0, plural, other {귀하는 {fieldsList} 필드를 액세스할 권한�
 msgid "{0} credits"
 msgstr "{0} 크레딧"
 
+#. js-lingui-id: Ej3KaG
+#. placeholder {0}: brand.productName
+#: src/pages/settings/legal/SettingsLegalDpa.tsx
+#: src/pages/settings/legal/SettingsLegalDpaNew.tsx
+msgid "{0} data processing agreement is currently unavailable."
+msgstr ""
+
 #. js-lingui-id: QpgBEp
 #. placeholder {0}: withoutCreditCardTrialPeriod.duration
 #: src/pages/onboarding/UpgradeFreeTrial.tsx
@@ -225,7 +226,9 @@ msgstr "{0}개 중복됨"
 
 #. js-lingui-id: stCODw
 #. placeholder {0}: appObject.fields.length
+#. placeholder {0}: brand.productName
 #: src/modules/settings/applications/hooks/useComputeObjectAndFieldsContentForApplication.ts
+#: src/modules/spreadsheet-import/steps/components/MatchColumnsStep/components/ColumnGrid.tsx
 msgid "{0} fields"
 msgstr "{0} 필드"
 
@@ -982,15 +985,16 @@ msgstr "이 워크스페이스에 대해 수락 및 서명된 DPA와 해당 템�
 msgid "Access Key ID"
 msgstr "액세스 키 ID"
 
+#. js-lingui-id: WV3Yat
+#. placeholder {0}: brand.productName
+#: src/modules/settings/mcp-and-apis/components/SettingsMcpSetup.tsx
+msgid "Access your {0} workspace data from your favorite MCP client like Claude, Codex or Cursor."
+msgstr ""
+
 #. js-lingui-id: CrjDqe
 #: src/pages/auth/Authorize.tsx
 msgid "Access your workspace data"
 msgstr "워크스페이스 데이터에 접근"
-
-#. js-lingui-id: IF4QNM
-#: src/modules/settings/mcp-and-apis/components/SettingsMcpSetup.tsx
-msgid "Access your workspace data from your favorite MCP client like Claude, Codex or Cursor."
-msgstr "Claude, Codex 또는 Cursor와 같은 선호하는 MCP 클라이언트를 통해 워크스페이스 데이터에 액세스하세요."
 
 #. js-lingui-id: AeXO77
 #: src/modules/settings/accounts/components/SettingsConnectedAccountsTableHeader.tsx
@@ -1153,6 +1157,11 @@ msgstr "추가"
 #: src/modules/settings/data-model/fields/forms/select/components/AddSelectOptionMenuItem.tsx
 msgid "Add \"{trimmedName}\" to options"
 msgstr "\"{trimmedName}\"을 옵션에 추가하기"
+
+#. js-lingui-id: dUOV5o
+#: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
+msgid "Add {productName} as a Streamable HTTP extension in Goose."
+msgstr ""
 
 #. js-lingui-id: 9CHcSG
 #: src/modules/object-record/record-table/empty-state/components/RecordTableEmptyStateNoRecordFoundForFilter.tsx
@@ -1505,35 +1514,35 @@ msgstr "SSO ID 공급자 추가"
 msgid "Add test input for evaluation (e.g., \"Find all customers in NY\")"
 msgstr ""
 
-#. js-lingui-id: FKGcEL
+#. js-lingui-id: zTPzKF
 #: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
-msgid "Add the Twenty MCP server as a remote context server in Zed."
-msgstr "Zed에서 Twenty MCP 서버를 원격 컨텍스트 서버로 추가하세요."
+msgid "Add the {productName} MCP server as a remote context server in Zed."
+msgstr ""
 
-#. js-lingui-id: iA2nHX
+#. js-lingui-id: RCi0de
 #: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
-msgid "Add the Twenty MCP server from Augment Code settings."
-msgstr "Augment Code 설정에서 Twenty MCP 서버를 추가하세요."
+msgid "Add the {productName} MCP server from Augment Code settings."
+msgstr ""
 
-#. js-lingui-id: l+NzAk
+#. js-lingui-id: VdmSXN
 #: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
-msgid "Add the Twenty MCP server from Raycast's MCP commands or settings."
-msgstr "Raycast의 MCP 명령 또는 설정에서 Twenty MCP 서버를 추가하세요."
+msgid "Add the {productName} MCP server from Raycast's MCP commands or settings."
+msgstr ""
 
-#. js-lingui-id: j6G/yI
+#. js-lingui-id: Zsp+Qq
 #: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
-msgid "Add the Twenty MCP server in Gemini CLI settings."
-msgstr "Gemini CLI 설정에서 Twenty MCP 서버를 추가하세요."
+msgid "Add the {productName} MCP server in Gemini CLI settings."
+msgstr ""
 
-#. js-lingui-id: /OyhlM
+#. js-lingui-id: BqUpn9
 #: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
-msgid "Add the Twenty MCP server to your LibreChat configuration file."
-msgstr "LibreChat 구성 파일에 Twenty MCP 서버를 추가하세요."
+msgid "Add the {productName} MCP server to your LibreChat configuration file."
+msgstr ""
 
-#. js-lingui-id: K0DXoj
+#. js-lingui-id: YpuC5t
 #: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
-msgid "Add the Twenty remote server with LM Studio's install link."
-msgstr "LM Studio의 설치 링크로 Twenty 원격 서버를 추가하세요."
+msgid "Add the {productName} remote server with LM Studio's install link."
+msgstr ""
 
 #. js-lingui-id: 5+ttxv
 #: src/modules/settings/accounts/components/SettingsAccountsBlocklistInput.tsx
@@ -1549,11 +1558,6 @@ msgstr "즐겨찾기에 추가"
 #: src/modules/settings/unsubscribe-topics/components/SettingsWorkspaceUnsubscribeTopicSection.tsx
 msgid "Add topic"
 msgstr "주제 추가"
-
-#. js-lingui-id: 4D/zWv
-#: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
-msgid "Add Twenty as a Streamable HTTP extension in Goose."
-msgstr "Goose에서 Twenty를 Streamable HTTP 확장으로 추가하세요."
 
 #. js-lingui-id: XnwceV
 #: src/pages/settings/applications/components/SettingsApplicationRegistrationRedirectURIsInput.tsx
@@ -3187,10 +3191,11 @@ msgstr "청구 주기"
 msgid "Billing period"
 msgstr "청구 기간"
 
-#. js-lingui-id: xF/NXI
+#. js-lingui-id: nt1Pg9
+#. placeholder {0}: brand.productName
 #: src/modules/settings/billing/hooks/useBillingPortalSession.ts
-msgid "Billing portal session error. Please retry or contact Twenty team"
-msgstr "결제 포털 세션 오류입니다. 다시 시도하거나 Twenty 팀에 문의하세요"
+msgid "Billing portal session error. Please retry or contact {0} support"
+msgstr ""
 
 #. js-lingui-id: 8kIU+G
 #: src/modules/advanced-text-editor/constants/AdvancedTextEditorBlockCatalog.ts
@@ -3893,11 +3898,12 @@ msgstr "이메일을 확인하세요"
 msgid "Check your inbox to verify your new email address."
 msgstr "새 이메일 주소를 확인하려면 받은 편지함을 확인하세요."
 
-#. js-lingui-id: SxwQE8
+#. js-lingui-id: RwgnEX
+#. placeholder {0}: brand.productName
 #: src/modules/settings/billing/hooks/useHandleCheckoutSession.ts
 #: src/modules/settings/billing/hooks/useHandleCheckoutSession.ts
-msgid "Checkout session error. Please retry or contact Twenty team"
-msgstr "결제 세션 오류입니다. 다시 시도하거나 Twenty 팀에 문의하십시오"
+msgid "Checkout session error. Please retry or contact {0} support"
+msgstr ""
 
 #. js-lingui-id: SviKkE
 #: src/localization/hooks/useLocaleOptions.ts
@@ -4554,6 +4560,16 @@ msgstr "IMAP 설정을 구성하여 이메일을 수신하고 동기화하세요
 msgid "Configure SMTP settings to send emails from your account."
 msgstr "이메일을 보내기 위해 SMTP 설정을 구성하십시오."
 
+#. js-lingui-id: x6Jukq
+#: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
+msgid "Configure the {productName} MCP server manually in Cascade."
+msgstr ""
+
+#. js-lingui-id: fzhFzO
+#: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
+msgid "Configure the {productName} MCP server manually in Cline."
+msgstr ""
+
 #. js-lingui-id: TiCmQz
 #: src/modules/settings/admin-panel/ai/components/SettingsAdminAI.tsx
 msgid "Configure the default AI models for all workspaces"
@@ -4568,16 +4584,6 @@ msgstr "Warp의 에이전트 설정에서 원격 MCP 서버를 구성하세요."
 #: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
 msgid "Configure the remote server in Amazon Q Developer's MCP settings."
 msgstr "Amazon Q Developer의 MCP 설정에서 원격 서버를 구성하세요."
-
-#. js-lingui-id: g1/8jH
-#: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
-msgid "Configure the Twenty MCP server manually in Cascade."
-msgstr "Cascade에서 Twenty MCP 서버를 수동으로 구성하세요."
-
-#. js-lingui-id: XiyvRh
-#: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
-msgid "Configure the Twenty MCP server manually in Cline."
-msgstr "Cline에서 Twenty MCP 서버를 수동으로 구성하세요."
 
 #. js-lingui-id: qA9AGQ
 #: src/modules/settings/domains/components/SettingsDomainRecords.tsx
@@ -8037,10 +8043,11 @@ msgstr "간격 전환 취소 중 오류 발생."
 msgid "Error while cancelling plan switching."
 msgstr "플랜 전환 취소 중 오류 발생."
 
-#. js-lingui-id: QmR+2U
+#. js-lingui-id: BLe2o6
+#. placeholder {0}: brand.productName
 #: src/modules/settings/billing/hooks/useEndSubscriptionTrialPeriod.ts
-msgid "Error while ending trial period. Please contact Twenty team."
-msgstr "시험 기간 종료 중 오류가 발생했습니다. Twenty 팀에 문의하세요."
+msgid "Error while ending trial period. Please contact {0} support."
+msgstr ""
 
 #. js-lingui-id: 5g78zo
 #: src/pages/settings/members/SettingsWorkspaceMember.tsx
@@ -8345,6 +8352,12 @@ msgstr "만료까지 남은 시간"
 #: src/modules/settings/developers/utils/formatExpiration.ts
 msgid "Expires in {dateDiff}"
 msgstr "{dateDiff}에 만료"
+
+#. js-lingui-id: dvJ/SB
+#. placeholder {0}: brand.productName
+#: src/pages/settings/community/SettingsCommunity.tsx
+msgid "Explore {0} documentation and current capabilities."
+msgstr ""
 
 #. js-lingui-id: GS+Mus
 #: src/modules/object-record/record-index/export/hooks/useRecordIndexExportRecords.ts
@@ -9170,6 +9183,11 @@ msgstr "폴더/레이블 가져오기"
 msgid "Folders"
 msgstr "폴더"
 
+#. js-lingui-id: pklV8q
+#: src/pages/settings/community/SettingsCommunity.tsx
+msgid "Follow upstream Twenty on X"
+msgstr ""
+
 #. js-lingui-id: I7Exsw
 #: src/pages/settings/community/SettingsCommunity.tsx
 msgid "Follow us on X"
@@ -9395,11 +9413,13 @@ msgstr "일반 - 설정"
 
 #. js-lingui-id: ziAjHi
 #: src/pages/settings/legal/SettingsLegalDpaNew.tsx
+#: src/pages/settings/legal/SettingsLegalDpaNew.tsx
 msgid "Generate"
 msgstr "생성"
 
 #. js-lingui-id: H3rta9
 #: src/pages/settings/legal/SettingsLegalDpa.tsx
+#: src/pages/settings/legal/SettingsLegalDpaNew.tsx
 #: src/pages/settings/legal/SettingsLegalDpaNew.tsx
 msgid "Generate DPA"
 msgstr "DPA 생성"
@@ -9878,7 +9898,7 @@ msgstr ""
 msgid "Horizontal separator line"
 msgstr "가로 구분선"
 
-#. js-lingui-id: WOXdI6
+#. js-lingui-id: jgFA31
 #: src/pages/settings/applications/utils/getCustomApplicationDescription.ts
 msgid ""
 "Host your workspace's customizations and overrides.\n"
@@ -9903,31 +9923,8 @@ msgid ""
 "npx create-twenty-app@latest my-twenty-app\n"
 "```\n"
 "\n"
-"See the [Getting Started guide](https://twenty.com/developers/extend/apps/getting-started) for the full walkthrough, and [Building Apps](https://twenty.com/developers/extend/apps/building) for the `defineApplication` / `defineEntity` APIs."
+"See the [{productName} documentation]({documentationUrl}) for the full walkthrough, including the `defineApplication` / `defineEntity` APIs."
 msgstr ""
-"워크스페이스의 사용자 지정 및 재정의를 호스팅합니다.\n"
-"\n"
-"#### 포함 내용\n"
-"표준 앱 위에 만드는 모든 확장은 Custom 아래에 그룹화됩니다. 스키마 변경, 인터페이스 변경, 워크스페이스 전용 로직을 한곳에 모아 둡니다.\n"
-"\n"
-"- 나만의 데이터 모델을 위한 사용자 지정 객체와 필드\n"
-"- 팀의 업무 방식을 형성하는 보기, 탐색 항목, 레코드 레이아웃\n"
-"- 워크스페이스를 자동화하거나 확장하는 로직 함수, 프런트 컴포넌트, 에이전트\n"
-"\n"
-"#### 존재 이유\n"
-"이 워크스페이스에 로컬로 유지되어야 하는 워크스페이스 전용 사용자 지정을 위해 이 앱을 사용하세요.\n"
-"\n"
-"하나의 비즈니스를 위해 하나의 워크스페이스를 다듬고 있다면, 여기에 보관하세요. 고유한 데이터 모델, UI, 자동화를 갖춘 재사용 가능한 비즈니스 앱을 만들어 버전 관리하거나 공유하거나 여러 워크스페이스에 설치해야 한다면, 대신 전용 앱을 만드세요.\n"
-"\n"
-"#### 나만의 앱 만들기\n"
-"\n"
-"명령 한 번으로 새 앱을 스캐폴드합니다:\n"
-"\n"
-"```bash\n"
-"npx create-twenty-app@latest my-twenty-app\n"
-"```\n"
-"\n"
-"전체 안내는 [시작하기 가이드](https://twenty.com/developers/extend/apps/getting-started)를 확인하고, `defineApplication` / `defineEntity` API는 [앱 빌드](https://twenty.com/developers/extend/apps/building)를 참고하세요."
 
 #. js-lingui-id: yY8wAv
 #: src/modules/workflow/workflow-steps/workflow-actions/delay-actions/components/WorkflowEditActionDelay.tsx
@@ -10950,6 +10947,11 @@ msgstr "디스코드에 참여하기"
 msgid "Join the community"
 msgstr "커뮤니티에 참여"
 
+#. js-lingui-id: aSkpme
+#: src/pages/settings/community/SettingsCommunity.tsx
+msgid "Join the upstream Twenty Discord"
+msgstr ""
+
 #. js-lingui-id: ffWso3
 #: src/modules/activities/calendar/components/CalendarEventCallRecorderAvatar.tsx
 msgid "Joining"
@@ -11412,6 +11414,7 @@ msgstr "모든 토큰에 대한 레거시 HS256 검증"
 
 #. js-lingui-id: vifyyw
 #: src/pages/settings/legal/SettingsLegalDpa.tsx
+#: src/pages/settings/legal/SettingsLegalDpaNew.tsx
 #: src/pages/settings/legal/SettingsLegalDpaNew.tsx
 msgid "Legal"
 msgstr "법무"
@@ -14223,10 +14226,11 @@ msgstr "온보딩 보상"
 msgid "One or more filters reference deactivated or deleted fields and will be automatically removed on save."
 msgstr "하나 이상의 필터가 비활성화되었거나 삭제된 필드를 참조하고 있어, 저장 시 자동으로 제거됩니다."
 
-#. js-lingui-id: 2l4SGU
+#. js-lingui-id: nIWaE5
+#. placeholder {0}: brand.productName
 #: src/pages/settings/enterprise/SettingsEnterprise.tsx
-msgid "One subscription provides one enterprise key that powers one production instance and one potential staging or test instance. To run a staging or test environment, install Twenty on a second server, activate it with this same enterprise key, then register that server as a development instance. Development instances unlock enterprise features without extra billing and do not count toward your production seats."
-msgstr "하나의 구독은 하나의 프로덕션 인스턴스와 하나의 스테이징 또는 테스트 인스턴스를 구동하는 엔터프라이즈 키 한 개를 제공합니다. 스테이징 또는 테스트 환경을 실행하려면 두 번째 서버에 Twenty를 설치하고, 동일한 엔터프라이즈 키로 활성화한 다음 해당 서버를 개발 인스턴스로 등록하세요. 개발 인스턴스는 추가 청구 없이 엔터프라이즈 기능을 활성화하며 프로덕션 좌석 수에 포함되지 않습니다."
+msgid "One subscription provides one enterprise key that powers one production instance and one potential staging or test instance. To run a staging or test environment, install {0} on a second server, activate it with this same enterprise key, then register that server as a development instance. Development instances unlock enterprise features without extra billing and do not count toward your production seats."
+msgstr ""
 
 #. js-lingui-id: oFTo3P
 #: src/modules/settings/event-logs/components/SettingsLogs.tsx
@@ -14319,15 +14323,15 @@ msgstr "이메일 편집기를 열어 블록 설정을 편집하세요."
 msgid "Open as link"
 msgstr "링크로 열기"
 
-#. js-lingui-id: n0vVgf
+#. js-lingui-id: BAb8aW
 #: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
-msgid "Open Claude with the Twenty connector name and MCP URL prefilled."
-msgstr "Twenty 커넥터 이름과 MCP URL이 미리 채워진 상태로 Claude를 여세요."
+msgid "Open Claude with the {productName} connector name and MCP URL prefilled."
+msgstr ""
 
-#. js-lingui-id: +n2jpB
+#. js-lingui-id: I+yg+J
 #: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
-msgid "Open Cursor's MCP installer with the Twenty remote server config."
-msgstr "Twenty 원격 서버 구성이 미리 채워진 상태로 Cursor의 MCP 설치 프로그램을 여세요."
+msgid "Open Cursor's MCP installer with the {productName} remote server config."
+msgstr ""
 
 #. js-lingui-id: pZZH4Q
 #: src/modules/auth/sign-in-up/components/EmailVerificationSent.tsx
@@ -14366,10 +14370,15 @@ msgstr "현재 페이지와 나란히 레코드를 열기"
 msgid "Open records on a dedicated page"
 msgstr "전용 페이지에서 레코드를 열기"
 
-#. js-lingui-id: q170S2
+#. js-lingui-id: i9ZD6n
 #: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
-msgid "Open Replit with the Twenty remote server config."
-msgstr "Twenty 원격 서버 구성이 미리 채워진 상태로 Replit을 여세요."
+msgid "Open Replit with the {productName} remote server config."
+msgstr ""
+
+#. js-lingui-id: XZmZ1V
+#: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
+msgid "Open the upstream Twenty ChatGPT integration for your workspace."
+msgstr ""
 
 #. js-lingui-id: sBd/cl
 #: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
@@ -15506,6 +15515,7 @@ msgstr "변경 로그 보기"
 #. js-lingui-id: ibPuCP
 #: src/pages/settings/applications/components/SettingsClaimApplicationSection.tsx
 #: src/pages/settings/applications/tabs/SettingsApplicationsDeveloperTab.tsx
+#: src/pages/settings/community/SettingsCommunity.tsx
 msgid "Read documentation"
 msgstr "문서 읽기"
 
@@ -18303,10 +18313,10 @@ msgstr "하위 필드"
 msgid "Subdomain"
 msgstr "하위 도메인"
 
-#. js-lingui-id: Sv4BSp
+#. js-lingui-id: vkXMsX
 #: src/modules/settings/billing/constants/SettingsBillingPlanComparisonRows.ts
-msgid "Subdomain (yourco.twenty.com)"
-msgstr "서브도메인 (yourco.twenty.com)"
+msgid "Subdomain (yourco.example.com)"
+msgstr ""
 
 #. js-lingui-id: mGO3xy
 #: src/modules/auth/sign-in-up/components/internal/SignInUpWorkspaceCreationForm.tsx
@@ -18397,13 +18407,14 @@ msgstr "구독"
 msgid "Subscription activated."
 msgstr "구독이 활성화되었습니다."
 
-#. js-lingui-id: 0okvpx
+#. js-lingui-id: FrYxRN
+#. placeholder {0}: brand.productName
 #: src/modules/settings/billing/components/AddPaymentMethodForm.tsx
 #: src/modules/settings/billing/components/AddPaymentMethodForm.tsx
 #: src/modules/settings/billing/hooks/useSubmitSubscriptionPayment.ts
 #: src/modules/settings/billing/hooks/useSubmitSubscriptionPayment.ts
-msgid "Subscription error. Please retry or contact Twenty team"
-msgstr "구독 오류입니다. 다시 시도하거나 Twenty 팀에 문의하세요"
+msgid "Subscription error. Please retry or contact {0} support"
+msgstr ""
 
 #. js-lingui-id: FooJUj
 #. placeholder {0}: getTargetPlanLabel(targetPlanKey)
@@ -18806,14 +18817,14 @@ msgstr "OpenAI 호환 공급자용 API 엔드포인트"
 msgid "The AWS region for Bedrock"
 msgstr "Bedrock용 AWS 리전"
 
-#. js-lingui-id: HP7per
+#. js-lingui-id: 7Zymz0
 #: src/pages/settings/applications/utils/getStandardApplicationDescription.ts
 msgid ""
-"The base data model every Twenty workspace runs on.\n"
+"The base data model every {productName} workspace runs on.\n"
 "\n"
 "#### What \"foundation\" means\n"
 "\n"
-"Every Twenty workspace starts with this set of objects. They define the shape of your CRM, including relationships, activity, and reporting. Everything else, including marketplace apps, AI agents, and custom objects, plugs into them.\n"
+"Every {productName} workspace starts with this set of objects. They define the shape of your CRM, including relationships, activity, and reporting. Everything else, including marketplace apps, AI agents, and custom objects, plugs into them.\n"
 "\n"
 "#### Included objects\n"
 "- **People & Companies**: contact and account records\n"
@@ -18821,11 +18832,11 @@ msgid ""
 "- **Notes & Tasks**: activity and follow-ups\n"
 "- **Workflows & Dashboards**: automation and reporting\n"
 "\n"
-"Remove this app and the rest of Twenty has nothing to hang off.\n"
+"Remove this app and the rest of {productName} has nothing to hang off.\n"
 "\n"
 "#### Build your own app\n"
 "\n"
-"Extend Twenty with your own objects, fields, logic functions, or AI skills. Scaffold a new app in one command:\n"
+"Extend {productName} with your own objects, fields, logic functions, or AI skills. Scaffold a new app in one command:\n"
 "\n"
 "```bash\n"
 "npx create-twenty-app@latest my-twenty-app\n"
@@ -18838,38 +18849,8 @@ msgid ""
 "yarn twenty dev\n"
 "```\n"
 "\n"
-"See the [Getting Started guide](https://twenty.com/developers/extend/apps/getting-started) for the full walkthrough, and [Building Apps](https://twenty.com/developers/extend/apps/building) for the `defineApplication` / `defineEntity` APIs."
+"See the [{productName} documentation]({documentationUrl}) for the full walkthrough, including the `defineApplication` / `defineEntity` APIs."
 msgstr ""
-"모든 Twenty 워크스페이스가 기반으로 하는 기본 데이터 모델입니다.\n"
-"\n"
-"#### \"foundation\"의 의미\n"
-"\n"
-"모든 Twenty 워크스페이스는 이 객체 집합으로 시작합니다. 여기에는 관계, 활동, 보고를 포함해 CRM의 형태가 정의됩니다. 마켓플레이스 앱, AI 에이전트, 사용자 지정 객체를 비롯한 다른 모든 것은 여기에 연결됩니다.\n"
-"\n"
-"#### 포함된 객체\n"
-"- **People & Companies**: 연락처 및 계정 레코드\n"
-"- **Opportunities**: 영업 파이프라인\n"
-"- **Notes & Tasks**: 활동 및 후속 조치\n"
-"- **Workflows & Dashboards**: 자동화 및 보고\n"
-"\n"
-"이 앱을 제거하면 나머지 Twenty는 의존할 토대가 없어집니다.\n"
-"\n"
-"#### 나만의 앱 만들기\n"
-"\n"
-"사용자 지정 객체, 필드, 로직 함수, AI 기술로 Twenty를 확장하세요. 명령 한 번으로 새 앱을 스캐폴드합니다:\n"
-"\n"
-"```bash\n"
-"npx create-twenty-app@latest my-twenty-app\n"
-"```\n"
-"\n"
-"그다음 폴더 안에서:\n"
-"\n"
-"```bash\n"
-"cd my-twenty-app\n"
-"yarn twenty dev\n"
-"```\n"
-"\n"
-"전체 안내는 [시작하기 가이드](https://twenty.com/developers/extend/apps/getting-started)를 확인하고, `defineApplication` / `defineEntity` API는 [앱 빌드](https://twenty.com/developers/extend/apps/building)를 참고하세요."
 
 #. js-lingui-id: VsxjzF
 #: src/modules/page-layout/widgets/call-recording-summary/components/CallRecordingSummaryBody.tsx
@@ -18978,10 +18959,11 @@ msgstr "수신자가 귀하의 주소 옆에 표시되는 이름입니다. 채�
 msgid "The page you're seeking is either gone or never was. Let's get you back on track"
 msgstr "찾고 계신 페이지는 이미 사라졌거나 존재하지 않습니다. 다시 정상화해 드리겠습니다"
 
-#. js-lingui-id: Ya1wb4
+#. js-lingui-id: TTVffO
+#. placeholder {0}: brand.legal.senderDisplayName
 #: src/pages/settings/legal/SettingsLegalDpaNew.tsx
-msgid "The PDF is pre-signed by Twenty and executed with your legal entity and authorized signatory."
-msgstr "이 PDF는 Twenty에서 미리 서명했으며, 귀하의 법인과 승인된 서명권자와 함께 체결됩니다."
+msgid "The PDF is pre-signed by {0} and executed with your legal entity and authorized signatory."
+msgstr ""
 
 #. js-lingui-id: 8vRPIJ
 #: src/modules/page-layout/widgets/call-recording-transcript/components/CallRecordingVideoPlayer.tsx
@@ -19951,11 +19933,6 @@ msgstr ""
 msgid "Turquoise"
 msgstr "터콰이즈"
 
-#. js-lingui-id: JnaRPe
-#: src/modules/spreadsheet-import/steps/components/MatchColumnsStep/components/ColumnGrid.tsx
-msgid "Twenty fields"
-msgstr "Twenty 필드"
-
 #. js-lingui-id: YIjS4q
 #: src/modules/ai/components/SettingsAgentModelCapabilities.tsx
 msgid "Twitter/X Search"
@@ -20699,6 +20676,11 @@ msgstr "{objectLabel} 업서트됨"
 #: src/modules/ai/constants/crud-tool-operation-verbs.constant.ts
 msgid "Upserting {objectLabel}"
 msgstr "{objectLabel} 업서트 중"
+
+#. js-lingui-id: i3x8Rj
+#: src/modules/settings/mcp-and-apis/utils/buildMcpSetupCategories.tsx
+msgid "Upstream app"
+msgstr ""
 
 #. js-lingui-id: 87NUzq
 #: src/pages/settings/applications/components/SettingsApplicationRegistrationRedirectURIsTable.tsx
@@ -21807,6 +21789,7 @@ msgstr "Workflows"
 #: src/pages/settings/layout/components/SettingsLayoutDetailScaffold.tsx
 #: src/pages/settings/layout/SettingsLayout.tsx
 #: src/pages/settings/legal/SettingsLegalDpa.tsx
+#: src/pages/settings/legal/SettingsLegalDpaNew.tsx
 #: src/pages/settings/legal/SettingsLegalDpaNew.tsx
 #: src/pages/settings/logic-functions/SettingsLogicFunctionDetail.tsx
 #: src/pages/settings/logic-functions/SettingsLogicFunctionDetail.tsx

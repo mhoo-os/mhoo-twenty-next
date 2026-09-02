@@ -1,5 +1,6 @@
 import { useRedirect } from '@/domain-manager/hooks/useRedirect';
 import { useSnackBar } from '@/ui/feedback/snack-bar-manager/hooks/useSnackBar';
+import { useResolvedBrand } from '@/client-config/hooks/useResolvedBrand';
 import { t } from '@lingui/core/macro';
 import { useState } from 'react';
 import { useMutation } from '@apollo/client/react';
@@ -21,6 +22,7 @@ export const useHandleCheckoutSession = ({
   successUrlPath: string;
 }) => {
   const { redirect } = useRedirect();
+  const brand = useResolvedBrand();
 
   const { enqueueErrorSnackBar } = useSnackBar();
 
@@ -41,14 +43,14 @@ export const useHandleCheckoutSession = ({
       });
       if (!data?.checkoutSession.url) {
         enqueueErrorSnackBar({
-          message: t`Checkout session error. Please retry or contact Twenty team`,
+          message: t`Checkout session error. Please retry or contact ${brand.productName} support`,
         });
         return;
       }
       redirect(data.checkoutSession.url);
     } catch {
       enqueueErrorSnackBar({
-        message: t`Checkout session error. Please retry or contact Twenty team`,
+        message: t`Checkout session error. Please retry or contact ${brand.productName} support`,
       });
     } finally {
       setIsSubmitting(false);

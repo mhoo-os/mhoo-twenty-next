@@ -1,11 +1,10 @@
-import { DEFAULT_WORKSPACE_LOGO } from '@/ui/navigation/navigation-drawer/constants/DefaultWorkspaceLogo';
-
 import { useAuth } from '@/auth/hooks/useAuth';
 import { availableWorkspacesState } from '@/auth/states/availableWorkspacesState';
 import { currentWorkspaceState } from '@/auth/states/currentWorkspaceState';
 import { countAvailableWorkspaces } from '@/auth/utils/availableWorkspacesUtils';
 import { supportChatState } from '@/client-config/states/supportChatState';
 import { isMultiWorkspaceEnabledState } from '@/client-config/states/isMultiWorkspaceEnabledState';
+import { useResolvedBrand } from '@/client-config/hooks/useResolvedBrand';
 import { useBuildWorkspaceUrl } from '@/domain-manager/hooks/useBuildWorkspaceUrl';
 import { useRedirectToDefaultDomain } from '@/domain-manager/hooks/useRedirectToDefaultDomain';
 import { useRedirectToWorkspaceDomain } from '@/domain-manager/hooks/useRedirectToWorkspaceDomain';
@@ -22,6 +21,7 @@ import { multiWorkspaceDropdownState } from '@/ui/navigation/navigation-drawer/s
 import { useColorScheme } from '@/ui/theme/hooks/useColorScheme';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { useSetAtomState } from '@/ui/utilities/state/jotai/hooks/useSetAtomState';
+import { getWorkspacePresentation } from '@/workspace/utils/getWorkspacePresentation';
 import { styled } from '@linaria/react';
 import { useLingui } from '@lingui/react/macro';
 import { themeCssVariables } from 'twenty-ui/theme-constants';
@@ -54,7 +54,12 @@ const StyledDescription = styled.div`
 `;
 
 export const MultiWorkspaceDropdownDefaultComponents = () => {
+  const brand = useResolvedBrand();
   const currentWorkspace = useAtomStateValue(currentWorkspaceState);
+  const currentWorkspacePresentation = getWorkspacePresentation(
+    brand,
+    currentWorkspace,
+  );
   const isMultiWorkspaceEnabled = useAtomStateValue(
     isMultiWorkspaceEnabledState,
   );
@@ -104,9 +109,9 @@ export const MultiWorkspaceDropdownDefaultComponents = () => {
           <DropdownMenuHeaderLeftComponent
             Avatar={
               <Avatar
-                placeholder={currentWorkspace?.displayName || ''}
+                placeholder={currentWorkspacePresentation.workspace.name}
                 avatarUrl={getAbsoluteImageUrl(
-                  currentWorkspace?.logo ?? DEFAULT_WORKSPACE_LOGO,
+                  currentWorkspacePresentation.workspace.logoUrl,
                 )}
               />
             }
@@ -143,7 +148,7 @@ export const MultiWorkspaceDropdownDefaultComponents = () => {
           />
         }
       >
-        {currentWorkspace?.displayName}
+        {currentWorkspacePresentation.workspace.name}
       </DropdownMenuHeader>
       {availableWorkspacesCount > 1 && (
         <>
@@ -154,31 +159,38 @@ export const MultiWorkspaceDropdownDefaultComponents = () => {
             ]
               .filter(({ id }) => id !== currentWorkspace?.id)
               .slice(0, 3)
-              .map((availableWorkspace) => (
-                <UndecoratedLink
-                  key={availableWorkspace.id}
-                  to={buildWorkspaceUrl(
-                    getWorkspaceUrl(availableWorkspace.workspaceUrls),
-                  )}
-                  onClick={(event) => {
-                    event?.preventDefault();
-                    handleChange(availableWorkspace);
-                  }}
-                >
-                  <MenuItemSelectAvatar
-                    text={availableWorkspace.displayName ?? t`(No name)`}
-                    avatar={
-                      <Avatar
-                        placeholder={availableWorkspace.displayName || ''}
-                        avatarUrl={getAbsoluteImageUrl(
-                          availableWorkspace.logo ?? DEFAULT_WORKSPACE_LOGO,
-                        )}
-                      />
-                    }
-                    selected={false}
-                  />
-                </UndecoratedLink>
-              ))}
+              .map((availableWorkspace) => {
+                const workspacePresentation = getWorkspacePresentation(
+                  brand,
+                  availableWorkspace,
+                );
+
+                return (
+                  <UndecoratedLink
+                    key={availableWorkspace.id}
+                    to={buildWorkspaceUrl(
+                      getWorkspaceUrl(availableWorkspace.workspaceUrls),
+                    )}
+                    onClick={(event) => {
+                      event?.preventDefault();
+                      handleChange(availableWorkspace);
+                    }}
+                  >
+                    <MenuItemSelectAvatar
+                      text={workspacePresentation.workspace.name}
+                      avatar={
+                        <Avatar
+                          placeholder={workspacePresentation.workspace.name}
+                          avatarUrl={getAbsoluteImageUrl(
+                            workspacePresentation.workspace.logoUrl,
+                          )}
+                        />
+                      }
+                      selected={false}
+                    />
+                  </UndecoratedLink>
+                );
+              })}
             {availableWorkspacesCount > 4 && (
               <MenuItem
                 LeftIcon={IconSwitchHorizontal}

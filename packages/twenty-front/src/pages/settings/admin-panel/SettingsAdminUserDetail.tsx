@@ -3,7 +3,6 @@ import { useParams } from 'react-router-dom';
 import { useQuery } from '@apollo/client/react';
 import { styled } from '@linaria/react';
 import { t } from '@lingui/core/macro';
-import { isNonEmptyString } from '@sniptt/guards';
 import { SettingsPath } from 'twenty-shared/types';
 import {
   getImageAbsoluteURI,
@@ -23,9 +22,10 @@ import { SettingsTableCard } from '@/settings/components/SettingsTableCard';
 import { SettingsPageLayout } from '@/settings/components/layout/SettingsPageLayout';
 import { TabList } from '@/ui/layout/tab-list/components/TabList';
 import { activeTabIdComponentState } from '@/ui/layout/tab-list/states/activeTabIdComponentState';
-import { DEFAULT_WORKSPACE_LOGO } from '@/ui/navigation/navigation-drawer/constants/DefaultWorkspaceLogo';
+import { useResolvedBrand } from '@/client-config/hooks/useResolvedBrand';
 import { useAtomComponentStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentStateValue';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
+import { getWorkspacePresentation } from '@/workspace/utils/getWorkspacePresentation';
 import {
   IconCalendar,
   IconEyeShare,
@@ -51,6 +51,7 @@ const StyledButtonContainer = styled.div`
 
 export const SettingsAdminUserDetail = () => {
   const { userId } = useParams<{ userId: string }>();
+  const brand = useResolvedBrand();
   const apolloAdminClient = useApolloAdminClient();
 
   const activeTabId = useAtomComponentStateValue(
@@ -82,17 +83,22 @@ export const SettingsAdminUserDetail = () => {
   );
 
   const tabs =
-    userLookupResult?.workspaces.map((workspace) => ({
-      id: workspace.id,
-      title: workspace.name,
-      logo:
-        getImageAbsoluteURI({
-          imageUrl: isNonEmptyString(workspace.logo)
-            ? workspace.logo
-            : DEFAULT_WORKSPACE_LOGO,
-          baseUrl: REACT_APP_SERVER_BASE_URL,
-        }) ?? '',
-    })) ?? [];
+    userLookupResult?.workspaces.map((workspace) => {
+      const workspacePresentation = getWorkspacePresentation(brand, {
+        displayName: workspace.name,
+        logo: workspace.logo,
+      });
+
+      return {
+        id: workspace.id,
+        title: workspacePresentation.workspace.name,
+        logo:
+          getImageAbsoluteURI({
+            imageUrl: workspacePresentation.workspace.logoUrl,
+            baseUrl: REACT_APP_SERVER_BASE_URL,
+          }) ?? '',
+      };
+    }) ?? [];
 
   const displayName = userFullName || userId || '';
 

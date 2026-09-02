@@ -31,10 +31,13 @@ export const buildMcpConfig = (mcpServerUrl: string) =>
     2,
   );
 
-export const buildClaudeInstallLink = (mcpServerUrl: string) => {
+export const buildClaudeInstallLink = (
+  mcpServerUrl: string,
+  serverDisplayName: string = MCP_SETUP.server.displayName,
+) => {
   const params = new URLSearchParams({
     modal: 'add-custom-connector',
-    connectorName: MCP_SETUP.server.displayName,
+    connectorName: serverDisplayName,
     connectorUrl: mcpServerUrl,
   });
 
@@ -62,14 +65,17 @@ export const buildVsCodeInstallLink = (mcpServerUrl: string) =>
     }),
   )}`;
 
-export const buildGooseInstallLink = (mcpServerUrl: string) => {
+export const buildGooseInstallLink = (
+  mcpServerUrl: string,
+  serverDisplayName: string = MCP_SETUP.server.displayName,
+) => {
   const params = new URLSearchParams({
     url: mcpServerUrl,
     type: 'streamable_http',
     timeout: '300',
     id: MCP_SETUP.server.name,
-    name: MCP_SETUP.server.displayName,
-    description: 'Access your Twenty workspace through MCP',
+    name: serverDisplayName,
+    description: `Access your ${serverDisplayName} workspace through MCP`,
   });
 
   params.append(
@@ -80,10 +86,13 @@ export const buildGooseInstallLink = (mcpServerUrl: string) => {
   return `goose://extension?${params.toString()}`;
 };
 
-export const buildReplitInstallLink = (mcpServerUrl: string) => {
+export const buildReplitInstallLink = (
+  mcpServerUrl: string,
+  serverDisplayName: string = MCP_SETUP.server.displayName,
+) => {
   const payload = btoa(
     JSON.stringify({
-      displayName: MCP_SETUP.server.displayName,
+      displayName: serverDisplayName,
       baseUrl: mcpServerUrl,
       headers: [
         {

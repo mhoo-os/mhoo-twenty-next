@@ -21,9 +21,10 @@ import {
 import { getAvailableWorkspacePathAndSearchParams } from '@/auth/utils/availableWorkspacesUtils';
 import { authProvidersState } from '@/client-config/states/authProvidersState';
 import { isDDLLockedState } from '@/client-config/states/isDDLLockedState';
-import { DEFAULT_WORKSPACE_LOGO } from '@/ui/navigation/navigation-drawer/constants/DefaultWorkspaceLogo';
+import { useResolvedBrand } from '@/client-config/hooks/useResolvedBrand';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { useSetAtomState } from '@/ui/utilities/state/jotai/hooks/useSetAtomState';
+import { getWorkspacePresentation } from '@/workspace/utils/getWorkspacePresentation';
 import { isNonEmptyString } from '@sniptt/guards';
 import { useContext } from 'react';
 import { Avatar } from 'twenty-ui/data-display';
@@ -126,6 +127,7 @@ const StyledForgotPasswordLinkContainer = styled.div`
 export const SignInUpGlobalScopeForm = () => {
   const { theme } = useContext(ThemeContext);
   const authProviders = useAtomStateValue(authProvidersState);
+  const brand = useResolvedBrand();
   const isDDLLocked = useAtomStateValue(isDDLLockedState);
   const signInUpStep = useAtomStateValue(signInUpStepState);
   const setSignInUpStep = useSetAtomState(signInUpStepState);
@@ -167,44 +169,52 @@ export const SignInUpGlobalScopeForm = () => {
       {signInUpStep === SignInUpStep.WorkspaceSelection && (
         <StyledOnboardingContentContainer>
           <StyledWorkspaceContainer>
-            {availableWorkspacesList.map((availableWorkspace, index) => (
-              <OnboardingStepAnimatedItem
-                key={availableWorkspace.id}
-                index={index}
-              >
-                <UndecoratedLink
-                  to={getAvailableWorkspaceUrl(availableWorkspace)}
+            {availableWorkspacesList.map((availableWorkspace, index) => {
+              const workspacePresentation = getWorkspacePresentation(
+                brand,
+                availableWorkspace,
+              );
+
+              return (
+                <OnboardingStepAnimatedItem
+                  key={availableWorkspace.id}
+                  index={index}
                 >
-                  <StyledWorkspaceItem>
-                    <StyledWorkspaceContent>
-                      <Avatar
-                        placeholder={availableWorkspace.displayName || ''}
-                        avatarUrl={getAbsoluteImageUrl(
-                          availableWorkspace.logo ?? DEFAULT_WORKSPACE_LOGO,
-                        )}
-                        size="lg"
-                      />
-                      <StyledWorkspaceTextContainer>
-                        <StyledWorkspaceName>
-                          {availableWorkspace.displayName ||
-                            availableWorkspace.id}
-                        </StyledWorkspaceName>
-                        <StyledWorkspaceUrl>
-                          {
-                            new URL(
-                              getWorkspaceUrl(availableWorkspace.workspaceUrls),
-                            ).hostname
-                          }
-                        </StyledWorkspaceUrl>
-                      </StyledWorkspaceTextContainer>
-                      <StyledChevronIcon>
-                        <IconChevronRight size={theme.icon.size.md} />
-                      </StyledChevronIcon>
-                    </StyledWorkspaceContent>
-                  </StyledWorkspaceItem>
-                </UndecoratedLink>
-              </OnboardingStepAnimatedItem>
-            ))}
+                  <UndecoratedLink
+                    to={getAvailableWorkspaceUrl(availableWorkspace)}
+                  >
+                    <StyledWorkspaceItem>
+                      <StyledWorkspaceContent>
+                        <Avatar
+                          placeholder={workspacePresentation.workspace.name}
+                          avatarUrl={getAbsoluteImageUrl(
+                            workspacePresentation.workspace.logoUrl,
+                          )}
+                          size="lg"
+                        />
+                        <StyledWorkspaceTextContainer>
+                          <StyledWorkspaceName>
+                            {workspacePresentation.workspace.name}
+                          </StyledWorkspaceName>
+                          <StyledWorkspaceUrl>
+                            {
+                              new URL(
+                                getWorkspaceUrl(
+                                  availableWorkspace.workspaceUrls,
+                                ),
+                              ).hostname
+                            }
+                          </StyledWorkspaceUrl>
+                        </StyledWorkspaceTextContainer>
+                        <StyledChevronIcon>
+                          <IconChevronRight size={theme.icon.size.md} />
+                        </StyledChevronIcon>
+                      </StyledWorkspaceContent>
+                    </StyledWorkspaceItem>
+                  </UndecoratedLink>
+                </OnboardingStepAnimatedItem>
+              );
+            })}
             {!isDDLLocked && (
               <OnboardingStepAnimatedItem
                 index={availableWorkspacesList.length}

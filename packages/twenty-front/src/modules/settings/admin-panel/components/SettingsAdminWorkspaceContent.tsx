@@ -3,8 +3,9 @@ import { type WorkspaceInfo } from '@/settings/admin-panel/types/WorkspaceInfo';
 import { getUpgradeHealthStatusBadge } from '@/settings/admin-panel/utils/getUpgradeHealthStatusBadge';
 import { getWorkspaceSchemaName } from '@/settings/admin-panel/utils/getWorkspaceSchemaName';
 import { SettingsTableCard } from '@/settings/components/SettingsTableCard';
-import { DEFAULT_WORKSPACE_LOGO } from '@/ui/navigation/navigation-drawer/constants/DefaultWorkspaceLogo';
+import { useResolvedBrand } from '@/client-config/hooks/useResolvedBrand';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
+import { getWorkspacePresentation } from '@/workspace/utils/getWorkspacePresentation';
 import { UserContext } from '@/users/contexts/UserContext';
 import { styled } from '@linaria/react';
 import { useLingui } from '@lingui/react/macro';
@@ -52,6 +53,7 @@ export const SettingsAdminWorkspaceContent = ({
 }: SettingsAdminWorkspaceContentProps) => {
   const { t } = useLingui();
   const { formatNumber } = useNumberFormat();
+  const brand = useResolvedBrand();
   const { dateFormat, timeFormat, timeZone } = useContext(UserContext);
   const { localeCatalog } = useAtomStateValue(dateLocaleState);
 
@@ -70,6 +72,10 @@ export const SettingsAdminWorkspaceContent = ({
   const upgradeHealthStatusBadge = getUpgradeHealthStatusBadge(
     workspaceUpgradeStatus?.health,
   );
+  const workspacePresentation = getWorkspacePresentation(brand, {
+    displayName: activeWorkspace?.name,
+    logo: activeWorkspace?.logo,
+  });
 
   const workspaceInfoItems = [
     {
@@ -77,7 +83,7 @@ export const SettingsAdminWorkspaceContent = ({
       label: t`Name`,
       value: activeWorkspace?.id ? (
         <LinkChip
-          label={activeWorkspace?.name ?? ''}
+          label={workspacePresentation.workspace.name}
           emptyLabel={t`Untitled`}
           to={getSettingsPath(SettingsPath.AdminPanelWorkspaceDetail, {
             workspaceId: activeWorkspace.id,
@@ -85,9 +91,7 @@ export const SettingsAdminWorkspaceContent = ({
           leftComponent={
             <AvatarOrIcon
               avatarUrl={getAbsoluteImageUrl(
-                isNonEmptyString(activeWorkspace?.logo)
-                  ? activeWorkspace?.logo
-                  : DEFAULT_WORKSPACE_LOGO,
+                workspacePresentation.workspace.logoUrl,
               )}
             />
           }

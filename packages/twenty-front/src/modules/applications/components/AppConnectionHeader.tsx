@@ -5,6 +5,9 @@ import { Avatar } from 'twenty-ui/data-display';
 import { IconRefresh } from 'twenty-ui/icon';
 import { ThemeContext, themeCssVariables } from 'twenty-ui/theme-constants';
 
+import { useResolvedBrand } from '@/client-config/hooks/useResolvedBrand';
+import { getAbsoluteImageUrl } from '~/utils/image/getAbsoluteImageUrl';
+
 type AppConnectionHeaderProps = {
   appLogoUrl?: string | null;
   appName: string;
@@ -58,6 +61,7 @@ export const AppConnectionHeader = ({
   appName,
 }: AppConnectionHeaderProps) => {
   const { theme } = useContext(ThemeContext);
+  const brand = useResolvedBrand();
 
   const [hasAppLogoError, setHasAppLogoError] = useState(false);
 
@@ -66,7 +70,10 @@ export const AppConnectionHeader = ({
   return (
     <StyledContainer>
       <StyledAppLogoTile>
-        <StyledAppLogo src={'/images/integrations/twenty-logo.svg'} alt="" />
+        <StyledAppLogo
+          src={getAbsoluteImageUrl(brand.assets.productMark.path)}
+          alt={brand.accessibility.logoAltText}
+        />
       </StyledAppLogoTile>
       <StyledLinkIconContainer aria-hidden>
         <IconRefresh size={theme.icon.size.md} stroke={theme.icon.stroke.lg} />
