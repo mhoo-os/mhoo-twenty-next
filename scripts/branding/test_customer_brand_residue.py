@@ -88,6 +88,18 @@ class CustomerBrandResidueTest(unittest.TestCase):
             [],
         )
 
+    def test_generic_context_words_do_not_exempt_upstream_customer_urls(self) -> None:
+        for context_word in ("source", "route", "schema", "migration", "package"):
+            with self.subTest(context_word=context_word):
+                text = f"const {context_word}Url = 'https://twenty.com/';"
+                violations = gate.scan_text(
+                    f"{context_word}-customer-surface.ts", text, CUSTOMER_RULE
+                )
+                self.assertIn(
+                    "raw-upstream-customer-url",
+                    {item["ruleId"] for item in violations},
+                )
+
     def test_receipt_stays_json_serializable_without_environmental_fields(self) -> None:
         receipt = gate.run_scan(ROOT)
         encoded = gate.canonical_json(receipt)
