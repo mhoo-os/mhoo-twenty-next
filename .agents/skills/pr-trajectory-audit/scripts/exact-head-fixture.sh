@@ -11,13 +11,14 @@ done
 
 assert_manual_only_workflow() {
   local workflow="$1"
+  local workflow_contents
 
-  [[ -f "$workflow" ]] || {
-    printf 'trajectory fixture rejected: missing workflow: %s\n' "$workflow" >&2
+  workflow_contents="$(git show "${head}:${workflow}" 2>/dev/null)" || {
+    printf 'trajectory fixture rejected: missing workflow at %s: %s\n' "$head" "$workflow" >&2
     exit 1
   }
 
-  if grep -Eq '^[[:space:]]*pull_request_target[[:space:]]*:' "$workflow"; then
+  if grep -Eq '^[[:space:]]*pull_request_target[[:space:]]*:' <<<"$workflow_contents"; then
     printf 'trajectory fixture rejected: pull_request_target restored: %s\n' "$workflow" >&2
     exit 1
   fi
@@ -32,7 +33,7 @@ assert_manual_only_workflow() {
     }
     in_on { invalid_event = 1; in_on = 0 }
     END { exit(workflow_dispatch_count == 1 && !invalid_event ? 0 : 1) }
-  ' "$workflow" || {
+  ' <<<"$workflow_contents" || {
     printf 'trajectory fixture rejected: workflow must expose only workflow_dispatch: %s\n' "$workflow" >&2
     exit 1
   }

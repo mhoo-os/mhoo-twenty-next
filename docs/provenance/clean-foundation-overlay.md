@@ -24,6 +24,7 @@ Trajectory-eval paths:
 - `.agents/skills/pr-trajectory-audit/SKILL.md`
 - `.agents/skills/pr-trajectory-audit/references/failure-patterns.md`
 - `.agents/skills/pr-trajectory-audit/scripts/exact-head-fixture.sh`
+- `.agents/skills/pr-trajectory-audit/scripts/exact-head-fixture.test.sh`
 - `.github/workflows/trajectory-eval.yml`
 
 Upstream dispatch boundary paths:

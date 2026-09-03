@@ -13,4 +13,5 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - run: bash .agents/skills/pr-trajectory-audit/scripts/exact-head-fixture.test.sh
       - run: bash .agents/skills/pr-trajectory-audit/scripts/exact-head-fixture.sh
