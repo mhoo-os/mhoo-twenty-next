@@ -40,4 +40,28 @@ grep -Fq "pull_request_target restored: $workflow" "$temporary_directory/output"
 }
 
 test "$(git rev-parse HEAD)" != "$unsafe_head"
+
+unrelated_head="$(
+  printf 'test: unrelated source ancestry\n' |
+    GIT_AUTHOR_NAME='Trajectory fixture' \
+    GIT_AUTHOR_EMAIL='trajectory-fixture@example.invalid' \
+    GIT_AUTHOR_DATE='2000-01-02T00:00:00Z' \
+    GIT_COMMITTER_NAME='Trajectory fixture' \
+    GIT_COMMITTER_EMAIL='trajectory-fixture@example.invalid' \
+    GIT_COMMITTER_DATE='2000-01-02T00:00:00Z' \
+    git commit-tree "$(git rev-parse 'HEAD^{tree}')"
+)"
+
+if bash "$fixture" HEAD "$unrelated_head" >"$temporary_directory/unrelated-output" 2>&1; then
+  printf 'exact-head fixture test failed: unrelated named head passed\n' >&2
+  exit 1
+fi
+
+grep -Fq 'source custody failed: upstream base is not an ancestor' \
+  "$temporary_directory/unrelated-output" || {
+  printf 'exact-head fixture test failed: unexpected ancestry rejection\n' >&2
+  sed -n '1,120p' "$temporary_directory/unrelated-output" >&2
+  exit 1
+}
+
 printf 'exact-head fixture regression test passed\n'

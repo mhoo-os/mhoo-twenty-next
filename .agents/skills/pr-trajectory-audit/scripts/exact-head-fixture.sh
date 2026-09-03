@@ -42,5 +42,5 @@ assert_manual_only_workflow() {
 assert_manual_only_workflow .github/workflows/pr-review-dispatch.yaml
 assert_manual_only_workflow .github/workflows/external-contributor-pr-auto-draft.yaml
 
-scripts/provenance/verify-source.sh
+scripts/provenance/verify-source.sh "$head"
 printf 'trajectory exact-head fixture passed\n'
