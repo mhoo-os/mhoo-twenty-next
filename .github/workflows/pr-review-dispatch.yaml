@@ -2,8 +2,8 @@ name: PR Review Dispatch
 run-name: "PR Review Dispatch #${{ github.event.pull_request.number }}"
 
 on:
-  pull_request_target:
-    types: [opened, ready_for_review, synchronize, labeled]
+  # Retained for upstream synchronization; review dispatch is TwentyHQ-owned.
+  workflow_dispatch:
 
 permissions: {}
 
@@ -14,6 +14,8 @@ concurrency:
 jobs:
   dispatch:
     if: >
+      github.repository == 'twentyhq/twenty' &&
+      github.event_name != 'workflow_dispatch' &&
       github.event.pull_request.draft == false &&
       (github.event.action != 'labeled' || startsWith(github.event.label.name, 'pr-review-'))
     runs-on: ubuntu-latest
