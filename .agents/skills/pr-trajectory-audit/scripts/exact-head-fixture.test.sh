@@ -5,9 +5,17 @@ root="$(git rev-parse --show-toplevel)"
 cd "$root"
 
 fixture=.agents/skills/pr-trajectory-audit/scripts/exact-head-fixture.sh
+source_verifier=scripts/provenance/verify-source.sh
 workflow=.github/workflows/pr-review-dispatch.yaml
 temporary_directory="$(mktemp -d)"
-trap 'rm -rf -- "$temporary_directory"' EXIT
+
+cleanup() {
+  if [[ -f "$temporary_directory/yarn.lock" ]]; then
+    cp "$temporary_directory/yarn.lock" yarn.lock
+  fi
+  rm -rf -- "$temporary_directory"
+}
+trap cleanup EXIT
 
 unsafe_blob="$({
   sed 's/^  workflow_dispatch:$/  pull_request_target:/' "$workflow"
@@ -64,4 +72,22 @@ grep -Fq 'source custody failed: upstream base is not an ancestor' \
   exit 1
 }
 
+cp yarn.lock "$temporary_directory/yarn.lock"
+printf '\n# exact-head-fixture dirty-worktree regression\n' >>yarn.lock
+
+bash "$fixture" HEAD HEAD >"$temporary_directory/explicit-ref-output"
+
+if bash "$source_verifier" >"$temporary_directory/dirty-output" 2>&1; then
+  printf 'exact-head fixture test failed: dirty working-tree lockfile passed\n' >&2
+  exit 1
+fi
+
+grep -Fq 'source custody failed: lockfile mismatch' \
+  "$temporary_directory/dirty-output" || {
+  printf 'exact-head fixture test failed: unexpected dirty-worktree rejection\n' >&2
+  sed -n '1,120p' "$temporary_directory/dirty-output" >&2
+  exit 1
+}
+
+cp "$temporary_directory/yarn.lock" yarn.lock
 printf 'exact-head fixture regression test passed\n'
