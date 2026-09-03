@@ -26,6 +26,15 @@ Trajectory-eval paths:
 - `.agents/skills/pr-trajectory-audit/scripts/exact-head-fixture.sh`
 - `.github/workflows/trajectory-eval.yml`
 
+Upstream dispatch boundary paths:
+
+- `.github/workflows/pr-review-dispatch.yaml`
+- `.github/workflows/external-contributor-pr-auto-draft.yaml`
+
+These files are retained solely so this fork can synchronize with upstream
+Twenty. In the Mhoo fork they are inert: they expose only manual dispatch and
+their TwentyHQ-only job predicates prevent a manual run from dispatching work.
+
 Clean runtime paths:
 
 - `.github/workflows/clean-foundation-ci.yml`

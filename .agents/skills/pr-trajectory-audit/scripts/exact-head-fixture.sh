@@ -8,5 +8,38 @@ allowed='^(\.twenty-source|CLAUDE\.md|AGENTS\.md|docs/provenance/(clean-foundati
 git diff --name-only "$base" "$head" | while IFS= read -r path; do
   [[ "$path" =~ $allowed ]] || { printf 'trajectory fixture rejected: %s\n' "$path" >&2; exit 1; }
 done
+
+assert_manual_only_workflow() {
+  local workflow="$1"
+
+  [[ -f "$workflow" ]] || {
+    printf 'trajectory fixture rejected: missing workflow: %s\n' "$workflow" >&2
+    exit 1
+  }
+
+  if grep -Eq '^[[:space:]]*pull_request_target[[:space:]]*:' "$workflow"; then
+    printf 'trajectory fixture rejected: pull_request_target restored: %s\n' "$workflow" >&2
+    exit 1
+  fi
+
+  awk '
+    /^on:[[:space:]]*(#.*)?$/ { in_on = 1; next }
+    in_on && /^[^[:space:]#]/ { in_on = 0; next }
+    in_on && /^[[:space:]]*($|#)/ { next }
+    in_on && /^  workflow_dispatch:[[:space:]]*(#.*)?$/ {
+      workflow_dispatch_count++
+      next
+    }
+    in_on { invalid_event = 1; in_on = 0 }
+    END { exit(workflow_dispatch_count == 1 && !invalid_event ? 0 : 1) }
+  ' "$workflow" || {
+    printf 'trajectory fixture rejected: workflow must expose only workflow_dispatch: %s\n' "$workflow" >&2
+    exit 1
+  }
+}
+
+assert_manual_only_workflow .github/workflows/pr-review-dispatch.yaml
+assert_manual_only_workflow .github/workflows/external-contributor-pr-auto-draft.yaml
+
 scripts/provenance/verify-source.sh
 printf 'trajectory exact-head fixture passed\n'
