@@ -229,17 +229,12 @@ def upstream_context(line: str) -> bool:
             "provenance",
             "technical",
             "license",
-            "source",
-            "route",
-            "schema",
-            "migration",
             "twenty_",
             "twentyconfig",
             "twenty-shared",
             "github.com/twentyhq",
             "brand.preset",
             "attribution",
-            "package",
         )
     )
 
