@@ -33,7 +33,7 @@ describe('emailing public page markup', () => {
     );
   });
 
-  it('does not create links for unavailable legal documents', () => {
+  it('renders only the approved legal-document links', () => {
     const brand = resolveEmailingPublicPageBrand(
       resolveProductBrand({
         preset: 'mhoo',
@@ -43,9 +43,15 @@ describe('emailing public page markup', () => {
 
     const footer = buildEmailingPublicPageFooter(brand);
 
-    expect(footer).toContain('Legal documents are currently unavailable.');
-    expect(footer).not.toContain('Privacy</a>');
-    expect(footer).not.toContain('Terms</a>');
+    expect(footer).toContain('href="https://mhoo.example/legal/privacy"');
+    expect(footer).toContain('href="https://mhoo.example/legal/terms"');
+    expect(footer).toContain(
+      'href="https://mhoo.example/legal/acceptable-use"',
+    );
+    expect(footer).toContain('href="https://mhoo.example/legal/open-source"');
+    expect(footer).toContain('href="https://mhoo.example/legal/dpa"');
+    expect(footer).toContain('DPA Status</a>');
+    expect(footer).not.toContain('Legal documents are currently unavailable.');
     expect(footer).not.toContain('DPA</a>');
     expect(footer).not.toContain('twenty.com');
   });

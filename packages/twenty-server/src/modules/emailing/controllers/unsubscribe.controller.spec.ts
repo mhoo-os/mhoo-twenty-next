@@ -55,7 +55,10 @@ describe('UnsubscribeController', () => {
 
     expect(page).toContain('<title>Mhoo email preferences</title>');
     expect(page).toContain('mhoo-email-600x436.png');
-    expect(page).toContain('Legal documents are currently unavailable.');
+    expect(page).toContain('href="https://mhoo.example/legal/privacy"');
+    expect(page).toContain('href="https://mhoo.example/legal/dpa"');
+    expect(page).toContain('DPA Status</a>');
+    expect(page).not.toContain('Legal documents are currently unavailable.');
     expect(messageSuppressionService.getTopicOptOutState).toHaveBeenCalledWith({
       workspaceId: payload.workspaceId,
       emailAddress: payload.emailAddress,
