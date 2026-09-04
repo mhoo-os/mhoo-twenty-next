@@ -227,6 +227,28 @@ describe('email templates rendering', () => {
     expect(html).toContain('mot de passe');
   });
 
+  it('should keep a Japanese Mhoo invitation free of the upstream product name', async () => {
+    const element = SendInviteLinkEmail({
+      link: 'https://mhoo.example.com/invite/token',
+      workspace: WORKSPACE,
+      sender: {
+        email: 'tim@example.com',
+        firstName: 'Tim',
+        lastName: 'Apple',
+      },
+      serverUrl: 'https://mhoo.example.com',
+      locale: 'ja-JP',
+      brand: MHOO_BRAND,
+    });
+    const html = await renderEmail(element);
+    const text = await renderEmail(element, { plainText: true });
+    const output = `${html}\n${text}`;
+
+    expect(output).toContain('Mhoo');
+    expect(output).toContain('CRMソフトウェア');
+    expect(output).not.toContain('Twenty');
+  });
+
   it.each(MHOO_TEMPLATES)(
     'should keep $name free of upstream customer-facing residue in HTML and plain text',
     async ({ element }) => {
