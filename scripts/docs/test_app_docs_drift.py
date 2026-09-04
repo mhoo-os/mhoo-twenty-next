@@ -42,9 +42,9 @@ class AppDocsDriftTests(unittest.TestCase):
         self.assertFalse(result["hasDrift"])
         self.assertFalse(result["commentNeeded"])
 
-    def test_public_client_change_without_docs_is_drift(self) -> None:
+    def test_public_client_source_change_without_docs_is_drift(self) -> None:
         result = evaluate(
-            ["packages/twenty-client-sdk/src/metadata/generated/types.ts"], []
+            ["packages/twenty-client-sdk/src/rest/index.ts"], []
         )
 
         self.assertTrue(result["hasDrift"])
@@ -52,9 +52,9 @@ class AppDocsDriftTests(unittest.TestCase):
         self.assertEqual(len(result["impacts"]), 1)
         self.assertTrue(result["impacts"][0]["needsUpdate"])
 
-    def test_public_client_change_with_mapped_docs_passes(self) -> None:
+    def test_public_client_source_change_with_mapped_docs_passes(self) -> None:
         result = evaluate(
-            ["packages/twenty-client-sdk/src/metadata/generated/types.ts"],
+            ["packages/twenty-client-sdk/src/rest/index.ts"],
             ["logic/logic-functions.mdx"],
         )
 
@@ -96,6 +96,24 @@ class AppDocsDriftTests(unittest.TestCase):
 
         self.assertTrue(is_ignored_path(path))
         self.assertTrue(matching_rules(path))
+
+    def test_product_route_registry_and_derived_metadata_are_ignored(self) -> None:
+        self.assertTrue(
+            is_ignored_path("packages/twenty-shared/src/types/AppPath.ts")
+        )
+        self.assertTrue(
+            is_ignored_path(
+                "packages/twenty-client-sdk/src/metadata/generated/types.ts"
+            )
+        )
+        self.assertTrue(
+            matching_rules("packages/twenty-shared/src/types/AppPath.ts")
+        )
+        self.assertTrue(
+            matching_rules(
+                "packages/twenty-client-sdk/src/metadata/generated/types.ts"
+            )
+        )
 
     def test_whitespace_only_diff_is_represented_by_empty_substantive_input(self) -> None:
         result = evaluate(

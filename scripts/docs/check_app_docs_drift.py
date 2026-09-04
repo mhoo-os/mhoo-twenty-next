@@ -18,6 +18,18 @@ from typing import Iterable, Sequence
 
 DOC_ROOT = "packages/twenty-docs/developers/extend/apps/"
 
+# These are product-shell implementation outputs, not extension contracts that
+# an app author can consume. Their source-of-truth is verified elsewhere:
+# AppPath is the host route registry, while metadata/generated is emitted by
+# the server's canonical GraphQL generation step. Keeping them out of this
+# app-docs guard avoids forcing unrelated app documentation changes.
+NON_APP_EXTENSION_PATHS = frozenset(
+    {
+        "packages/twenty-shared/src/types/AppPath.ts",
+    }
+)
+DERIVED_CLIENT_METADATA_PREFIX = "packages/twenty-client-sdk/src/metadata/generated/"
+
 
 @dataclass(frozen=True)
 class Rule:
@@ -170,7 +182,9 @@ def is_ignored_path(path: str) -> bool:
     normalized = path.replace("\\", "/")
     lower = normalized.lower()
     return (
-        "/__tests__/" in normalized
+        normalized in NON_APP_EXTENSION_PATHS
+        or normalized.startswith(DERIVED_CLIENT_METADATA_PREFIX)
+        or "/__tests__/" in normalized
         or "/fixtures/" in normalized
         or lower.endswith((
             ".test.ts",

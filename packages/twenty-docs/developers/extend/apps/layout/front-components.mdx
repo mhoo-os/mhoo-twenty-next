@@ -6,10 +6,6 @@ icon: "window-maximize"
 
 Front components are React components that render directly inside Twenty's UI. They run in an **isolated Web Worker** using Remote DOM — your code executes inside a sandboxed, opaque-origin iframe, yet its UI still renders natively in the page rather than being confined to that iframe.
 
-## Generated client metadata
-
-The client configuration GraphQL types are generated from the server contract. They include brand metadata such as the approved legal-document URLs used by the product shell. Treat that metadata as read-only configuration: front components must not replace the product's public legal routes or invent document availability.
-
 <Warning>
 Front components are still under active development. Your code runs against a partial DOM, not a real browser page, so advanced usages can fail, often silently. See [Current limitations](#current-limitations).
 </Warning>

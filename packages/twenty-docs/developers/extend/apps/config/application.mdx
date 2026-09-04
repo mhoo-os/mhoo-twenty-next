@@ -11,10 +11,6 @@ Every app must have exactly one `defineApplication` call. It declares:
 - **Variables** *(optional)* — key–value pairs exposed to your code as environment variables.
 - **Pre-install / post-install / uninstall hooks** *(optional)* — see [Logic Functions](/developers/extend/apps/logic/logic-functions).
 
-## Platform-owned routes
-
-`AppPath` also contains routes owned by the Twenty product itself, including public account and legal pages. Those paths are not app routes: apps should link to their own declared front components or logic-function routes instead of depending on product-owned paths.
-
 ```ts src/application-config.ts
 import { defineApplication } from 'twenty-sdk/define';
 
