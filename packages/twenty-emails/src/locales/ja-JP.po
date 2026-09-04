@@ -66,7 +66,7 @@ msgstr "新しいメールアドレスを確認してください"
 #. js-lingui-explicit-id
 #: src/emails/password-update-notify.email.tsx
 msgid "Connect to {productName}"
-msgstr ""
+msgstr "{productName}に接続"
 
 #. js-lingui-explicit-id
 #: src/components/Footer.tsx
@@ -165,7 +165,7 @@ msgstr "そのデータは削除され、今後復元することはできませ
 #. js-lingui-explicit-id
 #: src/emails/send-invite-link.email.tsx
 msgid "Join your team on {productName}"
-msgstr ""
+msgstr "{productName}でチームに参加"
 
 #. js-lingui-explicit-id
 #: src/emails/billing-subscription-renewing.email.tsx
@@ -326,7 +326,7 @@ msgstr "ウェブサイト"
 #. js-lingui-explicit-id
 #: src/components/WhatIsTwenty.tsx
 msgid "What is {productName}?"
-msgstr ""
+msgstr "{productName}とは？"
 
 #. js-lingui-explicit-id
 #: src/emails/billing-subscription-renewing.email.tsx

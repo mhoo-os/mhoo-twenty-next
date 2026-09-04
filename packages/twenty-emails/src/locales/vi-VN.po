@@ -66,7 +66,7 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/emails/password-update-notify.email.tsx
 msgid "Connect to {productName}"
-msgstr ""
+msgstr "Kết nối với {productName}"
 
 #. js-lingui-explicit-id
 #: src/components/Footer.tsx
@@ -165,7 +165,7 @@ msgstr "Dữ liệu của nó đã bị xóa và không thể khôi phục lại
 #. js-lingui-explicit-id
 #: src/emails/send-invite-link.email.tsx
 msgid "Join your team on {productName}"
-msgstr ""
+msgstr "Tham gia vào đội ngũ của bạn trên {productName}"
 
 #. js-lingui-explicit-id
 #: src/emails/billing-subscription-renewing.email.tsx
@@ -326,7 +326,7 @@ msgstr "Trang web"
 #. js-lingui-explicit-id
 #: src/components/WhatIsTwenty.tsx
 msgid "What is {productName}?"
-msgstr ""
+msgstr "{productName} là gì?"
 
 #. js-lingui-explicit-id
 #: src/emails/billing-subscription-renewing.email.tsx

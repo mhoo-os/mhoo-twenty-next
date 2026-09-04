@@ -66,7 +66,7 @@ msgstr "تأكيد عنوان بريدك الإلكتروني الجديد"
 #. js-lingui-explicit-id
 #: src/emails/password-update-notify.email.tsx
 msgid "Connect to {productName}"
-msgstr ""
+msgstr "الاتصال بـ {productName}"
 
 #. js-lingui-explicit-id
 #: src/components/Footer.tsx
@@ -165,7 +165,7 @@ msgstr "تمت إزالة بياناتها ولم يَعُد بالإمكان ا
 #. js-lingui-explicit-id
 #: src/emails/send-invite-link.email.tsx
 msgid "Join your team on {productName}"
-msgstr ""
+msgstr "انضم إلى فريقك في {productName}"
 
 #. js-lingui-explicit-id
 #: src/emails/billing-subscription-renewing.email.tsx
@@ -326,7 +326,7 @@ msgstr "الموقع الإلكتروني"
 #. js-lingui-explicit-id
 #: src/components/WhatIsTwenty.tsx
 msgid "What is {productName}?"
-msgstr ""
+msgstr "ما هو {productName}؟"
 
 #. js-lingui-explicit-id
 #: src/emails/billing-subscription-renewing.email.tsx

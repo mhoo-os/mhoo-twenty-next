@@ -66,7 +66,7 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/emails/password-update-notify.email.tsx
 msgid "Connect to {productName}"
-msgstr ""
+msgstr "Verbinden met {productName}"
 
 #. js-lingui-explicit-id
 #: src/components/Footer.tsx
@@ -165,7 +165,7 @@ msgstr "De gegevens zijn verwijderd en kunnen niet meer worden hersteld."
 #. js-lingui-explicit-id
 #: src/emails/send-invite-link.email.tsx
 msgid "Join your team on {productName}"
-msgstr ""
+msgstr "Sluit je aan bij je team op {productName}"
 
 #. js-lingui-explicit-id
 #: src/emails/billing-subscription-renewing.email.tsx
@@ -326,7 +326,7 @@ msgstr "Website"
 #. js-lingui-explicit-id
 #: src/components/WhatIsTwenty.tsx
 msgid "What is {productName}?"
-msgstr ""
+msgstr "Wat is {productName}?"
 
 #. js-lingui-explicit-id
 #: src/emails/billing-subscription-renewing.email.tsx

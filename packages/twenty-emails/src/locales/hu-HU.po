@@ -66,7 +66,7 @@ msgstr "Erősítsd meg az új e-mail címed"
 #. js-lingui-explicit-id
 #: src/emails/password-update-notify.email.tsx
 msgid "Connect to {productName}"
-msgstr ""
+msgstr "Csatlakozás a {productName}hez"
 
 #. js-lingui-explicit-id
 #: src/components/Footer.tsx
@@ -165,7 +165,7 @@ msgstr "Az adatai törlésre kerültek, és többé nem állíthatók vissza."
 #. js-lingui-explicit-id
 #: src/emails/send-invite-link.email.tsx
 msgid "Join your team on {productName}"
-msgstr ""
+msgstr "Csatlakozzon a csapatához a {productName}n"
 
 #. js-lingui-explicit-id
 #: src/emails/billing-subscription-renewing.email.tsx
@@ -326,7 +326,7 @@ msgstr "Weboldal"
 #. js-lingui-explicit-id
 #: src/components/WhatIsTwenty.tsx
 msgid "What is {productName}?"
-msgstr ""
+msgstr "Mi az a {productName}?"
 
 #. js-lingui-explicit-id
 #: src/emails/billing-subscription-renewing.email.tsx
