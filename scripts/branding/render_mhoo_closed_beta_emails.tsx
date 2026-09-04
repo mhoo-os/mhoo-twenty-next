@@ -7,7 +7,7 @@ import { SendEmailVerificationLinkEmail } from '../../packages/twenty-emails/src
 import { SendInviteLinkEmail } from '../../packages/twenty-emails/src/emails/send-invite-link.email';
 
 const outputDirectory = resolve(
-  process.env.MHOO_PREVIEW_OUTPUT ?? '/private/tmp/mhoo-mho181-visual-output',
+  process.env.MHOO_PREVIEW_OUTPUT ?? '/private/tmp/mhoo-mho233-preview-output',
   'emails',
 );
 
@@ -39,9 +39,13 @@ const renderPreview = async (preview: (typeof previews)[number]) => {
     !html.includes('Mhoo') ||
     !html.includes('Private beta preview') ||
     !html.includes('DRAFT / UNAPPROVED') ||
-    !html.includes('/images/mhoo/mhoo-email-600x436.png')
+    !html.includes('/images/mhoo/mhoo-email-600x436.png') ||
+    html.includes('Twenty') ||
+    html.includes('twenty.com')
   ) {
-    throw new Error(`Mhoo preview markers are missing from ${preview.name}`);
+    throw new Error(
+      `Mhoo preview validation failed for ${preview.name}: required markers are missing or upstream residue is present`,
+    );
   }
 
   writeFileSync(resolve(outputDirectory, `${preview.name}.html`), html);

@@ -6,7 +6,7 @@ import { buildUnsubscribePreferencesPage } from '../../packages/twenty-server/sr
 import { buildUnsubscribeResultPage } from '../../packages/twenty-server/src/engine/core-modules/emailing-domain/utils/build-unsubscribe-result-page.util';
 
 const outputDirectory = resolve(
-  process.env.MHOO_PREVIEW_OUTPUT ?? '/private/tmp/mhoo-mho181-visual-output',
+  process.env.MHOO_PREVIEW_OUTPUT ?? '/private/tmp/mhoo-mho233-preview-output',
   'pages',
 );
 
@@ -55,9 +55,13 @@ for (const [name, html] of [
     !html.includes('Private beta preview') ||
     !html.includes('DRAFT / UNAPPROVED') ||
     !html.includes('Legal documents are currently unavailable.') ||
-    !html.includes('/images/mhoo/mhoo-email-600x436.png')
+    !html.includes('/images/mhoo/mhoo-email-600x436.png') ||
+    html.includes('Twenty') ||
+    html.includes('twenty.com')
   ) {
-    throw new Error(`Mhoo preview markers are missing from ${name}`);
+    throw new Error(
+      `Mhoo preview validation failed for ${name}: required markers are missing or upstream residue is present`,
+    );
   }
 
   writeFileSync(resolve(outputDirectory, `${name}.html`), html);
