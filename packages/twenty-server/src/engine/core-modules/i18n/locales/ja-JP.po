@@ -191,7 +191,7 @@ msgstr "手作業で選定されたオーディエンス"
 
 #. js-lingui-id: TF/ZV2
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "A heads up before your Twenty trial ends"
+msgid "A heads up before your {productName} trial ends"
 msgstr "Twenty トライアルが終了する前のお知らせ"
 
 #. js-lingui-id: 6yZjO1
@@ -5611,7 +5611,7 @@ msgstr "メッセージチャネルのメッセージ関連付けをメッセー
 
 #. js-lingui-id: PviVyk
 #: src/engine/core-modules/workspace-invitation/services/workspace-invitation.service.ts
-msgid "Join your team on Twenty"
+msgid "Join your team on {productName}"
 msgstr "Twentyでチームに参加"
 
 #. js-lingui-id: +KEn4d
@@ -11786,7 +11786,7 @@ msgstr "水曜日"
 
 #. js-lingui-id: TVkCrJ
 #: src/engine/core-modules/email-verification/services/email-verification.service.ts
-msgid "Welcome to Twenty: Please Confirm Your Email"
+msgid "Welcome to {productName}: Please Confirm Your Email"
 msgstr "Twentyへようこそ: メールを確認してください"
 
 #. js-lingui-id: ofdfh5
@@ -12659,12 +12659,12 @@ msgstr "会社のアカウントを管理する責任のあるチームメンバ
 
 #. js-lingui-id: sOfbGC
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "Your Twenty plan renews soon"
+msgid "Your {productName} plan renews soon"
 msgstr "お使いの Twenty プランはまもなく更新されます"
 
 #. js-lingui-id: qW+K5e
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "Your Twenty trial is ending soon"
+msgid "Your {productName} trial is ending soon"
 msgstr "お使いの Twenty トライアルはまもなく終了します"
 
 #. js-lingui-id: ej/tZF

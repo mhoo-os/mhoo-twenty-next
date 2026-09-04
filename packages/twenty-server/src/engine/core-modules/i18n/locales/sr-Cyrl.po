@@ -191,7 +191,7 @@ msgstr "Пажљиво одабрана публика људи"
 
 #. js-lingui-id: TF/ZV2
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "A heads up before your Twenty trial ends"
+msgid "A heads up before your {productName} trial ends"
 msgstr "Обавештење пре истека вашег Twenty пробног периода"
 
 #. js-lingui-id: 6yZjO1
@@ -5611,7 +5611,7 @@ msgstr "Спојна табела која повезује асоцијациј
 
 #. js-lingui-id: PviVyk
 #: src/engine/core-modules/workspace-invitation/services/workspace-invitation.service.ts
-msgid "Join your team on Twenty"
+msgid "Join your team on {productName}"
 msgstr "Придружите се свом тиму на Twenty"
 
 #. js-lingui-id: +KEn4d
@@ -11786,7 +11786,7 @@ msgstr "Среда"
 
 #. js-lingui-id: TVkCrJ
 #: src/engine/core-modules/email-verification/services/email-verification.service.ts
-msgid "Welcome to Twenty: Please Confirm Your Email"
+msgid "Welcome to {productName}: Please Confirm Your Email"
 msgstr "Добродошли у Twenty: Молимо потврдите ваш имејл"
 
 #. js-lingui-id: ofdfh5
@@ -12659,12 +12659,12 @@ msgstr "Ваш тимски члан задужен за управљање на
 
 #. js-lingui-id: sOfbGC
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "Your Twenty plan renews soon"
+msgid "Your {productName} plan renews soon"
 msgstr "Ваш Twenty план ће ускоро бити обновљен"
 
 #. js-lingui-id: qW+K5e
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "Your Twenty trial is ending soon"
+msgid "Your {productName} trial is ending soon"
 msgstr "Ваш Twenty пробни период ускоро истиче"
 
 #. js-lingui-id: ej/tZF

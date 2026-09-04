@@ -191,7 +191,7 @@ msgstr "O audiență de persoane selectată manual"
 
 #. js-lingui-id: TF/ZV2
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "A heads up before your Twenty trial ends"
+msgid "A heads up before your {productName} trial ends"
 msgstr "O avertizare înainte ca perioada de probă Twenty să se încheie"
 
 #. js-lingui-id: 6yZjO1
@@ -5611,7 +5611,7 @@ msgstr "Tabel de legătură care conectează asocierile mesaj–canal la dosarel
 
 #. js-lingui-id: PviVyk
 #: src/engine/core-modules/workspace-invitation/services/workspace-invitation.service.ts
-msgid "Join your team on Twenty"
+msgid "Join your team on {productName}"
 msgstr "Alăturați-vă echipei pe Twenty"
 
 #. js-lingui-id: +KEn4d
@@ -11786,7 +11786,7 @@ msgstr "miercuri"
 
 #. js-lingui-id: TVkCrJ
 #: src/engine/core-modules/email-verification/services/email-verification.service.ts
-msgid "Welcome to Twenty: Please Confirm Your Email"
+msgid "Welcome to {productName}: Please Confirm Your Email"
 msgstr "Bine ați venit la Twenty: Vă rugăm să confirmați adresa de e-mail"
 
 #. js-lingui-id: ofdfh5
@@ -12659,12 +12659,12 @@ msgstr "Membrul echipei dumneavoastră responsabil de gestionarea contului compa
 
 #. js-lingui-id: sOfbGC
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "Your Twenty plan renews soon"
+msgid "Your {productName} plan renews soon"
 msgstr "Abonamentul dvs. Twenty se reînnoiește în curând"
 
 #. js-lingui-id: qW+K5e
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "Your Twenty trial is ending soon"
+msgid "Your {productName} trial is ending soon"
 msgstr "Perioada de probă Twenty se încheie în curând"
 
 #. js-lingui-id: ej/tZF

@@ -191,7 +191,7 @@ msgstr "Une audience de personnes sélectionnées manuellement"
 
 #. js-lingui-id: TF/ZV2
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "A heads up before your Twenty trial ends"
+msgid "A heads up before your {productName} trial ends"
 msgstr "Un rappel avant la fin de votre essai Twenty"
 
 #. js-lingui-id: 6yZjO1
@@ -5611,7 +5611,7 @@ msgstr "Table de jointure reliant les associations de messages du canal aux doss
 
 #. js-lingui-id: PviVyk
 #: src/engine/core-modules/workspace-invitation/services/workspace-invitation.service.ts
-msgid "Join your team on Twenty"
+msgid "Join your team on {productName}"
 msgstr "Rejoignez votre équipe sur Twenty"
 
 #. js-lingui-id: +KEn4d
@@ -11786,7 +11786,7 @@ msgstr "Mercredi"
 
 #. js-lingui-id: TVkCrJ
 #: src/engine/core-modules/email-verification/services/email-verification.service.ts
-msgid "Welcome to Twenty: Please Confirm Your Email"
+msgid "Welcome to {productName}: Please Confirm Your Email"
 msgstr "Bienvenue chez Twenty : Veuillez confirmer votre email"
 
 #. js-lingui-id: ofdfh5
@@ -12659,12 +12659,12 @@ msgstr "Le membre de votre équipe responsable de la gestion du compte entrepris
 
 #. js-lingui-id: sOfbGC
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "Your Twenty plan renews soon"
+msgid "Your {productName} plan renews soon"
 msgstr "Votre formule Twenty sera bientôt renouvelée"
 
 #. js-lingui-id: qW+K5e
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "Your Twenty trial is ending soon"
+msgid "Your {productName} trial is ending soon"
 msgstr "Votre période d’essai Twenty se termine bientôt"
 
 #. js-lingui-id: ej/tZF

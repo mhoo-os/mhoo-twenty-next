@@ -191,7 +191,7 @@ msgstr "精心挑选的人群受众"
 
 #. js-lingui-id: TF/ZV2
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "A heads up before your Twenty trial ends"
+msgid "A heads up before your {productName} trial ends"
 msgstr "在您的 Twenty 试用结束前的提醒通知"
 
 #. js-lingui-id: 6yZjO1
@@ -5611,7 +5611,7 @@ msgstr "用于将消息通道消息关联与消息文件夹关联起来的连接
 
 #. js-lingui-id: PviVyk
 #: src/engine/core-modules/workspace-invitation/services/workspace-invitation.service.ts
-msgid "Join your team on Twenty"
+msgid "Join your team on {productName}"
 msgstr "加入您的团队，使用 Twenty"
 
 #. js-lingui-id: +KEn4d
@@ -11786,7 +11786,7 @@ msgstr "星期三"
 
 #. js-lingui-id: TVkCrJ
 #: src/engine/core-modules/email-verification/services/email-verification.service.ts
-msgid "Welcome to Twenty: Please Confirm Your Email"
+msgid "Welcome to {productName}: Please Confirm Your Email"
 msgstr "欢迎来到Twenty: 请确认您的邮箱"
 
 #. js-lingui-id: ofdfh5
@@ -12659,12 +12659,12 @@ msgstr "负责管理公司账户的团队成员"
 
 #. js-lingui-id: sOfbGC
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "Your Twenty plan renews soon"
+msgid "Your {productName} plan renews soon"
 msgstr "您的 Twenty 方案即将续订"
 
 #. js-lingui-id: qW+K5e
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "Your Twenty trial is ending soon"
+msgid "Your {productName} trial is ending soon"
 msgstr "您的 Twenty 试用即将结束"
 
 #. js-lingui-id: ej/tZF

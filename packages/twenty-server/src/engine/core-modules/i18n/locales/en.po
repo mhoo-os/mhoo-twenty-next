@@ -186,7 +186,7 @@ msgstr "A hand-picked audience of people"
 
 #. js-lingui-id: TF/ZV2
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "A heads up before your Twenty trial ends"
+msgid "A heads up before your {productName} trial ends"
 msgstr "A heads up before your Twenty trial ends"
 
 #. js-lingui-id: 6yZjO1
@@ -5606,7 +5606,7 @@ msgstr "Join table linking message channel message associations to message folde
 
 #. js-lingui-id: PviVyk
 #: src/engine/core-modules/workspace-invitation/services/workspace-invitation.service.ts
-msgid "Join your team on Twenty"
+msgid "Join your team on {productName}"
 msgstr "Join your team on Twenty"
 
 #. js-lingui-id: +KEn4d
@@ -11781,7 +11781,7 @@ msgstr "Wednesday"
 
 #. js-lingui-id: TVkCrJ
 #: src/engine/core-modules/email-verification/services/email-verification.service.ts
-msgid "Welcome to Twenty: Please Confirm Your Email"
+msgid "Welcome to {productName}: Please Confirm Your Email"
 msgstr "Welcome to Twenty: Please Confirm Your Email"
 
 #. js-lingui-id: ofdfh5
@@ -12654,12 +12654,12 @@ msgstr "Your team member responsible for managing the company account"
 
 #. js-lingui-id: sOfbGC
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "Your Twenty plan renews soon"
+msgid "Your {productName} plan renews soon"
 msgstr "Your Twenty plan renews soon"
 
 #. js-lingui-id: qW+K5e
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "Your Twenty trial is ending soon"
+msgid "Your {productName} trial is ending soon"
 msgstr "Your Twenty trial is ending soon"
 
 #. js-lingui-id: ej/tZF

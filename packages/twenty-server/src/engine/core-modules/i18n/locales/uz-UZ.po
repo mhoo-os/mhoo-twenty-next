@@ -191,7 +191,7 @@ msgstr "Qo‘l bilan tanlab olingan odamlar auditoriyasi"
 
 #. js-lingui-id: TF/ZV2
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "A heads up before your Twenty trial ends"
+msgid "A heads up before your {productName} trial ends"
 msgstr "Twenty sinovingiz yakunlanishidan oldin ogohlantirish"
 
 #. js-lingui-id: 6yZjO1
@@ -5611,7 +5611,7 @@ msgstr "Xabar kanali xabar assotsiatsiyalarini xabar jildlariga bog‘lovchi qo�
 
 #. js-lingui-id: PviVyk
 #: src/engine/core-modules/workspace-invitation/services/workspace-invitation.service.ts
-msgid "Join your team on Twenty"
+msgid "Join your team on {productName}"
 msgstr "Twenty’da jamoangizga qoʻshiling"
 
 #. js-lingui-id: +KEn4d
@@ -11786,7 +11786,7 @@ msgstr "Chorshanba"
 
 #. js-lingui-id: TVkCrJ
 #: src/engine/core-modules/email-verification/services/email-verification.service.ts
-msgid "Welcome to Twenty: Please Confirm Your Email"
+msgid "Welcome to {productName}: Please Confirm Your Email"
 msgstr "Twenty’ga xush kelibsiz: Iltimos, elektron pochtangizni tasdiqlang"
 
 #. js-lingui-id: ofdfh5
@@ -12659,12 +12659,12 @@ msgstr "Kompaniya akkauntini boshqarishga mas'ul bo‘lgan jamoangiz a'zosi"
 
 #. js-lingui-id: sOfbGC
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "Your Twenty plan renews soon"
+msgid "Your {productName} plan renews soon"
 msgstr "Sizning Twenty tarif rejangiz tez orada yangilanadi"
 
 #. js-lingui-id: qW+K5e
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "Your Twenty trial is ending soon"
+msgid "Your {productName} trial is ending soon"
 msgstr "Sizning Twenty sinov davringiz tez orada tugaydi"
 
 #. js-lingui-id: ej/tZF

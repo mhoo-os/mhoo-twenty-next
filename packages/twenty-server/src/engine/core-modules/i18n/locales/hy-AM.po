@@ -191,7 +191,7 @@ msgstr "Ձեռքով ընտրված մարդկանց լսարան"
 
 #. js-lingui-id: TF/ZV2
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "A heads up before your Twenty trial ends"
+msgid "A heads up before your {productName} trial ends"
 msgstr "Ծանուցում մինչև ձեր Twenty փորձաշրջանի ավարտը"
 
 #. js-lingui-id: 6yZjO1
@@ -5611,7 +5611,7 @@ msgstr "Միացման աղյուսակ, որը կապում է հաղորդագ
 
 #. js-lingui-id: PviVyk
 #: src/engine/core-modules/workspace-invitation/services/workspace-invitation.service.ts
-msgid "Join your team on Twenty"
+msgid "Join your team on {productName}"
 msgstr "Միացեք ձեր թիմին Twenty պլատֆորմում"
 
 #. js-lingui-id: +KEn4d
@@ -11786,7 +11786,7 @@ msgstr "Չորեքշաբթի"
 
 #. js-lingui-id: TVkCrJ
 #: src/engine/core-modules/email-verification/services/email-verification.service.ts
-msgid "Welcome to Twenty: Please Confirm Your Email"
+msgid "Welcome to {productName}: Please Confirm Your Email"
 msgstr "Բարի գալուստ Twenty․ Խնդրում ենք հաստատել ձեր էլ. հասցեն"
 
 #. js-lingui-id: ofdfh5
@@ -12659,12 +12659,12 @@ msgstr "Ձեր թիմի այն անդամը, որը պատասխանատու է 
 
 #. js-lingui-id: sOfbGC
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "Your Twenty plan renews soon"
+msgid "Your {productName} plan renews soon"
 msgstr "Ձեր Twenty փաթեթի ժամկետը շուտով կթարմացվի"
 
 #. js-lingui-id: qW+K5e
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "Your Twenty trial is ending soon"
+msgid "Your {productName} trial is ending soon"
 msgstr "Ձեր Twenty փորձաշրջանը շուտով ավարտվում է"
 
 #. js-lingui-id: ej/tZF

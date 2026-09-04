@@ -191,7 +191,7 @@ msgstr "En noggrant utvald målgrupp av personer"
 
 #. js-lingui-id: TF/ZV2
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "A heads up before your Twenty trial ends"
+msgid "A heads up before your {productName} trial ends"
 msgstr "En förvarning innan din Twenty-testperiod avslutas"
 
 #. js-lingui-id: 6yZjO1
@@ -5611,7 +5611,7 @@ msgstr "Kopplingstabell som länkar meddelandekanalens meddelandeassociationer t
 
 #. js-lingui-id: PviVyk
 #: src/engine/core-modules/workspace-invitation/services/workspace-invitation.service.ts
-msgid "Join your team on Twenty"
+msgid "Join your team on {productName}"
 msgstr "Gå med i ditt team på Twenty"
 
 #. js-lingui-id: +KEn4d
@@ -11792,7 +11792,7 @@ msgstr "Onsdag"
 
 #. js-lingui-id: TVkCrJ
 #: src/engine/core-modules/email-verification/services/email-verification.service.ts
-msgid "Welcome to Twenty: Please Confirm Your Email"
+msgid "Welcome to {productName}: Please Confirm Your Email"
 msgstr "Välkommen till Twenty: Bekräfta din e-post"
 
 #. js-lingui-id: ofdfh5
@@ -12665,12 +12665,12 @@ msgstr "Din teammedlem som ansvarar för företagskontot"
 
 #. js-lingui-id: sOfbGC
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "Your Twenty plan renews soon"
+msgid "Your {productName} plan renews soon"
 msgstr "Ditt Twenty-abonnemang förnyas snart"
 
 #. js-lingui-id: qW+K5e
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "Your Twenty trial is ending soon"
+msgid "Your {productName} trial is ending soon"
 msgstr "Din Twenty-testperiod avslutas snart"
 
 #. js-lingui-id: ej/tZF
