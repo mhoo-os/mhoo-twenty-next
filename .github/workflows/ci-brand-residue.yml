@@ -1,0 +1,32 @@
+name: CI Brand Residue
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  brand-residue:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the complete repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Install the asset verifier dependency
+        run: python3 -m pip install --disable-pip-version-check 'Pillow>=10,<13'
+      - name: Verify governed Mhoo assets
+        run: python3 scripts/verify_mhoo_assets.py
+      - name: Run the deterministic brand residue gate
+        run: python3 scripts/branding/check_customer_brand_residue.py
+      - name: Run hostile mutation and regression tests
+        run: python3 -m unittest discover -s scripts/branding -p 'test_*.py'

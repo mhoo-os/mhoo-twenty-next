@@ -1,0 +1,331 @@
+{
+  "schema": "mhoo.brand-touchpoint-ledger.v1",
+  "version": 1,
+  "owner": "MHO-182",
+  "foundation": {
+    "repository": "https://github.com/twentyhq/twenty.git",
+    "ref": "refs/tags/twenty/v2.37.0",
+    "commit": "6da524b8903ec16a3eeea4b2e4a5fb63dbfc1c58",
+    "tree": "3ce4ef3eac3604ee52b6b8ee0f1a4766d7f533ca"
+  },
+  "dispositions": [
+    "customer-facing resolves Mhoo",
+    "generic brand consumer canonical contract/resolver",
+    "retained technical identity + reason",
+    "retained legal/provenance identity + reason",
+    "approved bounded “Powered by Twenty”",
+    "test fixture explicitly exercising upstream fallback"
+  ],
+  "pathRules": [
+    {
+      "id": "shared-brand-contract",
+      "match": "packages/twenty-shared/src/branding/",
+      "matchType": "prefix",
+      "disposition": "generic brand consumer canonical contract/resolver",
+      "owner": "MHO-158",
+      "reason": "The shared preset, type, validation, and workspace presentation contract is the only source of product identity values.",
+      "scopeJustification": "This bounded directory is the runtime-neutral brand contract and its tests.",
+      "checks": ["contract", "markers"],
+      "scan": false
+    },
+    {
+      "id": "front-brand-consumers",
+      "match": "packages/twenty-front/src/modules/client-config/",
+      "matchType": "prefix",
+      "disposition": "customer-facing resolves Mhoo",
+      "owner": "MHO-173",
+      "reason": "Authenticated browser presentation reads the resolved brand instead of selecting a product by a direct environment flag.",
+      "scopeJustification": "This directory owns the browser brand state, resolver hook, and URL adapter.",
+      "checks": ["residue"],
+      "scan": true
+    },
+    {
+      "id": "front-legal-consumers",
+      "match": "packages/twenty-front/src/pages/settings/legal/",
+      "matchType": "prefix",
+      "disposition": "customer-facing resolves Mhoo",
+      "owner": "MHO-177",
+      "reason": "Legal settings must fail closed when Mhoo documents are not approved.",
+      "scopeJustification": "This directory owns the customer-facing DPA availability and agreement surfaces.",
+      "checks": ["residue", "contract"],
+      "scan": true
+    },
+    {
+      "id": "front-browser-shell",
+      "match": "packages/twenty-front/index.html",
+      "matchType": "exact",
+      "disposition": "customer-facing resolves Mhoo",
+      "owner": "MHO-161",
+      "reason": "The initial browser shell must not emit an upstream favicon or product title before client configuration loads.",
+      "scopeJustification": "This is the single static browser entry document.",
+      "checks": ["residue"],
+      "scan": true
+    },
+    {
+      "id": "front-browser-manifest",
+      "match": "packages/twenty-front/public/manifest.json",
+      "matchType": "exact",
+      "disposition": "customer-facing resolves Mhoo",
+      "owner": "MHO-161",
+      "reason": "The install manifest is a customer-visible identity surface.",
+      "scopeJustification": "This is the single static browser install manifest.",
+      "checks": ["residue"],
+      "scan": true
+    },
+    {
+      "id": "server-public-pages",
+      "match": "packages/twenty-server/src/engine/core-modules/emailing-domain/",
+      "matchType": "prefix",
+      "disposition": "customer-facing resolves Mhoo",
+      "owner": "MHO-177",
+      "reason": "Unsubscribe HTML, text, and legal footer output is public server-rendered customer content.",
+      "scopeJustification": "This bounded module owns the public emailing-domain page and footer builders; tests are treated as explicit fixtures.",
+      "checks": ["residue", "contract"],
+      "scan": true
+    },
+    {
+      "id": "server-public-controller",
+      "match": "packages/twenty-server/src/modules/emailing/controllers/unsubscribe.controller.ts",
+      "matchType": "exact",
+      "disposition": "customer-facing resolves Mhoo",
+      "owner": "MHO-177",
+      "reason": "The public controller resolves the brand at request time and preserves the token and suppression boundary.",
+      "scopeJustification": "This is the single public controller entry point for unsubscribe pages.",
+      "checks": ["residue", "contract"],
+      "scan": true
+    },
+    {
+      "id": "email-components",
+      "match": "packages/twenty-emails/src/components/",
+      "matchType": "prefix",
+      "disposition": "generic brand consumer canonical contract/resolver",
+      "owner": "MHO-175",
+      "reason": "Transactional email components receive a resolved brand and render only contract-approved links and identity.",
+      "scopeJustification": "This directory contains shared transactional email presentation components.",
+      "checks": ["residue"],
+      "scan": true
+    },
+    {
+      "id": "email-preview-fixtures",
+      "match": "packages/twenty-emails/src/utils/preview-brand.ts",
+      "matchType": "exact",
+      "disposition": "test fixture explicitly exercising upstream fallback",
+      "owner": "MHO-175",
+      "reason": "The static React Email preview intentionally exercises the explicit upstream preset because it cannot read server configuration.",
+      "scopeJustification": "This is the reviewed preview-only adapter and is not a production resolver.",
+      "checks": ["markers"],
+      "scan": false
+    },
+    {
+      "id": "distribution-technical",
+      "match": "packages/twenty-docker/",
+      "matchType": "prefix",
+      "disposition": "retained technical identity + reason",
+      "owner": "MHO-179",
+      "reason": "Chart, image, and deployment identifiers remain Twenty-compatible technical identities while displayed product metadata resolves Mhoo.",
+      "scopeJustification": "This bounded distribution tree owns technical chart, image, and deployment identifiers.",
+      "checks": ["markers"],
+      "scan": false
+    },
+    {
+      "id": "upstream-documentation",
+      "match": "packages/twenty-docs/",
+      "matchType": "prefix",
+      "disposition": "retained legal/provenance identity + reason",
+      "owner": "MHO-179",
+      "reason": "The inherited documentation package and its upstream destination are retained as provenance-bearing content, not relabeled as Mhoo-owned legal material.",
+      "scopeJustification": "This package is the inherited documentation distribution surface and is separately reviewed for publication.",
+      "checks": ["markers"],
+      "scan": false
+    },
+    {
+      "id": "plugin-technical",
+      "match": "packages/twenty-codex-plugin/",
+      "matchType": "prefix",
+      "disposition": "retained technical identity + reason",
+      "owner": "MHO-179",
+      "reason": "The plugin package and skill names remain compatible technical identifiers; user-facing distribution metadata names the Mhoo distribution.",
+      "scopeJustification": "This bounded package owns the technical Codex plugin implementation.",
+      "checks": ["markers"],
+      "scan": false
+    },
+    {
+      "id": "mhoo-assets",
+      "match": "packages/twenty-front/public/images/mhoo/",
+      "matchType": "prefix",
+      "disposition": "customer-facing resolves Mhoo",
+      "owner": "MHO-155",
+      "reason": "The governed Mhoo asset family is hash- and dimension-custodied by the manifest and source verifier.",
+      "scopeJustification": "This directory contains only the generated Mhoo asset family and its provenance record.",
+      "checks": ["assets", "markers"],
+      "scan": false
+    },
+    {
+      "id": "residue-gate",
+      "match": "scripts/branding/",
+      "matchType": "prefix",
+      "disposition": "test fixture explicitly exercising upstream fallback",
+      "owner": "MHO-182",
+      "reason": "The scanner, its mutation fixtures, and its regression tests define the fail-closed source and artifact gate.",
+      "scopeJustification": "This bounded directory contains only the gate implementation and controlled positive/negative fixtures.",
+      "checks": ["markers"],
+      "scan": false
+    },
+    {
+      "id": "residue-workflow",
+      "match": ".github/workflows/ci-brand-residue.yml",
+      "matchType": "exact",
+      "disposition": "retained technical identity + reason",
+      "owner": "MHO-182",
+      "reason": "The workflow is CI plumbing that runs the deterministic residue receipt and does not itself present customer identity.",
+      "scopeJustification": "This is the single workflow entry point for the residue gate.",
+      "checks": ["markers"],
+      "scan": false
+    }
+  ],
+  "markerChecks": [
+    {
+      "id": "source-custody",
+      "path": ".twenty-source",
+      "owner": "R0",
+      "reason": "The clean source foundation must remain pinned to its immutable upstream commit, tree, ref, lockfile, and Dockerfile receipts.",
+      "markers": [
+        "TWENTY_SOURCE_FORMAT=1",
+        "TWENTY_UPSTREAM_REF=refs/tags/twenty/v2.37.0",
+        "TWENTY_UPSTREAM_COMMIT=6da524b8903ec16a3eeea4b2e4a5fb63dbfc1c58",
+        "TWENTY_UPSTREAM_TREE=3ce4ef3eac3604ee52b6b8ee0f1a4766d7f533ca",
+        "TWENTY_LOCKFILE_SHA256=60e495535a84abc3a2ea06a2d9ce39a5611cf3f2a9349e62ef47cf52c0e9940a",
+        "TWENTY_DOCKERFILE_SHA256=0b30715b133790043dd93bb0f0cef428891fe3797fdc19e46b2fed6ad043e91a"
+      ]
+    },
+    {
+      "id": "brand-presets",
+      "path": "packages/twenty-shared/src/branding/brand-presets.ts",
+      "owner": "MHO-158",
+      "reason": "Both the Mhoo contract and explicit upstream fallback must remain present in the canonical shared preset file.",
+      "markers": ["MHO_BRAND", "TWENTY_BRAND", "status: 'unavailable', url: null", "Powered by Twenty"]
+    },
+    {
+      "id": "mhoo-asset-custody",
+      "path": "packages/twenty-front/public/images/mhoo/PROVENANCE.md",
+      "owner": "MHO-155",
+      "reason": "The supplied raster source and its no-vector-drift decision are part of asset custody.",
+      "markers": ["6d4f6bc2532274cb919f080eef754af68628600f877595d94e9eb83fd366cefa", "No vector export is claimed"]
+    },
+    {
+      "id": "distribution-upstream-custody",
+      "path": "packages/twenty-docker/twenty/Dockerfile",
+      "owner": "MHO-179",
+      "reason": "Distribution metadata must preserve the governed upstream revision and license while displaying Mhoo.",
+      "markers": ["Mhoo built on Twenty", "org.opencontainers.image.upstream.revision", "6da524b8903ec16a3eeea4b2e4a5fb63dbfc1c58", "AGPL-3.0"]
+    },
+    {
+      "id": "chart-technical-identity",
+      "path": "packages/twenty-docker/helm/twenty/templates/_helpers.tpl",
+      "owner": "MHO-179",
+      "reason": "Helm helper names remain stable technical identifiers while brand values are configurable.",
+      "markers": ["twenty.fullname", "twenty.productBrandPreset"]
+    },
+    {
+      "id": "root-package-identity",
+      "path": "package.json",
+      "owner": "R0",
+      "reason": "The clean foundation keeps the upstream package and license identifiers intact.",
+      "markers": ["\"name\": \"twenty\"", "\"license\": \"AGPL-3.0\""]
+    },
+    {
+      "id": "plugin-license",
+      "path": "packages/twenty-codex-plugin/package.json",
+      "owner": "MHO-179",
+      "reason": "Distribution metadata changes must not silently remove the inherited license identity.",
+      "markers": ["\"license\": \"AGPL-3.0\"", "twenty-codex-plugin"]
+    }
+  ],
+  "artifactFixtures": [
+    {
+      "id": "mhoo-frontend-html",
+      "preset": "mhoo",
+      "kind": "frontend-html",
+      "path": "scripts/branding/fixtures/artifacts/mhoo/frontend.html",
+      "requiredTokens": ["<title>Mhoo</title>", "/images/mhoo/", "Legal documents are currently unavailable."],
+      "forbiddenTokens": ["twenty.com", "/images/icons/"]
+    },
+    {
+      "id": "mhoo-email-html",
+      "preset": "mhoo",
+      "kind": "transactional-email-html",
+      "path": "scripts/branding/fixtures/artifacts/mhoo/email.html",
+      "requiredTokens": ["Mhoo", "unsubscribe"],
+      "forbiddenTokens": ["twenty.com", "Powered by Twenty"]
+    },
+    {
+      "id": "mhoo-email-text",
+      "preset": "mhoo",
+      "kind": "transactional-email-text",
+      "path": "scripts/branding/fixtures/artifacts/mhoo/email.txt",
+      "requiredTokens": ["Mhoo", "unsubscribe"],
+      "forbiddenTokens": ["twenty.com", "Powered by Twenty"]
+    },
+    {
+      "id": "mhoo-server-public",
+      "preset": "mhoo",
+      "kind": "server-public-html",
+      "path": "scripts/branding/fixtures/artifacts/mhoo/server-unsubscribe.html",
+      "requiredTokens": ["Mhoo", "Legal documents are currently unavailable."],
+      "forbiddenTokens": ["twenty.com", "/images/icons/"]
+    },
+    {
+      "id": "mhoo-distribution",
+      "preset": "mhoo",
+      "kind": "distribution-metadata",
+      "path": "scripts/branding/fixtures/artifacts/mhoo/distribution.json",
+      "requiredTokens": ["Mhoo", "built on Twenty", "AGPL-3.0"],
+      "forbiddenTokens": ["twenty.com"],
+      "allowedTokens": ["built on Twenty"]
+    },
+    {
+      "id": "mhoo-legal-state",
+      "preset": "mhoo",
+      "kind": "legal-links",
+      "path": "scripts/branding/fixtures/artifacts/mhoo/legal-links.txt",
+      "requiredTokens": ["Mhoo legal documents unavailable"],
+      "forbiddenTokens": ["twenty.com", "https://", "http://"]
+    },
+    {
+      "id": "upstream-frontend-html",
+      "preset": "twenty",
+      "kind": "frontend-html",
+      "path": "scripts/branding/fixtures/artifacts/upstream/frontend.html",
+      "requiredTokens": ["<title>Twenty</title>", "Powered by Twenty", "https://twenty.com/"],
+      "forbiddenTokens": ["Mhoo"]
+    },
+    {
+      "id": "upstream-email-html",
+      "preset": "twenty",
+      "kind": "transactional-email-html",
+      "path": "scripts/branding/fixtures/artifacts/upstream/email.html",
+      "requiredTokens": ["Twenty", "Powered by Twenty", "https://twenty.com/"],
+      "forbiddenTokens": ["Mhoo"]
+    },
+    {
+      "id": "upstream-server-public",
+      "preset": "twenty",
+      "kind": "server-public-html",
+      "path": "scripts/branding/fixtures/artifacts/upstream/server-unsubscribe.html",
+      "requiredTokens": ["Twenty", "https://twenty.com/"],
+      "forbiddenTokens": ["Mhoo"]
+    }
+  ],
+  "negativeFixtures": [
+    {"id": "hardcoded-mhoo-url", "path": "scripts/branding/fixtures/negative/hardcoded-mhoo-url.ts", "expectedRule": "hardcoded-mhoo-url"},
+    {"id": "twenty-favicon", "path": "scripts/branding/fixtures/negative/twenty-favicon.html", "expectedRule": "twenty-favicon-residue"},
+    {"id": "direct-foundation-flag", "path": "scripts/branding/fixtures/negative/direct-foundation-flag.ts", "expectedRule": "direct-foundation-flag"},
+    {"id": "missing-icon", "path": "scripts/branding/fixtures/negative/missing-icon.json", "expectedRule": "missing-mhoo-asset"},
+    {"id": "fake-dpa-link", "path": "scripts/branding/fixtures/negative/fake-dpa-link.ts", "expectedRule": "fake-dpa-link"},
+    {"id": "unauthorized-license-edit", "path": "scripts/branding/fixtures/negative/unauthorized-license-edit.txt", "expectedRule": "unauthorized-license-identity"}
+  ],
+  "positiveFixtures": [
+    "scripts/branding/fixtures/positive/technical-identities.ts",
+    "scripts/branding/fixtures/positive/upstream-attribution.html"
+  ]
+}
