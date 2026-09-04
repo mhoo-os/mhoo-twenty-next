@@ -62,6 +62,33 @@ export const Footer = ({ i18n, brand }: FooterProps) => {
             ariaLabel: i18n._('Contact the product team'),
           },
         ];
+  const legalLinks = [
+    {
+      document: brand.legal.terms,
+      label: i18n._('Terms'),
+      ariaLabel: i18n._('Read the terms'),
+    },
+    {
+      document: brand.legal.privacy,
+      label: i18n._('Privacy'),
+      ariaLabel: i18n._('Read the privacy policy'),
+    },
+    {
+      document: brand.legal.acceptableUse,
+      label: i18n._('Acceptable Use'),
+      ariaLabel: i18n._('Read the acceptable use policy'),
+    },
+    {
+      document: brand.legal.openSource,
+      label: i18n._('Open Source'),
+      ariaLabel: i18n._('Read the open source notice'),
+    },
+    {
+      document: brand.legal.dpaAvailabilityNotice,
+      label: i18n._('DPA Status'),
+      ariaLabel: i18n._('Read the DPA availability notice'),
+    },
+  ].filter(({ document }) => isApprovedBrandDocument(document));
   const hasLegalEntity =
     brand.legal.legalEntityStatus === 'approved' &&
     brand.legal.legalEntity.trim().length > 0;
@@ -89,6 +116,21 @@ export const Footer = ({ i18n, brand }: FooterProps) => {
           </Column>
         ))}
       </Row>
+      {legalLinks.length > 0 ? (
+        <Row>
+          {legalLinks.map(({ document, label, ariaLabel }) => (
+            <Column key={label}>
+              <ShadowText>
+                <Link
+                  ariaLabel={ariaLabel}
+                  href={document.url as string}
+                  value={label}
+                />
+              </ShadowText>
+            </Column>
+          ))}
+        </Row>
+      ) : null}
       {hasLegalEntity ? (
         <ShadowText>{brand.legal.legalEntity}</ShadowText>
       ) : null}

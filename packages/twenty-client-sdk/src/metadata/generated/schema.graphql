@@ -2034,7 +2034,10 @@ type ClientConfigBrandLegal {
   senderDisplayName: String!
   privacy: ClientConfigBrandDocument!
   terms: ClientConfigBrandDocument!
+  acceptableUse: ClientConfigBrandDocument!
+  openSource: ClientConfigBrandDocument!
   dpa: ClientConfigBrandDocument!
+  dpaAvailabilityNotice: ClientConfigBrandDocument!
 }
 
 type ClientConfigBrandUrls {

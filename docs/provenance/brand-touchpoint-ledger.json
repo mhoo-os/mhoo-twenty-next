@@ -51,6 +51,28 @@
       "scan": true
     },
     {
+      "id": "public-legal-pages",
+      "match": "packages/twenty-front/src/pages/legal/",
+      "matchType": "prefix",
+      "disposition": "customer-facing resolves Mhoo",
+      "owner": "MHO-226",
+      "reason": "The five public legal routes render only hash-verified, approved Mhoo legal sources and fail closed for other product configurations.",
+      "scopeJustification": "This bounded directory owns the public legal route configuration, renderer, and behavioral tests.",
+      "checks": ["residue", "contract"],
+      "scan": true
+    },
+    {
+      "id": "public-legal-generated-sources",
+      "match": "packages/twenty-front/src/pages/legal/legal-document-sources.generated.ts",
+      "matchType": "exact",
+      "disposition": "retained legal/provenance identity + reason",
+      "owner": "MHO-226",
+      "reason": "This generated module is an exact-byte projection of the approved packet, including its governed upstream attribution; the packet verifier and deterministic generator custody it instead of the generic residue scan.",
+      "scopeJustification": "This is the single generated runtime source projection for the approved packet.",
+      "checks": ["markers"],
+      "scan": false
+    },
+    {
       "id": "front-browser-shell",
       "match": "packages/twenty-front/index.html",
       "matchType": "exact",
@@ -172,6 +194,28 @@
       "scan": false
     },
     {
+      "id": "legal-packet-custody",
+      "match": "docs/legal/mhoo/v2.0/",
+      "matchType": "prefix",
+      "disposition": "retained legal/provenance identity + reason",
+      "owner": "MHO-226",
+      "reason": "These files are the byte-for-byte APPROVED_FINAL legal packet and manifest; upstream names and URLs inside them are governed legal attribution, not brand residue.",
+      "scopeJustification": "This versioned directory contains only the six approved source documents and their manifest.",
+      "checks": ["markers"],
+      "scan": false
+    },
+    {
+      "id": "legal-packet-tooling",
+      "match": "scripts/legal/",
+      "matchType": "prefix",
+      "disposition": "retained technical identity + reason",
+      "owner": "MHO-226",
+      "reason": "The verifier, deterministic source generator, and mutation tests enforce legal packet custody and contain controlled fixture text.",
+      "scopeJustification": "This bounded directory contains only MHO-226 verification and generation tooling.",
+      "checks": ["markers"],
+      "scan": false
+    },
+    {
       "id": "residue-workflow",
       "match": ".github/workflows/ci-brand-residue.yml",
       "matchType": "exact",
@@ -204,6 +248,18 @@
       "owner": "MHO-158",
       "reason": "Both the Mhoo contract and explicit upstream fallback must remain present in the canonical shared preset file.",
       "markers": ["MHO_BRAND", "TWENTY_BRAND", "status: 'unavailable', url: null", "Powered by Twenty"]
+    },
+    {
+      "id": "mhoo-legal-packet",
+      "path": "docs/legal/mhoo/v2.0/mhoo-legal-packet-manifest-v2.0.json",
+      "owner": "MHO-226",
+      "reason": "The approved packet identity, entity, and fail-closed DPA state must remain explicit; per-file bytes and hashes are enforced by the dedicated verifier.",
+      "markers": [
+        "MHOO-LEGAL-2026-v2.0",
+        "APPROVED_FINAL",
+        "Mhoo LLC",
+        "UNAVAILABLE_FAIL_CLOSED"
+      ]
     },
     {
       "id": "mhoo-asset-custody",
@@ -247,7 +303,13 @@
       "preset": "mhoo",
       "kind": "frontend-html",
       "path": "scripts/branding/fixtures/artifacts/mhoo/frontend.html",
-      "requiredTokens": ["<title>Mhoo</title>", "/images/mhoo/", "Legal documents are currently unavailable."],
+      "requiredTokens": [
+        "<title>Mhoo</title>",
+        "/images/mhoo/",
+        "/legal/terms",
+        "/legal/privacy",
+        "/legal/dpa"
+      ],
       "forbiddenTokens": ["twenty.com", "/images/icons/"]
     },
     {
@@ -255,8 +317,15 @@
       "preset": "mhoo",
       "kind": "transactional-email-html",
       "path": "scripts/branding/fixtures/artifacts/mhoo/email.html",
-      "requiredTokens": ["Mhoo", "unsubscribe"],
-      "forbiddenTokens": ["twenty.com", "Powered by Twenty"]
+      "requiredTokens": [
+        "Mhoo",
+        "unsubscribe",
+        "/legal/terms",
+        "/legal/open-source",
+        "Powered by Twenty"
+      ],
+      "forbiddenTokens": ["twenty.com"],
+      "allowedTokens": ["Powered by Twenty"]
     },
     {
       "id": "mhoo-email-text",
@@ -271,8 +340,16 @@
       "preset": "mhoo",
       "kind": "server-public-html",
       "path": "scripts/branding/fixtures/artifacts/mhoo/server-unsubscribe.html",
-      "requiredTokens": ["Mhoo", "Legal documents are currently unavailable."],
-      "forbiddenTokens": ["twenty.com", "/images/icons/"]
+      "requiredTokens": [
+        "Mhoo",
+        "/legal/privacy",
+        "/legal/terms",
+        "/legal/dpa",
+        "/legal/open-source",
+        "Powered by Twenty"
+      ],
+      "forbiddenTokens": ["twenty.com", "/images/icons/"],
+      "allowedTokens": ["Powered by Twenty"]
     },
     {
       "id": "mhoo-distribution",
@@ -288,7 +365,15 @@
       "preset": "mhoo",
       "kind": "legal-links",
       "path": "scripts/branding/fixtures/artifacts/mhoo/legal-links.txt",
-      "requiredTokens": ["Mhoo legal documents unavailable"],
+      "requiredTokens": [
+        "Mhoo LLC",
+        "/legal/terms",
+        "/legal/privacy",
+        "/legal/acceptable-use",
+        "/legal/open-source",
+        "/legal/dpa",
+        "DPA unavailable"
+      ],
       "forbiddenTokens": ["twenty.com", "https://", "http://"]
     },
     {

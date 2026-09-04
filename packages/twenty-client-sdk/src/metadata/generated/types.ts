@@ -3935,7 +3935,16 @@ export default {
             "terms": [
                 206
             ],
+            "acceptableUse": [
+                206
+            ],
+            "openSource": [
+                206
+            ],
             "dpa": [
+                206
+            ],
+            "dpaAvailabilityNotice": [
                 206
             ],
             "__typename": [

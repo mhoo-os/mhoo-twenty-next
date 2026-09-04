@@ -27,7 +27,7 @@ dispositions:
 - `Powered by Twenty` is allowed only in an approved bounded attribution; or
 - a test fixture explicitly exercises the upstream fallback.
 
-The scanner checks the canonical preset/resolver, fail-closed legal state,
+The scanner checks the canonical preset/resolver, hash-pinned approved legal state,
 customer-path literals and resolver bypasses, asset references, required
 technical/provenance markers, the hash/dimension-custodied asset manifest, and
 representative frontend, email, server-public, legal, and distribution
@@ -48,6 +48,7 @@ the ledger with an owner and reason; it must not be hidden in a scanner skip.
 
 The gate proves source custody, static contract integrity, representative
 production artifact identity, and asset custody. It does not prove a live
-runtime, persisted-data recovery, legal publication approval, or production
-cutover. MHO-181 remains the human legal/publication gate and MHO-183 remains
-the final disposable-runtime and reversible-release proof.
+runtime, persisted-data recovery, production publication, or production
+cutover. The legal text is approved by the hash-pinned MHO-226 packet;
+MHO-183 remains the exact-candidate, disposable-runtime, release-window, and
+reversible-release authorization gate.

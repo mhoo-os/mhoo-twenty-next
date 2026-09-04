@@ -40,7 +40,10 @@ export type LegalBrand = Readonly<{
   senderDisplayName: string;
   privacy: BrandDocument;
   terms: BrandDocument;
+  acceptableUse: BrandDocument;
+  openSource: BrandDocument;
   dpa: BrandDocument;
+  dpaAvailabilityNotice: BrandDocument;
 }>;
 
 export type BrandUrlReference = Readonly<{

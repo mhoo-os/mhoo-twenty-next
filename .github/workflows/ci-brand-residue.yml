@@ -26,7 +26,13 @@ jobs:
         run: python3 -m pip install --disable-pip-version-check 'Pillow>=10,<13'
       - name: Verify governed Mhoo assets
         run: python3 scripts/verify_mhoo_assets.py
+      - name: Verify the approved Mhoo legal packet
+        run: python3 scripts/legal/verify_mhoo_legal_packet.py
+      - name: Verify generated Mhoo legal sources are current
+        run: python3 scripts/legal/generate_mhoo_legal_sources.py
       - name: Run the deterministic brand residue gate
         run: python3 scripts/branding/check_customer_brand_residue.py
       - name: Run hostile mutation and regression tests
-        run: python3 -m unittest discover -s scripts/branding -p 'test_*.py'
+        run: |
+          python3 -m unittest discover -s scripts/branding -p 'test_*.py'
+          python3 -m unittest discover -s scripts/legal -p 'test_*.py'

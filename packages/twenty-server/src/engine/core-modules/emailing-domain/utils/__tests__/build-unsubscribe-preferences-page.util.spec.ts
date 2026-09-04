@@ -27,7 +27,10 @@ describe('buildUnsubscribePreferencesPage', () => {
       expect(page).toContain('>Unsubscribe</button>');
       expect(page).toContain('action="/unsubscribe/all"');
       expect(page).toContain('>Mhoo</span>');
-      expect(page).toContain('Legal documents are currently unavailable.');
+      expect(page).toContain('href="https://mhoo.example/legal/privacy"');
+      expect(page).toContain('href="https://mhoo.example/legal/dpa"');
+      expect(page).toContain('DPA Status</a>');
+      expect(page).not.toContain('Legal documents are currently unavailable.');
       expect(page).not.toContain('twenty.com');
       expect(page.match(/<button/g)).toHaveLength(1);
     });

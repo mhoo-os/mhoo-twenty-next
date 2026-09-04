@@ -204,5 +204,19 @@ Customer-brand residue gate paths:
 - `scripts/branding/`
 - `.github/workflows/ci-brand-residue.yml`
 
+Approved Mhoo Legal Packet v2.0 paths:
+
+- `docs/legal/mhoo/v2.0/`
+- `docs/provenance/mhoo-legal-packet-v2.0.md`
+- `scripts/legal/`
+- `packages/twenty-front/src/pages/legal/`
+- `packages/twenty-front/src/modules/app/hooks/useCreateRootAppRouter.tsx`
+- `packages/twenty-front/src/modules/app/hooks/useCreateWorkspaceAppRouter.tsx`
+- `packages/twenty-shared/src/types/AppPath.ts`
+- `packages/twenty-emails/src/components/Footer.tsx`
+- `packages/twenty-server/src/engine/core-modules/emailing-domain/types/emailing-public-page-brand.type.ts`
+- `packages/twenty-server/src/engine/core-modules/emailing-domain/types/__tests__/emailing-public-page-brand.type.spec.ts`
+- `packages/twenty-front/src/modules/auth/sign-in-up/components/__tests__/FooterNote.test.tsx`
+
 These paths authorize source-level branding work only. They do not authorize
 runtime deployment, publication, legal approval, or production mutation.

@@ -41,6 +41,14 @@ describe('ProductBrandResolverService', () => {
     expect(brand.productName).toBe('Mhoo');
     expect(brand.urls.websiteUrl).toBe('https://crm.example.test/');
     expect(brand.urls.supportUrl).toBe('https://crm.example.test/support');
+    expect(brand.legal.terms.url).toBe('https://crm.example.test/legal/terms');
+    expect(brand.legal.dpa).toEqual({ status: 'unavailable', url: null });
+    expect(brand.legal.dpaAvailabilityNotice.url).toBe(
+      'https://crm.example.test/legal/dpa',
+    );
+    expect(brand.attribution.url).toBe(
+      'https://crm.example.test/legal/open-source',
+    );
     expect(brand.assets.productMark.path).toBe(
       '/images/mhoo/mhoo-snout-transparent-1024.png',
     );
