@@ -4,6 +4,7 @@ import { resolveProductBrand } from '../../packages/twenty-server/src/engine/cor
 import { resolveEmailingPublicPageBrand } from '../../packages/twenty-server/src/engine/core-modules/emailing-domain/types/emailing-public-page-brand.type';
 import { buildUnsubscribePreferencesPage } from '../../packages/twenty-server/src/engine/core-modules/emailing-domain/utils/build-unsubscribe-preferences-page.util';
 import { buildUnsubscribeResultPage } from '../../packages/twenty-server/src/engine/core-modules/emailing-domain/utils/build-unsubscribe-result-page.util';
+import { assertMhooClosedBetaPreview } from './mhoo_closed_beta_preview_validation';
 
 const outputDirectory = resolve(
   process.env.MHOO_PREVIEW_OUTPUT ?? '/private/tmp/mhoo-mho233-preview-output',
@@ -50,19 +51,17 @@ for (const [name, html] of [
   ['unsubscribe-preferences', preferences],
   ['unsubscribe-result', result],
 ] as const) {
-  if (
-    !html.includes('Mhoo') ||
-    !html.includes('Private beta preview') ||
-    !html.includes('DRAFT / UNAPPROVED') ||
-    !html.includes('Legal documents are currently unavailable.') ||
-    !html.includes('/images/mhoo/mhoo-email-600x436.png') ||
-    html.includes('Twenty') ||
-    html.includes('twenty.com')
-  ) {
-    throw new Error(
-      `Mhoo preview validation failed for ${name}: required markers are missing or upstream residue is present`,
-    );
-  }
+  assertMhooClosedBetaPreview({
+    name,
+    html,
+    requiredMarkers: [
+      'Mhoo',
+      'Private beta preview',
+      'DRAFT / UNAPPROVED',
+      'Legal documents are currently unavailable.',
+      '/images/mhoo/mhoo-email-600x436.png',
+    ],
+  });
 
   writeFileSync(resolve(outputDirectory, `${name}.html`), html);
 }
@@ -71,6 +70,7 @@ writeFileSync(
   resolve(outputDirectory, 'manifest.json'),
   JSON.stringify(
     {
+      issue: 'MHO-233',
       kind: 'mhoo-closed-beta-public-page-preview',
       status: 'DRAFT / UNAPPROVED — PRIVATE LOCAL PREVIEW',
       production: false,

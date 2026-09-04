@@ -5,6 +5,7 @@ import { renderEmail } from '../../packages/twenty-emails/src/utils/render-email
 import { PasswordResetLinkEmail } from '../../packages/twenty-emails/src/emails/password-reset-link.email';
 import { SendEmailVerificationLinkEmail } from '../../packages/twenty-emails/src/emails/send-email-verification-link.email';
 import { SendInviteLinkEmail } from '../../packages/twenty-emails/src/emails/send-invite-link.email';
+import { assertMhooClosedBetaPreview } from './mhoo_closed_beta_preview_validation';
 
 const outputDirectory = resolve(
   process.env.MHOO_PREVIEW_OUTPUT ?? '/private/tmp/mhoo-mho233-preview-output',
@@ -35,18 +36,16 @@ const renderPreview = async (preview: (typeof previews)[number]) => {
   const Component = preview.component;
   const html = await renderEmail(<Component {...preview.props} />);
 
-  if (
-    !html.includes('Mhoo') ||
-    !html.includes('Private beta preview') ||
-    !html.includes('DRAFT / UNAPPROVED') ||
-    !html.includes('/images/mhoo/mhoo-email-600x436.png') ||
-    html.includes('Twenty') ||
-    html.includes('twenty.com')
-  ) {
-    throw new Error(
-      `Mhoo preview validation failed for ${preview.name}: required markers are missing or upstream residue is present`,
-    );
-  }
+  assertMhooClosedBetaPreview({
+    name: preview.name,
+    html,
+    requiredMarkers: [
+      'Mhoo',
+      'Private beta preview',
+      'DRAFT / UNAPPROVED',
+      '/images/mhoo/mhoo-email-600x436.png',
+    ],
+  });
 
   writeFileSync(resolve(outputDirectory, `${preview.name}.html`), html);
   return {
@@ -66,6 +65,7 @@ const main = async () => {
     resolve(outputDirectory, 'manifest.json'),
     JSON.stringify(
       {
+        issue: 'MHO-233',
         kind: 'mhoo-closed-beta-email-preview',
         status: 'DRAFT / UNAPPROVED — PRIVATE LOCAL PREVIEW',
         production: false,
