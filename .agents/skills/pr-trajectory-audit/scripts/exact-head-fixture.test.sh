@@ -155,6 +155,101 @@ for index in "${!rogue_allowed_paths[@]}"; do
     }
 done
 
+distribution_allowed_paths=(
+  README.md
+  docs/provenance/distribution-display-ledger.md
+  packages/twenty-docker/docker-compose.yml
+  packages/twenty-docs/README.md
+  packages/twenty-docs/docs.json
+  packages/twenty-docs/package.json
+  packages/twenty-codex-plugin/README.md
+  packages/twenty-codex-plugin/package.json
+)
+
+for index in "${!distribution_allowed_paths[@]}"; do
+  path="${distribution_allowed_paths[$index]}"
+  blob="$({ git show "HEAD:$path"; printf '\n# distribution fixture\n'; } | git hash-object -w --stdin)"
+  fixture_index="$temporary_directory/distribution-$index-index"
+  GIT_INDEX_FILE="$fixture_index" git read-tree HEAD
+  GIT_INDEX_FILE="$fixture_index" git update-index \
+    --cacheinfo 100644 "$blob" "$path"
+  tree="$(GIT_INDEX_FILE="$fixture_index" git write-tree)"
+  candidate_head="$(
+    printf 'test: allow exact distribution path\n' |
+      GIT_AUTHOR_NAME='Trajectory fixture' \
+      GIT_AUTHOR_EMAIL='trajectory-fixture@example.invalid' \
+      GIT_AUTHOR_DATE='2000-01-01T00:03:00Z' \
+      GIT_COMMITTER_NAME='Trajectory fixture' \
+      GIT_COMMITTER_EMAIL='trajectory-fixture@example.invalid' \
+      GIT_COMMITTER_DATE='2000-01-01T00:03:00Z' \
+      git commit-tree "$tree" -p HEAD
+  )"
+
+  bash "$fixture" HEAD "$candidate_head" \
+    >"$temporary_directory/distribution-$index-output"
+done
+
+rogue_distribution_paths=(
+  README.md.backup
+  nested/README.md
+  READMExmd
+  docs/provenance/distribution-display-ledger.md.backup
+  nested/docs/provenance/distribution-display-ledger.md
+  docs/provenance/distribution-display-ledgerXmd
+  nested/packages/twenty-docker/docker-compose.yml
+  packages/twenty-dockerish/docker-compose.yml
+  packages/twenty-docs/README.md.backup
+  nested/packages/twenty-docs/README.md
+  packages/twenty-docs/READMExmd
+  packages/twenty-docs/docs.json.backup
+  nested/packages/twenty-docs/docs.json
+  packages/twenty-docs/docsXjson
+  packages/twenty-docs/package.json.backup
+  nested/packages/twenty-docs/package.json
+  packages/twenty-docs/packageXjson
+  packages/twenty-codex-plugin/README.md.backup
+  nested/packages/twenty-codex-plugin/README.md
+  packages/twenty-codex-plugin/READMExmd
+  packages/twenty-codex-plugin/package.json.backup
+  nested/packages/twenty-codex-plugin/package.json
+  packages/twenty-codex-plugin/packageXjson
+)
+
+for index in "${!rogue_distribution_paths[@]}"; do
+  path="${rogue_distribution_paths[$index]}"
+  blob="$(printf 'rogue distribution fixture\n' | git hash-object -w --stdin)"
+  fixture_index="$temporary_directory/rogue-distribution-$index-index"
+  GIT_INDEX_FILE="$fixture_index" git read-tree HEAD
+  GIT_INDEX_FILE="$fixture_index" git update-index --add \
+    --cacheinfo 100644 "$blob" "$path"
+  tree="$(GIT_INDEX_FILE="$fixture_index" git write-tree)"
+  candidate_head="$(
+    printf 'test: reject inexact distribution path\n' |
+      GIT_AUTHOR_NAME='Trajectory fixture' \
+      GIT_AUTHOR_EMAIL='trajectory-fixture@example.invalid' \
+      GIT_AUTHOR_DATE='2000-01-01T00:04:00Z' \
+      GIT_COMMITTER_NAME='Trajectory fixture' \
+      GIT_COMMITTER_EMAIL='trajectory-fixture@example.invalid' \
+      GIT_COMMITTER_DATE='2000-01-01T00:04:00Z' \
+      git commit-tree "$tree" -p HEAD
+  )"
+
+  if bash "$fixture" HEAD "$candidate_head" \
+    >"$temporary_directory/rogue-distribution-$index-output" 2>&1; then
+    printf 'exact-head fixture test failed: rogue distribution path passed: %s\n' \
+      "$path" >&2
+    exit 1
+  fi
+
+  grep -Fq "trajectory fixture rejected: $path" \
+    "$temporary_directory/rogue-distribution-$index-output" || {
+      printf 'exact-head fixture test failed: unexpected distribution rejection\n' >&2
+      sed -n '1,120p' \
+        "$temporary_directory/rogue-distribution-$index-output" >&2
+      exit 1
+    }
+done
+
 unrelated_head="$(
   printf 'test: unrelated source ancestry\n' |
     GIT_AUTHOR_NAME='Trajectory fixture' \
