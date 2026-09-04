@@ -334,7 +334,16 @@ export class ClientConfigBrandLegal implements LegalBrand {
   terms: ClientConfigBrandDocument;
 
   @Field(() => ClientConfigBrandDocument)
+  acceptableUse: ClientConfigBrandDocument;
+
+  @Field(() => ClientConfigBrandDocument)
+  openSource: ClientConfigBrandDocument;
+
+  @Field(() => ClientConfigBrandDocument)
   dpa: ClientConfigBrandDocument;
+
+  @Field(() => ClientConfigBrandDocument)
+  dpaAvailabilityNotice: ClientConfigBrandDocument;
 }
 
 @ObjectType()

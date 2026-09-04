@@ -1673,7 +1673,10 @@ export interface ClientConfigBrandLegal {
     senderDisplayName: Scalars['String']
     privacy: ClientConfigBrandDocument
     terms: ClientConfigBrandDocument
+    acceptableUse: ClientConfigBrandDocument
+    openSource: ClientConfigBrandDocument
     dpa: ClientConfigBrandDocument
+    dpaAvailabilityNotice: ClientConfigBrandDocument
     __typename: 'ClientConfigBrandLegal'
 }
 
@@ -5165,7 +5168,10 @@ export interface ClientConfigBrandLegalGenqlSelection{
     senderDisplayName?: boolean | number
     privacy?: ClientConfigBrandDocumentGenqlSelection
     terms?: ClientConfigBrandDocumentGenqlSelection
+    acceptableUse?: ClientConfigBrandDocumentGenqlSelection
+    openSource?: ClientConfigBrandDocumentGenqlSelection
     dpa?: ClientConfigBrandDocumentGenqlSelection
+    dpaAvailabilityNotice?: ClientConfigBrandDocumentGenqlSelection
     __typename?: boolean | number
     __scalar?: boolean | number
 }

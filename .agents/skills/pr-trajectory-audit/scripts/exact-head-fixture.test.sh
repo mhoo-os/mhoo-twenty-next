@@ -51,10 +51,10 @@ test "$(git rev-parse HEAD)" != "$unsafe_head"
 
 suffix_path=scripts/docs/check_app_docs_drift.py.backup
 suffix_blob="$(git hash-object -w scripts/docs/check_app_docs_drift.py)"
-GIT_INDEX_FILE="$temporary_directory/suffix-index" git read-tree HEAD
-GIT_INDEX_FILE="$temporary_directory/suffix-index" git update-index --add \
+GIT_INDEX_FILE="$temporary_directory/index" git read-tree HEAD
+GIT_INDEX_FILE="$temporary_directory/index" git update-index --add \
   --cacheinfo 100644 "$suffix_blob" "$suffix_path"
-suffix_tree="$(GIT_INDEX_FILE="$temporary_directory/suffix-index" git write-tree)"
+suffix_tree="$(GIT_INDEX_FILE="$temporary_directory/index" git write-tree)"
 suffix_head="$(
   printf 'test: add suffix bypass candidate\n' |
     GIT_AUTHOR_NAME='Trajectory fixture' \
@@ -91,7 +91,7 @@ allowed_paths=(
 for index in "${!allowed_paths[@]}"; do
   path="${allowed_paths[$index]}"
   blob="$({ git show "HEAD:$path"; printf '\n# exact-root fixture\n'; } | git hash-object -w --stdin)"
-  fixture_index="$temporary_directory/locale-catalog-$index-index"
+  fixture_index="$temporary_directory/index"
   GIT_INDEX_FILE="$fixture_index" git read-tree HEAD
   GIT_INDEX_FILE="$fixture_index" git update-index \
     --cacheinfo 100644 "$blob" "$path"
@@ -123,7 +123,7 @@ rogue_allowed_paths=(
 for index in "${!rogue_allowed_paths[@]}"; do
   path="${rogue_allowed_paths[$index]}"
   blob="$(printf 'rogue locale catalog fixture\n' | git hash-object -w --stdin)"
-  fixture_index="$temporary_directory/rogue-locale-catalog-$index-index"
+  fixture_index="$temporary_directory/index"
   GIT_INDEX_FILE="$fixture_index" git read-tree HEAD
   GIT_INDEX_FILE="$fixture_index" git update-index --add \
     --cacheinfo 100644 "$blob" "$path"
@@ -169,7 +169,7 @@ distribution_allowed_paths=(
 for index in "${!distribution_allowed_paths[@]}"; do
   path="${distribution_allowed_paths[$index]}"
   blob="$({ git show "HEAD:$path"; printf '\n# distribution fixture\n'; } | git hash-object -w --stdin)"
-  fixture_index="$temporary_directory/distribution-$index-index"
+  fixture_index="$temporary_directory/index"
   GIT_INDEX_FILE="$fixture_index" git read-tree HEAD
   GIT_INDEX_FILE="$fixture_index" git update-index \
     --cacheinfo 100644 "$blob" "$path"
@@ -218,7 +218,7 @@ rogue_distribution_paths=(
 for index in "${!rogue_distribution_paths[@]}"; do
   path="${rogue_distribution_paths[$index]}"
   blob="$(printf 'rogue distribution fixture\n' | git hash-object -w --stdin)"
-  fixture_index="$temporary_directory/rogue-distribution-$index-index"
+  fixture_index="$temporary_directory/index"
   GIT_INDEX_FILE="$fixture_index" git read-tree HEAD
   GIT_INDEX_FILE="$fixture_index" git update-index --add \
     --cacheinfo 100644 "$blob" "$path"
@@ -274,7 +274,7 @@ cumulative_allowed_paths=(
 for index in "${!cumulative_allowed_paths[@]}"; do
   path="${cumulative_allowed_paths[$index]}"
   blob="$({ git show "HEAD:$path"; printf '\n# cumulative fixture\n'; } | git hash-object -w --stdin)"
-  fixture_index="$temporary_directory/cumulative-$index-index"
+  fixture_index="$temporary_directory/index"
   GIT_INDEX_FILE="$fixture_index" git read-tree HEAD
   GIT_INDEX_FILE="$fixture_index" git update-index \
     --cacheinfo 100644 "$blob" "$path"
@@ -319,7 +319,7 @@ rogue_cumulative_paths=(
 for index in "${!rogue_cumulative_paths[@]}"; do
   path="${rogue_cumulative_paths[$index]}"
   blob="$(printf 'rogue cumulative fixture\n' | git hash-object -w --stdin)"
-  fixture_index="$temporary_directory/rogue-cumulative-$index-index"
+  fixture_index="$temporary_directory/index"
   GIT_INDEX_FILE="$fixture_index" git read-tree HEAD
   GIT_INDEX_FILE="$fixture_index" git update-index --add \
     --cacheinfo 100644 "$blob" "$path"
@@ -349,6 +349,98 @@ for index in "${!rogue_cumulative_paths[@]}"; do
         "$temporary_directory/rogue-cumulative-$index-output" >&2
       exit 1
     }
+done
+
+legal_allowed_paths=(
+  docs/legal/mhoo/v2.0/01-mhoo-master-terms-v2.0.md
+  docs/legal/mhoo/v2.0/02-mhoo-privacy-policy-v2.0.md
+  docs/legal/mhoo/v2.0/03-mhoo-acceptable-use-policy-v2.0.md
+  docs/legal/mhoo/v2.0/04-mhoo-open-source-notice-v2.0.md
+  docs/legal/mhoo/v2.0/05-mhoo-dpa-availability-notice-v2.0.md
+  docs/legal/mhoo/v2.0/06-mhoo-legal-approval-record-v2.0.md
+  docs/legal/mhoo/v2.0/mhoo-legal-packet-manifest-v2.0.json
+  docs/provenance/mhoo-legal-packet-v2.0.md
+  scripts/legal/verify_mhoo_legal_packet.py
+  scripts/legal/generate_mhoo_legal_sources.py
+  scripts/legal/test_verify_mhoo_legal_packet.py
+  packages/twenty-front/src/pages/legal/LegalDocumentApp.tsx
+  packages/twenty-front/src/pages/legal/LegalDocumentPage.tsx
+  packages/twenty-front/src/pages/legal/legal-document-config.ts
+  packages/twenty-front/src/pages/legal/legal-document-sources.generated.ts
+  packages/twenty-front/src/pages/legal/__tests__/LegalDocumentPage.test.tsx
+  packages/twenty-front/src/modules/app/components/DomainShell.tsx
+  packages/twenty-front/src/modules/app/components/__tests__/DomainShell.test.tsx
+  packages/twenty-shared/src/types/AppPath.ts
+)
+
+for index in "${!legal_allowed_paths[@]}"; do
+  path="${legal_allowed_paths[$index]}"
+  blob="$({ git show "HEAD:$path"; printf '\n# exact legal fixture\n'; } | git hash-object -w --stdin)"
+  fixture_index="$temporary_directory/index"
+  GIT_INDEX_FILE="$fixture_index" git read-tree HEAD
+  GIT_INDEX_FILE="$fixture_index" git update-index --cacheinfo 100644 "$blob" "$path"
+  tree="$(GIT_INDEX_FILE="$fixture_index" git write-tree)"
+  candidate_head="$(
+    printf 'test: allow exact legal path\n' |
+      GIT_AUTHOR_NAME='Trajectory fixture' \
+      GIT_AUTHOR_EMAIL='trajectory-fixture@example.invalid' \
+      GIT_AUTHOR_DATE='2000-01-01T00:06:30Z' \
+      GIT_COMMITTER_NAME='Trajectory fixture' \
+      GIT_COMMITTER_EMAIL='trajectory-fixture@example.invalid' \
+      GIT_COMMITTER_DATE='2000-01-01T00:06:30Z' \
+      git commit-tree "$tree" -p HEAD
+  )"
+
+  bash "$fixture" HEAD "$candidate_head" >"$temporary_directory/legal-$index-output"
+done
+
+rogue_legal_paths=(
+  docs/legal/mhoo/v2.0/01-mhoo-master-terms-v2.0.md.backup
+  docs/legal/mhoo/v2.0/rogue/01-mhoo-master-terms-v2.0.md
+  nested/docs/legal/mhoo/v2.0/01-mhoo-master-terms-v2.0.md
+  docs/legal/mhoo/v2.0/01-mhoo-master-terms-v2X0.md
+  docs/provenance/mhoo-legal-packet-v2.0.md.backup
+  nested/docs/provenance/mhoo-legal-packet-v2.0.md
+  scripts/legal/rogue/verify_mhoo_legal_packet.py
+  scripts/legal/verify_mhoo_legal_packet.py.backup
+  packages/twenty-front/src/pages/legal/rogue/LegalDocumentPage.tsx
+  packages/twenty-front/src/pages/legal/LegalDocumentPage.tsx.backup
+  nested/packages/twenty-front/src/pages/legal/LegalDocumentPage.tsx
+  packages/twenty-front/src/modules/app/components/rogue/DomainShell.tsx
+  packages/twenty-front/src/modules/app/components/DomainShell.tsx.backup
+  packages/twenty-front/src/modules/app/components/__tests__/rogue/DomainShell.test.tsx
+  packages/twenty-shared/src/types/rogue/AppPath.ts
+  packages/twenty-shared/src/types/AppPath.ts.backup
+)
+
+for index in "${!rogue_legal_paths[@]}"; do
+  path="${rogue_legal_paths[$index]}"
+  blob="$(printf 'rogue legal fixture\n' | git hash-object -w --stdin)"
+  fixture_index="$temporary_directory/index"
+  GIT_INDEX_FILE="$fixture_index" git read-tree HEAD
+  GIT_INDEX_FILE="$fixture_index" git update-index --add --cacheinfo 100644 "$blob" "$path"
+  tree="$(GIT_INDEX_FILE="$fixture_index" git write-tree)"
+  candidate_head="$(
+    printf 'test: reject inexact legal path\n' |
+      GIT_AUTHOR_NAME='Trajectory fixture' \
+      GIT_AUTHOR_EMAIL='trajectory-fixture@example.invalid' \
+      GIT_AUTHOR_DATE='2000-01-01T00:06:31Z' \
+      GIT_COMMITTER_NAME='Trajectory fixture' \
+      GIT_COMMITTER_EMAIL='trajectory-fixture@example.invalid' \
+      GIT_COMMITTER_DATE='2000-01-01T00:06:31Z' \
+      git commit-tree "$tree" -p HEAD
+  )"
+
+  if bash "$fixture" HEAD "$candidate_head" >"$temporary_directory/rogue-legal-$index-output" 2>&1; then
+    printf 'exact-head fixture test failed: rogue legal path passed: %s\n' "$path" >&2
+    exit 1
+  fi
+
+  grep -Fq "trajectory fixture rejected: $path" "$temporary_directory/rogue-legal-$index-output" || {
+    printf 'exact-head fixture test failed: unexpected legal rejection\n' >&2
+    sed -n '1,120p' "$temporary_directory/rogue-legal-$index-output" >&2
+    exit 1
+  }
 done
 
 unrelated_head="$(

@@ -58,7 +58,11 @@ for (const [name, html] of [
       'Mhoo',
       'Private beta preview',
       'DRAFT / UNAPPROVED',
-      'Legal documents are currently unavailable.',
+      'https://beta.mhoo.app/legal/privacy',
+      'https://beta.mhoo.app/legal/terms',
+      'https://beta.mhoo.app/legal/acceptable-use',
+      'https://beta.mhoo.app/legal/open-source',
+      'https://beta.mhoo.app/legal/dpa',
       '/images/mhoo/mhoo-email-600x436.png',
     ],
   });

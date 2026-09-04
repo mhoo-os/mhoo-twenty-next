@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import {
   getProductBrand,
   isBrandPresetId,
+  type BrandDocument,
   type BrandPresetId,
   type BrandResolverInput,
   type BrandUrlSet,
@@ -115,6 +116,26 @@ const resolveBrandUrls = (urls: BrandUrlSet, deploymentOrigin: string) => ({
   contactUrl: resolveBrandUrl(urls.contactUrl, deploymentOrigin),
 });
 
+const resolveBrandDocument = (
+  document: BrandDocument,
+  deploymentOrigin: string,
+): BrandDocument => {
+  if (document.status !== 'approved' || document.url === null) {
+    return document;
+  }
+
+  return {
+    ...document,
+    url: resolveBrandUrl(
+      {
+        kind: document.url.startsWith('/') ? 'relative' : 'absolute',
+        value: document.url,
+      },
+      deploymentOrigin,
+    ),
+  };
+};
+
 export const resolveProductBrand = ({
   preset,
   deploymentOrigin,
@@ -130,6 +151,43 @@ export const resolveProductBrand = ({
 
   return deepFreeze({
     ...productBrand,
+    legal: {
+      ...productBrand.legal,
+      privacy: resolveBrandDocument(
+        productBrand.legal.privacy,
+        normalizedOrigin,
+      ),
+      terms: resolveBrandDocument(productBrand.legal.terms, normalizedOrigin),
+      acceptableUse: resolveBrandDocument(
+        productBrand.legal.acceptableUse,
+        normalizedOrigin,
+      ),
+      openSource: resolveBrandDocument(
+        productBrand.legal.openSource,
+        normalizedOrigin,
+      ),
+      dpa: resolveBrandDocument(productBrand.legal.dpa, normalizedOrigin),
+      dpaAvailabilityNotice: resolveBrandDocument(
+        productBrand.legal.dpaAvailabilityNotice,
+        normalizedOrigin,
+      ),
+    },
+    attribution:
+      productBrand.attribution.status === 'approved' &&
+      productBrand.attribution.url !== null
+        ? {
+            ...productBrand.attribution,
+            url: resolveBrandUrl(
+              {
+                kind: productBrand.attribution.url.startsWith('/')
+                  ? 'relative'
+                  : 'absolute',
+                value: productBrand.attribution.url,
+              },
+              normalizedOrigin,
+            ),
+          }
+        : productBrand.attribution,
     urls: resolveBrandUrls(productBrand.urls, normalizedOrigin),
   });
 };

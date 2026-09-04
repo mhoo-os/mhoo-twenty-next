@@ -10,6 +10,8 @@ import { useIsCurrentLocationOnDefaultDomain } from '@/domain-manager/hooks/useI
 import { OnboardingPageLoader } from '@/onboarding/components/OnboardingPageLoader';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { UserOrMetadataLoader } from '~/loading/components/UserOrMetadataLoader';
+import { LegalDocumentApp } from '~/pages/legal/LegalDocumentApp';
+import { isLegalDocumentPath } from '~/pages/legal/legal-document-config';
 
 export const DomainShell = () => {
   const { isLoadedOnce } = useAtomStateValue(clientConfigApiStatusState);
@@ -30,6 +32,10 @@ export const DomainShell = () => {
         </SharedAppProviders>
       </BrowserRouter>
     );
+  }
+
+  if (isLegalDocumentPath(window.location.pathname)) {
+    return <LegalDocumentApp />;
   }
 
   if (!isMultiWorkspaceEnabled) {

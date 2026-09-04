@@ -313,7 +313,7 @@ describe('email templates rendering', () => {
 
       expect(output).toContain('Mhoo');
       expect(output).toContain(expectedJapaneseContent);
-      expect(output).not.toContain('Twenty');
+      expect(output.replace(/Powered by Twenty/g, '')).not.toContain('Twenty');
     },
   );
 
@@ -322,12 +322,22 @@ describe('email templates rendering', () => {
     async ({ element }) => {
       const html = await renderEmail(element);
       const text = await renderEmail(element, { plainText: true });
+      const output = `${html}\n${text}`;
+      const outputWithoutApprovedAttribution = output.replace(
+        /Powered by Twenty/g,
+        '',
+      );
 
-      expect(`${html}\n${text}`).not.toContain('Twenty');
-      expect(`${html}\n${text}`).not.toContain('twenty.com');
-      expect(`${html}\n${text}`).not.toContain('San Francisco');
-      expect(`${html}\n${text}`).not.toContain('Powered by');
-      expect(`${html}\n${text}`).not.toContain('MHOO Co., Ltd.');
+      expect(output).toContain('Powered by Twenty');
+      expect(output).toContain('https://mhoo.example.com/legal/terms');
+      expect(output).toContain('https://mhoo.example.com/legal/privacy');
+      expect(output).toContain('https://mhoo.example.com/legal/acceptable-use');
+      expect(output).toContain('https://mhoo.example.com/legal/open-source');
+      expect(output).toContain('https://mhoo.example.com/legal/dpa');
+      expect(outputWithoutApprovedAttribution).not.toContain('Twenty');
+      expect(output).not.toContain('twenty.com');
+      expect(output).not.toContain('San Francisco');
+      expect(output).not.toContain('MHOO Co., Ltd.');
     },
   );
 });

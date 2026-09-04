@@ -6,6 +6,14 @@ export enum AppPath {
   Invite = '/invite/:workspaceInviteHash',
   ResetPassword = '/reset-password/:passwordResetToken',
 
+  // Public, hash-pinned Mhoo Legal Packet v2.0 routes.
+  LegalIndex = '/legal',
+  LegalTerms = '/legal/terms',
+  LegalPrivacy = '/legal/privacy',
+  LegalAcceptableUse = '/legal/acceptable-use',
+  LegalOpenSource = '/legal/open-source',
+  LegalDpa = '/legal/dpa',
+
   // Onboarding
   WorkspaceActivation = '/workspace-activation',
   CreateProfile = '/create/profile',

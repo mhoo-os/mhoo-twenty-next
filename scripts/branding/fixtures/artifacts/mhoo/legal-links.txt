@@ -1,1 +1,7 @@
-Mhoo legal documents unavailable
+Mhoo LLC
+Terms: /legal/terms
+Privacy: /legal/privacy
+Acceptable Use: /legal/acceptable-use
+Open Source: /legal/open-source
+DPA Status: /legal/dpa
+DPA unavailable

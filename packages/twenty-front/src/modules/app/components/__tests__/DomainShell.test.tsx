@@ -41,6 +41,10 @@ jest.mock('@/app/components/WorkspaceApp', () => ({
   WorkspaceApp: () => <div>WORKSPACE_APP</div>,
 }));
 
+jest.mock('~/pages/legal/LegalDocumentApp', () => ({
+  LegalDocumentApp: () => <div>LEGAL_DOCUMENT_APP</div>,
+}));
+
 jest.mock('~/loading/components/UserOrMetadataLoader', () => ({
   UserOrMetadataLoader: () => <div>LOADER</div>,
 }));
@@ -105,6 +109,35 @@ describe('DomainShell', () => {
     renderShell();
 
     expect(screen.getByText('WORKSPACE_APP')).toBeInTheDocument();
+  });
+
+  it.each([
+    '/legal',
+    '/legal/terms',
+    '/legal/privacy',
+    '/legal/acceptable-use',
+    '/legal/open-source',
+    '/legal/dpa',
+  ])('mounts the public legal app for the exact route %s', (route) => {
+    setClientConfigLoaded(true);
+    jotaiStore.set(isMultiWorkspaceEnabledState.atom, false);
+    window.history.pushState({}, '', route);
+
+    renderShell();
+
+    expect(screen.getByText('LEGAL_DOCUMENT_APP')).toBeInTheDocument();
+    expect(screen.queryByText('WORKSPACE_APP')).not.toBeInTheDocument();
+  });
+
+  it('does not treat a legal-route suffix as a public legal page', () => {
+    setClientConfigLoaded(true);
+    jotaiStore.set(isMultiWorkspaceEnabledState.atom, false);
+    window.history.pushState({}, '', '/legal/terms/rogue');
+
+    renderShell();
+
+    expect(screen.getByText('WORKSPACE_APP')).toBeInTheDocument();
+    expect(screen.queryByText('LEGAL_DOCUMENT_APP')).not.toBeInTheDocument();
   });
 
   it('mounts the root app on the default domain in multi-workspace mode', () => {

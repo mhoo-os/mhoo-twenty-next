@@ -32,15 +32,16 @@ intentionally unchanged.
 
 ## Legal and attribution behavior
 
-The Mhoo preset currently carries an unapproved legal entity, unapproved
-Privacy/Terms documents, an unavailable DPA, and unapproved attribution. Email
-footers therefore omit those claims and links until MHO-181 records named human
-approval and publication destinations. No upstream legal or DPA destination is
-substituted for an Mhoo document.
+The Mhoo preset carries the approved Mhoo LLC legal entity and the five
+hash-pinned public legal routes from MHO-226. Email footers render Terms,
+Privacy, Acceptable Use, Open Source, and DPA Status links from the resolved
+deployment origin. The DPA agreement itself remains unavailable and URL-less;
+no upstream legal or DPA destination is substituted for an Mhoo document.
 
 The explicit upstream preset retains its approved upstream legal identity and
-bounded `Powered by Twenty` attribution. The Mhoo preset does not render that
-attribution merely because the label exists in the shared preset.
+bounded `Powered by Twenty` attribution. The Mhoo preset renders that exact
+approved wording only as a link to its hash-pinned Open Source Notice; it never
+links the attribution to `twenty.com`.
 
 ## Retained technical identity
 
@@ -60,7 +61,7 @@ attribution merely because the label exists in the shared preset.
 
 | Case | Expected proof |
 | --- | --- |
-| Mhoo HTML and plain text | Product identity and approved public URLs use Mhoo; unapproved legal and attribution claims are absent |
+| Mhoo HTML and plain text | Product identity, all five approved legal URLs, Mhoo LLC, and the exact bounded attribution use the resolved Mhoo origin; no upstream destination appears |
 | Upstream HTML and plain text | Twenty identity, upstream asset, documentation, legal, and bounded attribution behavior remain coherent |
 | Relative Mhoo asset path | URL is absolute, uses the resolved deployment origin, and preserves the governed asset path |
 | Human invitation sender | Display name is scoped as `Sender (via Product)` and uses the existing configured envelope address |

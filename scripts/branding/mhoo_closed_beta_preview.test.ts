@@ -161,3 +161,51 @@ test('rejects hostile Twenty and twenty.com residue', () => {
     );
   }
 });
+
+test('allows only the exact bounded Mhoo open-source attribution', () => {
+  const cleanHtml =
+    'Mhoo Private beta preview DRAFT / UNAPPROVED ' +
+    '/images/mhoo/mhoo-email-600x436.png';
+  const requiredMarkers = [
+    'Mhoo',
+    'Private beta preview',
+    'DRAFT / UNAPPROVED',
+    '/images/mhoo/mhoo-email-600x436.png',
+  ];
+  const approvedAttribution =
+    '<a href="/legal/open-source" ' + 'target="_blank">Powered by Twenty</a>';
+
+  assert.doesNotThrow(() =>
+    assertMhooClosedBetaPreview({
+      name: 'approved-attribution',
+      html: `${cleanHtml} ${approvedAttribution}`,
+      requiredMarkers,
+    }),
+  );
+  assert.doesNotThrow(() =>
+    assertMhooClosedBetaPreview({
+      name: 'approved-public-page-attribution',
+      html:
+        `${cleanHtml} ` +
+        '<a href="https://beta.mhoo.app/legal/open-source">Powered by Twenty</a>',
+      requiredMarkers,
+    }),
+  );
+
+  for (const hostileAttribution of [
+    'Powered by Twenty',
+    '<a href="https://evil.example/legal/open-source" target="_blank">Powered by Twenty</a>',
+    '<a href="/legal/open-source">Powered by Twenty</a>',
+    '<a href="/legal/open-source/rogue" target="_blank">Powered by Twenty</a>',
+    '<a href="https://beta.mhoo.app.evil.example/legal/open-source">Powered by Twenty</a>',
+    '<a href="https://beta.mhoo.app/legal/open-source/rogue">Powered by Twenty</a>',
+  ]) {
+    assert.throws(() =>
+      assertMhooClosedBetaPreview({
+        name: 'hostile-attribution',
+        html: `${cleanHtml} ${hostileAttribution}`,
+        requiredMarkers,
+      }),
+    );
+  }
+});

@@ -7,14 +7,27 @@ import {
 import { getApprovedLegalDocumentUrl } from '@/auth/sign-in-up/components/FooterNote';
 
 describe('getApprovedLegalDocumentUrl', () => {
-  it.each([
-    ['Mhoo', MHO_BRAND],
-    ['Twenty', TWENTY_BRAND],
-  ])('fails closed for the %s preset', (_name, brand) => {
-    expect(getApprovedLegalDocumentUrl(brand, 'termsOfService')).toBeNull();
-    expect(getApprovedLegalDocumentUrl(brand, 'privacyPolicy')).toBeNull();
+  it('exposes approved Mhoo terms and privacy while the DPA stays unavailable', () => {
+    expect(getApprovedLegalDocumentUrl(MHO_BRAND, 'termsOfService')).toBe(
+      '/legal/terms',
+    );
+    expect(getApprovedLegalDocumentUrl(MHO_BRAND, 'privacyPolicy')).toBe(
+      '/legal/privacy',
+    );
     expect(
-      getApprovedLegalDocumentUrl(brand, 'dataProcessingAgreement'),
+      getApprovedLegalDocumentUrl(MHO_BRAND, 'dataProcessingAgreement'),
+    ).toBeNull();
+  });
+
+  it('does not expose Mhoo legal routes through the upstream preset', () => {
+    expect(
+      getApprovedLegalDocumentUrl(TWENTY_BRAND, 'termsOfService'),
+    ).toBeNull();
+    expect(
+      getApprovedLegalDocumentUrl(TWENTY_BRAND, 'privacyPolicy'),
+    ).toBeNull();
+    expect(
+      getApprovedLegalDocumentUrl(TWENTY_BRAND, 'dataProcessingAgreement'),
     ).toBeNull();
   });
 

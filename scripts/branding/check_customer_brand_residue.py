@@ -460,14 +460,18 @@ def scan_contract(root: Path) -> list[dict[str, Any]]:
         twenty_block = twenty_match.group(1)
 
     required_mhoo_patterns = (
-        r"legalEntityStatus: 'unapproved'",
-        r"privacy:\s*\{\s*status: 'unapproved',\s*url: null\s*\}",
-        r"terms:\s*\{\s*status: 'unapproved',\s*url: null\s*\}",
+        r"legalEntity: 'Mhoo LLC'",
+        r"legalEntityStatus: 'approved'",
+        r"privacy:\s*\{\s*status: 'approved',\s*url: '/legal/privacy'\s*\}",
+        r"terms:\s*\{\s*status: 'approved',\s*url: '/legal/terms'\s*\}",
+        r"acceptableUse:\s*\{\s*status: 'approved',\s*url: '/legal/acceptable-use'\s*\}",
+        r"openSource:\s*\{\s*status: 'approved',\s*url: '/legal/open-source'\s*\}",
         r"dpa:\s*\{\s*status: 'unavailable',\s*url: null\s*\}",
+        r"dpaAvailabilityNotice:\s*\{\s*status: 'approved',\s*url: '/legal/dpa'\s*\}",
     )
     for pattern in required_mhoo_patterns:
         if not re.search(pattern, mhoo_block, re.S):
-            violations.append(contract_violation(preset_path.as_posix(), pattern, "fail-closed Mhoo legal state"))
+            violations.append(contract_violation(preset_path.as_posix(), pattern, "approved Mhoo packet with fail-closed DPA state"))
     if re.search(r"https?://", mhoo_block):
         violations.append(contract_violation(preset_path.as_posix(), "absolute URL in Mhoo preset", "origin-neutral relative Mhoo URLs"))
     for pattern in (r"preset: 'twenty'", r"https://twenty\.com/", r"status: 'approved'"):
