@@ -179,28 +179,37 @@ const TEMPLATES = [
 
 const MHOO_TEMPLATES = TEMPLATES.filter(({ name }) => name.startsWith('Mhoo'));
 
-const buildLocalizedSubjectCases = (productName: string) => [
-  {
-    name: 'invitation',
-    message: msg`Join your team on ${productName}`,
-  },
-  {
-    name: 'verification',
-    message: msg`Welcome to ${productName}: Please Confirm Your Email`,
-  },
-  {
-    name: 'trial ending',
-    message: msg`Your ${productName} trial is ending soon`,
-  },
-  {
-    name: 'trial converting',
-    message: msg`A heads up before your ${productName} trial ends`,
-  },
-  {
-    name: 'subscription renewing',
-    message: msg`Your ${productName} plan renews soon`,
-  },
-];
+const buildLocalizedSubjectCases = (productName: string) => {
+  const brand = { productName };
+
+  return [
+    {
+      name: 'invitation',
+      message: msg`Join your team on ${brand.productName}`,
+      expectedJapaneseSubject: `${brand.productName}でチームに参加`,
+    },
+    {
+      name: 'verification',
+      message: msg`Welcome to ${brand.productName}: Please Confirm Your Email`,
+      expectedJapaneseSubject: `${brand.productName}へようこそ: メールを確認してください`,
+    },
+    {
+      name: 'trial ending',
+      message: msg`Your ${brand.productName} trial is ending soon`,
+      expectedJapaneseSubject: `お使いの ${brand.productName} トライアルはまもなく終了します`,
+    },
+    {
+      name: 'trial converting',
+      message: msg`A heads up before your ${brand.productName} trial ends`,
+      expectedJapaneseSubject: `${brand.productName} トライアルが終了する前のお知らせ`,
+    },
+    {
+      name: 'subscription renewing',
+      message: msg`Your ${brand.productName} plan renews soon`,
+      expectedJapaneseSubject: `お使いの ${brand.productName} プランはまもなく更新されます`,
+    },
+  ];
+};
 
 // Transactional emails went out with an empty body for a month without a single
 // test noticing, because every email spec mocks the renderer (#23307). These
@@ -328,10 +337,12 @@ describe('localized transactional email subjects', () => {
 
   it.each(buildLocalizedSubjectCases('Mhoo'))(
     'should interpolate Mhoo into the Japanese $name subject',
-    ({ message }) => {
+    ({ message, expectedJapaneseSubject }) => {
       const subject = i18nService.getI18nInstance('ja-JP')._(message);
+      const englishFallback = i18nService.getI18nInstance('en')._(message);
 
-      expect(subject).toContain('Mhoo');
+      expect(subject).toBe(expectedJapaneseSubject);
+      expect(subject).not.toBe(englishFallback);
       expect(subject).not.toContain('Twenty');
     },
   );
