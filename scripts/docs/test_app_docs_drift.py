@@ -19,6 +19,23 @@ from check_app_docs_drift import (
 
 
 class AppDocsDriftTests(unittest.TestCase):
+    def test_fork_prs_run_the_verdict_without_requiring_comment_permission(self) -> None:
+        repository_root = Path(__file__).resolve().parents[2]
+        workflow = (
+            repository_root / ".github/workflows/ci-app-docs-drift.yaml"
+        ).read_text()
+        publication_step = workflow.split("- name: Post docs drift comment", 1)[1].split(
+            "- name: Gate on drift verdict", 1
+        )[0]
+        gate_step = workflow.split("- name: Gate on drift verdict", 1)[1]
+
+        self.assertIn(
+            "github.event.pull_request.head.repo.full_name == github.repository",
+            publication_step,
+        )
+        self.assertIn("CAN_PUBLISH_COMMENT", gate_step)
+        self.assertIn('"$CAN_PUBLISH_COMMENT" = "true"', gate_step)
+
     def test_no_substantive_paths_pass_without_a_comment(self) -> None:
         result = evaluate([], [])
 

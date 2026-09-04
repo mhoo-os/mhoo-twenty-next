@@ -68,7 +68,9 @@ jobs:
 
       - name: Post docs drift comment
         id: post-comment
-        if: steps.drift-check.outputs.comment_needed == 'true'
+        if: >-
+          steps.drift-check.outputs.comment_needed == 'true' &&
+          github.event.pull_request.head.repo.full_name == github.repository
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           COMMENT: ${{ steps.drift-check.outputs.comment }}
@@ -82,6 +84,7 @@ jobs:
           CHECK_OUTCOME: ${{ steps.drift-check.outcome }}
           COMMENT_OUTCOME: ${{ steps.post-comment.outcome }}
           COMMENT_NEEDED: ${{ steps.drift-check.outputs.comment_needed }}
+          CAN_PUBLISH_COMMENT: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
           HAS_DRIFT: ${{ steps.drift-check.outputs.has_drift }}
           SUMMARY: ${{ steps.drift-check.outputs.summary }}
         run: |
@@ -89,7 +92,7 @@ jobs:
             echo "::error::Deterministic docs drift checker did not complete (outcome: $CHECK_OUTCOME)."
             exit 1
           fi
-          if [ "$COMMENT_NEEDED" = "true" ] && [ "$COMMENT_OUTCOME" != "success" ]; then
+          if [ "$CAN_PUBLISH_COMMENT" = "true" ] && [ "$COMMENT_NEEDED" = "true" ] && [ "$COMMENT_OUTCOME" != "success" ]; then
             echo "::error::Docs drift comment could not be posted (outcome: $COMMENT_OUTCOME)."
             exit 1
           fi
