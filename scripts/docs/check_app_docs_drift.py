@@ -114,6 +114,26 @@ RULES: tuple[Rule, ...] = (
         ),
     ),
     Rule(
+        name="SDK billing and utility public entry points",
+        prefixes=(),
+        exact_paths=(
+            "packages/twenty-sdk/src/sdk/billing/index.ts",
+            "packages/twenty-sdk/src/sdk/utils/index.ts",
+        ),
+        docs=(
+            "config/public-assets.mdx",
+            "logic/logic-functions.mdx",
+        ),
+    ),
+    Rule(
+        name="Front-component renderer public entry point",
+        prefixes=(),
+        exact_paths=(
+            "packages/twenty-sdk/src/front-component-renderer/index.ts",
+        ),
+        docs=("layout/front-components.mdx",),
+    ),
+    Rule(
         name="App scaffolding",
         prefixes=(
             "packages/create-twenty-app/src/constants/template/",
@@ -321,6 +341,7 @@ def inspect_repository(base: str, head: str) -> dict[str, object]:
             relative
             for path in paths
             if (relative := docs_path_from_changed_path(path)) is not None
+            and has_substantive_diff(base, head, path)
         )
     )
     result = evaluate(substantive, docs)

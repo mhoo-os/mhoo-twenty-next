@@ -1,13 +1,21 @@
 #!/usr/bin/env python3
 
+import os
+import subprocess
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
 
 sys.path.insert(0, str(Path(__file__).parent))
 
-from check_app_docs_drift import evaluate, is_ignored_path, matching_rules
+from check_app_docs_drift import (
+    evaluate,
+    inspect_repository,
+    is_ignored_path,
+    matching_rules,
+)
 
 
 class AppDocsDriftTests(unittest.TestCase):
@@ -39,6 +47,33 @@ class AppDocsDriftTests(unittest.TestCase):
             result["impacts"][0]["changedDocs"], ["logic/logic-functions.mdx"]
         )
 
+    def test_sdk_billing_and_utility_entry_points_require_mapped_docs(self) -> None:
+        result = evaluate(
+            [
+                "packages/twenty-sdk/src/sdk/billing/index.ts",
+                "packages/twenty-sdk/src/sdk/utils/index.ts",
+            ],
+            [],
+        )
+
+        self.assertTrue(result["hasDrift"])
+        self.assertEqual(len(result["impacts"]), 1)
+        self.assertEqual(
+            result["impacts"][0]["rule"],
+            "SDK billing and utility public entry points",
+        )
+
+    def test_front_component_renderer_entry_point_requires_docs(self) -> None:
+        result = evaluate(
+            ["packages/twenty-sdk/src/front-component-renderer/index.ts"], []
+        )
+
+        self.assertTrue(result["hasDrift"])
+        self.assertEqual(
+            result["impacts"][0]["rule"],
+            "Front-component renderer public entry point",
+        )
+
     def test_tests_are_ignored(self) -> None:
         path = "packages/twenty-sdk/src/sdk/define/objects/__tests__/objects.test.ts"
 
@@ -52,6 +87,52 @@ class AppDocsDriftTests(unittest.TestCase):
 
         self.assertFalse(result["hasDrift"])
         self.assertFalse(result["commentNeeded"])
+
+    def test_whitespace_only_mapped_doc_does_not_clear_real_api_drift(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            repo = Path(temporary_directory)
+
+            def git(*args: str) -> None:
+                subprocess.run(
+                    ["git", *args],
+                    cwd=repo,
+                    check=True,
+                    stdout=subprocess.DEVNULL,
+                )
+
+            source_path = repo / "packages/twenty-sdk/src/sdk/utils/index.ts"
+            doc_path = (
+                repo
+                / "packages/twenty-docs/developers/extend/apps/logic/logic-functions.mdx"
+            )
+            source_path.parent.mkdir(parents=True)
+            doc_path.parent.mkdir(parents=True)
+            source_path.write_text("export const value = 'before';\n")
+            doc_path.write_text("# Runtime helpers\n")
+
+            git("init")
+            git("config", "user.name", "App Docs Drift Test")
+            git("config", "user.email", "app-docs-drift@example.test")
+            git("add", ".")
+            git("commit", "-m", "base fixture")
+            base = subprocess.check_output(
+                ["git", "rev-parse", "HEAD"], cwd=repo, text=True
+            ).strip()
+
+            source_path.write_text("export const value = 'after';\n")
+            doc_path.write_text("# Runtime helpers\n\n")
+            git("add", ".")
+            git("commit", "-m", "api change with whitespace doc change")
+
+            previous_directory = os.getcwd()
+            try:
+                os.chdir(repo)
+                result = inspect_repository(base, "HEAD")
+            finally:
+                os.chdir(previous_directory)
+
+        self.assertTrue(result["hasDrift"])
+        self.assertEqual(result["changedDocs"], [])
 
 
 if __name__ == "__main__":

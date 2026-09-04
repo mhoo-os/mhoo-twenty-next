@@ -30,10 +30,10 @@ jobs:
 
   docs-drift-check:
     needs: changed-files-check
-    # Secrets are unavailable on fork PRs; skip there and on bot PRs.
+    # The deterministic checker uses no third-party credential, so it also
+    # protects fork PRs. Bot PRs remain out of scope for this review surface.
     if: >-
       needs.changed-files-check.outputs.any_changed == 'true' &&
-      github.event.pull_request.head.repo.full_name == github.repository &&
       github.event.pull_request.user.type != 'Bot'
     timeout-minutes: 30
     runs-on: ubuntu-latest
