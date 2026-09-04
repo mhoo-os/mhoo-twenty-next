@@ -11,7 +11,7 @@ import { OnboardingPageLoader } from '@/onboarding/components/OnboardingPageLoad
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { UserOrMetadataLoader } from '~/loading/components/UserOrMetadataLoader';
 import { LegalDocumentApp } from '~/pages/legal/LegalDocumentApp';
-import { isLegalDocumentPath } from '~/pages/legal/legal-document-config';
+import { isLegalDocumentLocation } from '~/pages/legal/legal-document-config';
 
 export const DomainShell = () => {
   const { isLoadedOnce } = useAtomStateValue(clientConfigApiStatusState);
@@ -34,7 +34,7 @@ export const DomainShell = () => {
     );
   }
 
-  if (isLegalDocumentPath(window.location.pathname)) {
+  if (isLegalDocumentLocation(window.location)) {
     return <LegalDocumentApp />;
   }
 

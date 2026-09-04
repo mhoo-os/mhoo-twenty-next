@@ -96,3 +96,10 @@ export const getLegalDocumentDefinition = (
 export const isLegalDocumentPath = (path: string): boolean =>
   path === AppPath.LegalIndex ||
   LEGAL_DOCUMENTS.some(({ route }) => route === path);
+
+export const isLegalDocumentLocation = ({
+  pathname,
+  search,
+  hash,
+}: Pick<Location, 'pathname' | 'search' | 'hash'>): boolean =>
+  search === '' && hash === '' && isLegalDocumentPath(pathname);

@@ -140,6 +140,20 @@ describe('DomainShell', () => {
     expect(screen.queryByText('LEGAL_DOCUMENT_APP')).not.toBeInTheDocument();
   });
 
+  it.each(['/legal/terms?draft=true', '/legal/terms#altered'])(
+    'fails closed for a non-canonical legal location: %s',
+    (location) => {
+      setClientConfigLoaded(true);
+      jotaiStore.set(isMultiWorkspaceEnabledState.atom, false);
+      window.history.pushState({}, '', location);
+
+      renderShell();
+
+      expect(screen.getByText('WORKSPACE_APP')).toBeInTheDocument();
+      expect(screen.queryByText('LEGAL_DOCUMENT_APP')).not.toBeInTheDocument();
+    },
+  );
+
   it('mounts the root app on the default domain in multi-workspace mode', () => {
     setClientConfigLoaded(true);
     jotaiStore.set(isMultiWorkspaceEnabledState.atom, true);
