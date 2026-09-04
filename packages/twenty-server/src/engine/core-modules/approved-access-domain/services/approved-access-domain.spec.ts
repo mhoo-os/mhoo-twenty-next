@@ -15,6 +15,10 @@ import { WorkspaceDomainsService } from 'src/engine/core-modules/domain/workspac
 import { EmailService } from 'src/engine/core-modules/email/email.service';
 import { JwtWrapperService } from 'src/engine/core-modules/jwt/services/jwt-wrapper.service';
 import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
+import {
+  ProductBrandResolverService,
+  resolveProductBrand,
+} from 'src/engine/core-modules/twenty-config/services/product-brand-resolver.service';
 import { type WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
 import { getWorkspaceScopedRepositoryToken } from 'src/engine/twenty-orm/workspace-scoped-repository/get-workspace-scoped-repository-token.util';
 import { type WorkspaceScopedRepository } from 'src/engine/twenty-orm/workspace-scoped-repository/workspace-scoped-repository';
@@ -79,6 +83,17 @@ describe('ApprovedAccessDomainService', () => {
           provide: TwentyConfigService,
           useValue: {
             get: jest.fn(),
+          },
+        },
+        {
+          provide: ProductBrandResolverService,
+          useValue: {
+            resolve: jest.fn().mockReturnValue(
+              resolveProductBrand({
+                preset: 'twenty',
+                deploymentOrigin: 'https://app.twenty.com',
+              }),
+            ),
           },
         },
         {

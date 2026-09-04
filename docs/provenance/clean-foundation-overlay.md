@@ -159,5 +159,28 @@ Authenticated UI and customer-copy presentation paths:
 - `packages/twenty-front/src/modules/settings/billing/constants/SettingsBillingPlanComparisonRows.ts`
 - `packages/twenty-front/src/modules/spreadsheet-import/steps/components/MatchColumnsStep/components/ColumnGrid.tsx`
 
+Transactional email branding and sender identity paths:
+
+- `docs/provenance/transactional-email-branding-ledger.md`
+- `packages/twenty-emails/src/components/`
+- `packages/twenty-emails/src/emails/`
+- `packages/twenty-emails/src/index.ts`
+- `packages/twenty-emails/src/locales/`
+- `packages/twenty-emails/src/utils/brand.ts`
+- `packages/twenty-emails/src/utils/preview-brand.ts`
+- `packages/twenty-emails/src/constants/DefaultWorkspaceLogo.ts`
+- `packages/twenty-server/src/engine/core-modules/email/utils/build-email-sender.ts`
+- `packages/twenty-server/src/engine/core-modules/email/utils/__tests__/build-email-sender.util.spec.ts`
+- `packages/twenty-server/src/engine/core-modules/email/__tests__/email-templates-rendering.spec.ts`
+- `packages/twenty-server/src/engine/core-modules/admin-panel/services/admin-panel-server-admin.service.ts`
+- `packages/twenty-server/src/engine/core-modules/approved-access-domain/services/approved-access-domain.service.ts`
+- `packages/twenty-server/src/engine/core-modules/approved-access-domain/services/approved-access-domain.spec.ts`
+- `packages/twenty-server/src/engine/core-modules/auth/services/auth.service.ts`
+- `packages/twenty-server/src/engine/core-modules/auth/services/reset-password.service.ts`
+- `packages/twenty-server/src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts`
+- `packages/twenty-server/src/engine/core-modules/email-verification/services/email-verification.service.ts`
+- `packages/twenty-server/src/engine/core-modules/workspace-invitation/services/workspace-invitation.service.ts`
+- `packages/twenty-server/src/engine/workspace-manager/workspace-cleaner/services/cleaner.workspace-service.ts`
+
 These paths authorize source-level branding work only. They do not authorize
 runtime deployment, publication, legal approval, or production mutation.

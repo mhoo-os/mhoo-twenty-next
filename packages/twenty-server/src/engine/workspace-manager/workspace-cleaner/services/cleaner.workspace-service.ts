@@ -18,10 +18,12 @@ import { SubscriptionStatus } from 'src/engine/core-modules/billing/enums/billin
 import { BillingSubscriptionService } from 'src/engine/core-modules/billing/services/billing-subscription.service';
 import { WorkspaceDomainsService } from 'src/engine/core-modules/domain/workspace-domains/services/workspace-domains.service';
 import { EmailService } from 'src/engine/core-modules/email/email.service';
+import { buildEmailSender } from 'src/engine/core-modules/email/utils/build-email-sender';
 import { I18nService } from 'src/engine/core-modules/i18n/i18n.service';
 import { MetricsService } from 'src/engine/core-modules/metrics/metrics.service';
 import { MetricsKeys } from 'src/engine/core-modules/metrics/types/metrics-keys.type';
 import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
+import { ProductBrandResolverService } from 'src/engine/core-modules/twenty-config/services/product-brand-resolver.service';
 import { UserWorkspaceEntity } from 'src/engine/core-modules/user-workspace/user-workspace.entity';
 import { UserService } from 'src/engine/core-modules/user/services/user.service';
 import { UserVarsService } from 'src/engine/core-modules/user/user-vars/services/user-vars.service';
@@ -57,6 +59,7 @@ export class CleanerWorkspaceService {
   constructor(
     private readonly workspaceService: WorkspaceService,
     private readonly twentyConfigService: TwentyConfigService,
+    private readonly productBrandResolverService: ProductBrandResolverService,
     private readonly userVarsService: UserVarsService,
     private readonly userService: UserService,
     private readonly emailService: EmailService,
@@ -121,6 +124,7 @@ export class CleanerWorkspaceService {
     billingSettingsUrl: string,
     daysSinceInactive: number,
   ) {
+    const brand = this.productBrandResolverService.resolve();
     const emailData = {
       daysSinceInactive,
       inactiveDaysBeforeDelete: this.inactiveDaysBeforeSoftDelete,
@@ -128,6 +132,7 @@ export class CleanerWorkspaceService {
       workspaceDisplayName: `${workspaceDisplayName}`,
       link: billingSettingsUrl,
       locale: workspaceMember.locale,
+      brand,
     };
     const emailTemplate = WarnSuspendedWorkspaceEmail(emailData);
     const html = await renderEmail(emailTemplate, { pretty: true });
@@ -143,9 +148,10 @@ export class CleanerWorkspaceService {
 
     await this.emailService.send({
       to: workspaceMember.userEmail,
-      from: `${this.twentyConfigService.get(
-        'EMAIL_FROM_NAME',
-      )} <${this.twentyConfigService.get('EMAIL_FROM_ADDRESS')}>`,
+      from: buildEmailSender({
+        brand,
+        address: this.twentyConfigService.get('EMAIL_FROM_ADDRESS'),
+      }),
       subject,
       html,
       text,
@@ -213,11 +219,13 @@ export class CleanerWorkspaceService {
     workspaceDisplayName: string,
     daysSinceInactive: number,
   ) {
+    const brand = this.productBrandResolverService.resolve();
     const emailData = {
       daysSinceInactive: daysSinceInactive,
       userName: `${workspaceMember.name.firstName} ${workspaceMember.name.lastName}`,
       workspaceDisplayName,
       locale: workspaceMember.locale,
+      brand,
     };
     const emailTemplate = CleanSuspendedWorkspaceEmail(emailData);
     const html = await renderEmail(emailTemplate, { pretty: true });
@@ -229,9 +237,10 @@ export class CleanerWorkspaceService {
 
     await this.emailService.send({
       to: workspaceMember.userEmail,
-      from: `${this.twentyConfigService.get(
-        'EMAIL_FROM_NAME',
-      )} <${this.twentyConfigService.get('EMAIL_FROM_ADDRESS')}>`,
+      from: buildEmailSender({
+        brand,
+        address: this.twentyConfigService.get('EMAIL_FROM_ADDRESS'),
+      }),
       subject: 'Your workspace has been deleted',
       html,
       text,

@@ -65,8 +65,23 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/emails/password-update-notify.email.tsx
-msgid "Connect to Twenty"
-msgstr "Повежите се са Twenty"
+msgid "Connect to {productName}"
+msgstr "Повежите се са {productName}"
+
+#. js-lingui-explicit-id
+#: src/components/Footer.tsx
+msgid "Contact"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/Footer.tsx
+msgid "Contact product support"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/Footer.tsx
+msgid "Contact the product team"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/emails/password-update-notify.email.tsx
@@ -119,8 +134,8 @@ msgstr "Здраво {userName},"
 
 #. js-lingui-explicit-id
 #: src/emails/billing-trial-converting.email.tsx
-msgid "If Twenty is working for you, you're all set — there's nothing to do. If it's not the right fit, you can cancel in one click before then and you won't be charged."
-msgstr "Ако вам Twenty одговара, све је спремно — не морате ништа да радите. Ако ипак није прави избор, можете отказати једним кликом пре тог датума и нећете бити терећени."
+msgid "If {productName} is working for you, you're all set — there's nothing to do. If it's not the right fit, you can cancel in one click before then and you won't be charged."
+msgstr "Ако вам {productName} одговара, све је спремно — не морате ништа да радите. Ако ипак није прави избор, можете отказати једним кликом пре тог датума и нећете бити терећени."
 
 #. js-lingui-explicit-id
 #: src/emails/password-update-notify.email.tsx
@@ -134,8 +149,8 @@ msgstr "Ако не предузмете ништа, паузираћемо ва
 
 #. js-lingui-explicit-id
 #: src/emails/clean-suspended-workspace.email.tsx
-msgid "If you'd ever like to give Twenty another try, you can start a fresh workspace in minutes — we'd love to have you back."
-msgstr "Ако икада пожелите да Twenty дате још једну шансу, можете за неколико минута покренути нови радни простор — радо бисмо вас поново видели."
+msgid "If you'd ever like to give {productName} another try, you can start a fresh workspace in minutes — we'd love to have you back."
+msgstr "Ако икада пожелите да {productName} дате још једну шансу, можете за неколико минута покренути нови радни простор — радо бисмо вас поново видели."
 
 #. js-lingui-explicit-id
 #: src/components/WhatIsTwenty.tsx
@@ -149,8 +164,8 @@ msgstr "Његови подаци су уклоњени и више се не м
 
 #. js-lingui-explicit-id
 #: src/emails/send-invite-link.email.tsx
-msgid "Join your team on Twenty"
-msgstr "Придружите се свом тиму на Twenty"
+msgid "Join your team on {productName}"
+msgstr "Придружите се свом тиму на {productName}"
 
 #. js-lingui-explicit-id
 #: src/emails/billing-subscription-renewing.email.tsx
@@ -185,8 +200,9 @@ msgstr "Поново активирајте радни простор"
 
 #. js-lingui-explicit-id
 #: src/components/Footer.tsx
-msgid "Read Twenty's user guide"
-msgstr "Прочитајте Twenty корисничко упутство"
+#: src/components/Footer.tsx
+msgid "Read the user guide"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/emails/password-reset-link.email.tsx
@@ -197,11 +213,6 @@ msgstr "Ресетуј"
 #: src/emails/password-reset-link.email.tsx
 msgid "Reset your password 🗝"
 msgstr "Ресетујте вашу шифру 🗝"
-
-#. js-lingui-explicit-id
-#: src/components/Footer.tsx
-msgid "San Francisco / Paris"
-msgstr "Сан Франциско / Париз"
 
 #. js-lingui-explicit-id
 #: src/emails/server-admin-access-changed.email.tsx
@@ -244,9 +255,19 @@ msgid "Start a new workspace"
 msgstr "Покрените нови радни простор"
 
 #. js-lingui-explicit-id
+#: src/components/Footer.tsx
+msgid "Support"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/emails/test.email.tsx
 msgid "Test email"
 msgstr "Тест имејл"
+
+#. js-lingui-explicit-id
+#: src/emails/send-email-verification-link.email.tsx
+msgid "Thanks for registering for an account on {productName}! Before we get started, we just need to confirm that this is you. Click below to verify your email address."
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/emails/password-update-notify.email.tsx
@@ -265,10 +286,6 @@ msgstr "Да бисте задржали свој радни простор и �
 
 #. js-lingui-explicit-id
 #: src/components/Footer.tsx
-msgid "Twenty.com, Public Benefit Corporation"
-msgstr "Twenty.com, јавна корпорација"
-
-#. js-lingui-explicit-id
 #: src/components/Footer.tsx
 msgid "User guide"
 msgstr "Корисничко упутство"
@@ -286,18 +303,19 @@ msgstr "Потврдите е-адресу"
 
 #. js-lingui-explicit-id
 #: src/components/Footer.tsx
-msgid "Visit Twenty's developer documentation"
-msgstr "Посетите Twenty документацију за програмере"
+msgid "Visit developer documentation"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/components/Footer.tsx
-msgid "Visit Twenty's GitHub repository"
-msgstr "Посетите Twenty репозиторијум на GitHub-у"
+msgid "Visit the product GitHub repository"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/components/Footer.tsx
-msgid "Visit Twenty's website"
-msgstr "Посетите Twenty вебсајт"
+#: src/components/Footer.tsx
+msgid "Visit the product website"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/emails/billing-trial-converting.email.tsx
@@ -305,14 +323,20 @@ msgid "We don't like surprise charges, so here's a friendly heads up."
 msgstr "Не волимо неочекиване наплате, зато вам шаљемо пријатељску најаву."
 
 #. js-lingui-explicit-id
+#: src/emails/send-email-verification-link.email.tsx
+msgid "We received a request to change the email address associated with your {productName} account. Click below to confirm this change."
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/Footer.tsx
 #: src/components/Footer.tsx
 msgid "Website"
 msgstr "Вебсајт"
 
 #. js-lingui-explicit-id
 #: src/components/WhatIsTwenty.tsx
-msgid "What is Twenty?"
-msgstr "Шта је Twenty?"
+msgid "What is {productName}?"
+msgstr "Шта је {productName}?"
 
 #. js-lingui-explicit-id
 #: src/emails/billing-subscription-renewing.email.tsx

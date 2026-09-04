@@ -65,8 +65,23 @@ msgstr "Erősítsd meg az új e-mail címed"
 
 #. js-lingui-explicit-id
 #: src/emails/password-update-notify.email.tsx
-msgid "Connect to Twenty"
-msgstr "Csatlakozás a Twentyhez"
+msgid "Connect to {productName}"
+msgstr "Csatlakozás a {productName}hez"
+
+#. js-lingui-explicit-id
+#: src/components/Footer.tsx
+msgid "Contact"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/Footer.tsx
+msgid "Contact product support"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/Footer.tsx
+msgid "Contact the product team"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/emails/password-update-notify.email.tsx
@@ -119,8 +134,8 @@ msgstr "Szia {userName},"
 
 #. js-lingui-explicit-id
 #: src/emails/billing-trial-converting.email.tsx
-msgid "If Twenty is working for you, you're all set — there's nothing to do. If it's not the right fit, you can cancel in one click before then and you won't be charged."
-msgstr "Ha a Twenty bevált számodra, minden rendben — nincs további teendőd. Ha mégsem ez a megfelelő megoldás, egy kattintással lemondhatod addig, és nem számítunk fel díjat."
+msgid "If {productName} is working for you, you're all set — there's nothing to do. If it's not the right fit, you can cancel in one click before then and you won't be charged."
+msgstr "Ha a {productName} bevált számodra, minden rendben — nincs további teendőd. Ha mégsem ez a megfelelő megoldás, egy kattintással lemondhatod addig, és nem számítunk fel díjat."
 
 #. js-lingui-explicit-id
 #: src/emails/password-update-notify.email.tsx
@@ -134,8 +149,8 @@ msgstr "Ha nem teszel semmit, szüneteltetjük a munkaterületedet, és az adata
 
 #. js-lingui-explicit-id
 #: src/emails/clean-suspended-workspace.email.tsx
-msgid "If you'd ever like to give Twenty another try, you can start a fresh workspace in minutes — we'd love to have you back."
-msgstr "Ha valamikor később újra szeretnél esélyt adni a Twenty‑nek, néhány perc alatt új, üres munkaterületet indíthatsz — örömmel látunk vissza."
+msgid "If you'd ever like to give {productName} another try, you can start a fresh workspace in minutes — we'd love to have you back."
+msgstr "Ha valamikor később újra szeretnél esélyt adni a {productName}‑nek, néhány perc alatt új, üres munkaterületet indíthatsz — örömmel látunk vissza."
 
 #. js-lingui-explicit-id
 #: src/components/WhatIsTwenty.tsx
@@ -149,8 +164,8 @@ msgstr "Az adatai törlésre kerültek, és többé nem állíthatók vissza."
 
 #. js-lingui-explicit-id
 #: src/emails/send-invite-link.email.tsx
-msgid "Join your team on Twenty"
-msgstr "Csatlakozzon a csapatához a Twentyn"
+msgid "Join your team on {productName}"
+msgstr "Csatlakozzon a csapatához a {productName}n"
 
 #. js-lingui-explicit-id
 #: src/emails/billing-subscription-renewing.email.tsx
@@ -185,8 +200,9 @@ msgstr "Munkaterület újraaktiválása"
 
 #. js-lingui-explicit-id
 #: src/components/Footer.tsx
-msgid "Read Twenty's user guide"
-msgstr "Olvassa el a Twenty felhasználói útmutatóját"
+#: src/components/Footer.tsx
+msgid "Read the user guide"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/emails/password-reset-link.email.tsx
@@ -197,11 +213,6 @@ msgstr "Visszaállítás"
 #: src/emails/password-reset-link.email.tsx
 msgid "Reset your password 🗝"
 msgstr "Jelszó visszaállítása 🗝"
-
-#. js-lingui-explicit-id
-#: src/components/Footer.tsx
-msgid "San Francisco / Paris"
-msgstr "San Francisco / Párizs"
 
 #. js-lingui-explicit-id
 #: src/emails/server-admin-access-changed.email.tsx
@@ -244,9 +255,19 @@ msgid "Start a new workspace"
 msgstr "Új munkaterület indítása"
 
 #. js-lingui-explicit-id
+#: src/components/Footer.tsx
+msgid "Support"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/emails/test.email.tsx
 msgid "Test email"
 msgstr "Teszt e-mail"
+
+#. js-lingui-explicit-id
+#: src/emails/send-email-verification-link.email.tsx
+msgid "Thanks for registering for an account on {productName}! Before we get started, we just need to confirm that this is you. Click below to verify your email address."
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/emails/password-update-notify.email.tsx
@@ -265,10 +286,6 @@ msgstr "Ha meg szeretnéd tartani a munkaterületedet és mindent, amit létreho
 
 #. js-lingui-explicit-id
 #: src/components/Footer.tsx
-msgid "Twenty.com, Public Benefit Corporation"
-msgstr "Twenty.com, Közhasznú Vállalat"
-
-#. js-lingui-explicit-id
 #: src/components/Footer.tsx
 msgid "User guide"
 msgstr "Felhasználói útmutató"
@@ -286,18 +303,19 @@ msgstr "Email ellenőrzése"
 
 #. js-lingui-explicit-id
 #: src/components/Footer.tsx
-msgid "Visit Twenty's developer documentation"
-msgstr "Látogasson el a Twenty fejlesztői dokumentációjához"
+msgid "Visit developer documentation"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/components/Footer.tsx
-msgid "Visit Twenty's GitHub repository"
-msgstr "Látogasson el a Twenty GitHub tárházához"
+msgid "Visit the product GitHub repository"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/components/Footer.tsx
-msgid "Visit Twenty's website"
-msgstr "Látogasson el a Twenty weboldalára"
+#: src/components/Footer.tsx
+msgid "Visit the product website"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/emails/billing-trial-converting.email.tsx
@@ -305,14 +323,20 @@ msgid "We don't like surprise charges, so here's a friendly heads up."
 msgstr "Mi sem szeretjük a váratlan levonásokat, ezért küldjük ezt a barátságos előzetes értesítést."
 
 #. js-lingui-explicit-id
+#: src/emails/send-email-verification-link.email.tsx
+msgid "We received a request to change the email address associated with your {productName} account. Click below to confirm this change."
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/Footer.tsx
 #: src/components/Footer.tsx
 msgid "Website"
 msgstr "Weboldal"
 
 #. js-lingui-explicit-id
 #: src/components/WhatIsTwenty.tsx
-msgid "What is Twenty?"
-msgstr "Mi az a Twenty?"
+msgid "What is {productName}?"
+msgstr "Mi az a {productName}?"
 
 #. js-lingui-explicit-id
 #: src/emails/billing-subscription-renewing.email.tsx

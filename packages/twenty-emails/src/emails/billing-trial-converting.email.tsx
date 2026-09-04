@@ -4,6 +4,8 @@ import { CallToAction } from 'src/components/CallToAction';
 import { MainText } from 'src/components/MainText';
 import { Title } from 'src/components/Title';
 import { createI18nInstance } from 'src/utils/i18n.utils';
+import { PREVIEW_BRAND } from 'src/utils/preview-brand';
+import { type ResolvedBrand } from 'twenty-shared/branding';
 import { type APP_LOCALES } from 'twenty-shared/translations';
 
 type BillingTrialConvertingEmailProps = {
@@ -13,6 +15,7 @@ type BillingTrialConvertingEmailProps = {
   interval: 'month' | 'year';
   link: string;
   locale: keyof typeof APP_LOCALES;
+  brand: ResolvedBrand;
 };
 
 // Sent 7 days before a trial WITH a credit card ends, i.e. before the first charge.
@@ -25,6 +28,7 @@ export const BillingTrialConvertingEmail = ({
   interval,
   link,
   locale,
+  brand,
 }: BillingTrialConvertingEmailProps) => {
   const i18n = createI18nInstance(locale);
   const formattedDate = i18n.date(trialEndsAt, {
@@ -34,7 +38,7 @@ export const BillingTrialConvertingEmail = ({
   });
 
   return (
-    <BaseEmail width={333} locale={locale}>
+    <BaseEmail width={333} locale={locale} brand={brand}>
       <Title value={i18n._('A heads up before your trial ends')} />
       <MainText>
         {userName?.length > 1 ? (
@@ -62,7 +66,10 @@ export const BillingTrialConvertingEmail = ({
         )}
         <br />
         <br />
-        <Trans id="If Twenty is working for you, you're all set — there's nothing to do. If it's not the right fit, you can cancel in one click before then and you won't be charged." />
+        <Trans
+          id="If {productName} is working for you, you're all set — there's nothing to do. If it's not the right fit, you can cancel in one click before then and you won't be charged."
+          values={{ productName: brand.productName }}
+        />
       </MainText>
       <br />
       <CallToAction href={link} value={i18n._('Manage subscription')} />
@@ -79,6 +86,7 @@ BillingTrialConvertingEmail.PreviewProps = {
   interval: 'month',
   link: 'https://acme.twenty.com/settings/billing',
   locale: 'en',
+  brand: PREVIEW_BRAND,
 } as BillingTrialConvertingEmailProps;
 
 export default BillingTrialConvertingEmail;

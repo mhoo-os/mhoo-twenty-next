@@ -184,9 +184,10 @@ msgctxt "objectMetadata.description"
 msgid "A hand-picked audience of people"
 msgstr ""
 
-#. js-lingui-id: TF/ZV2
+#. js-lingui-id: qA5GBM
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "A heads up before your Twenty trial ends"
+msgid "A heads up before your {0} trial ends"
 msgstr ""
 
 #. js-lingui-id: 6yZjO1
@@ -5604,9 +5605,10 @@ msgctxt "objectMetadata.description"
 msgid "Join table linking message channel message associations to message folders"
 msgstr ""
 
-#. js-lingui-id: PviVyk
+#. js-lingui-id: kZ4/by
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/workspace-invitation/services/workspace-invitation.service.ts
-msgid "Join your team on Twenty"
+msgid "Join your team on {0}"
 msgstr ""
 
 #. js-lingui-id: +KEn4d
@@ -11779,9 +11781,10 @@ msgstr ""
 msgid "Wednesday"
 msgstr ""
 
-#. js-lingui-id: TVkCrJ
+#. js-lingui-id: OTtsDi
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/email-verification/services/email-verification.service.ts
-msgid "Welcome to Twenty: Please Confirm Your Email"
+msgid "Welcome to {0}: Please Confirm Your Email"
 msgstr ""
 
 #. js-lingui-id: ofdfh5
@@ -12652,14 +12655,16 @@ msgctxt "fieldMetadata.description"
 msgid "Your team member responsible for managing the company account"
 msgstr ""
 
-#. js-lingui-id: sOfbGC
+#. js-lingui-id: E67Uwl
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "Your Twenty plan renews soon"
+msgid "Your {0} plan renews soon"
 msgstr ""
 
-#. js-lingui-id: qW+K5e
+#. js-lingui-id: AJR7Fm
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "Your Twenty trial is ending soon"
+msgid "Your {0} trial is ending soon"
 msgstr ""
 
 #. js-lingui-id: ej/tZF

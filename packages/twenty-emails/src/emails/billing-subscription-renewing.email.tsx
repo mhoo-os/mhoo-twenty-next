@@ -4,6 +4,8 @@ import { CallToAction } from 'src/components/CallToAction';
 import { MainText } from 'src/components/MainText';
 import { Title } from 'src/components/Title';
 import { createI18nInstance } from 'src/utils/i18n.utils';
+import { PREVIEW_BRAND } from 'src/utils/preview-brand';
+import { type ResolvedBrand } from 'twenty-shared/branding';
 import { type APP_LOCALES } from 'twenty-shared/translations';
 
 type BillingSubscriptionRenewingEmailProps = {
@@ -12,6 +14,7 @@ type BillingSubscriptionRenewingEmailProps = {
   renewsAt: Date;
   link: string;
   locale: keyof typeof APP_LOCALES;
+  brand: ResolvedBrand;
 };
 
 // Sent 7 days before a yearly subscription renews. Goal: never let a large annual
@@ -23,6 +26,7 @@ export const BillingSubscriptionRenewingEmail = ({
   renewsAt,
   link,
   locale,
+  brand,
 }: BillingSubscriptionRenewingEmailProps) => {
   const i18n = createI18nInstance(locale);
   const formattedDate = i18n.date(renewsAt, {
@@ -32,7 +36,7 @@ export const BillingSubscriptionRenewingEmail = ({
   });
 
   return (
-    <BaseEmail width={333} locale={locale}>
+    <BaseEmail width={333} locale={locale} brand={brand}>
       <Title value={i18n._('Your plan renews soon')} />
       <MainText>
         {userName?.length > 1 ? (
@@ -68,6 +72,7 @@ BillingSubscriptionRenewingEmail.PreviewProps = {
   renewsAt: new Date('2027-07-02'),
   link: 'https://acme.twenty.com/settings/billing',
   locale: 'en',
+  brand: PREVIEW_BRAND,
 } as BillingSubscriptionRenewingEmailProps;
 
 export default BillingSubscriptionRenewingEmail;

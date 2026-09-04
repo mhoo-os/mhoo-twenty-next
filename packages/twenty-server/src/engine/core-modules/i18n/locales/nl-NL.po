@@ -189,10 +189,11 @@ msgctxt "objectMetadata.description"
 msgid "A hand-picked audience of people"
 msgstr "Een zorgvuldig geselecteerde doelgroep van mensen"
 
-#. js-lingui-id: TF/ZV2
+#. js-lingui-id: qA5GBM
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "A heads up before your Twenty trial ends"
-msgstr "Een seintje voordat je Twenty-proefperiode eindigt"
+msgid "A heads up before your {0} trial ends"
+msgstr "Een seintje voordat je {0}-proefperiode eindigt"
 
 #. js-lingui-id: 6yZjO1
 #: src/engine/core-modules/application/application.exception.ts
@@ -5609,10 +5610,11 @@ msgctxt "objectMetadata.description"
 msgid "Join table linking message channel message associations to message folders"
 msgstr "Koppeltabel die berichtkanaal-berichtassociaties koppelt aan berichtenmappen"
 
-#. js-lingui-id: PviVyk
+#. js-lingui-id: kZ4/by
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/workspace-invitation/services/workspace-invitation.service.ts
-msgid "Join your team on Twenty"
-msgstr "Sluit je aan bij je team op Twenty"
+msgid "Join your team on {0}"
+msgstr "Sluit je aan bij je team op {0}"
 
 #. js-lingui-id: +KEn4d
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-call-recording-standard-flat-field-metadata.util.ts
@@ -11784,10 +11786,11 @@ msgstr "Webhook niet gevonden."
 msgid "Wednesday"
 msgstr "Woensdag"
 
-#. js-lingui-id: TVkCrJ
+#. js-lingui-id: OTtsDi
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/email-verification/services/email-verification.service.ts
-msgid "Welcome to Twenty: Please Confirm Your Email"
-msgstr "Welkom bij Twenty: Bevestig alstublieft uw e-mail"
+msgid "Welcome to {0}: Please Confirm Your Email"
+msgstr "Welkom bij {0}: Bevestig alstublieft uw e-mail"
 
 #. js-lingui-id: ofdfh5
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-campaign-standard-flat-field-metadata.util.ts
@@ -12657,15 +12660,17 @@ msgctxt "fieldMetadata.description"
 msgid "Your team member responsible for managing the company account"
 msgstr "Uw teamlid verantwoordelijk voor het beheer van het bedrijfsaccount"
 
-#. js-lingui-id: sOfbGC
+#. js-lingui-id: E67Uwl
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "Your Twenty plan renews soon"
-msgstr "Je Twenty-abonnement wordt binnenkort verlengd"
+msgid "Your {0} plan renews soon"
+msgstr "Je {0}-abonnement wordt binnenkort verlengd"
 
-#. js-lingui-id: qW+K5e
+#. js-lingui-id: AJR7Fm
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "Your Twenty trial is ending soon"
-msgstr "Je Twenty-proefperiode loopt binnenkort af"
+msgid "Your {0} trial is ending soon"
+msgstr "Je {0}-proefperiode loopt binnenkort af"
 
 #. js-lingui-id: ej/tZF
 #: src/engine/core-modules/graphql/hooks/use-graphql-error-handler.hook.ts

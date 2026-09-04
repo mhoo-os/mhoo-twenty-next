@@ -1,4 +1,5 @@
 import { createElement } from 'react';
+import { msg } from '@lingui/core/macro';
 
 import {
   BillingSubscriptionRenewingEmail,
@@ -15,136 +16,200 @@ import {
   EmailRenderError,
   renderEmail,
 } from 'twenty-emails';
+import { I18nService } from 'src/engine/core-modules/i18n/i18n.service';
+import { resolveProductBrand } from 'src/engine/core-modules/twenty-config/services/product-brand-resolver.service';
 
 const WORKSPACE = { name: 'Acme Inc', logo: undefined };
-const SENDER = {
-  email: 'tim@twenty.com',
-  firstName: 'Tim',
-  lastName: 'Apple',
+const TWENTY_BRAND = resolveProductBrand({
+  preset: 'twenty',
+  deploymentOrigin: 'https://app.twenty.com',
+});
+const MHOO_BRAND = resolveProductBrand({
+  preset: 'mhoo',
+  deploymentOrigin: 'https://mhoo.example.com',
+});
+
+const buildTemplateSet = (brand: typeof TWENTY_BRAND, host: string) => {
+  const sender = {
+    email: 'tim@example.com',
+    firstName: 'Tim',
+    lastName: 'Apple',
+  };
+  const billingLink = `${host}/settings/billing`;
+
+  return [
+    {
+      name: `${brand.productName} BillingSubscriptionRenewingEmail`,
+      element: BillingSubscriptionRenewingEmail({
+        userName: 'Tim',
+        workspaceDisplayName: 'Acme Inc',
+        renewsAt: new Date('2026-01-01'),
+        link: billingLink,
+        locale: 'en',
+        brand,
+      }),
+      expectedContent: billingLink,
+    },
+    {
+      name: `${brand.productName} BillingTrialConvertingEmail`,
+      element: BillingTrialConvertingEmail({
+        userName: 'Tim',
+        workspaceDisplayName: 'Acme Inc',
+        trialEndsAt: new Date('2026-01-01'),
+        interval: 'month',
+        link: billingLink,
+        locale: 'en',
+        brand,
+      }),
+      expectedContent: billingLink,
+    },
+    {
+      name: `${brand.productName} BillingTrialEndingEmail`,
+      element: BillingTrialEndingEmail({
+        userName: 'Tim',
+        workspaceDisplayName: 'Acme Inc',
+        trialEndsAt: new Date('2026-01-01'),
+        dataRetentionDays: 30,
+        link: billingLink,
+        locale: 'en',
+        brand,
+      }),
+      expectedContent: billingLink,
+    },
+    {
+      name: `${brand.productName} CleanSuspendedWorkspaceEmail`,
+      element: CleanSuspendedWorkspaceEmail({
+        daysSinceInactive: 30,
+        userName: 'Tim',
+        workspaceDisplayName: 'Acme Inc',
+        locale: 'en',
+        brand,
+      }),
+      expectedContent: 'Acme Inc',
+    },
+    {
+      name: `${brand.productName} PasswordResetLinkEmail`,
+      element: PasswordResetLinkEmail({
+        duration: '5 minutes',
+        hasPassword: true,
+        link: `${host}/reset-password`,
+        locale: 'en',
+        brand,
+      }),
+      expectedContent: `${host}/reset-password`,
+    },
+    {
+      name: `${brand.productName} PasswordUpdateNotifyEmail`,
+      element: PasswordUpdateNotifyEmail({
+        userName: 'Tim',
+        email: sender.email,
+        link: host,
+        locale: 'en',
+        brand,
+      }),
+      expectedContent: sender.email,
+    },
+    {
+      name: `${brand.productName} SendApprovedAccessDomainValidation`,
+      element: SendApprovedAccessDomainValidation({
+        link: `${host}/validate-approved-access-domain`,
+        domain: 'acme.com',
+        workspace: WORKSPACE,
+        sender,
+        serverUrl: host,
+        locale: 'en',
+        brand,
+      }),
+      expectedContent: `${host}/validate-approved-access-domain`,
+    },
+    {
+      name: `${brand.productName} SendEmailVerificationLinkEmail`,
+      element: SendEmailVerificationLinkEmail({
+        link: `${host}/verify-email`,
+        locale: 'en',
+        brand,
+      }),
+      expectedContent: `${host}/verify-email`,
+    },
+    {
+      name: `${brand.productName} SendInviteLinkEmail`,
+      element: SendInviteLinkEmail({
+        link: `${host}/invite/token`,
+        workspace: WORKSPACE,
+        sender,
+        serverUrl: host,
+        locale: 'en',
+        brand,
+      }),
+      expectedContent: `${host}/invite/token`,
+    },
+    {
+      name: `${brand.productName} ServerAdminAccessChangedEmail`,
+      element: ServerAdminAccessChangedEmail({
+        actorName: 'Tim',
+        targetName: 'Jony',
+        targetEmail: 'jony@example.com',
+        canAccessFullAdminPanel: true,
+        canImpersonate: false,
+        locale: 'en',
+        brand,
+      }),
+      expectedContent: 'jony@example.com',
+    },
+    {
+      name: `${brand.productName} WarnSuspendedWorkspaceEmail`,
+      element: WarnSuspendedWorkspaceEmail({
+        daysSinceInactive: 30,
+        inactiveDaysBeforeDelete: 60,
+        userName: 'Tim',
+        workspaceDisplayName: 'Acme Inc',
+        link: billingLink,
+        locale: 'en',
+        brand,
+      }),
+      expectedContent: billingLink,
+    },
+  ];
 };
 
 const TEMPLATES = [
-  {
-    name: 'BillingSubscriptionRenewingEmail',
-    element: BillingSubscriptionRenewingEmail({
-      userName: 'Tim',
-      workspaceDisplayName: 'Acme Inc',
-      renewsAt: new Date('2026-01-01'),
-      link: 'https://app.twenty.com/settings/billing',
-      locale: 'en',
-    }),
-    expectedContent: 'https://app.twenty.com/settings/billing',
-  },
-  {
-    name: 'BillingTrialConvertingEmail',
-    element: BillingTrialConvertingEmail({
-      userName: 'Tim',
-      workspaceDisplayName: 'Acme Inc',
-      trialEndsAt: new Date('2026-01-01'),
-      interval: 'month',
-      link: 'https://app.twenty.com/settings/billing',
-      locale: 'en',
-    }),
-    expectedContent: 'https://app.twenty.com/settings/billing',
-  },
-  {
-    name: 'BillingTrialEndingEmail',
-    element: BillingTrialEndingEmail({
-      userName: 'Tim',
-      workspaceDisplayName: 'Acme Inc',
-      trialEndsAt: new Date('2026-01-01'),
-      dataRetentionDays: 30,
-      link: 'https://app.twenty.com/settings/billing',
-      locale: 'en',
-    }),
-    expectedContent: 'https://app.twenty.com/settings/billing',
-  },
-  {
-    name: 'CleanSuspendedWorkspaceEmail',
-    element: CleanSuspendedWorkspaceEmail({
-      daysSinceInactive: 30,
-      userName: 'Tim',
-      workspaceDisplayName: 'Acme Inc',
-      locale: 'en',
-    }),
-    expectedContent: 'Acme Inc',
-  },
-  {
-    name: 'PasswordResetLinkEmail',
-    element: PasswordResetLinkEmail({
-      duration: '5 minutes',
-      hasPassword: true,
-      link: 'https://app.twenty.com/reset-password',
-      locale: 'en',
-    }),
-    expectedContent: 'https://app.twenty.com/reset-password',
-  },
-  {
-    name: 'PasswordUpdateNotifyEmail',
-    element: PasswordUpdateNotifyEmail({
-      userName: 'Tim',
-      email: 'tim@twenty.com',
-      link: 'https://app.twenty.com',
-      locale: 'en',
-    }),
-    expectedContent: 'tim@twenty.com',
-  },
-  {
-    name: 'SendApprovedAccessDomainValidation',
-    element: SendApprovedAccessDomainValidation({
-      link: 'https://app.twenty.com/validate-approved-access-domain',
-      domain: 'acme.com',
-      workspace: WORKSPACE,
-      sender: SENDER,
-      serverUrl: 'https://app.twenty.com',
-      locale: 'en',
-    }),
-    expectedContent: 'https://app.twenty.com/validate-approved-access-domain',
-  },
-  {
-    name: 'SendEmailVerificationLinkEmail',
-    element: SendEmailVerificationLinkEmail({
-      link: 'https://app.twenty.com/verify-email',
-      locale: 'en',
-    }),
-    expectedContent: 'https://app.twenty.com/verify-email',
-  },
-  {
-    name: 'SendInviteLinkEmail',
-    element: SendInviteLinkEmail({
-      link: 'https://app.twenty.com/invite/token',
-      workspace: WORKSPACE,
-      sender: SENDER,
-      serverUrl: 'https://app.twenty.com',
-      locale: 'en',
-    }),
-    expectedContent: 'https://app.twenty.com/invite/token',
-  },
-  {
-    name: 'ServerAdminAccessChangedEmail',
-    element: ServerAdminAccessChangedEmail({
-      actorName: 'Tim',
-      targetName: 'Jony',
-      targetEmail: 'jony@twenty.com',
-      canAccessFullAdminPanel: true,
-      canImpersonate: false,
-      locale: 'en',
-    }),
-    expectedContent: 'jony@twenty.com',
-  },
-  {
-    name: 'WarnSuspendedWorkspaceEmail',
-    element: WarnSuspendedWorkspaceEmail({
-      daysSinceInactive: 30,
-      inactiveDaysBeforeDelete: 60,
-      userName: 'Tim',
-      workspaceDisplayName: 'Acme Inc',
-      link: 'https://app.twenty.com/settings/billing',
-      locale: 'en',
-    }),
-    expectedContent: 'https://app.twenty.com/settings/billing',
-  },
+  ...buildTemplateSet(TWENTY_BRAND, 'https://app.twenty.com'),
+  ...buildTemplateSet(MHOO_BRAND, 'https://mhoo.example.com'),
 ];
+
+const MHOO_TEMPLATES = TEMPLATES.filter(({ name }) => name.startsWith('Mhoo'));
+
+const buildLocalizedSubjectCases = (productName: string) => {
+  const brand = { productName };
+
+  return [
+    {
+      name: 'invitation',
+      message: msg`Join your team on ${brand.productName}`,
+      expectedJapaneseSubject: `${brand.productName}でチームに参加`,
+    },
+    {
+      name: 'verification',
+      message: msg`Welcome to ${brand.productName}: Please Confirm Your Email`,
+      expectedJapaneseSubject: `${brand.productName}へようこそ: メールを確認してください`,
+    },
+    {
+      name: 'trial ending',
+      message: msg`Your ${brand.productName} trial is ending soon`,
+      expectedJapaneseSubject: `お使いの ${brand.productName} トライアルはまもなく終了します`,
+    },
+    {
+      name: 'trial converting',
+      message: msg`A heads up before your ${brand.productName} trial ends`,
+      expectedJapaneseSubject: `${brand.productName} トライアルが終了する前のお知らせ`,
+    },
+    {
+      name: 'subscription renewing',
+      message: msg`Your ${brand.productName} plan renews soon`,
+      expectedJapaneseSubject: `お使いの ${brand.productName} プランはまもなく更新されます`,
+    },
+  ];
+};
 
 // Transactional emails went out with an empty body for a month without a single
 // test noticing, because every email spec mocks the renderer (#23307). These
@@ -189,11 +254,108 @@ describe('email templates rendering', () => {
         hasPassword: true,
         link: 'https://app.twenty.com/reset-password',
         locale: 'fr-FR',
+        brand: TWENTY_BRAND,
       }),
     );
 
     expect(html).toContain('mot de passe');
   });
+
+  it.each([
+    {
+      name: 'invitation',
+      expectedJapaneseContent: 'CRMソフトウェア',
+      element: SendInviteLinkEmail({
+        link: 'https://mhoo.example.com/invite/token',
+        workspace: WORKSPACE,
+        sender: {
+          email: 'tim@example.com',
+          firstName: 'Tim',
+          lastName: 'Apple',
+        },
+        serverUrl: 'https://mhoo.example.com',
+        locale: 'ja-JP',
+        brand: MHOO_BRAND,
+      }),
+    },
+    {
+      name: 'verification',
+      expectedJapaneseContent: 'ご登録いただきありがとうございます',
+      element: SendEmailVerificationLinkEmail({
+        link: 'https://mhoo.example.com/verify-email',
+        locale: 'ja-JP',
+        brand: MHOO_BRAND,
+      }),
+    },
+    {
+      name: 'billing',
+      expectedJapaneseContent: '特に操作は不要です',
+      element: BillingTrialConvertingEmail({
+        userName: 'Tim',
+        workspaceDisplayName: 'Acme Inc',
+        trialEndsAt: new Date('2026-01-01'),
+        interval: 'month',
+        link: 'https://mhoo.example.com/settings/billing',
+        locale: 'ja-JP',
+        brand: MHOO_BRAND,
+      }),
+    },
+  ])(
+    'should render a translated Japanese Mhoo $name body without upstream branding',
+    async ({ element, expectedJapaneseContent }) => {
+      const html = await renderEmail(element);
+      const text = await renderEmail(element, { plainText: true });
+      const output = `${html}\n${text}`;
+
+      expect(output).toContain('Mhoo');
+      expect(output).toContain(expectedJapaneseContent);
+      expect(output).not.toContain('Twenty');
+    },
+  );
+
+  it.each(MHOO_TEMPLATES)(
+    'should keep $name free of upstream customer-facing residue in HTML and plain text',
+    async ({ element }) => {
+      const html = await renderEmail(element);
+      const text = await renderEmail(element, { plainText: true });
+
+      expect(`${html}\n${text}`).not.toContain('Twenty');
+      expect(`${html}\n${text}`).not.toContain('twenty.com');
+      expect(`${html}\n${text}`).not.toContain('San Francisco');
+      expect(`${html}\n${text}`).not.toContain('Powered by');
+      expect(`${html}\n${text}`).not.toContain('MHOO Co., Ltd.');
+    },
+  );
+});
+
+describe('localized transactional email subjects', () => {
+  const i18nService = new I18nService();
+
+  beforeAll(async () => {
+    await i18nService.loadTranslations();
+  });
+
+  it.each(buildLocalizedSubjectCases('Mhoo'))(
+    'should interpolate Mhoo into the Japanese $name subject',
+    ({ message, expectedJapaneseSubject }) => {
+      const subject = i18nService.getI18nInstance('ja-JP')._(message);
+      const englishFallback = i18nService.getI18nInstance('en')._(message);
+
+      expect(subject).toBe(expectedJapaneseSubject);
+      expect(subject).not.toBe(englishFallback);
+      expect(subject).not.toContain('Twenty');
+    },
+  );
+
+  it.each(buildLocalizedSubjectCases('Twenty'))(
+    'should preserve the upstream product in the default $name subject',
+    ({ message }) => {
+      const subject = i18nService.getI18nInstance('en')._(message);
+
+      expect(subject).toContain('Twenty');
+      expect(subject).not.toContain('Mhoo');
+    },
+  );
 });
 
 describe('renderEmail guard', () => {

@@ -189,10 +189,11 @@ msgctxt "objectMetadata.description"
 msgid "A hand-picked audience of people"
 msgstr "קהל יעד שנבחר בקפידה של אנשים"
 
-#. js-lingui-id: TF/ZV2
+#. js-lingui-id: qA5GBM
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "A heads up before your Twenty trial ends"
-msgstr "תזכורת לפני שתקופת הניסיון שלך ב-Twenty מסתיימת"
+msgid "A heads up before your {0} trial ends"
+msgstr "תזכורת לפני שתקופת הניסיון שלך ב-{0} מסתיימת"
 
 #. js-lingui-id: 6yZjO1
 #: src/engine/core-modules/application/application.exception.ts
@@ -5609,10 +5610,11 @@ msgctxt "objectMetadata.description"
 msgid "Join table linking message channel message associations to message folders"
 msgstr "טבלת קישור שמקשרת בין שיוכי הודעות של ערוץ ההודעות לתיקיות הודעות"
 
-#. js-lingui-id: PviVyk
+#. js-lingui-id: kZ4/by
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/workspace-invitation/services/workspace-invitation.service.ts
-msgid "Join your team on Twenty"
-msgstr "הצטרף לצוות שלך ב-Twenty"
+msgid "Join your team on {0}"
+msgstr "הצטרף לצוות שלך ב-{0}"
 
 #. js-lingui-id: +KEn4d
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-call-recording-standard-flat-field-metadata.util.ts
@@ -11784,10 +11786,11 @@ msgstr "וובהוק לא נמצא."
 msgid "Wednesday"
 msgstr "יום רביעי"
 
-#. js-lingui-id: TVkCrJ
+#. js-lingui-id: OTtsDi
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/email-verification/services/email-verification.service.ts
-msgid "Welcome to Twenty: Please Confirm Your Email"
-msgstr "ברוך הבא ל-Twenty: נא לאשר את האימייל שלך"
+msgid "Welcome to {0}: Please Confirm Your Email"
+msgstr "ברוך הבא ל-{0}: נא לאשר את האימייל שלך"
 
 #. js-lingui-id: ofdfh5
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-campaign-standard-flat-field-metadata.util.ts
@@ -12657,15 +12660,17 @@ msgctxt "fieldMetadata.description"
 msgid "Your team member responsible for managing the company account"
 msgstr "חבר הצוות שלך אחראי על ניהול חשבון החברה"
 
-#. js-lingui-id: sOfbGC
+#. js-lingui-id: E67Uwl
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "Your Twenty plan renews soon"
-msgstr "תוכנית ה-Twenty שלך מתחדשת בקרוב"
+msgid "Your {0} plan renews soon"
+msgstr "תוכנית ה-{0} שלך מתחדשת בקרוב"
 
-#. js-lingui-id: qW+K5e
+#. js-lingui-id: AJR7Fm
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "Your Twenty trial is ending soon"
-msgstr "תקופת הניסיון שלך ב-Twenty מסתיימת בקרוב"
+msgid "Your {0} trial is ending soon"
+msgstr "תקופת הניסיון שלך ב-{0} מסתיימת בקרוב"
 
 #. js-lingui-id: ej/tZF
 #: src/engine/core-modules/graphql/hooks/use-graphql-error-handler.hook.ts

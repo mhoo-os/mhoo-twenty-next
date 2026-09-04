@@ -65,8 +65,23 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/emails/password-update-notify.email.tsx
-msgid "Connect to Twenty"
-msgstr "Yhdistä Twenty"
+msgid "Connect to {productName}"
+msgstr "Yhdistä {productName}"
+
+#. js-lingui-explicit-id
+#: src/components/Footer.tsx
+msgid "Contact"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/Footer.tsx
+msgid "Contact product support"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/Footer.tsx
+msgid "Contact the product team"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/emails/password-update-notify.email.tsx
@@ -119,8 +134,8 @@ msgstr "Hei {userName},"
 
 #. js-lingui-explicit-id
 #: src/emails/billing-trial-converting.email.tsx
-msgid "If Twenty is working for you, you're all set — there's nothing to do. If it's not the right fit, you can cancel in one click before then and you won't be charged."
-msgstr "Jos Twenty toimii sinulle, kaikki on kunnossa — mitään ei tarvitse tehdä. Jos se ei ole sinulle sopiva, voit peruuttaa tilauksen yhdellä napsautuksella ennen sitä, eikä sinua veloiteta."
+msgid "If {productName} is working for you, you're all set — there's nothing to do. If it's not the right fit, you can cancel in one click before then and you won't be charged."
+msgstr "Jos {productName} toimii sinulle, kaikki on kunnossa — mitään ei tarvitse tehdä. Jos se ei ole sinulle sopiva, voit peruuttaa tilauksen yhdellä napsautuksella ennen sitä, eikä sinua veloiteta."
 
 #. js-lingui-explicit-id
 #: src/emails/password-update-notify.email.tsx
@@ -134,8 +149,8 @@ msgstr "Jos et tee mitään, keskeytämme työtilasi ja säilytämme tietosi tur
 
 #. js-lingui-explicit-id
 #: src/emails/clean-suspended-workspace.email.tsx
-msgid "If you'd ever like to give Twenty another try, you can start a fresh workspace in minutes — we'd love to have you back."
-msgstr "Jos haluat joskus kokeilla Twentyä uudelleen, voit aloittaa uuden työtilan muutamassa minuutissa — toivotamme sinut mielellämme takaisin."
+msgid "If you'd ever like to give {productName} another try, you can start a fresh workspace in minutes — we'd love to have you back."
+msgstr "Jos haluat joskus kokeilla {productName}ä uudelleen, voit aloittaa uuden työtilan muutamassa minuutissa — toivotamme sinut mielellämme takaisin."
 
 #. js-lingui-explicit-id
 #: src/components/WhatIsTwenty.tsx
@@ -149,8 +164,8 @@ msgstr "Sen tiedot on poistettu eikä niitä voida enää palauttaa."
 
 #. js-lingui-explicit-id
 #: src/emails/send-invite-link.email.tsx
-msgid "Join your team on Twenty"
-msgstr "Liity tiimiisi Twentyssä"
+msgid "Join your team on {productName}"
+msgstr "Liity tiimiisi {productName}ssä"
 
 #. js-lingui-explicit-id
 #: src/emails/billing-subscription-renewing.email.tsx
@@ -185,8 +200,9 @@ msgstr "Aktivoi työtila uudelleen"
 
 #. js-lingui-explicit-id
 #: src/components/Footer.tsx
-msgid "Read Twenty's user guide"
-msgstr "Lue Twentyn käyttäjäopas"
+#: src/components/Footer.tsx
+msgid "Read the user guide"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/emails/password-reset-link.email.tsx
@@ -197,11 +213,6 @@ msgstr "Nollaa"
 #: src/emails/password-reset-link.email.tsx
 msgid "Reset your password 🗝"
 msgstr "Nollaa salasanasi 🗝"
-
-#. js-lingui-explicit-id
-#: src/components/Footer.tsx
-msgid "San Francisco / Paris"
-msgstr "San Francisco / Pariisi"
 
 #. js-lingui-explicit-id
 #: src/emails/server-admin-access-changed.email.tsx
@@ -244,9 +255,19 @@ msgid "Start a new workspace"
 msgstr "Aloita uusi työtila"
 
 #. js-lingui-explicit-id
+#: src/components/Footer.tsx
+msgid "Support"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/emails/test.email.tsx
 msgid "Test email"
 msgstr "Testisähköposti"
+
+#. js-lingui-explicit-id
+#: src/emails/send-email-verification-link.email.tsx
+msgid "Thanks for registering for an account on {productName}! Before we get started, we just need to confirm that this is you. Click below to verify your email address."
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/emails/password-update-notify.email.tsx
@@ -265,10 +286,6 @@ msgstr "Jos haluat säilyttää työtilasi ja kaiken tekemäsi, lisää maksutap
 
 #. js-lingui-explicit-id
 #: src/components/Footer.tsx
-msgid "Twenty.com, Public Benefit Corporation"
-msgstr "Twenty.com, yleishyödyllinen yhtiö"
-
-#. js-lingui-explicit-id
 #: src/components/Footer.tsx
 msgid "User guide"
 msgstr "Käyttäjäopas"
@@ -286,18 +303,19 @@ msgstr "Vahvista sähköposti"
 
 #. js-lingui-explicit-id
 #: src/components/Footer.tsx
-msgid "Visit Twenty's developer documentation"
-msgstr "Tutustu Twentyn kehittäjädokumentaatioon"
+msgid "Visit developer documentation"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/components/Footer.tsx
-msgid "Visit Twenty's GitHub repository"
-msgstr "Vieraile Twentyn GitHub-repositoriossa"
+msgid "Visit the product GitHub repository"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/components/Footer.tsx
-msgid "Visit Twenty's website"
-msgstr "Vieraile Twentyn verkkosivustolla"
+#: src/components/Footer.tsx
+msgid "Visit the product website"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/emails/billing-trial-converting.email.tsx
@@ -305,14 +323,20 @@ msgid "We don't like surprise charges, so here's a friendly heads up."
 msgstr "Emme pidä yllättävistä veloituksista, joten tässä ystävällinen muistutus."
 
 #. js-lingui-explicit-id
+#: src/emails/send-email-verification-link.email.tsx
+msgid "We received a request to change the email address associated with your {productName} account. Click below to confirm this change."
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/Footer.tsx
 #: src/components/Footer.tsx
 msgid "Website"
 msgstr "Verkkosivusto"
 
 #. js-lingui-explicit-id
 #: src/components/WhatIsTwenty.tsx
-msgid "What is Twenty?"
-msgstr "Mikä on Twenty?"
+msgid "What is {productName}?"
+msgstr "Mikä on {productName}?"
 
 #. js-lingui-explicit-id
 #: src/emails/billing-subscription-renewing.email.tsx

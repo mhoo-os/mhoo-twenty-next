@@ -11,12 +11,14 @@ type LinkProps = {
   value: JSX.Element | JSX.Element[] | string;
   href: string;
   color?: string;
+  ariaLabel?: string;
 };
 
-export const Link = ({ value, href, color }: LinkProps) => {
+export const Link = ({ value, href, color, ariaLabel }: LinkProps) => {
   return (
     <EmailLink
       href={href}
+      aria-label={ariaLabel}
       style={{
         ...linkStyle,
         color: color ?? canvasTheme.font.colors.tertiary,

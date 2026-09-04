@@ -65,8 +65,23 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/emails/password-update-notify.email.tsx
-msgid "Connect to Twenty"
-msgstr "连接 Twenty"
+msgid "Connect to {productName}"
+msgstr "连接 {productName}"
+
+#. js-lingui-explicit-id
+#: src/components/Footer.tsx
+msgid "Contact"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/Footer.tsx
+msgid "Contact product support"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/Footer.tsx
+msgid "Contact the product team"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/emails/password-update-notify.email.tsx
@@ -119,8 +134,8 @@ msgstr "您好，{userName},"
 
 #. js-lingui-explicit-id
 #: src/emails/billing-trial-converting.email.tsx
-msgid "If Twenty is working for you, you're all set — there's nothing to do. If it's not the right fit, you can cancel in one click before then and you won't be charged."
-msgstr "如果 Twenty 很适合您，那就一切就绪——您无需做任何操作。如果它并不合适，您可以在此之前一键取消，且不会被收费。"
+msgid "If {productName} is working for you, you're all set — there's nothing to do. If it's not the right fit, you can cancel in one click before then and you won't be charged."
+msgstr "如果 {productName} 很适合您，那就一切就绪——您无需做任何操作。如果它并不合适，您可以在此之前一键取消，且不会被收费。"
 
 #. js-lingui-explicit-id
 #: src/emails/password-update-notify.email.tsx
@@ -134,8 +149,8 @@ msgstr "如果您什么都不做，我们会暂停您的工作区，并在 {data
 
 #. js-lingui-explicit-id
 #: src/emails/clean-suspended-workspace.email.tsx
-msgid "If you'd ever like to give Twenty another try, you can start a fresh workspace in minutes — we'd love to have you back."
-msgstr "如果您想再次尝试 Twenty，您可以在几分钟内创建一个全新的工作区——我们非常期待您回归。"
+msgid "If you'd ever like to give {productName} another try, you can start a fresh workspace in minutes — we'd love to have you back."
+msgstr "如果您想再次尝试 {productName}，您可以在几分钟内创建一个全新的工作区——我们非常期待您回归。"
 
 #. js-lingui-explicit-id
 #: src/components/WhatIsTwenty.tsx
@@ -149,8 +164,8 @@ msgstr "其数据已被移除，无法再恢复。"
 
 #. js-lingui-explicit-id
 #: src/emails/send-invite-link.email.tsx
-msgid "Join your team on Twenty"
-msgstr "加入您的团队，使用 Twenty"
+msgid "Join your team on {productName}"
+msgstr "加入您的团队，使用 {productName}"
 
 #. js-lingui-explicit-id
 #: src/emails/billing-subscription-renewing.email.tsx
@@ -185,8 +200,9 @@ msgstr "重新激活工作区"
 
 #. js-lingui-explicit-id
 #: src/components/Footer.tsx
-msgid "Read Twenty's user guide"
-msgstr "阅读 Twenty 的用户指南"
+#: src/components/Footer.tsx
+msgid "Read the user guide"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/emails/password-reset-link.email.tsx
@@ -197,11 +213,6 @@ msgstr "重置"
 #: src/emails/password-reset-link.email.tsx
 msgid "Reset your password 🗝"
 msgstr "重置您的密码 🗝"
-
-#. js-lingui-explicit-id
-#: src/components/Footer.tsx
-msgid "San Francisco / Paris"
-msgstr "旧金山/巴黎"
 
 #. js-lingui-explicit-id
 #: src/emails/server-admin-access-changed.email.tsx
@@ -244,9 +255,19 @@ msgid "Start a new workspace"
 msgstr "创建新工作区"
 
 #. js-lingui-explicit-id
+#: src/components/Footer.tsx
+msgid "Support"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/emails/test.email.tsx
 msgid "Test email"
 msgstr "测试邮箱"
+
+#. js-lingui-explicit-id
+#: src/emails/send-email-verification-link.email.tsx
+msgid "Thanks for registering for an account on {productName}! Before we get started, we just need to confirm that this is you. Click below to verify your email address."
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/emails/password-update-notify.email.tsx
@@ -265,10 +286,6 @@ msgstr "若要保留您的工作区以及您构建的一切，请添加付款方
 
 #. js-lingui-explicit-id
 #: src/components/Footer.tsx
-msgid "Twenty.com, Public Benefit Corporation"
-msgstr "Twenty.com，公益公司"
-
-#. js-lingui-explicit-id
 #: src/components/Footer.tsx
 msgid "User guide"
 msgstr "用户指南"
@@ -286,18 +303,19 @@ msgstr "验证邮箱"
 
 #. js-lingui-explicit-id
 #: src/components/Footer.tsx
-msgid "Visit Twenty's developer documentation"
-msgstr "访问 Twenty 的开发者文档"
+msgid "Visit developer documentation"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/components/Footer.tsx
-msgid "Visit Twenty's GitHub repository"
-msgstr "访问 Twenty 的 GitHub 仓库"
+msgid "Visit the product GitHub repository"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/components/Footer.tsx
-msgid "Visit Twenty's website"
-msgstr "访问 Twenty 的网站"
+#: src/components/Footer.tsx
+msgid "Visit the product website"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/emails/billing-trial-converting.email.tsx
@@ -305,14 +323,20 @@ msgid "We don't like surprise charges, so here's a friendly heads up."
 msgstr "我们也不喜欢意外扣费，所以提前友好提醒您一下。"
 
 #. js-lingui-explicit-id
+#: src/emails/send-email-verification-link.email.tsx
+msgid "We received a request to change the email address associated with your {productName} account. Click below to confirm this change."
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/Footer.tsx
 #: src/components/Footer.tsx
 msgid "Website"
 msgstr "网站"
 
 #. js-lingui-explicit-id
 #: src/components/WhatIsTwenty.tsx
-msgid "What is Twenty?"
-msgstr "什么是 Twenty？"
+msgid "What is {productName}?"
+msgstr "什么是 {productName}？"
 
 #. js-lingui-explicit-id
 #: src/emails/billing-subscription-renewing.email.tsx

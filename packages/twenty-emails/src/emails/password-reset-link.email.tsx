@@ -5,6 +5,8 @@ import { Link } from 'src/components/Link';
 import { MainText } from 'src/components/MainText';
 import { Title } from 'src/components/Title';
 import { createI18nInstance } from 'src/utils/i18n.utils';
+import { PREVIEW_BRAND } from 'src/utils/preview-brand';
+import { type ResolvedBrand } from 'twenty-shared/branding';
 import { type APP_LOCALES } from 'twenty-shared/translations';
 
 type PasswordResetLinkEmailProps = {
@@ -12,6 +14,7 @@ type PasswordResetLinkEmailProps = {
   hasPassword: boolean;
   link: string;
   locale: keyof typeof APP_LOCALES;
+  brand: ResolvedBrand;
 };
 
 export const PasswordResetLinkEmail = ({
@@ -19,6 +22,7 @@ export const PasswordResetLinkEmail = ({
   hasPassword,
   link,
   locale,
+  brand,
 }: PasswordResetLinkEmailProps) => {
   const i18n = createI18nInstance(locale);
   const headline = hasPassword
@@ -27,7 +31,7 @@ export const PasswordResetLinkEmail = ({
   const ctaLabel = hasPassword ? i18n._('Reset') : i18n._('Set');
 
   return (
-    <BaseEmail locale={locale}>
+    <BaseEmail locale={locale} brand={brand}>
       <Title value={headline} />
       <MainText>
         <Trans
@@ -50,6 +54,7 @@ PasswordResetLinkEmail.PreviewProps = {
   hasPassword: true,
   link: 'https://app.twenty.com/reset-password/123',
   locale: 'en',
+  brand: PREVIEW_BRAND,
 } as PasswordResetLinkEmailProps;
 
 export default PasswordResetLinkEmail;

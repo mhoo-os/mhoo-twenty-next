@@ -77,6 +77,84 @@ grep -Fq "trajectory fixture rejected: $suffix_path" "$temporary_directory/suffi
   exit 1
 }
 
+allowed_paths=(
+  packages/twenty-front/src/locales/ja-JP.po
+  packages/twenty-front/src/locales/generated/ja-JP.ts
+  packages/twenty-emails/src/locales/ja-JP.po
+  packages/twenty-emails/src/locales/generated/ja-JP.ts
+  packages/twenty-server/src/engine/core-modules/i18n/locales/ja-JP.po
+  packages/twenty-server/src/engine/core-modules/i18n/locales/generated/ja-JP.ts
+  packages/twenty-front/src/modules/client-config/components/ClientConfigProviderEffect.tsx
+  packages/twenty-front/src/modules/settings/billing/components/AddPaymentMethodForm.tsx
+)
+
+for index in "${!allowed_paths[@]}"; do
+  path="${allowed_paths[$index]}"
+  blob="$({ git show "HEAD:$path"; printf '\n# exact-root fixture\n'; } | git hash-object -w --stdin)"
+  fixture_index="$temporary_directory/locale-catalog-$index-index"
+  GIT_INDEX_FILE="$fixture_index" git read-tree HEAD
+  GIT_INDEX_FILE="$fixture_index" git update-index \
+    --cacheinfo 100644 "$blob" "$path"
+  tree="$(GIT_INDEX_FILE="$fixture_index" git write-tree)"
+  candidate_head="$(
+    printf 'test: allow exact-root locale catalog path\n' |
+      GIT_AUTHOR_NAME='Trajectory fixture' \
+      GIT_AUTHOR_EMAIL='trajectory-fixture@example.invalid' \
+      GIT_AUTHOR_DATE="2000-01-01T00:01:0${index}Z" \
+      GIT_COMMITTER_NAME='Trajectory fixture' \
+      GIT_COMMITTER_EMAIL='trajectory-fixture@example.invalid' \
+      GIT_COMMITTER_DATE="2000-01-01T00:01:0${index}Z" \
+      git commit-tree "$tree" -p HEAD
+  )"
+
+  bash "$fixture" HEAD "$candidate_head" \
+    >"$temporary_directory/locale-catalog-$index-output"
+done
+
+rogue_allowed_paths=(
+  packages/twenty-emails/src/locales/ja-JP.po.backup
+  packages/twenty-emails/src/locales/rogue/ja-JP.po
+  packages/twenty-server/src/engine/core-modules/i18n/locales.generated/ja-JP.ts
+  nested/packages/twenty-front/src/locales/ja-JP.po
+  packages/twenty-front/src/modules/client-config/components/rogue/ClientConfigProviderEffect.tsx
+  packages/twenty-front/src/modules/settings/billing/components/rogue/AddPaymentMethodForm.tsx
+)
+
+for index in "${!rogue_allowed_paths[@]}"; do
+  path="${rogue_allowed_paths[$index]}"
+  blob="$(printf 'rogue locale catalog fixture\n' | git hash-object -w --stdin)"
+  fixture_index="$temporary_directory/rogue-locale-catalog-$index-index"
+  GIT_INDEX_FILE="$fixture_index" git read-tree HEAD
+  GIT_INDEX_FILE="$fixture_index" git update-index --add \
+    --cacheinfo 100644 "$blob" "$path"
+  tree="$(GIT_INDEX_FILE="$fixture_index" git write-tree)"
+  candidate_head="$(
+    printf 'test: reject inexact locale catalog path\n' |
+      GIT_AUTHOR_NAME='Trajectory fixture' \
+      GIT_AUTHOR_EMAIL='trajectory-fixture@example.invalid' \
+      GIT_AUTHOR_DATE="2000-01-01T00:02:0${index}Z" \
+      GIT_COMMITTER_NAME='Trajectory fixture' \
+      GIT_COMMITTER_EMAIL='trajectory-fixture@example.invalid' \
+      GIT_COMMITTER_DATE="2000-01-01T00:02:0${index}Z" \
+      git commit-tree "$tree" -p HEAD
+  )"
+
+  if bash "$fixture" HEAD "$candidate_head" \
+    >"$temporary_directory/rogue-locale-catalog-$index-output" 2>&1; then
+    printf 'exact-head fixture test failed: rogue locale/catalog path passed: %s\n' \
+      "$path" >&2
+    exit 1
+  fi
+
+  grep -Fq "trajectory fixture rejected: $path" \
+    "$temporary_directory/rogue-locale-catalog-$index-output" || {
+      printf 'exact-head fixture test failed: unexpected locale/catalog rejection\n' >&2
+      sed -n '1,120p' \
+        "$temporary_directory/rogue-locale-catalog-$index-output" >&2
+      exit 1
+    }
+done
+
 unrelated_head="$(
   printf 'test: unrelated source ancestry\n' |
     GIT_AUTHOR_NAME='Trajectory fixture' \
