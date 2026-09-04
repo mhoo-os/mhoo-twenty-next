@@ -135,7 +135,7 @@ msgstr "Hej {userName},"
 #. js-lingui-explicit-id
 #: src/emails/billing-trial-converting.email.tsx
 msgid "If {productName} is working for you, you're all set — there's nothing to do. If it's not the right fit, you can cancel in one click before then and you won't be charged."
-msgstr ""
+msgstr "Hvis {productName} fungerer for dig, er du helt klar — du behøver ikke gøre noget. Hvis det ikke er det rette match, kan du opsige med ét klik inden da, og du vil ikke blive opkrævet."
 
 #. js-lingui-explicit-id
 #: src/emails/password-update-notify.email.tsx
@@ -150,7 +150,7 @@ msgstr "Hvis du ikke gør noget, sætter vi dit arbejdsområde på pause og hold
 #. js-lingui-explicit-id
 #: src/emails/clean-suspended-workspace.email.tsx
 msgid "If you'd ever like to give {productName} another try, you can start a fresh workspace in minutes — we'd love to have you back."
-msgstr ""
+msgstr "Hvis du på et tidspunkt vil give {productName} en chance igen, kan du starte et nyt arbejdsområde på få minutter — vi vil meget gerne have dig tilbage."
 
 #. js-lingui-explicit-id
 #: src/components/WhatIsTwenty.tsx

@@ -135,7 +135,7 @@ msgstr "Szia {userName},"
 #. js-lingui-explicit-id
 #: src/emails/billing-trial-converting.email.tsx
 msgid "If {productName} is working for you, you're all set — there's nothing to do. If it's not the right fit, you can cancel in one click before then and you won't be charged."
-msgstr ""
+msgstr "Ha a {productName} bevált számodra, minden rendben — nincs további teendőd. Ha mégsem ez a megfelelő megoldás, egy kattintással lemondhatod addig, és nem számítunk fel díjat."
 
 #. js-lingui-explicit-id
 #: src/emails/password-update-notify.email.tsx
@@ -150,7 +150,7 @@ msgstr "Ha nem teszel semmit, szüneteltetjük a munkaterületedet, és az adata
 #. js-lingui-explicit-id
 #: src/emails/clean-suspended-workspace.email.tsx
 msgid "If you'd ever like to give {productName} another try, you can start a fresh workspace in minutes — we'd love to have you back."
-msgstr ""
+msgstr "Ha valamikor később újra szeretnél esélyt adni a {productName}‑nek, néhány perc alatt új, üres munkaterületet indíthatsz — örömmel látunk vissza."
 
 #. js-lingui-explicit-id
 #: src/components/WhatIsTwenty.tsx

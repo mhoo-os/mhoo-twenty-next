@@ -135,7 +135,7 @@ msgstr "{userName}님, 안녕하세요."
 #. js-lingui-explicit-id
 #: src/emails/billing-trial-converting.email.tsx
 msgid "If {productName} is working for you, you're all set — there's nothing to do. If it's not the right fit, you can cancel in one click before then and you won't be charged."
-msgstr ""
+msgstr "{productName}가 만족스러우시다면, 이미 모두 준비된 상태이므로 따로 하실 일은 없습니다. 맞지 않는다고 느끼신다면, 그 전에 한 번의 클릭으로 취소하실 수 있으며 요금이 청구되지 않습니다."
 
 #. js-lingui-explicit-id
 #: src/emails/password-update-notify.email.tsx
@@ -150,7 +150,7 @@ msgstr "아무 작업도 하지 않으시면, 워크스페이스를 일시 중�
 #. js-lingui-explicit-id
 #: src/emails/clean-suspended-workspace.email.tsx
 msgid "If you'd ever like to give {productName} another try, you can start a fresh workspace in minutes — we'd love to have you back."
-msgstr ""
+msgstr "언제든 {productName}를 다시 사용해 보고 싶으시다면, 몇 분 안에 새 워크스페이스를 시작하실 수 있습니다. 다시 찾아와 주시면 매우 기쁘겠습니다."
 
 #. js-lingui-explicit-id
 #: src/components/WhatIsTwenty.tsx
