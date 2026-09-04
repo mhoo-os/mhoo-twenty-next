@@ -4,7 +4,12 @@ export type { JSONContent } from '@tiptap/core';
 // onto an incompatible major and ship empty email bodies.
 export { render, toPlainText } from 'react-email';
 export * from './utils/render-email';
-export { PREVIEW_BRAND, resolvePreviewBrand } from './utils/preview-brand';
+export {
+  MHO_PREVIEW_BRAND,
+  PREVIEW_BRAND,
+  getPreviewNotice,
+  resolvePreviewBrand,
+} from './utils/preview-brand';
 export * from './emails/billing-subscription-renewing.email';
 export * from './emails/billing-trial-converting.email';
 export * from './emails/billing-trial-ending.email';

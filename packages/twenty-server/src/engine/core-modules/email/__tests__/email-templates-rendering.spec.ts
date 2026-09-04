@@ -1,3 +1,7 @@
+import { execFileSync } from 'node:child_process';
+import { mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join, resolve } from 'node:path';
 import { createElement } from 'react';
 import { msg } from '@lingui/core/macro';
 
@@ -356,6 +360,36 @@ describe('localized transactional email subjects', () => {
       expect(subject).not.toContain('Mhoo');
     },
   );
+});
+
+describe('MHO-233 private preview command', () => {
+  it('builds and verifies all deterministic preview artifacts', () => {
+    const repositoryRoot = execFileSync(
+      'git',
+      ['rev-parse', '--show-toplevel'],
+      { encoding: 'utf8' },
+    ).trim();
+    const outputDirectory = mkdtempSync(
+      join(tmpdir(), 'mhoo-mho233-preview-command-'),
+    );
+
+    try {
+      execFileSync(
+        resolve(
+          repositoryRoot,
+          'scripts/branding/render_mhoo_closed_beta_previews.sh',
+        ),
+        [],
+        {
+          cwd: repositoryRoot,
+          env: { ...process.env, MHOO_PREVIEW_OUTPUT: outputDirectory },
+          stdio: 'pipe',
+        },
+      );
+    } finally {
+      rmSync(outputDirectory, { recursive: true, force: true });
+    }
+  }, 60_000);
 });
 
 describe('renderEmail guard', () => {

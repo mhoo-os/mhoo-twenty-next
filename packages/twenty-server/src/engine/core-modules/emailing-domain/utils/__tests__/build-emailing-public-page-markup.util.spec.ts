@@ -49,4 +49,23 @@ describe('emailing public page markup', () => {
     expect(footer).not.toContain('DPA</a>');
     expect(footer).not.toContain('twenty.com');
   });
+
+  it('renders an explicit notice only when a preview supplies one', () => {
+    const brand = resolveEmailingPublicPageBrand(
+      resolveProductBrand({
+        preset: 'mhoo',
+        deploymentOrigin: 'https://mhoo.example',
+      }),
+    );
+
+    expect(
+      buildEmailingPublicPageFooter({
+        ...brand,
+        previewNotice: 'Private beta preview — DRAFT / UNAPPROVED',
+      }),
+    ).toContain('Private beta preview — DRAFT / UNAPPROVED');
+    expect(buildEmailingPublicPageFooter(brand)).not.toContain(
+      'Private beta preview',
+    );
+  });
 });

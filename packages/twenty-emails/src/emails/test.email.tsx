@@ -1,7 +1,7 @@
 import { BaseEmail } from 'src/components/BaseEmail';
 import { Title } from 'src/components/Title';
 import { createI18nInstance } from 'src/utils/i18n.utils';
-import { PREVIEW_BRAND } from 'src/utils/preview-brand';
+import { MHO_PREVIEW_BRAND } from 'src/utils/preview-brand';
 import { type ResolvedBrand } from 'twenty-shared/branding';
 import { type APP_LOCALES } from 'twenty-shared/translations';
 
@@ -26,7 +26,7 @@ export const TestEmail = ({ locale, brand }: TestEmailProps) => {
 
 TestEmail.PreviewProps = {
   locale: 'en',
-  brand: PREVIEW_BRAND,
+  brand: MHO_PREVIEW_BRAND,
 };
 
 export default TestEmail;
