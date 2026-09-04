@@ -9,7 +9,7 @@ email_allowed='^(packages/twenty-front/src/locales/([^/]+\.po|generated/[^/]+\.t
 
 distribution_allowed='^(README\.md|docs/provenance/distribution-display-ledger\.md|packages/twenty-docker/.*|packages/twenty-docs/(README\.md|docs\.json|package\.json)|packages/twenty-codex-plugin/(README\.md|package\.json))$'
 
-scanner_allowed='^(docs/provenance/(brand-touchpoint-ledger\.json|brand-residue-gate\.md)|scripts/branding/|\.github/workflows/ci-brand-residue\.yml)'
+scanner_allowed='^(docs/provenance/(brand-touchpoint-ledger\.json|brand-residue-gate\.md)|scripts/branding/.*|\.github/workflows/ci-brand-residue\.yml)$'
 
 git diff --name-only "$base" "$head" | while IFS= read -r path; do
   [[ "$path" =~ $allowed || "$path" =~ $email_allowed || "$path" =~ $distribution_allowed || "$path" =~ $scanner_allowed ]] || { printf 'trajectory fixture rejected: %s\n' "$path" >&2; exit 1; }

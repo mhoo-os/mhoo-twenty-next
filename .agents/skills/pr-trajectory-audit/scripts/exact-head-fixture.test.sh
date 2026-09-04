@@ -250,6 +250,107 @@ for index in "${!rogue_distribution_paths[@]}"; do
     }
 done
 
+cumulative_allowed_paths=(
+  docs/provenance/server-public-presentation-ledger.md
+  packages/twenty-server/src/engine/core-modules/emailing-domain/services/unsubscribe-content.service.ts
+  packages/twenty-server/src/engine/core-modules/emailing-domain/services/unsubscribe-content.service.spec.ts
+  packages/twenty-server/src/engine/core-modules/emailing-domain/types/emailing-public-page-brand.type.ts
+  packages/twenty-server/src/engine/core-modules/emailing-domain/types/__tests__/emailing-public-page-brand.type.spec.ts
+  packages/twenty-server/src/engine/core-modules/emailing-domain/utils/build-emailing-public-page-markup.util.ts
+  packages/twenty-server/src/engine/core-modules/emailing-domain/utils/build-unsubscribe-html-footer.util.ts
+  packages/twenty-server/src/engine/core-modules/emailing-domain/utils/build-unsubscribe-preferences-page.util.ts
+  packages/twenty-server/src/engine/core-modules/emailing-domain/utils/build-unsubscribe-result-page.util.ts
+  packages/twenty-server/src/engine/core-modules/emailing-domain/utils/build-unsubscribe-text-footer.util.ts
+  packages/twenty-server/src/engine/core-modules/emailing-domain/utils/__tests__/build-emailing-public-page-markup.util.spec.ts
+  packages/twenty-server/src/engine/core-modules/emailing-domain/utils/__tests__/build-unsubscribe-preferences-page.util.spec.ts
+  packages/twenty-server/src/modules/emailing/controllers/unsubscribe.controller.ts
+  packages/twenty-server/src/modules/emailing/controllers/unsubscribe.controller.spec.ts
+  docs/provenance/brand-touchpoint-ledger.json
+  docs/provenance/brand-residue-gate.md
+  scripts/branding/check_customer_brand_residue.py
+  .github/workflows/ci-brand-residue.yml
+)
+
+for index in "${!cumulative_allowed_paths[@]}"; do
+  path="${cumulative_allowed_paths[$index]}"
+  blob="$({ git show "HEAD:$path"; printf '\n# cumulative fixture\n'; } | git hash-object -w --stdin)"
+  fixture_index="$temporary_directory/cumulative-$index-index"
+  GIT_INDEX_FILE="$fixture_index" git read-tree HEAD
+  GIT_INDEX_FILE="$fixture_index" git update-index \
+    --cacheinfo 100644 "$blob" "$path"
+  tree="$(GIT_INDEX_FILE="$fixture_index" git write-tree)"
+  candidate_head="$(
+    printf 'test: allow exact cumulative path\n' |
+      GIT_AUTHOR_NAME='Trajectory fixture' \
+      GIT_AUTHOR_EMAIL='trajectory-fixture@example.invalid' \
+      GIT_AUTHOR_DATE='2000-01-01T00:05:00Z' \
+      GIT_COMMITTER_NAME='Trajectory fixture' \
+      GIT_COMMITTER_EMAIL='trajectory-fixture@example.invalid' \
+      GIT_COMMITTER_DATE='2000-01-01T00:05:00Z' \
+      git commit-tree "$tree" -p HEAD
+  )"
+
+  bash "$fixture" HEAD "$candidate_head" \
+    >"$temporary_directory/cumulative-$index-output"
+done
+
+rogue_cumulative_paths=(
+  docs/provenance/server-public-presentation-ledger.md.backup
+  nested/docs/provenance/server-public-presentation-ledger.md
+  docs/provenance/server-public-presentation-ledgerXmd
+  packages/twenty-server/src/engine/core-modules/emailing-domain/services/rogue/unsubscribe-content.service.ts
+  packages/twenty-server/src/engine/core-modules/emailing-domain/services/unsubscribe-content.service.ts.backup
+  packages/twenty-server/src/engine/core-modules/emailing-domain/types/rogue/emailing-public-page-brand.type.ts
+  packages/twenty-server/src/engine/core-modules/emailing-domain/types/emailing-public-page-brand.typeXts
+  packages/twenty-server/src/engine/core-modules/emailing-domain/utils/rogue/build-emailing-public-page-markup.util.ts
+  packages/twenty-server/src/engine/core-modules/emailing-domain/utils/build-unsubscribe-result-page.util.ts.backup
+  packages/twenty-server/src/modules/emailing/controllers/rogue/unsubscribe.controller.ts
+  packages/twenty-server/src/modules/emailing/controllers/unsubscribe.controllerXts
+  docs/provenance/brand-touchpoint-ledger.json.backup
+  nested/docs/provenance/brand-residue-gate.md
+  docs/provenance/brand-residue-gateXmd
+  nested/scripts/branding/check_customer_brand_residue.py
+  scripts/brandingish/check_customer_brand_residue.py
+  nested/.github/workflows/ci-brand-residue.yml
+  .github/workflows/ci-brand-residue.yml.backup
+  .github/workflows/ci-brand-residueXyml
+)
+
+for index in "${!rogue_cumulative_paths[@]}"; do
+  path="${rogue_cumulative_paths[$index]}"
+  blob="$(printf 'rogue cumulative fixture\n' | git hash-object -w --stdin)"
+  fixture_index="$temporary_directory/rogue-cumulative-$index-index"
+  GIT_INDEX_FILE="$fixture_index" git read-tree HEAD
+  GIT_INDEX_FILE="$fixture_index" git update-index --add \
+    --cacheinfo 100644 "$blob" "$path"
+  tree="$(GIT_INDEX_FILE="$fixture_index" git write-tree)"
+  candidate_head="$(
+    printf 'test: reject inexact cumulative path\n' |
+      GIT_AUTHOR_NAME='Trajectory fixture' \
+      GIT_AUTHOR_EMAIL='trajectory-fixture@example.invalid' \
+      GIT_AUTHOR_DATE='2000-01-01T00:06:00Z' \
+      GIT_COMMITTER_NAME='Trajectory fixture' \
+      GIT_COMMITTER_EMAIL='trajectory-fixture@example.invalid' \
+      GIT_COMMITTER_DATE='2000-01-01T00:06:00Z' \
+      git commit-tree "$tree" -p HEAD
+  )"
+
+  if bash "$fixture" HEAD "$candidate_head" \
+    >"$temporary_directory/rogue-cumulative-$index-output" 2>&1; then
+    printf 'exact-head fixture test failed: rogue cumulative path passed: %s\n' \
+      "$path" >&2
+    exit 1
+  fi
+
+  grep -Fq "trajectory fixture rejected: $path" \
+    "$temporary_directory/rogue-cumulative-$index-output" || {
+      printf 'exact-head fixture test failed: unexpected cumulative rejection\n' >&2
+      sed -n '1,120p' \
+        "$temporary_directory/rogue-cumulative-$index-output" >&2
+      exit 1
+    }
+done
+
 unrelated_head="$(
   printf 'test: unrelated source ancestry\n' |
     GIT_AUTHOR_NAME='Trajectory fixture' \
