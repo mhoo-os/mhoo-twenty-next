@@ -77,17 +77,19 @@ grep -Fq "trajectory fixture rejected: $suffix_path" "$temporary_directory/suffi
   exit 1
 }
 
-locale_catalog_paths=(
+allowed_paths=(
   packages/twenty-front/src/locales/ja-JP.po
   packages/twenty-front/src/locales/generated/ja-JP.ts
   packages/twenty-emails/src/locales/ja-JP.po
   packages/twenty-emails/src/locales/generated/ja-JP.ts
   packages/twenty-server/src/engine/core-modules/i18n/locales/ja-JP.po
   packages/twenty-server/src/engine/core-modules/i18n/locales/generated/ja-JP.ts
+  packages/twenty-front/src/modules/client-config/components/ClientConfigProviderEffect.tsx
+  packages/twenty-front/src/modules/settings/billing/components/AddPaymentMethodForm.tsx
 )
 
-for index in "${!locale_catalog_paths[@]}"; do
-  path="${locale_catalog_paths[$index]}"
+for index in "${!allowed_paths[@]}"; do
+  path="${allowed_paths[$index]}"
   blob="$({ git show "HEAD:$path"; printf '\n# exact-root fixture\n'; } | git hash-object -w --stdin)"
   fixture_index="$temporary_directory/locale-catalog-$index-index"
   GIT_INDEX_FILE="$fixture_index" git read-tree HEAD
@@ -109,15 +111,17 @@ for index in "${!locale_catalog_paths[@]}"; do
     >"$temporary_directory/locale-catalog-$index-output"
 done
 
-rogue_locale_catalog_paths=(
+rogue_allowed_paths=(
   packages/twenty-emails/src/locales/ja-JP.po.backup
   packages/twenty-emails/src/locales/rogue/ja-JP.po
   packages/twenty-server/src/engine/core-modules/i18n/locales.generated/ja-JP.ts
   nested/packages/twenty-front/src/locales/ja-JP.po
+  packages/twenty-front/src/modules/client-config/components/rogue/ClientConfigProviderEffect.tsx
+  packages/twenty-front/src/modules/settings/billing/components/rogue/AddPaymentMethodForm.tsx
 )
 
-for index in "${!rogue_locale_catalog_paths[@]}"; do
-  path="${rogue_locale_catalog_paths[$index]}"
+for index in "${!rogue_allowed_paths[@]}"; do
+  path="${rogue_allowed_paths[$index]}"
   blob="$(printf 'rogue locale catalog fixture\n' | git hash-object -w --stdin)"
   fixture_index="$temporary_directory/rogue-locale-catalog-$index-index"
   GIT_INDEX_FILE="$fixture_index" git read-tree HEAD
