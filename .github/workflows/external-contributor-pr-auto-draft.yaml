@@ -1,14 +1,17 @@
 name: Auto-Draft External PRs
 
 on:
-  pull_request_target:
-    types: [opened]
+  # Retained for upstream synchronization; draft conversion is delegated to
+  # TwentyHQ's private ci-privileged repository.
+  workflow_dispatch:
 
 permissions: {}
 
 jobs:
   dispatch:
     if: |
+      github.repository == 'twentyhq/twenty' &&
+      github.event_name != 'workflow_dispatch' &&
       github.event.pull_request.draft == false &&
       github.event.pull_request.author_association != 'MEMBER' &&
       github.event.pull_request.author_association != 'OWNER' &&
