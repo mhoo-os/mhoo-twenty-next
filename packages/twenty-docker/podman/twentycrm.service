@@ -1,5 +1,5 @@
 [Unit]
-Description=TwentyCRM Container Stack via Podman-Compose
+Description=Mhoo Container Stack built on Twenty via Podman-Compose
 After=network.target
 
 [Service]
@@ -12,4 +12,3 @@ RemainAfterExit=yes
 
 [Install]
 WantedBy=default.target
-

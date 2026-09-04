@@ -130,8 +130,16 @@ COPY --chown=1000 --from=twenty-server-build /app/packages/twenty-emails/dist /a
 COPY --chown=1000 --from=twenty-server-build /app/packages/twenty-client-sdk/package.json /app/packages/twenty-client-sdk/
 COPY --chown=1000 --from=twenty-server-build /app/packages/twenty-client-sdk/dist /app/packages/twenty-client-sdk/dist
 
-LABEL org.opencontainers.image.source=https://github.com/twentyhq/twenty
-LABEL org.opencontainers.image.description="Twenty server image (no frontend)."
+LABEL org.opencontainers.image.title="Mhoo built on Twenty"
+LABEL org.opencontainers.image.vendor="Mhoo"
+LABEL org.opencontainers.image.source="https://github.com/mhoo-os/mhoo-twenty-next"
+LABEL org.opencontainers.image.revision="$APP_VERSION"
+LABEL org.opencontainers.image.description="Mhoo distribution server image built on Twenty (no frontend)."
+LABEL org.opencontainers.image.upstream.source="https://github.com/twentyhq/twenty"
+LABEL org.opencontainers.image.upstream.version="v2.37.0"
+LABEL org.opencontainers.image.upstream.revision="6da524b8903ec16a3eeea4b2e4a5fb63dbfc1c58"
+LABEL org.opencontainers.image.upstream.tree="3ce4ef3eac3604ee52b6b8ee0f1a4766d7f533ca"
+LABEL org.opencontainers.image.licenses="AGPL-3.0"
 
 # Remove unused, unpatchable components the scanner flags (none are executed at
 # runtime, and none can be fixed by upgrading our deps or Node):
@@ -184,7 +192,7 @@ FROM twenty-server AS twenty
 
 COPY --chown=1000 --from=twenty-front-build /app/packages/twenty-front/build /app/packages/twenty-server/dist/front
 
-LABEL org.opencontainers.image.description="Twenty image with backend and frontend."
+LABEL org.opencontainers.image.description="Mhoo distribution image with the governed Twenty backend and frontend."
 
 
 # ===========================================================================
@@ -281,6 +289,8 @@ ARG APP_VERSION=0.0.0
 ENV S6_KEEP_ENV=1
 ENV PG_DATABASE_URL=postgres://twenty:twenty@localhost:5432/default \
     SERVER_URL=http://localhost:2020 \
+    PRODUCT_BRAND_PRESET=mhoo \
+    PRODUCT_BRAND_DEPLOYMENT_ORIGIN=http://localhost:2020 \
     REDIS_URL=redis://localhost:6379 \
     STORAGE_TYPE=local \
     APP_SECRET=twenty-app-dev-secret-not-for-production \
@@ -296,7 +306,15 @@ ENV PG_DATABASE_URL=postgres://twenty:twenty@localhost:5432/default \
 EXPOSE 2020
 VOLUME ["/data/postgres", "/app/packages/twenty-server/.local-storage"]
 
-LABEL org.opencontainers.image.source=https://github.com/twentyhq/twenty
-LABEL org.opencontainers.image.description="All-in-one Twenty image for local development and SDK usage. Includes PostgreSQL, Redis, server, and worker."
+LABEL org.opencontainers.image.title="Mhoo built on Twenty"
+LABEL org.opencontainers.image.vendor="Mhoo"
+LABEL org.opencontainers.image.source="https://github.com/mhoo-os/mhoo-twenty-next"
+LABEL org.opencontainers.image.revision="$APP_VERSION"
+LABEL org.opencontainers.image.description="All-in-one Mhoo distribution image for local development and SDK usage, built on Twenty. Includes PostgreSQL, Redis, server, and worker."
+LABEL org.opencontainers.image.upstream.source="https://github.com/twentyhq/twenty"
+LABEL org.opencontainers.image.upstream.version="v2.37.0"
+LABEL org.opencontainers.image.upstream.revision="6da524b8903ec16a3eeea4b2e4a5fb63dbfc1c58"
+LABEL org.opencontainers.image.upstream.tree="3ce4ef3eac3604ee52b6b8ee0f1a4766d7f533ca"
+LABEL org.opencontainers.image.licenses="AGPL-3.0"
 
 ENTRYPOINT ["/init"]

@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Twenty Helm Chart Values",
+  "title": "Mhoo distribution Helm chart values (built on Twenty)",
   "type": "object",
   "additionalProperties": true,
   "definitions": {
@@ -58,6 +58,22 @@
         "repository": { "type": "string" },
         "tag": { "type": "string" },
         "pullPolicy": { "type": "string", "enum": ["Always", "IfNotPresent", "Never"] }
+      }
+    },
+    "brand": {
+      "type": "object",
+      "description": "Generic product presentation settings. These do not change technical resource names or selectors.",
+      "properties": {
+        "preset": {
+          "type": "string",
+          "enum": ["mhoo", "twenty"],
+          "default": "mhoo",
+          "description": "Reviewed product presentation preset. Use twenty only for an explicit upstream-compatibility fixture."
+        },
+        "deploymentOrigin": {
+          "type": "string",
+          "description": "HTTP(S) origin used to resolve relative product links. If empty, it is derived from SERVER_URL or ingress."
+        }
       }
     },
     "nameOverride": { "type": "string" },

@@ -1,24 +1,30 @@
-# Twenty Codex Plugin
+# Twenty Codex Plugin (Mhoo-compatible)
 
-Official Codex plugin for building, deploying, and querying Twenty apps. Bundles five focused skills, the public Twenty documentation MCP server, and a one-command workspace MCP setup helper.
+Technical Codex plugin for building, deploying, and querying Twenty
+applications, used by the Mhoo distribution. It bundles five focused skills,
+the upstream Twenty documentation MCP server, and a one-command workspace MCP
+setup helper. Technical commands, package names, and the stable `twenty` MCP
+key remain unchanged for compatibility.
 
 This package is the source of the plugin published to the Codex marketplace.
 
 ## What This Plugin Does
 
-The plugin teaches Codex how to work with the Twenty CRM platform. After installation, Codex can:
+The plugin teaches Codex how to work with the Twenty platform used by Mhoo.
+After installation, Codex can:
 
-- Scaffold a new Twenty app with `create-twenty-app`.
+- Scaffold a Twenty app with the technical `create-twenty-app` command.
 - Add or modify app entities (objects, fields, logic functions, layouts, front components, workflows).
 - Manage remotes, sync changes, build, deploy, view logs, and configure CI/CD.
 - Prepare README, marketplace metadata, logos, and screenshots for npm/marketplace publication.
-- Connect to a Twenty workspace via MCP and present records as readable Markdown with linked record names.
+- Connect to a Twenty workspace, including an Mhoo-compatible deployment, via MCP and present records as readable Markdown with linked record names.
 
 ## Installation
 
 ### From the Codex Marketplace
 
-Search for "Twenty" in the Codex plugin directory and install.
+Search for "Twenty" (the technical plugin name) in the Codex plugin directory
+and install it for Mhoo-compatible app work.
 
 ### Locally for Development
 
@@ -46,8 +52,8 @@ Cross-skill operating rules are in [`AGENTS.md`](./AGENTS.md). Reference docs ar
 
 The plugin works in two layers:
 
-- The bundled `twenty-docs` MCP server works immediately and lets Codex search public Twenty documentation.
-- Workspace data access is user-specific. Each user adds their own Twenty workspace MCP endpoint to their private Codex MCP config using the helper below.
+- The bundled `twenty-docs` MCP server works immediately and lets Codex search public upstream Twenty documentation.
+- Workspace data access is user-specific. Each user adds their own Mhoo/Twenty workspace MCP endpoint to their private Codex MCP config using the helper below.
 
 **Do not** add workspace-specific MCP URLs to this package. They are user-local and belong only in the user's machine-local Codex MCP configuration.
 

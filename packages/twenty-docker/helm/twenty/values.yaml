@@ -4,6 +4,13 @@ image:
   tag: ""  # defaults to Chart.yaml appVersion
   pullPolicy: IfNotPresent
 
+# Product presentation. The Mhoo distribution is the source default; set
+# preset to "twenty" only for an explicit upstream-compatibility fixture.
+# deploymentOrigin must be an http(s) origin without a path, query, or fragment.
+brand:
+  preset: mhoo
+  deploymentOrigin: ""
+
 nameOverride: ""
 fullnameOverride: ""
 

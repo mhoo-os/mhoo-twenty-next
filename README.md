@@ -1,42 +1,48 @@
 <p align="center">
-  <a href="https://www.twenty.com">
-    <img src="./packages/twenty-website/public/images/core/logo.svg" width="100px" alt="Twenty logo" />
+  <a href="https://github.com/mhoo-os/mhoo-twenty-next">
+    <img src="./packages/twenty-front/public/images/mhoo/mhoo-snout-transparent-1024.png" width="100px" alt="Mhoo pig snout mark" />
   </a>
 </p>
 
-<h2 align="center">The #1 Open-Source CRM</h2>
+<h2 align="center">Mhoo — a governed distribution built on Twenty</h2>
 
-<p align="center"><a href="https://twenty.com"><img src="./packages/twenty-website/public/images/readme/globe-icon.svg" width="12" height="12"/> Website</a> · <a href="https://docs.twenty.com"><img src="./packages/twenty-website/public/images/readme/book-icon.svg" width="12" height="12"/> Documentation</a> · <a href="https://github.com/orgs/twentyhq/projects/1"><img src="./packages/twenty-website/public/images/readme/map-icon.svg" width="12" height="12"/> Roadmap </a> · <a href="https://discord.gg/cx5n4Jzs57"><img src="./packages/twenty-website/public/images/readme/discord-icon.svg" width="12" height="12"/> Discord</a> · <a href="https://www.figma.com/file/xt8O9mFeLl46C5InWwoMrN/Twenty"><img src="./packages/twenty-website/public/images/readme/figma-icon.webp"  width="12" height="12"/>  Figma</a></p>
-
-<p align="center">
-  <a href="https://www.twenty.com">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="./packages/twenty-website/public/images/readme/github-cover-dark.webp" />
-      <source media="(prefers-color-scheme: light)" srcset="./packages/twenty-website/public/images/readme/github-cover-light.webp" />
-      <img src="./packages/twenty-website/public/images/readme/github-cover-light.webp" alt="Twenty banner" />
-    </picture>
-  </a>
-</p>
+<p align="center"><a href="https://github.com/mhoo-os/mhoo-twenty-next"><img src="./packages/twenty-website/public/images/readme/code-icon.svg" width="12" height="12"/> Mhoo source</a> · <a href="./packages/twenty-docker/helm/twenty/README.md"><img src="./packages/twenty-website/public/images/readme/rocket-icon.svg" width="12" height="12"/> Operator guide</a> · <a href="https://docs.twenty.com"><img src="./packages/twenty-website/public/images/readme/book-icon.svg" width="12" height="12"/> Upstream Twenty docs</a> · <a href="./docs/provenance/distribution-display-ledger.md"><img src="./packages/twenty-website/public/images/readme/map-icon.svg" width="12" height="12"/> Distribution ledger</a></p>
 
 <br />
 
-# Why Twenty
+# Why Mhoo
 
-Twenty gives technical teams the building blocks for a custom CRM that meets complex business needs and quickly adapts as the business evolves. Twenty is the CRM you build, ship, and version like the rest of your stack.
+Mhoo is the governed product distribution built on a clean Twenty foundation.
+It keeps the upstream application framework, technical contracts, and upgrade
+identity intact while giving customer-facing and operator-facing surfaces one
+reviewed Mhoo presentation.
 
-<a href="https://twenty.com/resources/why-twenty"><img src="./packages/twenty-website/public/images/readme/star-icon.svg" width="14" height="14"/> Learn more about why we built Twenty</a>
+The source overlay is recorded in the [distribution display ledger](./docs/provenance/distribution-display-ledger.md). Legal publication, disposable
+runtime proof, and release selection remain downstream gates.
 
 <br />
 
 # Installation
 
-### <img src="./packages/twenty-website/public/images/readme/globe-icon.svg" width="14" height="14"/> Cloud
+### <img src="./packages/twenty-website/public/images/readme/rocket-icon.svg" width="14" height="14"/> Source-compatible self-hosting
 
-The fastest way to get started. Sign up at [twenty.com](https://twenty.com) and spin up a workspace in under a minute, with no infrastructure to manage and always up to date.
+Use the governed Docker Compose source path while developing or preparing a
+release:
+
+```bash
+cp packages/twenty-docker/.env.example .env
+# Set SERVER_URL, PRODUCT_BRAND_DEPLOYMENT_ORIGIN, and the required secrets.
+docker compose --env-file .env -f packages/twenty-docker/docker-compose.yml up -d
+```
+
+`PRODUCT_BRAND_PRESET=mhoo` is the distribution default. The deployment origin
+must be the same `http(s)` origin as `SERVER_URL`, without a path or query.
+This source path does not by itself claim public release or production proof.
 
 ### <img src="./packages/twenty-website/public/images/readme/book-icon.svg" width="14" height="14"/> Build an app
 
-Scaffold a new app with the Twenty CLI:
+The app-development commands and package names intentionally retain their
+technical Twenty identity:
 
 ```bash
 npx create-twenty-app my-app
@@ -66,20 +72,24 @@ Then ship it to your workspace:
 npx twenty app:publish --private
 ```
 
-See the [app development guide](https://docs.twenty.com/developers/extend/apps/getting-started) for objects, views, agents, and logic functions.
+See the [upstream Twenty app development guide](https://docs.twenty.com/developers/extend/apps/getting-started) for objects, views, agents, and logic functions.
 
-### <img src="./packages/twenty-website/public/images/readme/rocket-icon.svg" width="14" height="14"/> Self-hosting
+### <img src="./packages/twenty-website/public/images/readme/book-icon.svg" width="14" height="14"/> Technical reference
 
-Run Twenty on your own infrastructure with [Docker Compose](https://docs.twenty.com/developers/self-host/capabilities/docker-compose), or contribute locally via the [local setup guide](https://docs.twenty.com/developers/contribute/capabilities/local-setup).
+For retained upstream framework behavior, consult the [upstream Twenty
+Docker Compose guide](https://docs.twenty.com/developers/self-host/capabilities/docker-compose)
+and [local setup guide](https://docs.twenty.com/developers/contribute/capabilities/local-setup).
 
 <br />
 <br />
 
-# Everything you need
+# Upstream Twenty capabilities retained by this distribution
 
-Twenty gives you the building blocks of a modern CRM (objects, views, workflows, and agents) and lets you extend them as code. Here's a tour of what's in the box.
+The inherited application surface provides the CRM building blocks, objects,
+views, workflows, agents, and app extension points. The sections below retain
+upstream technical examples; they are not separate Mhoo product claims.
 
-Want to go deeper? Read the <a href="https://docs.twenty.com/user-guide/introduction"><img src="./packages/twenty-website/public/images/readme/planner-icon.svg" width="14" height="14"/> User Guide</a> for product walkthroughs, or the <a href="https://docs.twenty.com"><img src="./packages/twenty-website/public/images/readme/book-icon.svg" width="14" height="14"/> Documentation</a> for developer reference.
+Read the <a href="https://docs.twenty.com/user-guide/introduction"><img src="./packages/twenty-website/public/images/readme/planner-icon.svg" width="14" height="14"/> Upstream Twenty user guide</a> for product walkthroughs, or the <a href="https://docs.twenty.com"><img src="./packages/twenty-website/public/images/readme/book-icon.svg" width="14" height="14"/> Upstream Twenty documentation</a> for developer reference.
 
 <table align="center">
   <tr>
@@ -159,6 +169,6 @@ Want to go deeper? Read the <a href="https://docs.twenty.com/user-guide/introduc
 
 Thanks to these amazing services that we use and recommend for code review (Greptile), catching bugs (Sentry) and translating (Crowdin).
 
-# Join the Community
+# Join the upstream Twenty community
 
 <p><a href="https://github.com/twentyhq/twenty"><img src="./packages/twenty-website/public/images/readme/star-icon.svg" width="12" height="12"/> Star the repo</a> · <a href="https://discord.gg/cx5n4Jzs57"><img src="./packages/twenty-website/public/images/readme/discord-icon.svg" width="12" height="12"/> Discord</a> · <a href="https://github.com/twentyhq/twenty/discussions"><img src="./packages/twenty-website/public/images/readme/message-icon.svg" width="12" height="12"/> Feature requests</a> · <a href="https://github.com/orgs/twentyhq/projects/1/views/35"><img src="./packages/twenty-website/public/images/readme/rocket-icon.svg" width="12" height="12"/> Releases</a> · <a href="https://twitter.com/twentycrm"><img src="./packages/twenty-website/public/images/readme/x-icon.svg" width="12" height="12"/> X</a> · <a href="https://www.linkedin.com/company/twenty/"><img src="./packages/twenty-website/public/images/readme/linkedin-icon.svg" width="12" height="12"/> LinkedIn</a> · <a href="https://twenty.crowdin.com/twenty"><img src="./packages/twenty-website/public/images/readme/language-icon.svg" width="12" height="12"/> Crowdin</a> · <a href="https://github.com/twentyhq/twenty/contribute"><img src="./packages/twenty-website/public/images/readme/code-icon.svg" width="12" height="12"/> Contribute</a></p>

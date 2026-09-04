@@ -44,6 +44,16 @@ resource "kubernetes_deployment" "twentycrm_worker" {
           }
 
           env {
+            name  = "PRODUCT_BRAND_PRESET"
+            value = var.twentycrm_product_brand_preset
+          }
+
+          env {
+            name  = "PRODUCT_BRAND_DEPLOYMENT_ORIGIN"
+            value = trimspace(var.twentycrm_product_brand_deployment_origin) != "" ? trimspace(var.twentycrm_product_brand_deployment_origin) : var.twentycrm_app_hostname
+          }
+
+          env {
             name  = "PG_DATABASE_URL"
             value = "postgres://twenty:${var.twentycrm_pgdb_admin_password}@${kubernetes_service.twentycrm_db.metadata.0.name}.${kubernetes_namespace.twentycrm.metadata.0.name}.svc.cluster.local/default"
           }

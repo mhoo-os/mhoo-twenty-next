@@ -24,6 +24,8 @@ services:
     environment:
       NODE_PORT: "3000"
       SERVER_URL: ${SERVER_URL}
+      PRODUCT_BRAND_PRESET: ${PRODUCT_BRAND_PRESET:-mhoo}
+      PRODUCT_BRAND_DEPLOYMENT_ORIGIN: ${PRODUCT_BRAND_DEPLOYMENT_ORIGIN:-${SERVER_URL:-http://localhost:8080}}
       PG_DATABASE_URL: "postgresql://twenty:${PG_DATABASE_PASSWORD}@twenty-db:5432/twenty"
       REDIS_URL: "redis://twenty-redis:6379"
       APP_SECRET: ${APP_SECRET}
@@ -40,6 +42,8 @@ services:
     command: yarn worker:prod
     environment:
       SERVER_URL: ${SERVER_URL}
+      PRODUCT_BRAND_PRESET: ${PRODUCT_BRAND_PRESET:-mhoo}
+      PRODUCT_BRAND_DEPLOYMENT_ORIGIN: ${PRODUCT_BRAND_DEPLOYMENT_ORIGIN:-${SERVER_URL:-http://localhost:8080}}
       PG_DATABASE_URL: "postgresql://twenty:${PG_DATABASE_PASSWORD}@twenty-db:5432/twenty"
       REDIS_URL: "redis://twenty-redis:6379"
       APP_SECRET: ${APP_SECRET}
