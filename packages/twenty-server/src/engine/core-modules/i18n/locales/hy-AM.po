@@ -189,10 +189,11 @@ msgctxt "objectMetadata.description"
 msgid "A hand-picked audience of people"
 msgstr "Ձեռքով ընտրված մարդկանց լսարան"
 
-#. js-lingui-id: TF/ZV2
+#. js-lingui-id: qA5GBM
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "A heads up before your {productName} trial ends"
-msgstr "Ծանուցում մինչև ձեր Twenty փորձաշրջանի ավարտը"
+msgid "A heads up before your {0} trial ends"
+msgstr "Ծանուցում մինչև ձեր {0} փորձաշրջանի ավարտը"
 
 #. js-lingui-id: 6yZjO1
 #: src/engine/core-modules/application/application.exception.ts
@@ -5609,10 +5610,11 @@ msgctxt "objectMetadata.description"
 msgid "Join table linking message channel message associations to message folders"
 msgstr "Միացման աղյուսակ, որը կապում է հաղորդագրության ալիքի հաղորդագրության ասոցիացիաները հաղորդագրության թղթապանակներին"
 
-#. js-lingui-id: PviVyk
+#. js-lingui-id: kZ4/by
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/workspace-invitation/services/workspace-invitation.service.ts
-msgid "Join your team on {productName}"
-msgstr "Միացեք ձեր թիմին Twenty պլատֆորմում"
+msgid "Join your team on {0}"
+msgstr "Միացեք ձեր թիմին {0} պլատֆորմում"
 
 #. js-lingui-id: +KEn4d
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-call-recording-standard-flat-field-metadata.util.ts
@@ -11784,10 +11786,11 @@ msgstr "Webhook-ը չի գտնվել։"
 msgid "Wednesday"
 msgstr "Չորեքշաբթի"
 
-#. js-lingui-id: TVkCrJ
+#. js-lingui-id: OTtsDi
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/email-verification/services/email-verification.service.ts
-msgid "Welcome to {productName}: Please Confirm Your Email"
-msgstr "Բարի գալուստ Twenty․ Խնդրում ենք հաստատել ձեր էլ. հասցեն"
+msgid "Welcome to {0}: Please Confirm Your Email"
+msgstr "Բարի գալուստ {0}․ Խնդրում ենք հաստատել ձեր էլ. հասցեն"
 
 #. js-lingui-id: ofdfh5
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-campaign-standard-flat-field-metadata.util.ts
@@ -12657,15 +12660,17 @@ msgctxt "fieldMetadata.description"
 msgid "Your team member responsible for managing the company account"
 msgstr "Ձեր թիմի այն անդամը, որը պատասխանատու է ընկերության հաշվի կառավարման համար"
 
-#. js-lingui-id: sOfbGC
+#. js-lingui-id: E67Uwl
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "Your {productName} plan renews soon"
-msgstr "Ձեր Twenty փաթեթի ժամկետը շուտով կթարմացվի"
+msgid "Your {0} plan renews soon"
+msgstr "Ձեր {0} փաթեթի ժամկետը շուտով կթարմացվի"
 
-#. js-lingui-id: qW+K5e
+#. js-lingui-id: AJR7Fm
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "Your {productName} trial is ending soon"
-msgstr "Ձեր Twenty փորձաշրջանը շուտով ավարտվում է"
+msgid "Your {0} trial is ending soon"
+msgstr "Ձեր {0} փորձաշրջանը շուտով ավարտվում է"
 
 #. js-lingui-id: ej/tZF
 #: src/engine/core-modules/graphql/hooks/use-graphql-error-handler.hook.ts

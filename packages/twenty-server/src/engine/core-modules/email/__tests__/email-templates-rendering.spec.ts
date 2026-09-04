@@ -1,4 +1,5 @@
 import { createElement } from 'react';
+import { msg } from '@lingui/core/macro';
 
 import {
   BillingSubscriptionRenewingEmail,
@@ -15,6 +16,7 @@ import {
   EmailRenderError,
   renderEmail,
 } from 'twenty-emails';
+import { I18nService } from 'src/engine/core-modules/i18n/i18n.service';
 import { resolveProductBrand } from 'src/engine/core-modules/twenty-config/services/product-brand-resolver.service';
 
 const WORKSPACE = { name: 'Acme Inc', logo: undefined };
@@ -177,6 +179,29 @@ const TEMPLATES = [
 
 const MHOO_TEMPLATES = TEMPLATES.filter(({ name }) => name.startsWith('Mhoo'));
 
+const buildLocalizedSubjectCases = (productName: string) => [
+  {
+    name: 'invitation',
+    message: msg`Join your team on ${productName}`,
+  },
+  {
+    name: 'verification',
+    message: msg`Welcome to ${productName}: Please Confirm Your Email`,
+  },
+  {
+    name: 'trial ending',
+    message: msg`Your ${productName} trial is ending soon`,
+  },
+  {
+    name: 'trial converting',
+    message: msg`A heads up before your ${productName} trial ends`,
+  },
+  {
+    name: 'subscription renewing',
+    message: msg`Your ${productName} plan renews soon`,
+  },
+];
+
 // Transactional emails went out with an empty body for a month without a single
 // test noticing, because every email spec mocks the renderer (#23307). These
 // specs run the real render path instead.
@@ -227,27 +252,57 @@ describe('email templates rendering', () => {
     expect(html).toContain('mot de passe');
   });
 
-  it('should keep a Japanese Mhoo invitation free of the upstream product name', async () => {
-    const element = SendInviteLinkEmail({
-      link: 'https://mhoo.example.com/invite/token',
-      workspace: WORKSPACE,
-      sender: {
-        email: 'tim@example.com',
-        firstName: 'Tim',
-        lastName: 'Apple',
-      },
-      serverUrl: 'https://mhoo.example.com',
-      locale: 'ja-JP',
-      brand: MHOO_BRAND,
-    });
-    const html = await renderEmail(element);
-    const text = await renderEmail(element, { plainText: true });
-    const output = `${html}\n${text}`;
+  it.each([
+    {
+      name: 'invitation',
+      expectedJapaneseContent: 'CRMソフトウェア',
+      element: SendInviteLinkEmail({
+        link: 'https://mhoo.example.com/invite/token',
+        workspace: WORKSPACE,
+        sender: {
+          email: 'tim@example.com',
+          firstName: 'Tim',
+          lastName: 'Apple',
+        },
+        serverUrl: 'https://mhoo.example.com',
+        locale: 'ja-JP',
+        brand: MHOO_BRAND,
+      }),
+    },
+    {
+      name: 'verification',
+      expectedJapaneseContent: 'ご登録いただきありがとうございます',
+      element: SendEmailVerificationLinkEmail({
+        link: 'https://mhoo.example.com/verify-email',
+        locale: 'ja-JP',
+        brand: MHOO_BRAND,
+      }),
+    },
+    {
+      name: 'billing',
+      expectedJapaneseContent: '特に操作は不要です',
+      element: BillingTrialConvertingEmail({
+        userName: 'Tim',
+        workspaceDisplayName: 'Acme Inc',
+        trialEndsAt: new Date('2026-01-01'),
+        interval: 'month',
+        link: 'https://mhoo.example.com/settings/billing',
+        locale: 'ja-JP',
+        brand: MHOO_BRAND,
+      }),
+    },
+  ])(
+    'should render a translated Japanese Mhoo $name body without upstream branding',
+    async ({ element, expectedJapaneseContent }) => {
+      const html = await renderEmail(element);
+      const text = await renderEmail(element, { plainText: true });
+      const output = `${html}\n${text}`;
 
-    expect(output).toContain('Mhoo');
-    expect(output).toContain('CRMソフトウェア');
-    expect(output).not.toContain('Twenty');
-  });
+      expect(output).toContain('Mhoo');
+      expect(output).toContain(expectedJapaneseContent);
+      expect(output).not.toContain('Twenty');
+    },
+  );
 
   it.each(MHOO_TEMPLATES)(
     'should keep $name free of upstream customer-facing residue in HTML and plain text',
@@ -260,6 +315,34 @@ describe('email templates rendering', () => {
       expect(`${html}\n${text}`).not.toContain('San Francisco');
       expect(`${html}\n${text}`).not.toContain('Powered by');
       expect(`${html}\n${text}`).not.toContain('MHOO Co., Ltd.');
+    },
+  );
+});
+
+describe('localized transactional email subjects', () => {
+  const i18nService = new I18nService();
+
+  beforeAll(async () => {
+    await i18nService.loadTranslations();
+  });
+
+  it.each(buildLocalizedSubjectCases('Mhoo'))(
+    'should interpolate Mhoo into the Japanese $name subject',
+    ({ message }) => {
+      const subject = i18nService.getI18nInstance('ja-JP')._(message);
+
+      expect(subject).toContain('Mhoo');
+      expect(subject).not.toContain('Twenty');
+    },
+  );
+
+  it.each(buildLocalizedSubjectCases('Twenty'))(
+    'should preserve the upstream product in the default $name subject',
+    ({ message }) => {
+      const subject = i18nService.getI18nInstance('en')._(message);
+
+      expect(subject).toContain('Twenty');
+      expect(subject).not.toContain('Mhoo');
     },
   );
 });

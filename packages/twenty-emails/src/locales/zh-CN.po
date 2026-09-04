@@ -265,6 +265,11 @@ msgid "Test email"
 msgstr "测试邮箱"
 
 #. js-lingui-explicit-id
+#: src/emails/send-email-verification-link.email.tsx
+msgid "Thanks for registering for an account on {productName}! Before we get started, we just need to confirm that this is you. Click below to verify your email address."
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/emails/password-update-notify.email.tsx
 msgid "This is a confirmation that password for your account ({email}) was successfully changed on {formattedDate}."
 msgstr "确认您的账户（{email}）密码已在 {formattedDate} 成功更改。"
@@ -316,6 +321,11 @@ msgstr ""
 #: src/emails/billing-trial-converting.email.tsx
 msgid "We don't like surprise charges, so here's a friendly heads up."
 msgstr "我们也不喜欢意外扣费，所以提前友好提醒您一下。"
+
+#. js-lingui-explicit-id
+#: src/emails/send-email-verification-link.email.tsx
+msgid "We received a request to change the email address associated with your {productName} account. Click below to confirm this change."
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/components/Footer.tsx

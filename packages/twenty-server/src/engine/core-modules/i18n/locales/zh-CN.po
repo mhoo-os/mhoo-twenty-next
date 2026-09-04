@@ -189,10 +189,11 @@ msgctxt "objectMetadata.description"
 msgid "A hand-picked audience of people"
 msgstr "精心挑选的人群受众"
 
-#. js-lingui-id: TF/ZV2
+#. js-lingui-id: qA5GBM
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "A heads up before your {productName} trial ends"
-msgstr "在您的 Twenty 试用结束前的提醒通知"
+msgid "A heads up before your {0} trial ends"
+msgstr "在您的 {0} 试用结束前的提醒通知"
 
 #. js-lingui-id: 6yZjO1
 #: src/engine/core-modules/application/application.exception.ts
@@ -5609,10 +5610,11 @@ msgctxt "objectMetadata.description"
 msgid "Join table linking message channel message associations to message folders"
 msgstr "用于将消息通道消息关联与消息文件夹关联起来的连接表"
 
-#. js-lingui-id: PviVyk
+#. js-lingui-id: kZ4/by
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/workspace-invitation/services/workspace-invitation.service.ts
-msgid "Join your team on {productName}"
-msgstr "加入您的团队，使用 Twenty"
+msgid "Join your team on {0}"
+msgstr "加入您的团队，使用 {0}"
 
 #. js-lingui-id: +KEn4d
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-call-recording-standard-flat-field-metadata.util.ts
@@ -11784,10 +11786,11 @@ msgstr "未找到 Webhook。"
 msgid "Wednesday"
 msgstr "星期三"
 
-#. js-lingui-id: TVkCrJ
+#. js-lingui-id: OTtsDi
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/email-verification/services/email-verification.service.ts
-msgid "Welcome to {productName}: Please Confirm Your Email"
-msgstr "欢迎来到Twenty: 请确认您的邮箱"
+msgid "Welcome to {0}: Please Confirm Your Email"
+msgstr "欢迎来到{0}: 请确认您的邮箱"
 
 #. js-lingui-id: ofdfh5
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-campaign-standard-flat-field-metadata.util.ts
@@ -12657,15 +12660,17 @@ msgctxt "fieldMetadata.description"
 msgid "Your team member responsible for managing the company account"
 msgstr "负责管理公司账户的团队成员"
 
-#. js-lingui-id: sOfbGC
+#. js-lingui-id: E67Uwl
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "Your {productName} plan renews soon"
-msgstr "您的 Twenty 方案即将续订"
+msgid "Your {0} plan renews soon"
+msgstr "您的 {0} 方案即将续订"
 
-#. js-lingui-id: qW+K5e
+#. js-lingui-id: AJR7Fm
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "Your {productName} trial is ending soon"
-msgstr "您的 Twenty 试用即将结束"
+msgid "Your {0} trial is ending soon"
+msgstr "您的 {0} 试用即将结束"
 
 #. js-lingui-id: ej/tZF
 #: src/engine/core-modules/graphql/hooks/use-graphql-error-handler.hook.ts

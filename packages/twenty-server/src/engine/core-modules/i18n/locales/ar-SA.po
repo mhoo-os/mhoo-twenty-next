@@ -189,10 +189,11 @@ msgctxt "objectMetadata.description"
 msgid "A hand-picked audience of people"
 msgstr "جمهور مختار بعناية من الأشخاص"
 
-#. js-lingui-id: TF/ZV2
+#. js-lingui-id: qA5GBM
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "A heads up before your {productName} trial ends"
-msgstr "تنبيه قبل انتهاء فترة تجربة Twenty الخاصة بك"
+msgid "A heads up before your {0} trial ends"
+msgstr "تنبيه قبل انتهاء فترة تجربة {0} الخاصة بك"
 
 #. js-lingui-id: 6yZjO1
 #: src/engine/core-modules/application/application.exception.ts
@@ -5609,10 +5610,11 @@ msgctxt "objectMetadata.description"
 msgid "Join table linking message channel message associations to message folders"
 msgstr "جدول ربط لربط ارتباطات رسائل قنوات الرسائل بمجلدات الرسائل"
 
-#. js-lingui-id: PviVyk
+#. js-lingui-id: kZ4/by
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/workspace-invitation/services/workspace-invitation.service.ts
-msgid "Join your team on {productName}"
-msgstr "انضم إلى فريقك على Twenty"
+msgid "Join your team on {0}"
+msgstr "انضم إلى فريقك على {0}"
 
 #. js-lingui-id: +KEn4d
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-call-recording-standard-flat-field-metadata.util.ts
@@ -11784,10 +11786,11 @@ msgstr "الويب هوك غير موجود."
 msgid "Wednesday"
 msgstr "الأربعاء"
 
-#. js-lingui-id: TVkCrJ
+#. js-lingui-id: OTtsDi
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/email-verification/services/email-verification.service.ts
-msgid "Welcome to {productName}: Please Confirm Your Email"
-msgstr "مرحبًا بك في Twenty: يرجى تأكيد بريدك الإلكتروني"
+msgid "Welcome to {0}: Please Confirm Your Email"
+msgstr "مرحبًا بك في {0}: يرجى تأكيد بريدك الإلكتروني"
 
 #. js-lingui-id: ofdfh5
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-campaign-standard-flat-field-metadata.util.ts
@@ -12657,15 +12660,17 @@ msgctxt "fieldMetadata.description"
 msgid "Your team member responsible for managing the company account"
 msgstr "العضو في فريقك المسئول عن إدارة حساب الشركة"
 
-#. js-lingui-id: sOfbGC
+#. js-lingui-id: E67Uwl
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "Your {productName} plan renews soon"
-msgstr "سيتم تجديد خطة Twenty الخاصة بك قريبًا"
+msgid "Your {0} plan renews soon"
+msgstr "سيتم تجديد خطة {0} الخاصة بك قريبًا"
 
-#. js-lingui-id: qW+K5e
+#. js-lingui-id: AJR7Fm
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "Your {productName} trial is ending soon"
-msgstr "تنتهي فترة تجربة Twenty الخاصة بك قريبًا"
+msgid "Your {0} trial is ending soon"
+msgstr "تنتهي فترة تجربة {0} الخاصة بك قريبًا"
 
 #. js-lingui-id: ej/tZF
 #: src/engine/core-modules/graphql/hooks/use-graphql-error-handler.hook.ts

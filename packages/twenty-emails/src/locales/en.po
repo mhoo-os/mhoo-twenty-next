@@ -260,6 +260,11 @@ msgid "Test email"
 msgstr "Test email"
 
 #. js-lingui-explicit-id
+#: src/emails/send-email-verification-link.email.tsx
+msgid "Thanks for registering for an account on {productName}! Before we get started, we just need to confirm that this is you. Click below to verify your email address."
+msgstr "Thanks for registering for an account on {productName}! Before we get started, we just need to confirm that this is you. Click below to verify your email address."
+
+#. js-lingui-explicit-id
 #: src/emails/password-update-notify.email.tsx
 msgid "This is a confirmation that password for your account ({email}) was successfully changed on {formattedDate}."
 msgstr "This is a confirmation that password for your account ({email}) was successfully changed on {formattedDate}."
@@ -311,6 +316,11 @@ msgstr "Visit the product website"
 #: src/emails/billing-trial-converting.email.tsx
 msgid "We don't like surprise charges, so here's a friendly heads up."
 msgstr "We don't like surprise charges, so here's a friendly heads up."
+
+#. js-lingui-explicit-id
+#: src/emails/send-email-verification-link.email.tsx
+msgid "We received a request to change the email address associated with your {productName} account. Click below to confirm this change."
+msgstr "We received a request to change the email address associated with your {productName} account. Click below to confirm this change."
 
 #. js-lingui-explicit-id
 #: src/components/Footer.tsx

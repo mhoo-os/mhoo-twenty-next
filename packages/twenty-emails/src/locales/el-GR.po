@@ -265,6 +265,11 @@ msgid "Test email"
 msgstr "Δοκιμαστικό email"
 
 #. js-lingui-explicit-id
+#: src/emails/send-email-verification-link.email.tsx
+msgid "Thanks for registering for an account on {productName}! Before we get started, we just need to confirm that this is you. Click below to verify your email address."
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/emails/password-update-notify.email.tsx
 msgid "This is a confirmation that password for your account ({email}) was successfully changed on {formattedDate}."
 msgstr "Αυτό είναι ένα επιβεβαίωση ότι ο κωδικός για τον λογαριασμό σας ({email}) άλλαξε με επιτυχία στις {formattedDate}."
@@ -316,6 +321,11 @@ msgstr ""
 #: src/emails/billing-trial-converting.email.tsx
 msgid "We don't like surprise charges, so here's a friendly heads up."
 msgstr "Δεν μας αρέσουν οι απρόσμενες χρεώσεις, οπότε σας στέλνουμε αυτή τη φιλική υπενθύμιση."
+
+#. js-lingui-explicit-id
+#: src/emails/send-email-verification-link.email.tsx
+msgid "We received a request to change the email address associated with your {productName} account. Click below to confirm this change."
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/components/Footer.tsx

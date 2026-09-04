@@ -189,10 +189,11 @@ msgctxt "objectMetadata.description"
 msgid "A hand-picked audience of people"
 msgstr "Gondosan kiválasztott emberekből álló célközönség"
 
-#. js-lingui-id: TF/ZV2
+#. js-lingui-id: qA5GBM
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "A heads up before your {productName} trial ends"
-msgstr "Előzetes figyelmeztetés, mielőtt a Twenty próbaidőszaka lejár"
+msgid "A heads up before your {0} trial ends"
+msgstr "Előzetes figyelmeztetés, mielőtt a {0} próbaidőszaka lejár"
 
 #. js-lingui-id: 6yZjO1
 #: src/engine/core-modules/application/application.exception.ts
@@ -5609,10 +5610,11 @@ msgctxt "objectMetadata.description"
 msgid "Join table linking message channel message associations to message folders"
 msgstr "Kapcsolótábla, amely az üzenetcsatorna üzenet-társításait az üzenetmappákhoz kapcsolja"
 
-#. js-lingui-id: PviVyk
+#. js-lingui-id: kZ4/by
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/workspace-invitation/services/workspace-invitation.service.ts
-msgid "Join your team on {productName}"
-msgstr "Csatlakozzon a csapatához a Twentyn"
+msgid "Join your team on {0}"
+msgstr "Csatlakozzon a csapatához a {0}n"
 
 #. js-lingui-id: +KEn4d
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-call-recording-standard-flat-field-metadata.util.ts
@@ -11784,10 +11786,11 @@ msgstr "Webhook nem található."
 msgid "Wednesday"
 msgstr "Szerda"
 
-#. js-lingui-id: TVkCrJ
+#. js-lingui-id: OTtsDi
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/email-verification/services/email-verification.service.ts
-msgid "Welcome to {productName}: Please Confirm Your Email"
-msgstr "Üdvözöljük a Twenty-ben: Kérjük, erősítse meg e-mail-címét"
+msgid "Welcome to {0}: Please Confirm Your Email"
+msgstr "Üdvözöljük a {0}-ben: Kérjük, erősítse meg e-mail-címét"
 
 #. js-lingui-id: ofdfh5
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-campaign-standard-flat-field-metadata.util.ts
@@ -12657,15 +12660,17 @@ msgctxt "fieldMetadata.description"
 msgid "Your team member responsible for managing the company account"
 msgstr "Az Ön csapatának megbízott tagja, aki a cégfiókot kezeli"
 
-#. js-lingui-id: sOfbGC
+#. js-lingui-id: E67Uwl
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "Your {productName} plan renews soon"
-msgstr "A Twenty csomagod hamarosan megújul"
+msgid "Your {0} plan renews soon"
+msgstr "A {0} csomagod hamarosan megújul"
 
-#. js-lingui-id: qW+K5e
+#. js-lingui-id: AJR7Fm
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "Your {productName} trial is ending soon"
-msgstr "A Twenty próbaidőszakod hamarosan lejár"
+msgid "Your {0} trial is ending soon"
+msgstr "A {0} próbaidőszakod hamarosan lejár"
 
 #. js-lingui-id: ej/tZF
 #: src/engine/core-modules/graphql/hooks/use-graphql-error-handler.hook.ts

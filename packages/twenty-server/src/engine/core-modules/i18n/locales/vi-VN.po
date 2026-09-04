@@ -189,10 +189,11 @@ msgctxt "objectMetadata.description"
 msgid "A hand-picked audience of people"
 msgstr "Một tập khách hàng được chọn thủ công"
 
-#. js-lingui-id: TF/ZV2
+#. js-lingui-id: qA5GBM
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "A heads up before your {productName} trial ends"
-msgstr "Thông báo trước khi bản dùng thử Twenty của bạn kết thúc"
+msgid "A heads up before your {0} trial ends"
+msgstr "Thông báo trước khi bản dùng thử {0} của bạn kết thúc"
 
 #. js-lingui-id: 6yZjO1
 #: src/engine/core-modules/application/application.exception.ts
@@ -5609,10 +5610,11 @@ msgctxt "objectMetadata.description"
 msgid "Join table linking message channel message associations to message folders"
 msgstr "Bảng nối liên kết các liên kết tin nhắn của kênh với các thư mục tin nhắn"
 
-#. js-lingui-id: PviVyk
+#. js-lingui-id: kZ4/by
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/workspace-invitation/services/workspace-invitation.service.ts
-msgid "Join your team on {productName}"
-msgstr "Tham gia vào đội ngũ của bạn trên Twenty"
+msgid "Join your team on {0}"
+msgstr "Tham gia vào đội ngũ của bạn trên {0}"
 
 #. js-lingui-id: +KEn4d
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-call-recording-standard-flat-field-metadata.util.ts
@@ -11784,10 +11786,11 @@ msgstr "Không tìm thấy webhook."
 msgid "Wednesday"
 msgstr "Thứ Tư"
 
-#. js-lingui-id: TVkCrJ
+#. js-lingui-id: OTtsDi
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/email-verification/services/email-verification.service.ts
-msgid "Welcome to {productName}: Please Confirm Your Email"
-msgstr "Chào mừng đến với Twenty: Vui lòng xác nhận email của bạn"
+msgid "Welcome to {0}: Please Confirm Your Email"
+msgstr "Chào mừng đến với {0}: Vui lòng xác nhận email của bạn"
 
 #. js-lingui-id: ofdfh5
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-campaign-standard-flat-field-metadata.util.ts
@@ -12657,15 +12660,17 @@ msgctxt "fieldMetadata.description"
 msgid "Your team member responsible for managing the company account"
 msgstr "Thành viên trong nhóm của bạn phụ trách quản lý tài khoản công ty"
 
-#. js-lingui-id: sOfbGC
+#. js-lingui-id: E67Uwl
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "Your {productName} plan renews soon"
-msgstr "Gói Twenty của bạn sẽ gia hạn sớm"
+msgid "Your {0} plan renews soon"
+msgstr "Gói {0} của bạn sẽ gia hạn sớm"
 
-#. js-lingui-id: qW+K5e
+#. js-lingui-id: AJR7Fm
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "Your {productName} trial is ending soon"
-msgstr "Bản dùng thử Twenty của bạn sắp kết thúc"
+msgid "Your {0} trial is ending soon"
+msgstr "Bản dùng thử {0} của bạn sắp kết thúc"
 
 #. js-lingui-id: ej/tZF
 #: src/engine/core-modules/graphql/hooks/use-graphql-error-handler.hook.ts

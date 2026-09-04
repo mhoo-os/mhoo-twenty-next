@@ -189,9 +189,10 @@ msgctxt "objectMetadata.description"
 msgid "A hand-picked audience of people"
 msgstr "crwdns138361:0crwdne138361:0"
 
-#. js-lingui-id: TF/ZV2
+#. js-lingui-id: qA5GBM
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "A heads up before your {productName} trial ends"
+msgid "A heads up before your {0} trial ends"
 msgstr "crwdns133999:0crwdne133999:0"
 
 #. js-lingui-id: 6yZjO1
@@ -5609,9 +5610,10 @@ msgctxt "objectMetadata.description"
 msgid "Join table linking message channel message associations to message folders"
 msgstr "crwdns139013:0crwdne139013:0"
 
-#. js-lingui-id: PviVyk
+#. js-lingui-id: kZ4/by
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/workspace-invitation/services/workspace-invitation.service.ts
-msgid "Join your team on {productName}"
+msgid "Join your team on {0}"
 msgstr "crwdns4977:0crwdne4977:0"
 
 #. js-lingui-id: +KEn4d
@@ -11784,9 +11786,10 @@ msgstr "crwdns65792:0crwdne65792:0"
 msgid "Wednesday"
 msgstr "crwdns8354:0crwdne8354:0"
 
-#. js-lingui-id: TVkCrJ
+#. js-lingui-id: OTtsDi
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/email-verification/services/email-verification.service.ts
-msgid "Welcome to {productName}: Please Confirm Your Email"
+msgid "Welcome to {0}: Please Confirm Your Email"
 msgstr "crwdns4981:0crwdne4981:0"
 
 #. js-lingui-id: ofdfh5
@@ -12657,14 +12660,16 @@ msgctxt "fieldMetadata.description"
 msgid "Your team member responsible for managing the company account"
 msgstr "crwdns139857:0crwdne139857:0"
 
-#. js-lingui-id: sOfbGC
+#. js-lingui-id: E67Uwl
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "Your {productName} plan renews soon"
+msgid "Your {0} plan renews soon"
 msgstr "crwdns134377:0crwdne134377:0"
 
-#. js-lingui-id: qW+K5e
+#. js-lingui-id: AJR7Fm
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "Your {productName} trial is ending soon"
+msgid "Your {0} trial is ending soon"
 msgstr "crwdns134379:0crwdne134379:0"
 
 #. js-lingui-id: ej/tZF

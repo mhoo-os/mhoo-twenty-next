@@ -189,10 +189,11 @@ msgctxt "objectMetadata.description"
 msgid "A hand-picked audience of people"
 msgstr "Ένα προσεκτικά επιλεγμένο κοινό ανθρώπων"
 
-#. js-lingui-id: TF/ZV2
+#. js-lingui-id: qA5GBM
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "A heads up before your {productName} trial ends"
-msgstr "Μια ενημέρωση πριν λήξει η δοκιμαστική περίοδος του Twenty σας"
+msgid "A heads up before your {0} trial ends"
+msgstr "Μια ενημέρωση πριν λήξει η δοκιμαστική περίοδος του {0} σας"
 
 #. js-lingui-id: 6yZjO1
 #: src/engine/core-modules/application/application.exception.ts
@@ -5609,10 +5610,11 @@ msgctxt "objectMetadata.description"
 msgid "Join table linking message channel message associations to message folders"
 msgstr "Πίνακας σύζευξης που συνδέει τις συσχετίσεις μηνυμάτων καναλιού με φακέλους μηνυμάτων"
 
-#. js-lingui-id: PviVyk
+#. js-lingui-id: kZ4/by
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/workspace-invitation/services/workspace-invitation.service.ts
-msgid "Join your team on {productName}"
-msgstr "Συμμετέχετε στην ομάδα σας στο Twenty"
+msgid "Join your team on {0}"
+msgstr "Συμμετέχετε στην ομάδα σας στο {0}"
 
 #. js-lingui-id: +KEn4d
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-call-recording-standard-flat-field-metadata.util.ts
@@ -11784,10 +11786,11 @@ msgstr "Το webhook δεν βρέθηκε."
 msgid "Wednesday"
 msgstr "Τετάρτη"
 
-#. js-lingui-id: TVkCrJ
+#. js-lingui-id: OTtsDi
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/email-verification/services/email-verification.service.ts
-msgid "Welcome to {productName}: Please Confirm Your Email"
-msgstr "Καλώς ήρθατε στο Twenty: Παρακαλώ επιβεβαιώστε το email σας"
+msgid "Welcome to {0}: Please Confirm Your Email"
+msgstr "Καλώς ήρθατε στο {0}: Παρακαλώ επιβεβαιώστε το email σας"
 
 #. js-lingui-id: ofdfh5
 #: src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-message-campaign-standard-flat-field-metadata.util.ts
@@ -12657,15 +12660,17 @@ msgctxt "fieldMetadata.description"
 msgid "Your team member responsible for managing the company account"
 msgstr "Το μέλος της ομάδας σας υπεύθυνο για τη διαχείριση του λογαριασμού της εταιρείας"
 
-#. js-lingui-id: sOfbGC
+#. js-lingui-id: E67Uwl
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "Your {productName} plan renews soon"
-msgstr "Το πρόγραμμα Twenty σας θα ανανεωθεί σύντομα"
+msgid "Your {0} plan renews soon"
+msgstr "Το πρόγραμμα {0} σας θα ανανεωθεί σύντομα"
 
-#. js-lingui-id: qW+K5e
+#. js-lingui-id: AJR7Fm
+#. placeholder {0}: brand.productName
 #: src/engine/core-modules/billing/reminders/services/billing-reminder.service.ts
-msgid "Your {productName} trial is ending soon"
-msgstr "Η δοκιμαστική περίοδός σας στο Twenty λήγει σύντομα"
+msgid "Your {0} trial is ending soon"
+msgstr "Η δοκιμαστική περίοδός σας στο {0} λήγει σύντομα"
 
 #. js-lingui-id: ej/tZF
 #: src/engine/core-modules/graphql/hooks/use-graphql-error-handler.hook.ts
