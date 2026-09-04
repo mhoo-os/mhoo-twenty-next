@@ -49,6 +49,34 @@ grep -Fq "pull_request_target restored: $workflow" "$temporary_directory/output"
 
 test "$(git rev-parse HEAD)" != "$unsafe_head"
 
+suffix_path=scripts/docs/check_app_docs_drift.py.backup
+suffix_blob="$(git hash-object -w scripts/docs/check_app_docs_drift.py)"
+GIT_INDEX_FILE="$temporary_directory/suffix-index" git read-tree HEAD
+GIT_INDEX_FILE="$temporary_directory/suffix-index" git update-index --add \
+  --cacheinfo 100644 "$suffix_blob" "$suffix_path"
+suffix_tree="$(GIT_INDEX_FILE="$temporary_directory/suffix-index" git write-tree)"
+suffix_head="$(
+  printf 'test: add suffix bypass candidate\n' |
+    GIT_AUTHOR_NAME='Trajectory fixture' \
+    GIT_AUTHOR_EMAIL='trajectory-fixture@example.invalid' \
+    GIT_AUTHOR_DATE='2000-01-01T00:00:01Z' \
+    GIT_COMMITTER_NAME='Trajectory fixture' \
+    GIT_COMMITTER_EMAIL='trajectory-fixture@example.invalid' \
+    GIT_COMMITTER_DATE='2000-01-01T00:00:01Z' \
+    git commit-tree "$suffix_tree" -p HEAD
+)"
+
+if bash "$fixture" HEAD "$suffix_head" >"$temporary_directory/suffix-output" 2>&1; then
+  printf 'exact-head fixture test failed: approved-path suffix passed\n' >&2
+  exit 1
+fi
+
+grep -Fq "trajectory fixture rejected: $suffix_path" "$temporary_directory/suffix-output" || {
+  printf 'exact-head fixture test failed: unexpected suffix rejection\n' >&2
+  sed -n '1,120p' "$temporary_directory/suffix-output" >&2
+  exit 1
+}
+
 unrelated_head="$(
   printf 'test: unrelated source ancestry\n' |
     GIT_AUTHOR_NAME='Trajectory fixture' \
