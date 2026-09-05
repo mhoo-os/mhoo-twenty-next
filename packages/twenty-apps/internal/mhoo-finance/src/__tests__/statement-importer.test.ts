@@ -197,6 +197,15 @@ describe('governed statement importer', () => {
   });
 
   it('fails closed for ambiguous source accounts, duplicate-FITID, and OFX correction semantics', () => {
+    for (const [name, malformed] of [
+      ['nested', qfxText().replace('<OFX>', '<OFX><OFX>')],
+      ['missing', qfxText().replace('<OFX>', '')],
+      ['unclosed', qfxText().replace('</OFX>', '')],
+      ['trailing', `${qfxText()}<OFX></OFX>`],
+    ] as const) {
+      const rejected = parseQfxOfxStatement(csvInput(malformed, { artifactId: `root-${name}`, originalFileId: `synthetic-files-reference-root-${name}`, originalFileName: `root-${name}.qfx`, mimeType: 'application/x-qfx' }), 'QFX');
+      expect(rejected.rejectedRows).toMatchObject([{ sourceLocation: 'ofx:structure', code: 'MALFORMED_ROW' }]);
+    }
     const multiAccount = parseQfxOfxStatement(csvInput(qfxText().replace('<ACCTID>synthetic', '<ACCTID>synthetic<ACCTID>second'), { artifactId: 'multi', originalFileId: 'synthetic-files-reference-multi', originalFileName: 'multi.qfx', mimeType: 'application/x-qfx' }), 'QFX');
     expect(multiAccount.rejectedRows).toMatchObject([{ code: 'MALFORMED_ROW' }]);
     const wrongBinding = parseQfxOfxStatement(csvInput(qfxText(), { artifactId: 'wrong-binding', originalFileId: 'synthetic-files-reference-wrong-binding', originalFileName: 'wrong-binding.qfx', mimeType: 'application/x-qfx', accountBinding: { ...csvInput('').accountBinding, accountKey: 'acct-synthetic-5678' } }), 'QFX');

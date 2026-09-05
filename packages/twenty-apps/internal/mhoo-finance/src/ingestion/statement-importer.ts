@@ -333,6 +333,17 @@ const tagValue = (fragment: string, tag: string): string | undefined => {
 
 const tagCount = (fragment: string, tag: string): number => [...fragment.matchAll(new RegExp(`<${tag}(?:>|\\s)`, 'gi'))].length;
 
+/** QFX leaf tags may use SGML-style open tags, but the enclosing OFX message must be one complete envelope. */
+const hasSingleClosedOfxEnvelope = (text: string): boolean => {
+  const openings = [...text.matchAll(/<OFX>/gi)];
+  const closings = [...text.matchAll(/<\/OFX>/gi)];
+  if (openings.length !== 1 || closings.length !== 1) return false;
+  const openingEnd = (openings[0].index ?? -1) + openings[0][0].length;
+  const closingStart = closings[0].index ?? -1;
+  const closingEnd = closingStart + closings[0][0].length;
+  return closingStart >= openingEnd && text.slice(closingEnd).trim() === '';
+};
+
 const sourceSummaryControls = (text: string): { controls?: StatementSummaryControlsV1; rejection?: RejectedStatementRow } => {
   const fields = [
     ['depositsMinor', 'DEPANDCREDIT'],
@@ -369,7 +380,7 @@ export const parseQfxOfxStatement = (input: ArtifactInput, sourceFormat: 'QFX' |
   const accountBlocks = [...text.matchAll(/<BANKACCTFROM>([\s\S]*?)(?:<\/BANKACCTFROM>|(?=<BANKTRANLIST>))/gi)];
   const listBlocks = [...text.matchAll(/<BANKTRANLIST>/gi)];
   const accountBlock = accountBlocks[0]?.[1] ?? '';
-  if (!/<OFX>/i.test(text) || accountBlocks.length !== 1 || listBlocks.length !== 1 || tagCount(accountBlock, 'ACCTID') !== 1 || !tagValue(accountBlock, 'ACCTID')) return { receipt, controls: { periodStart: '', periodEnd: '' }, rows: [], rejectedRows: [{ sourceLocation: 'ofx:structure', code: 'MALFORMED_ROW', message: 'Exactly one OFX root, account binding, account identifier, and transaction list are required.', rawValues: {} }] };
+  if (!hasSingleClosedOfxEnvelope(text) || accountBlocks.length !== 1 || listBlocks.length !== 1 || tagCount(accountBlock, 'ACCTID') !== 1 || !tagValue(accountBlock, 'ACCTID')) return { receipt, controls: { periodStart: '', periodEnd: '' }, rows: [], rejectedRows: [{ sourceLocation: 'ofx:structure', code: 'MALFORMED_ROW', message: 'One closed OFX root, account binding, account identifier, and transaction list are required.', rawValues: {} }] };
   if (accountBlocks.length > 1) return { receipt, controls: { periodStart: '', periodEnd: '' }, rows: [], rejectedRows: [{ sourceLocation: 'ofx:account', code: 'UNSUPPORTED_FORMAT', message: 'Multiple bank accounts in one artifact are outside the bounded parser contract.', rawValues: {} }] };
   const sourceAccountId = tagValue(accountBlock, 'ACCTID') as string;
   const sourceAccountHash = createHash('sha256').update(sourceAccountId).digest('hex');
