@@ -19,6 +19,7 @@ const input = (artifactId, name, mimeType) => ({
   bytes: fixture(name),
   acquiredAt: '2026-09-05T12:00:00.000Z',
   acquiredBy: 'fixture-author',
+  originalFileId: 'synthetic-files-reference-001',
 });
 
 const csv = parseCsvStatement(input('synthetic-csv-february-v1', 'synthetic-bank-february.csv', 'text/csv'), SYNTHETIC_BANK_CSV_V1);

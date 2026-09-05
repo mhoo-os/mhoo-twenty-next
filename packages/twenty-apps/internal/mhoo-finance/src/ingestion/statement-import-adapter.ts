@@ -46,6 +46,8 @@ export const toFinanceNativeImportRecords = (
       acquiredAt: statement.receipt.acquiredAt,
       acquiredBy: statement.receipt.acquiredBy,
       supersedesArtifactKey: statement.receipt.supersedesArtifactId,
+      originalFiles: [{ id: statement.receipt.originalFileId }],
+      statementControls: JSON.stringify(statement.controls),
     }],
     importReceipts: [{
       receiptKey: `receipt-${receiptScope}`,
@@ -77,6 +79,7 @@ export const toFinanceNativeImportRecords = (
       sourceSignConvention: 'SIGNED_AMOUNT_POSITIVE_INFLOW',
       transactionDate: row.transactionDate,
       postedDate: row.postedDate,
+      rawValues: JSON.stringify(row.rawValues),
     })),
   };
 };

@@ -41,6 +41,8 @@ export type FinanceFixtureNativeRecords = {
     acquiredAt?: string;
     acquiredBy?: string;
     supersedesArtifactKey?: string;
+    originalFiles?: readonly { id: string }[];
+    statementControls?: string;
   }>;
   importReceipts: Array<{
     receiptKey: ImportReceipt['receiptId'];
@@ -72,6 +74,9 @@ export type FinanceFixtureNativeRecords = {
     sourceSignConvention?: string;
     transactionDate?: string;
     postedDate?: string;
+    rawValues?: string;
+    originalFiles?: readonly { id: string }[];
+    statementControls?: string;
   }>;
   coveragePeriods: Array<
     Pick<

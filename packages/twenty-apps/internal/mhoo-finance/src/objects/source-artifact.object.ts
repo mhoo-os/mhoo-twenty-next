@@ -27,6 +27,8 @@ import {
   SOURCE_ARTIFACT_ACQUIRED_BY_FIELD_UNIVERSAL_IDENTIFIER,
   SOURCE_ARTIFACT_SUPERSEDES_FIELD_UNIVERSAL_IDENTIFIER,
   SOURCE_ARTIFACT_ACCOUNT_FIELD_UNIVERSAL_IDENTIFIER,
+  SOURCE_ARTIFACT_FILES_FIELD_UNIVERSAL_IDENTIFIER,
+  SOURCE_ARTIFACT_STATEMENT_CONTROLS_FIELD_UNIVERSAL_IDENTIFIER,
   SOURCE_ARTIFACT_ROW_COUNT_FIELD_UNIVERSAL_IDENTIFIER,
   SOURCE_ARTIFACT_STATUS_FIELD_UNIVERSAL_IDENTIFIER,
 } from 'src/constants/universal-identifiers';
@@ -166,6 +168,24 @@ export default defineObject({
       name: 'acquiredBy',
       label: 'Acquired by',
       icon: 'IconUser',
+    },
+    {
+      universalIdentifier: SOURCE_ARTIFACT_STATEMENT_CONTROLS_FIELD_UNIVERSAL_IDENTIFIER,
+      type: FieldType.TEXT,
+      name: 'statementControls',
+      label: 'Statement controls',
+      description: 'Versioned supplied statement totals and balance controls.',
+      icon: 'IconCalculator',
+      isNullable: true,
+    },
+    {
+      universalIdentifier: SOURCE_ARTIFACT_FILES_FIELD_UNIVERSAL_IDENTIFIER,
+      type: FieldType.FILES,
+      name: 'originalFiles',
+      label: 'Original files',
+      description: 'Immutable Twenty Files-compatible evidence reference; upload is outside this source slice.',
+      icon: 'IconFile',
+      universalSettings: { maxNumberOfValues: 1 },
     },
     {
       universalIdentifier: SOURCE_ARTIFACT_SUPERSEDES_FIELD_UNIVERSAL_IDENTIFIER,

@@ -7,6 +7,8 @@ import {
   parseQfxOfxStatement,
   reconcileStatementPeriod,
   retainUnparsedPdfArtifact,
+  compareAdjacentPeriodBalances,
+  compareStatementSummaryControls,
 } from 'src/ingestion/statement-importer';
 import { toFinanceNativeImportRecords } from 'src/ingestion/statement-import-adapter';
 
@@ -21,6 +23,7 @@ const csvInput = (content: string, overrides: Record<string, unknown> = {}) => (
   bytes: bytes(content),
   acquiredAt: '2026-09-05T12:00:00.000Z',
   acquiredBy: 'fixture-author',
+  originalFileId: 'synthetic-files-reference-001',
   ...overrides,
 });
 
@@ -41,6 +44,7 @@ describe('governed statement importer', () => {
       byteLength: bytes(`\uFEFF${csv}`).byteLength,
       acquiredAt: '2026-09-05T12:00:00.000Z',
       acquiredBy: 'fixture-author',
+  originalFileId: 'synthetic-files-reference-001',
       parserProfileId: 'synthetic-bank-csv-v1',
     });
     expect(statement.rows).toEqual([
@@ -94,7 +98,7 @@ describe('governed statement importer', () => {
   it('parses QFX/OFX controls and proves exact minor-unit period arithmetic', () => {
     const qfx = [
       'OFXHEADER:100',
-      '<OFX><BANKMSGSRSV1><STMTTRNRS><STMTRS><BANKTRANLIST><DTSTART>20260201<DTEND>20260228',
+      '<OFX><BANKMSGSRSV1><STMTTRNRS><STMTRS><BANKACCTFROM><ACCTID>synthetic</BANKACCTFROM><BANKTRANLIST><DTSTART>20260201<DTEND>20260228',
       '<STMTTRN><FITID>fit-1<DTPOSTED>20260202<TRNAMT>100.00<NAME>Synthetic deposit',
       '<STMTTRN><FITID>fit-2<DTPOSTED>20260203<TRNAMT>-25.55<NAME>Synthetic withdrawal',
       '</BANKTRANLIST><CLOSING><DTOPEN>20260201<DTCLOSE>20260228<BALOPEN>100.00<BALCLOSE>174.45</CLOSING></STMTRS></STMTTRNRS></BANKMSGSRSV1></OFX>',
@@ -170,7 +174,7 @@ describe('governed statement importer', () => {
 
   it('fails closed for unsupported multi-account, duplicate-FITID, and OFX correction semantics', () => {
     const multiAccount = parseQfxOfxStatement(csvInput('<BANKACCTFROM><BANKACCTFROM>', { artifactId: 'multi', originalFileName: 'multi.ofx', mimeType: 'application/x-ofx' }), 'OFX');
-    expect(multiAccount.rejectedRows).toMatchObject([{ code: 'UNSUPPORTED_FORMAT' }]);
+    expect(multiAccount.rejectedRows).toMatchObject([{ code: 'MALFORMED_ROW' }]);
     const duplicateFitId = parseQfxOfxStatement(csvInput([
       '<BANKTRANLIST><DTSTART>20260201<DTEND>20260228',
       '<STMTTRN><FITID>same<DTPOSTED>20260202<TRNAMT>1.00<NAME>One</STMTTRN>',
@@ -179,7 +183,7 @@ describe('governed statement importer', () => {
     ].join(''), { artifactId: 'dupe', originalFileName: 'dupe.ofx', mimeType: 'application/x-ofx' }), 'OFX');
     expect(duplicateFitId.rejectedRows).toMatchObject([{ code: 'MALFORMED_ROW' }]);
     const correction = parseQfxOfxStatement(csvInput('<BANKTRANLIST><DTSTART>20260201<DTEND>20260228<STMTTRN><FITID>x<DTPOSTED>20260202<TRNAMT>1.00<NAME>One<CORRECTACTION>REPLACE</STMTTRN></BANKTRANLIST><LEDGERBAL><BALAMT>1.00', { artifactId: 'correction', originalFileName: 'correction.ofx', mimeType: 'application/x-ofx' }), 'OFX');
-    expect(correction.rejectedRows).toMatchObject([{ code: 'UNSUPPORTED_FORMAT' }]);
+    expect(correction.rejectedRows).toMatchObject([{ code: 'MALFORMED_ROW' }]);
   });
 
   it('scopes source record identity to an account and requires a versioned correction for changed source values', () => {
@@ -215,6 +219,20 @@ describe('governed statement importer', () => {
     expect(() => reconcileStatementPeriod(oversized)).toThrow('aggregate exceeds safe integer range');
   });
 
+  it('compares versioned supplied controls and adjacent statement balances deterministically', () => {
+    expect(compareStatementSummaryControls({ schemaVersion: 'statement-summary-controls-v1', depositsMinor: 100, paymentsMinor: 50, feesMinor: 3, interestMinor: 2 }, { depositsMinor: 100, paymentsMinor: 49, feesMinor: 3, interestMinor: 2 }).map((item) => item.status)).toEqual(['MATCH', 'MISMATCH', 'MATCH', 'MATCH']);
+    expect(compareAdjacentPeriodBalances(17445, 17445).status).toBe('MATCH');
+    expect(compareAdjacentPeriodBalances(17445, 17000).status).toBe('MISMATCH');
+  });
+
+  it('retains duplicate acquisition metadata linked to the canonical hash', () => {
+    const original = parseCsvStatement(csvInput(csv), SYNTHETIC_BANK_CSV_V1);
+    const complete = importBoundedStatement(original, initialState, 10);
+    const duplicate = parseCsvStatement(csvInput(csv, { originalFileName: 'received-copy.csv', acquiredAt: '2026-09-06T12:00:00.000Z', acquiredBy: 'second-receiver' }), SYNTHETIC_BANK_CSV_V1);
+    const replay = importBoundedStatement(duplicate, complete.state, 10);
+    expect(replay.state.acquisitions).toMatchObject([{ disposition: 'CANONICAL' }, { disposition: 'DUPLICATE', canonicalArtifactId: 'synthetic-bank-february-v1', originalFileName: 'received-copy.csv', acquiredBy: 'second-receiver' }]);
+  });
+
   it('keeps rejected rows from asserting source completeness and maps accepted rows through existing Finance objects', () => {
     const statement = parseCsvStatement(csvInput(`${csv}\n02/32/2026,02/04/2026,Bad date,5.00,txn-bad`), SYNTHETIC_BANK_CSV_V1);
     const imported = importBoundedStatement(statement, initialState, 10);
@@ -223,6 +241,8 @@ describe('governed statement importer', () => {
     expect(native.sourceArtifacts[0]).toMatchObject({ artifactKey: 'synthetic-bank-february-v1', contentHash: statement.receipt.sha256 });
     expect(native.financeFacts).toHaveLength(2);
     expect(native.importReceipts[0]).toMatchObject({ rejectedRows: 1, importedRows: 2 });
-    expect(native.financeFacts[0]).toMatchObject({ artifactKey: 'synthetic-bank-february-v1', sourceRowKey: 'csv:row:2', classification: 'UNCLASSIFIED', sourceAmount: '125.00' });
+    expect(native.sourceArtifacts[0].originalFiles).toEqual([{ id: 'synthetic-files-reference-001' }]);
+    expect(native.sourceArtifacts[0].statementControls).toContain('periodStart');
+    expect(native.financeFacts[0]).toMatchObject({ artifactKey: 'synthetic-bank-february-v1', sourceRowKey: 'csv:row:2', classification: 'UNCLASSIFIED', sourceAmount: '125.00', rawValues: expect.stringContaining('Transaction ID') });
   });
 });
