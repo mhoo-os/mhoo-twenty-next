@@ -1,0 +1,78 @@
+{
+  "engine": "pdfplumber",
+  "input": "corpus/originals/settlement-export.pdf",
+  "network_disabled": true,
+  "pages": [
+    {
+      "page": 1,
+      "text": "MHO-254 SYNTHETIC FIXTURE - NOT A REAL ACCOUNT\nDOCUMENT ID: settlement-export\nDATE | SETTLEMENT ID | GROSS | FEE | NET\n2026-02-04 | SET-001 | 100.00 | -3.00 | 97.00\n2026-02-05 | SET-002 | 75.00 | -2.25 | 72.75\n2026-02-05 | SET-002 | 75.00 | -2.25 | 72.75\nDUPLICATE ROW IS INTENTIONAL AND MUST REMAIN VISIBLE"
+    }
+  ],
+  "extraction": {
+    "document_id": "settlement-export",
+    "kind": "settlement_export",
+    "rows": [
+      {
+        "id": "SET-001",
+        "date": "2026-02-04",
+        "amount_raw": "97.00",
+        "amount_minor": 9700,
+        "source_page": 1,
+        "source_line": 4,
+        "source_char_span": [
+          0,
+          45
+        ],
+        "source_text": "2026-02-04 | SET-001 | 100.00 | -3.00 | 97.00",
+        "gross_raw": "100.00",
+        "gross_minor": 10000,
+        "fee_raw": "-3.00",
+        "fee_minor": -300
+      },
+      {
+        "id": "SET-002",
+        "date": "2026-02-05",
+        "amount_raw": "72.75",
+        "amount_minor": 7275,
+        "source_page": 1,
+        "source_line": 5,
+        "source_char_span": [
+          0,
+          44
+        ],
+        "source_text": "2026-02-05 | SET-002 | 75.00 | -2.25 | 72.75",
+        "gross_raw": "75.00",
+        "gross_minor": 7500,
+        "fee_raw": "-2.25",
+        "fee_minor": -225
+      },
+      {
+        "id": "SET-002",
+        "date": "2026-02-05",
+        "amount_raw": "72.75",
+        "amount_minor": 7275,
+        "source_page": 1,
+        "source_line": 6,
+        "source_char_span": [
+          0,
+          44
+        ],
+        "source_text": "2026-02-05 | SET-002 | 75.00 | -2.25 | 72.75",
+        "gross_raw": "75.00",
+        "gross_minor": 7500,
+        "fee_raw": "-2.25",
+        "fee_minor": -225
+      }
+    ],
+    "opening_minor": null,
+    "closing_minor": null,
+    "calculated_closing_minor": null,
+    "duplicate_ids": [
+      "SET-002"
+    ],
+    "arithmetic_status": "PASS",
+    "silent_repair_performed": false
+  },
+  "worker_peak_rss_bytes": 32354304,
+  "stderr": ""
+}

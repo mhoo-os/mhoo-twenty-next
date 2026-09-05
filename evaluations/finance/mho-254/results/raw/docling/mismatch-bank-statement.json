@@ -1,0 +1,57 @@
+{
+  "engine": "docling",
+  "input": "corpus/originals/mismatch-bank-statement.pdf",
+  "network_disabled": true,
+  "pages": [
+    {
+      "page": 1,
+      "text": "MHO-254 SYNTHETIC FIXTURE - NOT A REAL ACCOUNT DOCUMENT ID: mismatch-bank-statement\nOPENING BALANCE: 400.00 DATE | DESCRIPTION | AMOUNT | RUNNING BALANCE 2026-04-02 | Deposit Beta | +200.00 | 600.00 2026-04-09 | Service Fee | -10.00 | 600.00\nCLOSING BALANCE: 600.00"
+    }
+  ],
+  "extraction": {
+    "document_id": "mismatch-bank-statement",
+    "kind": "bank_statement",
+    "rows": [
+      {
+        "id": "mismatch-bank-statement-row-1",
+        "date": "2026-04-02",
+        "amount_raw": "+200.00",
+        "amount_minor": 20000,
+        "source_page": 1,
+        "source_line": 2,
+        "source_char_span": [
+          70,
+          114
+        ],
+        "source_text": "OPENING BALANCE: 400.00 DATE | DESCRIPTION | AMOUNT | RUNNING BALANCE 2026-04-02 | Deposit Beta | +200.00 | 600.00 2026-04-09 | Service Fee | -10.00 | 600.00",
+        "description": "Deposit Beta",
+        "balance_raw": "600.00",
+        "balance_minor": 60000
+      },
+      {
+        "id": "mismatch-bank-statement-row-2",
+        "date": "2026-04-09",
+        "amount_raw": "-10.00",
+        "amount_minor": -1000,
+        "source_page": 1,
+        "source_line": 2,
+        "source_char_span": [
+          115,
+          157
+        ],
+        "source_text": "OPENING BALANCE: 400.00 DATE | DESCRIPTION | AMOUNT | RUNNING BALANCE 2026-04-02 | Deposit Beta | +200.00 | 600.00 2026-04-09 | Service Fee | -10.00 | 600.00",
+        "description": "Service Fee",
+        "balance_raw": "600.00",
+        "balance_minor": 60000
+      }
+    ],
+    "opening_minor": 40000,
+    "closing_minor": 60000,
+    "calculated_closing_minor": 59000,
+    "duplicate_ids": [],
+    "arithmetic_status": "FLAGGED",
+    "silent_repair_performed": false
+  },
+  "worker_peak_rss_bytes": 1215987712,
+  "stderr": "[INFO] 2026-09-05 20:42:29,355 [RapidOCR] base.py:23: Using engine_name: torch\n[INFO] 2026-09-05 20:42:29,358 [RapidOCR] device_config.py:57: Using CPU device\n[INFO] 2026-09-05 20:42:29,370 [RapidOCR] download_file.py:60: File exists and is valid: /workspace/scratch/ae360d63e7a9/mho254-venv/lib/python3.12/site-packages/rapidocr/models/PP-OCRv6_det_small.pth\n[INFO] 2026-09-05 20:42:29,370 [RapidOCR] main.py:50: Using /workspace/scratch/ae360d63e7a9/mho254-venv/lib/python3.12/site-packages/rapidocr/models/PP-OCRv6_det_small.pth\n[INFO] 2026-09-05 20:42:29,694 [RapidOCR] base.py:23: Using engine_name: torch\n[INFO] 2026-09-05 20:42:29,695 [RapidOCR] device_config.py:57: Using CPU device\n[INFO] 2026-09-05 20:42:29,697 [RapidOCR] download_file.py:60: File exists and is valid: /workspace/scratch/ae360d63e7a9/mho254-venv/lib/python3.12/site-packages/rapidocr/models/ch_ptocr_mobile_v2.0_cls_mobile.pth\n[INFO] 2026-09-05 20:42:29,698 [RapidOCR] main.py:50: Using /workspace/scratch/ae360d63e7a9/mho254-venv/lib/python3.12/site-packages/rapidocr/models/ch_ptocr_mobile_v2.0_cls_mobile.pth\n[INFO] 2026-09-05 20:42:29,781 [RapidOCR] base.py:23: Using engine_name: torch\n[INFO] 2026-09-05 20:42:29,781 [RapidOCR] device_config.py:57: Using CPU device\n[INFO] 2026-09-05 20:42:29,805 [RapidOCR] download_file.py:60: File exists and is valid: /workspace/scratch/ae360d63e7a9/mho254-venv/lib/python3.12/site-packages/rapidocr/models/PP-OCRv6_rec_small.pth\n[INFO] 2026-09-05 20:42:29,805 [RapidOCR] main.py:50: Using /workspace/scratch/ae360d63e7a9/mho254-venv/lib/python3.12/site-packages/rapidocr/models/PP-OCRv6_rec_small.pth\n\nLoading weights:   0%|          | 0/770 [00:00<?, ?it/s]\nLoading weights:  58%|\u2588\u2588\u2588\u2588\u2588\u258a    | 443/770 [00:00<00:00, 4427.44it/s]\nLoading weights: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 770/770 [00:00<00:00, 4266.86it/s]\n"
+}

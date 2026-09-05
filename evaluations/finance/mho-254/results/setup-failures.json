@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "failures": [
+    {
+      "stage": "dependency-resolution",
+      "candidate": "docling==2.126.0",
+      "observed": "Default Linux resolution selected torch 2.14.0 and CUDA 13 packages for a CPU-only benchmark.",
+      "disposition": "Stopped before installation; installed torch==2.8.0+cpu and torchvision==0.23.0+cpu from the official PyTorch CPU index, then installed Docling.",
+      "impact": "Docling needs an explicit CPU pin to avoid unnecessary GPU dependencies in this environment."
+    },
+    {
+      "stage": "first-model-download",
+      "candidate": "docling==2.126.0",
+      "observed": "The first conversion failed before source processing because HTTPX detected the task SOCKS proxy but socksio was absent.",
+      "disposition": "Pinned socksio==1.0.0 locally and retried; retained measured results were generated offline after models were cached.",
+      "impact": "Proxy environments require an undeclared transport extra for first-time model download."
+    },
+    {
+      "stage": "baseline-scan",
+      "candidate": "pdfplumber==0.11.10",
+      "observed": "The image-only statement yielded zero extracted rows and no balances.",
+      "disposition": "Retained as a failed case. Docling's bundled RapidOCR path was then evaluated on the same original.",
+      "impact": "pdfplumber cannot be the scan parser without a separate reviewed OCR wrapper."
+    }
+  ]
+}

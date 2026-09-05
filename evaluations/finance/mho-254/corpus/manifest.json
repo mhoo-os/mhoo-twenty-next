@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "generator": "corpus/generate_corpus.py",
+  "files": [
+    {
+      "path": "originals/mismatch-bank-statement.pdf",
+      "sha256": "28f174b3f32748198840d32623b8865330ca9cb123b8cb94aa6e1cd0d1f4942a",
+      "bytes": 1698
+    },
+    {
+      "path": "originals/mismatch-bank-statement.source.txt",
+      "sha256": "5260cd509460afccc79cdcd36491b659b92f1141d1992e93a66ad3df3c654311",
+      "bytes": 268
+    },
+    {
+      "path": "originals/scan-bank-statement.pdf",
+      "sha256": "2a39abd53543911d04b59b86d0411bd9aac3d82f64aa2eecf047c60d2f71de11",
+      "bytes": 38347
+    },
+    {
+      "path": "originals/scan-bank-statement.source.txt",
+      "sha256": "29c3334a3a669de32a505eb491d62d5b32a6e8a34d97abfa301b9b7845f53b45",
+      "bytes": 264
+    },
+    {
+      "path": "originals/settlement-export.pdf",
+      "sha256": "dc8c788f3b2082f0603bcc5fafe4aaf3bb8c65e426daa7239f1f4e2ca088f28a",
+      "bytes": 1703
+    },
+    {
+      "path": "originals/settlement-export.source.txt",
+      "sha256": "03b67ca40c10f7463c87838c75daaff5e967f26e344d7d9edf08b9dd987e7cc2",
+      "bytes": 310
+    },
+    {
+      "path": "originals/text-bank-statement.pdf",
+      "sha256": "aaeebcb900f6b20c9466f4dc52920f3b1b56803612dc0745ec52e775ea299f2d",
+      "bytes": 1732
+    },
+    {
+      "path": "originals/text-bank-statement.source.txt",
+      "sha256": "adbb76e6741cc5851f29b06f70249e6d266e3dd7df10180985ced746a5a54cbc",
+      "bytes": 321
+    }
+  ]
+}

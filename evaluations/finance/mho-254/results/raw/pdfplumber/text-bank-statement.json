@@ -1,0 +1,73 @@
+{
+  "engine": "pdfplumber",
+  "input": "corpus/originals/text-bank-statement.pdf",
+  "network_disabled": true,
+  "pages": [
+    {
+      "page": 1,
+      "text": "MHO-254 SYNTHETIC FIXTURE - NOT A REAL ACCOUNT\nDOCUMENT ID: text-bank-statement\nOPENING BALANCE: 1,000.00\nDATE | DESCRIPTION | AMOUNT | RUNNING BALANCE\n2026-01-03 | Deposit Alpha | +250.00 | 1,250.00\n2026-01-08 | Supply Store | -50.00 | 1,200.00\n2026-01-17 | Utility Bill | -120.00 | 1,080.00\nCLOSING BALANCE: 1,080.00"
+    }
+  ],
+  "extraction": {
+    "document_id": "text-bank-statement",
+    "kind": "bank_statement",
+    "rows": [
+      {
+        "id": "text-bank-statement-row-1",
+        "date": "2026-01-03",
+        "amount_raw": "+250.00",
+        "amount_minor": 25000,
+        "source_page": 1,
+        "source_line": 5,
+        "source_char_span": [
+          0,
+          47
+        ],
+        "source_text": "2026-01-03 | Deposit Alpha | +250.00 | 1,250.00",
+        "description": "Deposit Alpha",
+        "balance_raw": "1,250.00",
+        "balance_minor": 125000
+      },
+      {
+        "id": "text-bank-statement-row-2",
+        "date": "2026-01-08",
+        "amount_raw": "-50.00",
+        "amount_minor": -5000,
+        "source_page": 1,
+        "source_line": 6,
+        "source_char_span": [
+          0,
+          45
+        ],
+        "source_text": "2026-01-08 | Supply Store | -50.00 | 1,200.00",
+        "description": "Supply Store",
+        "balance_raw": "1,200.00",
+        "balance_minor": 120000
+      },
+      {
+        "id": "text-bank-statement-row-3",
+        "date": "2026-01-17",
+        "amount_raw": "-120.00",
+        "amount_minor": -12000,
+        "source_page": 1,
+        "source_line": 7,
+        "source_char_span": [
+          0,
+          46
+        ],
+        "source_text": "2026-01-17 | Utility Bill | -120.00 | 1,080.00",
+        "description": "Utility Bill",
+        "balance_raw": "1,080.00",
+        "balance_minor": 108000
+      }
+    ],
+    "opening_minor": 100000,
+    "closing_minor": 108000,
+    "calculated_closing_minor": 108000,
+    "duplicate_ids": [],
+    "arithmetic_status": "PASS",
+    "silent_repair_performed": false
+  },
+  "worker_peak_rss_bytes": 32595968,
+  "stderr": ""
+}
