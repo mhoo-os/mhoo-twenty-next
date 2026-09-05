@@ -47,3 +47,11 @@ later write through these same objects and lineage contracts; no dashboard-only
 authority is allowed.
 
 See [PORTING.md](./PORTING.md) for the exact carry-forward/discard matrix.
+
+## Governed statement-import source slice
+
+MHO-126 adds deterministic QFX/OFX and a documented **synthetic-only** CSV
+profile, immutable byte receipts, row lineage, correction revisions, bounded
+hash-bound checkpoints, and native-record projection through this App’s merged
+object vocabulary. See [INGESTION.md](./INGESTION.md) for supported semantics,
+fixture commands, and the remaining real-source acceptance gaps.

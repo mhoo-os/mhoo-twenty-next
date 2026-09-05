@@ -27,6 +27,7 @@ export type FixtureSelectionRequest = {
 export type FinanceFixtureNativeRecords = {
   sourceArtifacts: Array<{
     artifactKey: SourceArtifact['artifactId'];
+    accountKey?: string;
     sourceKind: SourceArtifact['sourceKind'];
     period: SourceArtifact['period'];
     contentHash: SourceArtifact['contentHash'];
@@ -34,6 +35,12 @@ export type FinanceFixtureNativeRecords = {
     status: ImportReceipt['status'];
     freshness: SourceArtifact['freshness'];
     rowCount: SourceArtifact['rowCount'];
+    originalFileName?: string;
+    mimeType?: string;
+    byteLength?: number;
+    acquiredAt?: string;
+    acquiredBy?: string;
+    supersedesArtifactKey?: string;
   }>;
   importReceipts: Array<{
     receiptKey: ImportReceipt['receiptId'];
@@ -44,6 +51,9 @@ export type FinanceFixtureNativeRecords = {
     deduplicatedRows: ImportReceipt['deduplicatedRows'];
     sourceRevision: ImportReceipt['sourceRevision'];
     contentHash: ImportReceipt['contentHash'];
+    checkpoint?: string;
+    rejectedRows?: number;
+    parserProfile?: string;
   }>;
   financeFacts: Array<{
     factKey: NormalizedFact['factKey'];
@@ -57,6 +67,11 @@ export type FinanceFixtureNativeRecords = {
     includedInTotals: NormalizedFact['includedInTotals'];
     exclusionReason: NormalizedFact['exclusionReason'];
     description: NormalizedFact['description'];
+    sourceLocation?: string;
+    sourceAmount?: string;
+    sourceSignConvention?: string;
+    transactionDate?: string;
+    postedDate?: string;
   }>;
   coveragePeriods: Array<
     Pick<
