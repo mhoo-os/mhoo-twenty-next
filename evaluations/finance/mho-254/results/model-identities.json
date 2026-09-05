@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "captured_at": "2026-09-05T00:00:00Z",
+  "scope": "Model artifacts observed in the successful Docling scan extraction; no source documents are included in these assets.",
+  "docling_models": [
+    {
+      "repository": "docling-project/docling-layout-heron",
+      "snapshot_revision": "8f39ad3c0b4c58e9c2d2c84a38465abf757272d8",
+      "license_evidence": "Apache-2.0 in the pinned model card",
+      "source": "https://huggingface.co/docling-project/docling-layout-heron/tree/8f39ad3c0b4c58e9c2d2c84a38465abf757272d8"
+    },
+    {
+      "repository": "docling-project/docling-models",
+      "tag": "v2.3.0",
+      "snapshot_revision": "fc0f2d45e2218ea24bce5045f58a389aed16dc23",
+      "license_evidence": "CDLA-Permissive-2.0 in the pinned model card",
+      "source": "https://huggingface.co/docling-project/docling-models/tree/fc0f2d45e2218ea24bce5045f58a389aed16dc23"
+    }
+  ],
+  "rapidocr": {
+    "package": "rapidocr",
+    "version": "3.9.2",
+    "package_license_expression": "Apache-2.0",
+    "model_source_family": "RapidAI/RapidOCR v3.9.2 on ModelScope",
+    "models": [
+      {
+        "filename": "PP-OCRv6_det_small.pth",
+        "sha256": "fbdc74c97ea7b770ab22cbdc1bba01a52bdf1975efcf3442057356d622b05d54",
+        "source_url": "https://www.modelscope.cn/models/RapidAI/RapidOCR/resolve/v3.9.2/onnx/PP-OCRv6/det/PP-OCRv6_det_small.pth"
+      },
+      {
+        "filename": "PP-OCRv6_rec_small.pth",
+        "sha256": "0107b2ad694ccc9b1db7cf9ed3ffbc93d1795d9e08d9cf823127243a87bce516",
+        "source_url": "https://www.modelscope.cn/models/RapidAI/RapidOCR/resolve/v3.9.2/onnx/PP-OCRv6/rec/PP-OCRv6_rec_small.pth"
+      },
+      {
+        "filename": "ch_ptocr_mobile_v2.0_cls_mobile.pth",
+        "sha256": "bfe13860824b3365c0c7f7ccfcddc8ff11645c60051739ff18bc9913f60c98e1",
+        "source_url": "https://www.modelscope.cn/models/RapidAI/RapidOCR/resolve/v3.9.2/onnx/PP-OCRv4/cls/ch_ptocr_mobile_v2.0_cls_mobile.pth"
+      }
+    ],
+    "licensing_caveat": "The package and PaddleOCR code repositories identify Apache-2.0. This benchmark did not obtain separate legal approval for model artifacts; preserve notices and review before distribution."
+  },
+  "data_egress": {
+    "first_run": "Model downloads occurred before the retained run; only deterministic synthetic PDFs were eligible inputs.",
+    "retained_run": "HF_HUB_OFFLINE=1, TRANSFORMERS_OFFLINE=1 and MHO254_NETWORK_DISABLED=1 were set in every worker. A socket guard was installed before parser imports, and inputs were local synthetic paths.",
+    "proved_boundary": "This proves source-local execution for the retained configuration, not for optional cloud or LLM integrations."
+  }
+}

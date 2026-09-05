@@ -238,5 +238,14 @@ Approved Mhoo Legal Packet v2.0 paths:
 - `packages/twenty-server/src/engine/core-modules/emailing-domain/types/__tests__/emailing-public-page-brand.type.spec.ts`
 - `packages/twenty-front/src/modules/auth/sign-in-up/components/__tests__/FooterNote.test.tsx`
 
+MHO-254 synthetic Finance evaluation paths:
+
+- `evaluations/finance/mho-254/`
+
+This path contains a synthetic-only parser benchmark, retained raw results,
+candidate licensing/egress review, and an adoption recommendation. It adds no
+runtime dependency, provider connection, customer data, deployment behavior,
+or second financial source of truth.
+
 These paths authorize source-level branding work only. They do not authorize
 runtime deployment, publication, legal approval, or production mutation.

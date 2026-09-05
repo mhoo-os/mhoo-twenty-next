@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "pandera": {
+    "valid_row_accepted": true,
+    "invalid_source_page_rejected": true,
+    "runtime_seconds": 0.020605,
+    "scope": "boundary shape and source-locator rules only; no accounting arithmetic"
+  },
+  "rapidfuzz": {
+    "query": "Synth Supply Stor",
+    "ranked_candidates": [
+      {
+        "candidate": "Synthetic Supply Store",
+        "score": 87.17948717948718
+      },
+      {
+        "candidate": "Synthetic Supply Storage",
+        "score": 82.92682926829268
+      },
+      {
+        "candidate": "Synthetic Utility Bill",
+        "score": 46.15384615384615
+      }
+    ],
+    "runtime_seconds": 0.000169,
+    "establishes_financial_match": false,
+    "scope": "candidate generation only; deterministic amount/date/account evidence must decide"
+  },
+  "peak_rss_bytes": 90972160
+}

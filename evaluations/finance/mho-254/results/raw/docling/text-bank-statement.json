@@ -1,0 +1,73 @@
+{
+  "engine": "docling",
+  "input": "corpus/originals/text-bank-statement.pdf",
+  "network_disabled": true,
+  "pages": [
+    {
+      "page": 1,
+      "text": "MHO-254 SYNTHETIC FIXTURE - NOT A REAL ACCOUNT DOCUMENT ID: text-bank-statement\nOPENING BALANCE: 1,000.00 DATE | DESCRIPTION | AMOUNT | RUNNING BALANCE 2026-01-03 | Deposit Alpha | +250.00 | 1,250.00 2026-01-08 | Supply Store | -50.00 | 1,200.00 2026-01-17 | Utility Bill | -120.00 | 1,080.00\nCLOSING BALANCE: 1,080.00"
+    }
+  ],
+  "extraction": {
+    "document_id": "text-bank-statement",
+    "kind": "bank_statement",
+    "rows": [
+      {
+        "id": "text-bank-statement-row-1",
+        "date": "2026-01-03",
+        "amount_raw": "+250.00",
+        "amount_minor": 25000,
+        "source_page": 1,
+        "source_line": 2,
+        "source_char_span": [
+          72,
+          119
+        ],
+        "source_text": "OPENING BALANCE: 1,000.00 DATE | DESCRIPTION | AMOUNT | RUNNING BALANCE 2026-01-03 | Deposit Alpha | +250.00 | 1,250.00 2026-01-08 | Supply Store | -50.00 | 1,200.00 2026-01-17 | Utility Bill | -120.00 | 1,080.00",
+        "description": "Deposit Alpha",
+        "balance_raw": "1,250.00",
+        "balance_minor": 125000
+      },
+      {
+        "id": "text-bank-statement-row-2",
+        "date": "2026-01-08",
+        "amount_raw": "-50.00",
+        "amount_minor": -5000,
+        "source_page": 1,
+        "source_line": 2,
+        "source_char_span": [
+          120,
+          165
+        ],
+        "source_text": "OPENING BALANCE: 1,000.00 DATE | DESCRIPTION | AMOUNT | RUNNING BALANCE 2026-01-03 | Deposit Alpha | +250.00 | 1,250.00 2026-01-08 | Supply Store | -50.00 | 1,200.00 2026-01-17 | Utility Bill | -120.00 | 1,080.00",
+        "description": "Supply Store",
+        "balance_raw": "1,200.00",
+        "balance_minor": 120000
+      },
+      {
+        "id": "text-bank-statement-row-3",
+        "date": "2026-01-17",
+        "amount_raw": "-120.00",
+        "amount_minor": -12000,
+        "source_page": 1,
+        "source_line": 2,
+        "source_char_span": [
+          166,
+          212
+        ],
+        "source_text": "OPENING BALANCE: 1,000.00 DATE | DESCRIPTION | AMOUNT | RUNNING BALANCE 2026-01-03 | Deposit Alpha | +250.00 | 1,250.00 2026-01-08 | Supply Store | -50.00 | 1,200.00 2026-01-17 | Utility Bill | -120.00 | 1,080.00",
+        "description": "Utility Bill",
+        "balance_raw": "1,080.00",
+        "balance_minor": 108000
+      }
+    ],
+    "opening_minor": 100000,
+    "closing_minor": 108000,
+    "calculated_closing_minor": 108000,
+    "duplicate_ids": [],
+    "arithmetic_status": "PASS",
+    "silent_repair_performed": false
+  },
+  "worker_peak_rss_bytes": 1217712128,
+  "stderr": "[INFO] 2026-09-05 20:41:23,792 [RapidOCR] base.py:23: Using engine_name: torch\n[INFO] 2026-09-05 20:41:23,796 [RapidOCR] device_config.py:57: Using CPU device\n[INFO] 2026-09-05 20:41:23,832 [RapidOCR] download_file.py:60: File exists and is valid: /workspace/scratch/ae360d63e7a9/mho254-venv/lib/python3.12/site-packages/rapidocr/models/PP-OCRv6_det_small.pth\n[INFO] 2026-09-05 20:41:23,834 [RapidOCR] main.py:50: Using /workspace/scratch/ae360d63e7a9/mho254-venv/lib/python3.12/site-packages/rapidocr/models/PP-OCRv6_det_small.pth\n[INFO] 2026-09-05 20:41:24,459 [RapidOCR] base.py:23: Using engine_name: torch\n[INFO] 2026-09-05 20:41:24,490 [RapidOCR] device_config.py:57: Using CPU device\n[INFO] 2026-09-05 20:41:24,515 [RapidOCR] download_file.py:60: File exists and is valid: /workspace/scratch/ae360d63e7a9/mho254-venv/lib/python3.12/site-packages/rapidocr/models/ch_ptocr_mobile_v2.0_cls_mobile.pth\n[INFO] 2026-09-05 20:41:24,518 [RapidOCR] main.py:50: Using /workspace/scratch/ae360d63e7a9/mho254-venv/lib/python3.12/site-packages/rapidocr/models/ch_ptocr_mobile_v2.0_cls_mobile.pth\n[INFO] 2026-09-05 20:41:24,713 [RapidOCR] base.py:23: Using engine_name: torch\n[INFO] 2026-09-05 20:41:24,713 [RapidOCR] device_config.py:57: Using CPU device\n[INFO] 2026-09-05 20:41:24,811 [RapidOCR] download_file.py:60: File exists and is valid: /workspace/scratch/ae360d63e7a9/mho254-venv/lib/python3.12/site-packages/rapidocr/models/PP-OCRv6_rec_small.pth\n[INFO] 2026-09-05 20:41:24,811 [RapidOCR] main.py:50: Using /workspace/scratch/ae360d63e7a9/mho254-venv/lib/python3.12/site-packages/rapidocr/models/PP-OCRv6_rec_small.pth\n\nLoading weights:   0%|          | 0/770 [00:00<?, ?it/s]\nLoading weights:  21%|\u2588\u2588        | 162/770 [00:00<00:00, 1559.15it/s]\nLoading weights:  41%|\u2588\u2588\u2588\u2588\u258f     | 318/770 [00:00<00:00, 1413.09it/s]\nLoading weights: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 770/770 [00:00<00:00, 2396.47it/s]\n"
+}

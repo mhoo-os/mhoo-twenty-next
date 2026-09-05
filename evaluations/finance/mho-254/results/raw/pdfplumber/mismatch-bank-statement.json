@@ -1,0 +1,57 @@
+{
+  "engine": "pdfplumber",
+  "input": "corpus/originals/mismatch-bank-statement.pdf",
+  "network_disabled": true,
+  "pages": [
+    {
+      "page": 1,
+      "text": "MHO-254 SYNTHETIC FIXTURE - NOT A REAL ACCOUNT\nDOCUMENT ID: mismatch-bank-statement\nOPENING BALANCE: 400.00\nDATE | DESCRIPTION | AMOUNT | RUNNING BALANCE\n2026-04-02 | Deposit Beta | +200.00 | 600.00\n2026-04-09 | Service Fee | -10.00 | 600.00\nCLOSING BALANCE: 600.00"
+    }
+  ],
+  "extraction": {
+    "document_id": "mismatch-bank-statement",
+    "kind": "bank_statement",
+    "rows": [
+      {
+        "id": "mismatch-bank-statement-row-1",
+        "date": "2026-04-02",
+        "amount_raw": "+200.00",
+        "amount_minor": 20000,
+        "source_page": 1,
+        "source_line": 5,
+        "source_char_span": [
+          0,
+          44
+        ],
+        "source_text": "2026-04-02 | Deposit Beta | +200.00 | 600.00",
+        "description": "Deposit Beta",
+        "balance_raw": "600.00",
+        "balance_minor": 60000
+      },
+      {
+        "id": "mismatch-bank-statement-row-2",
+        "date": "2026-04-09",
+        "amount_raw": "-10.00",
+        "amount_minor": -1000,
+        "source_page": 1,
+        "source_line": 6,
+        "source_char_span": [
+          0,
+          42
+        ],
+        "source_text": "2026-04-09 | Service Fee | -10.00 | 600.00",
+        "description": "Service Fee",
+        "balance_raw": "600.00",
+        "balance_minor": 60000
+      }
+    ],
+    "opening_minor": 40000,
+    "closing_minor": 60000,
+    "calculated_closing_minor": 59000,
+    "duplicate_ids": [],
+    "arithmetic_status": "FLAGGED",
+    "silent_repair_performed": false
+  },
+  "worker_peak_rss_bytes": 31514624,
+  "stderr": ""
+}

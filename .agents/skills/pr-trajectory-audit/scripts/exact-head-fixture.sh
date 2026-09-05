@@ -13,8 +13,10 @@ scanner_allowed='^(docs/provenance/(brand-touchpoint-ledger\.json|brand-residue-
 
 legal_allowed='^(docs/legal/mhoo/v2\.0/(01-mhoo-master-terms-v2\.0\.md|02-mhoo-privacy-policy-v2\.0\.md|03-mhoo-acceptable-use-policy-v2\.0\.md|04-mhoo-open-source-notice-v2\.0\.md|05-mhoo-dpa-availability-notice-v2\.0\.md|06-mhoo-legal-approval-record-v2\.0\.md|mhoo-legal-packet-manifest-v2\.0\.json)|docs/provenance/mhoo-legal-packet-v2\.0\.md|scripts/legal/(verify_mhoo_legal_packet|generate_mhoo_legal_sources|test_verify_mhoo_legal_packet)\.py|packages/twenty-front/src/pages/legal/(LegalDocumentApp\.tsx|LegalDocumentPage\.tsx|legal-document-config\.ts|legal-document-sources\.generated\.ts|__tests__/LegalDocumentPage\.test\.tsx)|packages/twenty-front/src/modules/app/components/(DomainShell|__tests__/DomainShell\.test)\.tsx|packages/twenty-shared/src/types/AppPath\.ts)$'
 
+evaluation_allowed='^evaluations/finance/mho-254/.+$'
+
 git diff --name-only "$base" "$head" | while IFS= read -r path; do
-  [[ "$path" =~ $allowed || "$path" =~ $email_allowed || "$path" =~ $distribution_allowed || "$path" =~ $scanner_allowed || "$path" =~ $legal_allowed ]] || { printf 'trajectory fixture rejected: %s\n' "$path" >&2; exit 1; }
+  [[ "$path" =~ $allowed || "$path" =~ $email_allowed || "$path" =~ $distribution_allowed || "$path" =~ $scanner_allowed || "$path" =~ $legal_allowed || "$path" =~ $evaluation_allowed ]] || { printf 'trajectory fixture rejected: %s\n' "$path" >&2; exit 1; }
 done
 
 assert_manual_only_workflow() {
