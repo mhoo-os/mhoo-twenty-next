@@ -2,16 +2,16 @@ import { DataSource, type DataSourceOptions } from 'typeorm';
 
 import { typeORMCoreModuleOptions } from 'src/database/typeorm/core/core.datasource';
 
-// Load the image's actual migration set, including the configured billing mode,
-// without loading application entities or running any migrations/schema writes.
-const dataSource = new DataSource({
-  ...typeORMCoreModuleOptions,
-  entities: [],
-  synchronize: false,
-  migrationsRun: false,
-} as DataSourceOptions);
-
 export async function checkInitialization(): Promise<void> {
+  // Load the image's actual migration set, including the configured billing mode,
+  // without loading application entities or running any migrations/schema writes.
+  const dataSource = new DataSource({
+    ...typeORMCoreModuleOptions,
+    entities: [],
+    synchronize: false,
+    migrationsRun: false,
+  } as DataSourceOptions);
+
   try {
     await dataSource.initialize();
 
