@@ -15,7 +15,8 @@ export type FactClassification =
   | 'VOID'
   | 'DISCOUNT'
   | 'INTERNAL_TRANSFER'
-  | 'CARD_PAYMENT';
+  | 'CARD_PAYMENT'
+  | 'UNCLASSIFIED';
 
 export type SourceArtifact = {
   artifactId: string;
@@ -46,7 +47,7 @@ export type SourceRow = {
 export type ImportReceipt = {
   receiptId: string;
   artifactId: string;
-  status: 'IMPORTED' | 'DUPLICATE';
+  status: 'IMPORTED' | 'DUPLICATE' | 'PARTIAL' | 'REJECTED' | 'IMPORTED_WITH_REJECTIONS';
   attempts: number;
   importedRows: number;
   deduplicatedRows: number;
@@ -73,7 +74,8 @@ export type NormalizedFact = {
     | 'DUPLICATE_ROW'
     | 'PENDING_NOT_POSTED'
     | 'INTERNAL_MOVEMENT'
-    | 'POS_OVERLAP';
+    | 'POS_OVERLAP'
+    | 'SOURCE_UNRECONCILED';
 };
 
 export type CoveragePeriod = {

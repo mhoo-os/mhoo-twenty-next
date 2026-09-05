@@ -7,6 +7,9 @@ import {
 
 import {
   IMPORT_RECEIPT_ARTIFACT_FIELD_UNIVERSAL_IDENTIFIER,
+  IMPORT_RECEIPT_CHECKPOINT_FIELD_UNIVERSAL_IDENTIFIER,
+  IMPORT_RECEIPT_REJECTED_ROWS_FIELD_UNIVERSAL_IDENTIFIER,
+  IMPORT_RECEIPT_PARSER_PROFILE_FIELD_UNIVERSAL_IDENTIFIER,
   IMPORT_RECEIPT_ATTEMPTS_FIELD_UNIVERSAL_IDENTIFIER,
   IMPORT_RECEIPT_DEDUPLICATED_ROWS_FIELD_UNIVERSAL_IDENTIFIER,
   IMPORT_RECEIPT_HASH_FIELD_UNIVERSAL_IDENTIFIER,
@@ -22,6 +25,9 @@ import {
 enum ReceiptStatus {
   IMPORTED = 'IMPORTED',
   DUPLICATE = 'DUPLICATE',
+  PARTIAL = 'PARTIAL',
+  REJECTED = 'REJECTED',
+  IMPORTED_WITH_REJECTIONS = 'IMPORTED_WITH_REJECTIONS',
 }
 
 export default defineObject({
@@ -51,6 +57,9 @@ export default defineObject({
       options: [
         { id: 'd9e1d2f3-a4b5-4678-9012-3456789abd01', value: ReceiptStatus.IMPORTED, label: 'Imported', color: 'green', position: 0 },
         { id: 'd9e1d2f3-a4b5-4678-9012-3456789abd02', value: ReceiptStatus.DUPLICATE, label: 'Duplicate', color: 'gray', position: 1 },
+        { id: 'd9e1d2f3-a4b5-4678-9012-3456789abd03', value: ReceiptStatus.PARTIAL, label: 'Partial', color: 'yellow', position: 2 },
+        { id: 'd9e1d2f3-a4b5-4678-9012-3456789abd04', value: ReceiptStatus.REJECTED, label: 'Rejected', color: 'red', position: 3 },
+        { id: 'd9e1d2f3-a4b5-4678-9012-3456789abd05', value: ReceiptStatus.IMPORTED_WITH_REJECTIONS, label: 'Imported with rejections', color: 'orange', position: 4 },
       ],
     },
     {
@@ -87,6 +96,30 @@ export default defineObject({
       name: 'contentHash',
       label: 'Content hash',
       icon: 'IconHash',
+    },
+    {
+      universalIdentifier: IMPORT_RECEIPT_CHECKPOINT_FIELD_UNIVERSAL_IDENTIFIER,
+      type: FieldType.TEXT,
+      name: 'checkpoint',
+      label: 'Checkpoint',
+      description: 'Hash-bound next source-row offset for a bounded import.',
+      icon: 'IconPlayerPause',
+      isNullable: true,
+    },
+    {
+      universalIdentifier: IMPORT_RECEIPT_REJECTED_ROWS_FIELD_UNIVERSAL_IDENTIFIER,
+      type: FieldType.NUMBER,
+      name: 'rejectedRows',
+      label: 'Rejected rows',
+      icon: 'IconAlertTriangle',
+    },
+    {
+      universalIdentifier: IMPORT_RECEIPT_PARSER_PROFILE_FIELD_UNIVERSAL_IDENTIFIER,
+      type: FieldType.TEXT,
+      name: 'parserProfile',
+      label: 'Parser profile',
+      description: 'Versioned parser or mapping identity for this import result.',
+      icon: 'IconCode',
     },
     {
       universalIdentifier: IMPORT_RECEIPT_ARTIFACT_FIELD_UNIVERSAL_IDENTIFIER,

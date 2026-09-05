@@ -8,6 +8,12 @@ import {
 import {
   FINANCE_FACT_AMOUNT_FIELD_UNIVERSAL_IDENTIFIER,
   FINANCE_FACT_ARTIFACT_FIELD_UNIVERSAL_IDENTIFIER,
+  FINANCE_FACT_SOURCE_LOCATION_FIELD_UNIVERSAL_IDENTIFIER,
+  FINANCE_FACT_SOURCE_AMOUNT_FIELD_UNIVERSAL_IDENTIFIER,
+  FINANCE_FACT_SOURCE_SIGN_FIELD_UNIVERSAL_IDENTIFIER,
+  FINANCE_FACT_TRANSACTION_DATE_FIELD_UNIVERSAL_IDENTIFIER,
+  FINANCE_FACT_POSTED_DATE_FIELD_UNIVERSAL_IDENTIFIER,
+  FINANCE_FACT_RAW_VALUES_FIELD_UNIVERSAL_IDENTIFIER,
   FINANCE_FACT_CLASSIFICATION_FIELD_UNIVERSAL_IDENTIFIER,
   FINANCE_FACT_DESCRIPTION_FIELD_UNIVERSAL_IDENTIFIER,
   FINANCE_FACT_EXCLUSION_FIELD_UNIVERSAL_IDENTIFIER,
@@ -30,6 +36,7 @@ enum Classification {
   DISCOUNT = 'DISCOUNT',
   INTERNAL_TRANSFER = 'INTERNAL_TRANSFER',
   CARD_PAYMENT = 'CARD_PAYMENT',
+  UNCLASSIFIED = 'UNCLASSIFIED',
 }
 
 enum FactStatus {
@@ -62,6 +69,50 @@ export default defineObject({
       name: 'sourceRowKey',
       label: 'Source row key',
       icon: 'IconTable',
+    },
+    {
+      universalIdentifier: FINANCE_FACT_SOURCE_LOCATION_FIELD_UNIVERSAL_IDENTIFIER,
+      type: FieldType.TEXT,
+      name: 'sourceLocation',
+      label: 'Source location',
+      description: 'Exact file row or source record location.',
+      icon: 'IconMapPin',
+    },
+    {
+      universalIdentifier: FINANCE_FACT_SOURCE_AMOUNT_FIELD_UNIVERSAL_IDENTIFIER,
+      type: FieldType.TEXT,
+      name: 'sourceAmount',
+      label: 'Original source amount',
+      icon: 'IconReceipt',
+    },
+    {
+      universalIdentifier: FINANCE_FACT_SOURCE_SIGN_FIELD_UNIVERSAL_IDENTIFIER,
+      type: FieldType.TEXT,
+      name: 'sourceSignConvention',
+      label: 'Source sign convention',
+      icon: 'IconArrowsExchange',
+    },
+    {
+      universalIdentifier: FINANCE_FACT_TRANSACTION_DATE_FIELD_UNIVERSAL_IDENTIFIER,
+      type: FieldType.TEXT,
+      name: 'transactionDate',
+      label: 'Transaction date',
+      icon: 'IconCalendar',
+    },
+    {
+      universalIdentifier: FINANCE_FACT_POSTED_DATE_FIELD_UNIVERSAL_IDENTIFIER,
+      type: FieldType.TEXT,
+      name: 'postedDate',
+      label: 'Posted date',
+      icon: 'IconCalendarCheck',
+      isNullable: true,
+    },
+    {
+      universalIdentifier: FINANCE_FACT_RAW_VALUES_FIELD_UNIVERSAL_IDENTIFIER,
+      type: FieldType.TEXT,
+      name: 'rawValues',
+      label: 'Unmodified source values',
+      icon: 'IconBraces',
     },
     {
       universalIdentifier: FINANCE_FACT_ARTIFACT_FIELD_UNIVERSAL_IDENTIFIER,
@@ -108,6 +159,7 @@ export default defineObject({
         { id: 'e9e1d2f3-a4b5-4678-9012-3456789abd05', value: Classification.DISCOUNT, label: 'Discount', color: 'yellow', position: 4 },
         { id: 'e9e1d2f3-a4b5-4678-9012-3456789abd06', value: Classification.INTERNAL_TRANSFER, label: 'Internal transfer', color: 'purple', position: 5 },
         { id: 'e9e1d2f3-a4b5-4678-9012-3456789abd07', value: Classification.CARD_PAYMENT, label: 'Card payment', color: 'blue', position: 6 },
+        { id: 'e9e1d2f3-a4b5-4678-9012-3456789abd10', value: Classification.UNCLASSIFIED, label: 'Unclassified source row', color: 'gray', position: 7 },
       ],
     },
     {
