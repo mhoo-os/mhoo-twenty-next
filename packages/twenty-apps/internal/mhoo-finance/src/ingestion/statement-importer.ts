@@ -26,6 +26,8 @@ export type OriginalArtifactReceipt = {
   parserProfileId: string;
   parserProfileVersion: number;
   originalFileId: string;
+  accountBinding?: SourceAccountBindingV1;
+  suppliedSummaryControls?: StatementSummaryControlsV1;
   supersedesArtifactId?: string;
 };
 
@@ -48,11 +50,37 @@ export type RejectedStatementRow = {
   rawValues: Readonly<Record<string, string>>;
 };
 
+/**
+ * A supplied statement-summary control is source evidence, not a calculated
+ * transaction total. In OFX, DEPANDCREDIT already includes interest and
+ * CHKANDDEB already includes fees, so those inclusive totals are never added
+ * together with TOTALINT or TOTALFEES.
+ */
+export type StatementSummaryControlsV1 = Readonly<{
+  schemaVersion: 'statement-summary-controls-v1';
+  depositsMinor: number;
+  paymentsMinor: number;
+  feesMinor: number;
+  interestMinor: number;
+}>;
+
+/** The account key and a non-reversible source identifier digest are versioned together. */
+export type SourceAccountBindingV1 = Readonly<{
+  schemaVersion: 'source-account-binding-v1';
+  accountKey: string;
+  sourceAccountHash: string;
+}>;
+
 export type StatementControls = {
   periodStart: string;
   periodEnd: string;
   openingBalanceMinor?: number;
   closingBalanceMinor?: number;
+  /** Controls provided with the versioned mapping contract. */
+  suppliedSummaryControls?: StatementSummaryControlsV1;
+  /** Controls captured verbatim from the supported OFX summary tags. */
+  observedSummaryControls?: StatementSummaryControlsV1;
+  sourceAccountHash?: string;
 };
 
 export type ParsedStatement = {
@@ -138,6 +166,8 @@ export type ArtifactInput = {
   acquiredAt: string;
   acquiredBy: string;
   originalFileId: string;
+  accountBinding?: SourceAccountBindingV1;
+  suppliedSummaryControls?: StatementSummaryControlsV1;
   supersedesArtifactId?: string;
 };
 
@@ -234,22 +264,43 @@ const receiptFor = (input: ArtifactInput, sourceFormat: SourceFormat, profileId:
   parserProfileId: profileId,
   parserProfileVersion: profileVersion,
   originalFileId: input.originalFileId,
+  accountBinding: input.accountBinding,
+  suppliedSummaryControls: input.suppliedSummaryControls,
   supersedesArtifactId: input.supersedesArtifactId,
 });
 
+const hasValidSummaryControls = (controls: StatementSummaryControlsV1 | undefined): controls is StatementSummaryControlsV1 => controls !== undefined
+  && controls.schemaVersion === 'statement-summary-controls-v1'
+  && ['depositsMinor', 'paymentsMinor', 'feesMinor', 'interestMinor'].every((name) => Number.isSafeInteger(controls[name as keyof Omit<StatementSummaryControlsV1, 'schemaVersion'>]));
+
+const invalidSuppliedControls = (input: ArtifactInput, receipt: OriginalArtifactReceipt): ParsedStatement | undefined => {
+  if (input.suppliedSummaryControls !== undefined && !hasValidSummaryControls(input.suppliedSummaryControls)) {
+    return {
+      receipt,
+      controls: { periodStart: '', periodEnd: '' },
+      rows: [],
+      rejectedRows: [{ sourceLocation: 'artifact:summary-controls', code: 'MALFORMED_ROW', message: 'Supplied statement summary controls must use statement-summary-controls-v1 with exact safe minor-unit values.', rawValues: {} }],
+    };
+  }
+  return undefined;
+};
+
 export const parseCsvStatement = (input: ArtifactInput, profile: CsvProfile): ParsedStatement => {
   requireInput(input);
+  const receipt = receiptFor(input, 'CSV', profile.id, profile.version);
+  const invalidControls = invalidSuppliedControls(input, receipt);
+  if (invalidControls) return invalidControls;
   let text: string;
   try { text = decodeUtf8(input.bytes); } catch {
-    return { receipt: receiptFor(input, 'CSV', profile.id, profile.version), controls: { periodStart: '', periodEnd: '' }, rows: [], rejectedRows: [{ sourceLocation: 'artifact', code: 'INVALID_ENCODING', message: 'Artifact is not valid UTF-8.', rawValues: {} }] };
+    return { receipt, controls: { periodStart: '', periodEnd: '' }, rows: [], rejectedRows: [{ sourceLocation: 'artifact', code: 'INVALID_ENCODING', message: 'Artifact is not valid UTF-8.', rawValues: {} }] };
   }
   const parsed = readCsv(text, profile.delimiter);
-  if (!Array.isArray(parsed)) return { receipt: receiptFor(input, 'CSV', profile.id, profile.version), controls: { periodStart: '', periodEnd: '' }, rows: [], rejectedRows: [parsed] };
+  if (!Array.isArray(parsed)) return { receipt, controls: { periodStart: '', periodEnd: '' }, rows: [], rejectedRows: [parsed] };
   const header = parsed[0];
-  if (!header) return { receipt: receiptFor(input, 'CSV', profile.id, profile.version), controls: { periodStart: '', periodEnd: '' }, rows: [], rejectedRows: [{ sourceLocation: 'csv:line:1', code: 'MISSING_REQUIRED_FIELD', message: 'CSV header row is required.', rawValues: {} }] };
+  if (!header) return { receipt, controls: { periodStart: '', periodEnd: '' }, rows: [], rejectedRows: [{ sourceLocation: 'csv:line:1', code: 'MISSING_REQUIRED_FIELD', message: 'CSV header row is required.', rawValues: {} }] };
   const indexes = new Map(header.values.map((value, index) => [value.trim(), index]));
   const missing = profile.requiredHeaders.filter((column) => !indexes.has(column));
-  if (missing.length > 0) return { receipt: receiptFor(input, 'CSV', profile.id, profile.version), controls: { periodStart: '', periodEnd: '' }, rows: [], rejectedRows: [{ sourceLocation: 'csv:line:1', code: 'MISSING_REQUIRED_FIELD', message: `Missing required header(s): ${missing.join(', ')}.`, rawValues: Object.fromEntries(header.values.map((value, index) => [String(index), value])) }] };
+  if (missing.length > 0) return { receipt, controls: { periodStart: '', periodEnd: '' }, rows: [], rejectedRows: [{ sourceLocation: 'csv:line:1', code: 'MISSING_REQUIRED_FIELD', message: `Missing required header(s): ${missing.join(', ')}.`, rawValues: Object.fromEntries(header.values.map((value, index) => [String(index), value])) }] };
 
   const rows: RawStatementRow[] = [];
   const rejectedRows: RejectedStatementRow[] = [];
@@ -271,13 +322,38 @@ export const parseCsvStatement = (input: ArtifactInput, profile: CsvProfile): Pa
     rows.push({ sourceRecordId, sourceLocation, rawValues, transactionDate, postedDate, description, sourceAmount: amountText, amountMinor, direction: amountMinor >= 0 ? 'INFLOW' : 'OUTFLOW' });
   }
   const dates = rows.map((row) => row.transactionDate).sort();
-  return { receipt: receiptFor(input, 'CSV', profile.id, profile.version), controls: { periodStart: dates[0] ?? '', periodEnd: dates[dates.length - 1] ?? '' }, rows, rejectedRows };
+  return { receipt, controls: { periodStart: dates[0] ?? '', periodEnd: dates[dates.length - 1] ?? '', suppliedSummaryControls: input.suppliedSummaryControls }, rows, rejectedRows };
 };
 
 const tagValue = (fragment: string, tag: string): string | undefined => {
   const closed = new RegExp(`<${tag}>([\\s\\S]*?)<\\/${tag}>`, 'i').exec(fragment)?.[1];
   const open = new RegExp(`<${tag}>([^<\\r\\n]+)`, 'i').exec(fragment)?.[1];
   return (closed ?? open)?.trim();
+};
+
+const tagCount = (fragment: string, tag: string): number => [...fragment.matchAll(new RegExp(`<${tag}(?:>|\\s)`, 'gi'))].length;
+
+const sourceSummaryControls = (text: string): { controls?: StatementSummaryControlsV1; rejection?: RejectedStatementRow } => {
+  const fields = [
+    ['depositsMinor', 'DEPANDCREDIT'],
+    ['paymentsMinor', 'CHKANDDEB'],
+    ['feesMinor', 'TOTALFEES'],
+    ['interestMinor', 'TOTALINT'],
+  ] as const;
+  const values = fields.map(([name, tag]) => ({ name, tag, count: tagCount(text, tag), value: tagValue(text, tag) }));
+  if (values.every(({ value }) => value === undefined)) return {};
+  if (values.some(({ count }) => count !== 1)) {
+    return { rejection: { sourceLocation: 'ofx:summary-controls', code: 'MALFORMED_ROW', message: 'Supported OFX summary controls may occur exactly once.', rawValues: Object.fromEntries(values.map(({ tag, value }) => [tag, value ?? ''])) } };
+  }
+  if (values.some(({ value }) => value === undefined)) {
+    return { rejection: { sourceLocation: 'ofx:summary-controls', code: 'MISSING_REQUIRED_FIELD', message: 'When present, supported OFX summary controls must include DEPANDCREDIT, CHKANDDEB, TOTALFEES, and TOTALINT.', rawValues: Object.fromEntries(values.map(({ tag, value }) => [tag, value ?? ''])) } };
+  }
+  const parsed = values.map(({ name, tag, value }) => ({ name, tag, value, minor: parseMinorUnits(value as string) }));
+  if (parsed.some(({ minor }) => minor === undefined)) {
+    return { rejection: { sourceLocation: 'ofx:summary-controls', code: 'INVALID_AMOUNT', message: 'OFX summary controls must be exact signed two-decimal values.', rawValues: Object.fromEntries(parsed.map(({ tag, value }) => [tag, value as string])) } };
+  }
+  const byName = Object.fromEntries(parsed.map(({ name, minor }) => [name, minor]));
+  return { controls: { schemaVersion: 'statement-summary-controls-v1', depositsMinor: byName.depositsMinor as number, paymentsMinor: byName.paymentsMinor as number, feesMinor: byName.feesMinor as number, interestMinor: byName.interestMinor as number } };
 };
 
 export const parseQfxOfxStatement = (input: ArtifactInput, sourceFormat: 'QFX' | 'OFX'): ParsedStatement => {
@@ -288,17 +364,24 @@ export const parseQfxOfxStatement = (input: ArtifactInput, sourceFormat: 'QFX' |
   }
   const profileId = `${sourceFormat.toLowerCase()}-statement-v1`;
   const receipt = receiptFor(input, sourceFormat, profileId, 1);
+  const invalidControls = invalidSuppliedControls(input, receipt);
+  if (invalidControls) return invalidControls;
   const accountBlocks = [...text.matchAll(/<BANKACCTFROM>([\s\S]*?)(?:<\/BANKACCTFROM>|(?=<BANKTRANLIST>))/gi)];
   const listBlocks = [...text.matchAll(/<BANKTRANLIST>/gi)];
-  if (!/<OFX>/i.test(text) || accountBlocks.length !== 1 || listBlocks.length !== 1 || !tagValue(accountBlocks[0]?.[1] ?? '', 'ACCTID')) return { receipt, controls: { periodStart: '', periodEnd: '' }, rows: [], rejectedRows: [{ sourceLocation: 'ofx:structure', code: 'MALFORMED_ROW', message: 'Exactly one OFX root, account binding, and transaction list are required.', rawValues: {} }] };
+  const accountBlock = accountBlocks[0]?.[1] ?? '';
+  if (!/<OFX>/i.test(text) || accountBlocks.length !== 1 || listBlocks.length !== 1 || tagCount(accountBlock, 'ACCTID') !== 1 || !tagValue(accountBlock, 'ACCTID')) return { receipt, controls: { periodStart: '', periodEnd: '' }, rows: [], rejectedRows: [{ sourceLocation: 'ofx:structure', code: 'MALFORMED_ROW', message: 'Exactly one OFX root, account binding, account identifier, and transaction list are required.', rawValues: {} }] };
   if (accountBlocks.length > 1) return { receipt, controls: { periodStart: '', periodEnd: '' }, rows: [], rejectedRows: [{ sourceLocation: 'ofx:account', code: 'UNSUPPORTED_FORMAT', message: 'Multiple bank accounts in one artifact are outside the bounded parser contract.', rawValues: {} }] };
+  const sourceAccountId = tagValue(accountBlock, 'ACCTID') as string;
+  const sourceAccountHash = createHash('sha256').update(sourceAccountId).digest('hex');
+  if (!input.accountBinding || input.accountBinding.schemaVersion !== 'source-account-binding-v1' || input.accountBinding.accountKey !== input.accountKey || input.accountBinding.sourceAccountHash !== sourceAccountHash) return { receipt, controls: { periodStart: '', periodEnd: '', sourceAccountHash }, rows: [], rejectedRows: [{ sourceLocation: 'ofx:account', code: 'MALFORMED_ROW', message: 'Source account does not match the explicit account binding.', rawValues: { ACCTID_SHA256: sourceAccountHash } }] };
   const closingBlock = /<CLOSING>([\s\S]*?)(?:<\/CLOSING>|(?=<LEDGERBAL>|<\/STMTRS>))/i.exec(text)?.[1];
   const start = closingBlock ? tagValue(closingBlock, 'DTOPEN') ?? '' : tagValue(text, 'DTSTART') ?? '';
   const end = closingBlock ? tagValue(closingBlock, 'DTCLOSE') ?? '' : tagValue(text, 'DTEND') ?? '';
   // OFX CLOSING supplies BALOPEN/BALCLOSE. Regular LEDGERBAL supplies a closing balance only.
   const opening = closingBlock ? tagValue(closingBlock, 'BALOPEN') : undefined;
   const closing = closingBlock ? tagValue(closingBlock, 'BALCLOSE') : (() => { const ledgerBalances = [...text.matchAll(/<LEDGERBAL>[\s\S]*?<BALAMT>([^<\r\n]+)/gi)]; return ledgerBalances[ledgerBalances.length - 1]?.[1]?.trim(); })();
-  const controls: StatementControls = { periodStart: asOfxDate(start) ?? '', periodEnd: asOfxDate(end) ?? '', openingBalanceMinor: opening ? parseMinorUnits(opening) : undefined, closingBalanceMinor: closing ? parseMinorUnits(closing) : undefined };
+  const summary = sourceSummaryControls(text);
+  const controls: StatementControls = { periodStart: asOfxDate(start) ?? '', periodEnd: asOfxDate(end) ?? '', openingBalanceMinor: opening ? parseMinorUnits(opening) : undefined, closingBalanceMinor: closing ? parseMinorUnits(closing) : undefined, suppliedSummaryControls: input.suppliedSummaryControls, observedSummaryControls: summary.controls, sourceAccountHash };
   const rows: RawStatementRow[] = [];
   const rejectedRows: RejectedStatementRow[] = [];
   const seenFitIds = new Set<string>();
@@ -322,6 +405,10 @@ export const parseQfxOfxStatement = (input: ArtifactInput, sourceFormat: 'QFX' |
   }
   if (!controls.periodStart || !controls.periodEnd) rejectedRows.push({ sourceLocation: 'ofx:controls', code: 'MISSING_REQUIRED_FIELD', message: 'DTSTART and DTEND statement controls are required.', rawValues: { DTSTART: start, DTEND: end } });
   if (opening && controls.openingBalanceMinor === undefined || closing && controls.closingBalanceMinor === undefined) rejectedRows.push({ sourceLocation: 'ofx:controls', code: 'INVALID_AMOUNT', message: 'Statement balance control is invalid.', rawValues: { BALAMT: closing ?? opening ?? '' } });
+  if (summary.rejection) rejectedRows.push(summary.rejection);
+  if (controls.suppliedSummaryControls && controls.observedSummaryControls && compareStatementSummaryControls(controls.suppliedSummaryControls, controls.observedSummaryControls).some(({ status }) => status === 'MISMATCH')) {
+    rejectedRows.push({ sourceLocation: 'ofx:summary-controls', code: 'MALFORMED_ROW', message: 'Supplied statement summary controls do not match the parsed OFX source controls.', rawValues: {} });
+  }
   return { receipt, controls, rows, rejectedRows };
 };
 
@@ -347,10 +434,52 @@ export const reconcileStatementPeriod = (statement: ParsedStatement): PeriodArit
   return { openingBalanceMinor: statement.controls.openingBalanceMinor, inflowsMinor, outflowsMinor, closingBalanceMinor: statement.controls.closingBalanceMinor, calculatedClosingBalanceMinor, matches: calculatedClosingBalanceMinor !== undefined && statement.controls.closingBalanceMinor !== undefined && calculatedClosingBalanceMinor === statement.controls.closingBalanceMinor };
 };
 
-export type StatementSummaryControlsV1 = { schemaVersion: 'statement-summary-controls-v1'; depositsMinor?: number; paymentsMinor?: number; feesMinor?: number; interestMinor?: number; };
 export type SummaryControlComparison = { name: 'depositsMinor' | 'paymentsMinor' | 'feesMinor' | 'interestMinor'; suppliedMinor?: number; observedMinor?: number; status: 'MATCH' | 'MISMATCH' | 'NOT_SUPPLIED' | 'NOT_OBSERVABLE'; };
 export const compareStatementSummaryControls = (supplied: StatementSummaryControlsV1, observed: Partial<Omit<StatementSummaryControlsV1, 'schemaVersion'>>): SummaryControlComparison[] => (['depositsMinor', 'paymentsMinor', 'feesMinor', 'interestMinor'] as const).map((name) => ({ name, suppliedMinor: supplied[name], observedMinor: observed[name], status: supplied[name] === undefined ? 'NOT_SUPPLIED' : observed[name] === undefined ? 'NOT_OBSERVABLE' : supplied[name] === observed[name] ? 'MATCH' : 'MISMATCH' }));
-export const compareAdjacentPeriodBalances = (earlierClosingMinor: number | undefined, laterOpeningMinor: number | undefined): SummaryControlComparison => ({ name: 'paymentsMinor', suppliedMinor: earlierClosingMinor, observedMinor: laterOpeningMinor, status: earlierClosingMinor === undefined || laterOpeningMinor === undefined ? 'NOT_OBSERVABLE' : earlierClosingMinor === laterOpeningMinor ? 'MATCH' : 'MISMATCH' });
+
+/** Compares controls captured by the parser, so callers cannot compare detached values. */
+export const compareParsedStatementSummaryControls = (statement: ParsedStatement): readonly SummaryControlComparison[] => {
+  const supplied = statement.controls.suppliedSummaryControls;
+  if (!supplied) return [];
+  return compareStatementSummaryControls(supplied, statement.controls.observedSummaryControls ?? {});
+};
+
+export type PeriodContinuityComparison = Readonly<{
+  status: 'MATCH' | 'MISMATCH' | 'REJECTED';
+  reason: 'MATCHING_BALANCE' | 'BALANCE_MISMATCH' | 'ACCOUNT_IDENTITY_MISMATCH' | 'NON_ADJACENT_PERIOD' | 'MISSING_CONTROL';
+  earlierClosingMinor?: number;
+  laterOpeningMinor?: number;
+}>;
+
+const followingDate = (date: string): string | undefined => {
+  const parsed = asIsoDate(date, 'YYYY-MM-DD');
+  if (!parsed) return undefined;
+  const next = new Date(`${parsed}T00:00:00.000Z`);
+  next.setUTCDate(next.getUTCDate() + 1);
+  return next.toISOString().slice(0, 10);
+};
+
+/**
+ * Continuity is only meaningful for the same retained source-account digest
+ * and periods that meet at the next calendar day. A mismatch never becomes a
+ * soft arithmetic comparison across unrelated accounts or months.
+ */
+export const compareAdjacentParsedStatements = (earlier: ParsedStatement, later: ParsedStatement): PeriodContinuityComparison => {
+  if (earlier.receipt.accountKey !== later.receipt.accountKey || !earlier.controls.sourceAccountHash || earlier.controls.sourceAccountHash !== later.controls.sourceAccountHash) {
+    return { status: 'REJECTED', reason: 'ACCOUNT_IDENTITY_MISMATCH' };
+  }
+  if (followingDate(earlier.controls.periodEnd) !== later.controls.periodStart) {
+    return { status: 'REJECTED', reason: 'NON_ADJACENT_PERIOD' };
+  }
+  const earlierClosingMinor = earlier.controls.closingBalanceMinor;
+  const laterOpeningMinor = later.controls.openingBalanceMinor;
+  if (earlierClosingMinor === undefined || laterOpeningMinor === undefined) {
+    return { status: 'REJECTED', reason: 'MISSING_CONTROL', earlierClosingMinor, laterOpeningMinor };
+  }
+  return earlierClosingMinor === laterOpeningMinor
+    ? { status: 'MATCH', reason: 'MATCHING_BALANCE', earlierClosingMinor, laterOpeningMinor }
+    : { status: 'MISMATCH', reason: 'BALANCE_MISMATCH', earlierClosingMinor, laterOpeningMinor };
+};
 
 export type ImportedSourceRow = RawStatementRow & {
   accountKey: string;
@@ -361,14 +490,14 @@ export type ImportedSourceRow = RawStatementRow & {
   rowFingerprint: string;
   supersedesRowFingerprint?: string;
 };
-export type ArtifactAcquisitionReceipt = { artifactId: string; canonicalArtifactId: string; accountKey: string; sha256: string; originalFileName: string; acquiredAt: string; acquiredBy: string; disposition: 'CANONICAL' | 'DUPLICATE'; };
+export type ArtifactAcquisitionReceipt = { artifactId: string; canonicalArtifactId: string; accountKey: string; sha256: string; originalFileId: string; originalFileName: string; acquiredAt: string; acquiredBy: string; disposition: 'CANONICAL' | 'DUPLICATE'; };
 export type ImportState = {
   receipts: readonly OriginalArtifactReceipt[];
   acquisitions?: readonly ArtifactAcquisitionReceipt[];
   rows: readonly ImportedSourceRow[];
   activeCheckpoint?: ImportCheckpoint;
 };
-export type ImportCheckpoint = { artifactSha256: string; accountKey: string; nextRowOffset: number };
+export type ImportCheckpoint = { artifactSha256: string; accountKey: string; parserProfileId: string; parserProfileVersion: number; nextRowOffset: number };
 export type BoundedImportResult = {
   state: ImportState;
   checkpoint?: ImportCheckpoint;
@@ -379,18 +508,22 @@ export type BoundedImportResult = {
   canProvePeriodComplete: false;
 };
 
-const fingerprintRow = (row: RawStatementRow): string => createHash('sha256').update(JSON.stringify({ sourceRecordId: row.sourceRecordId, rawValues: row.rawValues, sourceAmount: row.sourceAmount })).digest('hex');
+/** Includes normalized mapping output so a versioned reparse can create a correction revision. */
+const fingerprintRow = (row: RawStatementRow): string => createHash('sha256').update(JSON.stringify({ sourceRecordId: row.sourceRecordId, rawValues: row.rawValues, sourceAmount: row.sourceAmount, transactionDate: row.transactionDate, postedDate: row.postedDate, description: row.description, amountMinor: row.amountMinor, direction: row.direction })).digest('hex');
 const artifactIdentity = (receipt: OriginalArtifactReceipt): string => `${receipt.accountKey}:${receipt.sha256}`;
 
 export const importBoundedStatement = (statement: ParsedStatement, state: ImportState, maxRows: number, checkpoint?: ImportCheckpoint): BoundedImportResult => {
   if (!Number.isInteger(maxRows) || maxRows <= 0) throw new Error('maxRows must be a positive integer.');
   const receipt = statement.receipt;
+  const fileCollision = state.receipts.find((existing) => existing.originalFileId === receipt.originalFileId && existing.sha256 !== receipt.sha256)
+    ?? state.acquisitions?.find((existing) => existing.originalFileId === receipt.originalFileId && existing.sha256 !== receipt.sha256);
+  if (fileCollision) return { state, status: 'REJECTED', importedRows: 0, duplicateRows: 0, rejectedRows: [...statement.rejectedRows, { sourceLocation: 'artifact', code: 'MALFORMED_ROW', message: 'Original Files reference is already bound to different immutable bytes.', rawValues: {} }], canProvePeriodComplete: false };
   const sameArtifact = state.receipts.find((existing) => artifactIdentity(existing) === artifactIdentity(receipt));
   const profileChanged = sameArtifact !== undefined && (
     sameArtifact.parserProfileId !== receipt.parserProfileId ||
     sameArtifact.parserProfileVersion !== receipt.parserProfileVersion
   );
-  if (sameArtifact && !profileChanged) return { state: { ...state, acquisitions: [...(state.acquisitions ?? []), { artifactId: receipt.artifactId, canonicalArtifactId: sameArtifact.artifactId, accountKey: receipt.accountKey, sha256: receipt.sha256, originalFileName: receipt.originalFileName, acquiredAt: receipt.acquiredAt, acquiredBy: receipt.acquiredBy, disposition: 'DUPLICATE' }] }, status: 'DUPLICATE_ARTIFACT', importedRows: 0, duplicateRows: statement.rows.length, rejectedRows: statement.rejectedRows, canProvePeriodComplete: false };
+  if (sameArtifact && !profileChanged) return { state: { ...state, acquisitions: [...(state.acquisitions ?? []), { artifactId: receipt.artifactId, canonicalArtifactId: sameArtifact.artifactId, accountKey: receipt.accountKey, sha256: receipt.sha256, originalFileId: receipt.originalFileId, originalFileName: receipt.originalFileName, acquiredAt: receipt.acquiredAt, acquiredBy: receipt.acquiredBy, disposition: 'DUPLICATE' }] }, status: 'DUPLICATE_ARTIFACT', importedRows: 0, duplicateRows: statement.rows.length, rejectedRows: statement.rejectedRows, canProvePeriodComplete: false };
   if (sameArtifact && profileChanged && sameArtifact.artifactId !== receipt.artifactId) return { state, status: 'REJECTED', importedRows: 0, duplicateRows: 0, rejectedRows: [...statement.rejectedRows, { sourceLocation: 'artifact', code: 'MALFORMED_ROW', message: 'A mapping correction must reparse the retained artifact identity; it cannot create a second original receipt.', rawValues: {} }], canProvePeriodComplete: false };
   const priorWithId = state.receipts.find((existing) => existing.accountKey === receipt.accountKey && existing.artifactId === receipt.artifactId);
   if (priorWithId && !sameArtifact && !receipt.supersedesArtifactId) return { state, status: 'REJECTED', importedRows: 0, duplicateRows: 0, rejectedRows: [...statement.rejectedRows, { sourceLocation: 'artifact', code: 'MALFORMED_ROW', message: 'Changed artifact content requires an explicit supersedesArtifactId.', rawValues: {} }], canProvePeriodComplete: false };
@@ -399,11 +532,11 @@ export const importBoundedStatement = (statement: ParsedStatement, state: Import
   const start = checkpoint?.nextRowOffset ?? 0;
   if (!Number.isInteger(start) || start < 0 || start > statement.rows.length) throw new Error('Checkpoint offset must be an integer within the source row range.');
   if (state.activeCheckpoint) {
-    if (!checkpoint || checkpoint.artifactSha256 !== state.activeCheckpoint.artifactSha256 || checkpoint.accountKey !== state.activeCheckpoint.accountKey || checkpoint.nextRowOffset !== state.activeCheckpoint.nextRowOffset) throw new Error('Checkpoint does not match persisted import progress.');
+    if (!checkpoint || checkpoint.artifactSha256 !== state.activeCheckpoint.artifactSha256 || checkpoint.accountKey !== state.activeCheckpoint.accountKey || checkpoint.parserProfileId !== state.activeCheckpoint.parserProfileId || checkpoint.parserProfileVersion !== state.activeCheckpoint.parserProfileVersion || checkpoint.nextRowOffset !== state.activeCheckpoint.nextRowOffset) throw new Error('Checkpoint does not match persisted import progress.');
   } else if (checkpoint) {
     throw new Error('No persisted checkpoint exists for this import.');
   }
-  if (checkpoint && (checkpoint.artifactSha256 !== receipt.sha256 || checkpoint.accountKey !== receipt.accountKey)) throw new Error('Checkpoint does not bind this exact artifact and account.');
+  if (checkpoint && (checkpoint.artifactSha256 !== receipt.sha256 || checkpoint.accountKey !== receipt.accountKey || checkpoint.parserProfileId !== receipt.parserProfileId || checkpoint.parserProfileVersion !== receipt.parserProfileVersion)) throw new Error('Checkpoint does not bind this exact artifact, account, and mapping version.');
 
   const changedRecordWithoutCorrection = statement.rows.find((row) => {
     const prior = state.rows.find((candidate) => candidate.accountKey === receipt.accountKey && candidate.sourceRecordId === row.sourceRecordId);
@@ -426,7 +559,7 @@ export const importBoundedStatement = (statement: ParsedStatement, state: Import
     importedRows += 1;
   }
   const complete = end === statement.rows.length;
-  const nextCheckpoint = complete ? undefined : { artifactSha256: receipt.sha256, accountKey: receipt.accountKey, nextRowOffset: end };
-  const nextState: ImportState = { receipts: complete && !sameArtifact ? [...state.receipts, receipt] : state.receipts, acquisitions: [...(state.acquisitions ?? []), { artifactId: receipt.artifactId, canonicalArtifactId: receipt.artifactId, accountKey: receipt.accountKey, sha256: receipt.sha256, originalFileName: receipt.originalFileName, acquiredAt: receipt.acquiredAt, acquiredBy: receipt.acquiredBy, disposition: 'CANONICAL' }], rows, activeCheckpoint: nextCheckpoint };
+  const nextCheckpoint = complete ? undefined : { artifactSha256: receipt.sha256, accountKey: receipt.accountKey, parserProfileId: receipt.parserProfileId, parserProfileVersion: receipt.parserProfileVersion, nextRowOffset: end };
+  const nextState: ImportState = { receipts: complete && !sameArtifact ? [...state.receipts, receipt] : state.receipts, acquisitions: [...(state.acquisitions ?? []), { artifactId: receipt.artifactId, canonicalArtifactId: receipt.artifactId, accountKey: receipt.accountKey, sha256: receipt.sha256, originalFileId: receipt.originalFileId, originalFileName: receipt.originalFileName, acquiredAt: receipt.acquiredAt, acquiredBy: receipt.acquiredBy, disposition: 'CANONICAL' }], rows, activeCheckpoint: nextCheckpoint };
   return { state: nextState, checkpoint: nextCheckpoint, status: complete ? (statement.rejectedRows.length > 0 ? 'COMPLETE_WITH_REJECTIONS' : 'COMPLETE') : 'PARTIAL', importedRows, duplicateRows, rejectedRows: statement.rejectedRows, canProvePeriodComplete: false };
 };

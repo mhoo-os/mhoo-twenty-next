@@ -24,7 +24,10 @@ export const toFinanceNativeImportRecords = (
   FinanceFixtureNativeRecords,
   'sourceArtifacts' | 'importReceipts' | 'financeFacts'
 > => {
-  const rows = stateRows.filter((row) => row.artifactId === statement.receipt.artifactId && row.accountKey === statement.receipt.accountKey);
+  const artifactRows = stateRows.filter((row) => row.artifactId === statement.receipt.artifactId && row.accountKey === statement.receipt.accountKey);
+  // State retains every correction revision for lineage; the native current
+  // projection exposes only the latest revision for each source record.
+  const rows = artifactRows.filter((row) => !artifactRows.some((candidate) => candidate.sourceRecordId === row.sourceRecordId && candidate.rowRevision > row.rowRevision));
   const sourceRevision = Math.max(1, ...rows.map((row) => row.rowRevision));
   const status = nativeStatus(result.status);
   const profile = `${statement.receipt.parserProfileId}@${statement.receipt.parserProfileVersion}`;
