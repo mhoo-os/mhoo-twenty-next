@@ -1,0 +1,78 @@
+{
+  "engine": "docling",
+  "input": "corpus/originals/settlement-export.pdf",
+  "network_disabled": true,
+  "pages": [
+    {
+      "page": 1,
+      "text": "MHO-254 SYNTHETIC FIXTURE - NOT A REAL ACCOUNT DOCUMENT ID: settlement-export\nDATE | SETTLEMENT ID | GROSS | FEE | NET 2026-02-04 | SET-001 | 100.00 | -3.00 | 97.00 2026-02-05 | SET-002 | 75.00 | -2.25 | 72.75 2026-02-05 | SET-002 | 75.00 | -2.25 | 72.75\nDUPLICATE ROW IS INTENTIONAL AND MUST REMAIN VISIBLE"
+    }
+  ],
+  "extraction": {
+    "document_id": "settlement-export",
+    "kind": "settlement_export",
+    "rows": [
+      {
+        "id": "SET-001",
+        "date": "2026-02-04",
+        "amount_raw": "97.00",
+        "amount_minor": 9700,
+        "source_page": 1,
+        "source_line": 2,
+        "source_char_span": [
+          41,
+          86
+        ],
+        "source_text": "DATE | SETTLEMENT ID | GROSS | FEE | NET 2026-02-04 | SET-001 | 100.00 | -3.00 | 97.00 2026-02-05 | SET-002 | 75.00 | -2.25 | 72.75 2026-02-05 | SET-002 | 75.00 | -2.25 | 72.75",
+        "gross_raw": "100.00",
+        "gross_minor": 10000,
+        "fee_raw": "-3.00",
+        "fee_minor": -300
+      },
+      {
+        "id": "SET-002",
+        "date": "2026-02-05",
+        "amount_raw": "72.75",
+        "amount_minor": 7275,
+        "source_page": 1,
+        "source_line": 2,
+        "source_char_span": [
+          87,
+          131
+        ],
+        "source_text": "DATE | SETTLEMENT ID | GROSS | FEE | NET 2026-02-04 | SET-001 | 100.00 | -3.00 | 97.00 2026-02-05 | SET-002 | 75.00 | -2.25 | 72.75 2026-02-05 | SET-002 | 75.00 | -2.25 | 72.75",
+        "gross_raw": "75.00",
+        "gross_minor": 7500,
+        "fee_raw": "-2.25",
+        "fee_minor": -225
+      },
+      {
+        "id": "SET-002",
+        "date": "2026-02-05",
+        "amount_raw": "72.75",
+        "amount_minor": 7275,
+        "source_page": 1,
+        "source_line": 2,
+        "source_char_span": [
+          132,
+          176
+        ],
+        "source_text": "DATE | SETTLEMENT ID | GROSS | FEE | NET 2026-02-04 | SET-001 | 100.00 | -3.00 | 97.00 2026-02-05 | SET-002 | 75.00 | -2.25 | 72.75 2026-02-05 | SET-002 | 75.00 | -2.25 | 72.75",
+        "gross_raw": "75.00",
+        "gross_minor": 7500,
+        "fee_raw": "-2.25",
+        "fee_minor": -225
+      }
+    ],
+    "opening_minor": null,
+    "closing_minor": null,
+    "calculated_closing_minor": null,
+    "duplicate_ids": [
+      "SET-002"
+    ],
+    "arithmetic_status": "PASS",
+    "silent_repair_performed": false
+  },
+  "worker_peak_rss_bytes": 1205067776,
+  "stderr": "[INFO] 2026-09-05 20:42:11,907 [RapidOCR] base.py:23: Using engine_name: torch\n[INFO] 2026-09-05 20:42:11,911 [RapidOCR] device_config.py:57: Using CPU device\n[INFO] 2026-09-05 20:42:11,926 [RapidOCR] download_file.py:60: File exists and is valid: /workspace/scratch/ae360d63e7a9/mho254-venv/lib/python3.12/site-packages/rapidocr/models/PP-OCRv6_det_small.pth\n[INFO] 2026-09-05 20:42:11,927 [RapidOCR] main.py:50: Using /workspace/scratch/ae360d63e7a9/mho254-venv/lib/python3.12/site-packages/rapidocr/models/PP-OCRv6_det_small.pth\n[INFO] 2026-09-05 20:42:12,259 [RapidOCR] base.py:23: Using engine_name: torch\n[INFO] 2026-09-05 20:42:12,259 [RapidOCR] device_config.py:57: Using CPU device\n[INFO] 2026-09-05 20:42:12,260 [RapidOCR] download_file.py:60: File exists and is valid: /workspace/scratch/ae360d63e7a9/mho254-venv/lib/python3.12/site-packages/rapidocr/models/ch_ptocr_mobile_v2.0_cls_mobile.pth\n[INFO] 2026-09-05 20:42:12,261 [RapidOCR] main.py:50: Using /workspace/scratch/ae360d63e7a9/mho254-venv/lib/python3.12/site-packages/rapidocr/models/ch_ptocr_mobile_v2.0_cls_mobile.pth\n[INFO] 2026-09-05 20:42:12,548 [RapidOCR] base.py:23: Using engine_name: torch\n[INFO] 2026-09-05 20:42:12,550 [RapidOCR] device_config.py:57: Using CPU device\n[INFO] 2026-09-05 20:42:12,589 [RapidOCR] download_file.py:60: File exists and is valid: /workspace/scratch/ae360d63e7a9/mho254-venv/lib/python3.12/site-packages/rapidocr/models/PP-OCRv6_rec_small.pth\n[INFO] 2026-09-05 20:42:12,590 [RapidOCR] main.py:50: Using /workspace/scratch/ae360d63e7a9/mho254-venv/lib/python3.12/site-packages/rapidocr/models/PP-OCRv6_rec_small.pth\n\nLoading weights:   0%|          | 0/770 [00:00<?, ?it/s]\nLoading weights:  39%|\u2588\u2588\u2588\u2589      | 304/770 [00:00<00:00, 3038.24it/s]\nLoading weights:  79%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2589  | 608/770 [00:00<00:00, 2076.95it/s]\nLoading weights: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 770/770 [00:00<00:00, 2232.30it/s]\n"
+}

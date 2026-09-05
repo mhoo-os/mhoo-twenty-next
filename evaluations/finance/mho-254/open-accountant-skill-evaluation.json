@@ -1,0 +1,34 @@
+{
+  "source_repository": "openaccountant/skills",
+  "source_commit": "f5abe381f24b5b7d59f1d0b4a825b14494ff2034",
+  "method": "Read-only contract mapping. Candidate instructions were treated as untrusted text; no Wilson tool, database mutation, web converter, or global skill installation was invoked.",
+  "skills": [
+    {
+      "path": "shared/import-transactions/SKILL.md",
+      "blob_sha": "dc22e5bfdda3d4fceaacdd2e6d9f96f938262cdf",
+      "tested_logic": false,
+      "useful_patterns": ["format/header profiling", "preview before action", "bounded batches"],
+      "contract_failures": ["prescribes inserts and categorization", "date+amount+description dedupe can collapse distinct facts", "manual remove-duplicates destroys evidence", "no artifact hash, parser version, revision lineage or exact source pointer"],
+      "decision": "REJECT",
+      "safe_adaptation": "Reference header examples only; implement no mutation from this skill."
+    },
+    {
+      "path": "business/month-end-close/SKILL.md",
+      "blob_sha": "8141742c388238978e67576848044ab2883dcb71",
+      "tested_logic": false,
+      "useful_patterns": ["ordered reconciliation checklist", "do not skip unexplained differences", "per-account review"],
+      "contract_failures": ["prescribes categorization mutations", "agent-produced summary can become arithmetic authority", "declares a month closed without snapshot/procedure receipt", "omits coverage status, lineage, contradictory evidence and limitations"],
+      "decision": "REFERENCE",
+      "safe_adaptation": "Use checklist ordering only; governed tools must supply totals and humans retain close authority."
+    },
+    {
+      "path": "business/profit-loss/SKILL.md",
+      "blob_sha": "0773d2570fed7a52099d819d5162fed477a5d8db",
+      "tested_logic": false,
+      "useful_patterns": ["cash-basis limitation is explicit", "simple reader-facing statement layout"],
+      "contract_failures": ["assumes amount sign establishes revenue/expense", "manual classifications are unreceipted", "agent recomputes totals and margins", "no coverage/snapshot/procedure/lineage references"],
+      "decision": "REFERENCE",
+      "safe_adaptation": "Reuse presentation vocabulary only after deterministic procedures return receipt-bound totals."
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "engine": "docling",
+  "input": "corpus/originals/scan-bank-statement.pdf",
+  "network_disabled": true,
+  "pages": [
+    {
+      "page": 1,
+      "text": "MHO-254 SYNTHETIC FIXTURE - NOT A REAL ACCOUNT DOCUMENT ID: scan-bank-statement\nOPENING BALANCE: 500.00 DATE | DESCRIPTION | AMOUNT | RUNNING BALANCE 2026-03-02 | Card Settlement | +125.00 | 625.00 2026-03-11 | Bank Fee | -35.00 | 590.00\nCLOSING BALANCE: 590.00"
+    }
+  ],
+  "extraction": {
+    "document_id": "scan-bank-statement",
+    "kind": "bank_statement",
+    "rows": [
+      {
+        "id": "scan-bank-statement-row-1",
+        "date": "2026-03-02",
+        "amount_raw": "+125.00",
+        "amount_minor": 12500,
+        "source_page": 1,
+        "source_line": 2,
+        "source_char_span": [
+          70,
+          117
+        ],
+        "source_text": "OPENING BALANCE: 500.00 DATE | DESCRIPTION | AMOUNT | RUNNING BALANCE 2026-03-02 | Card Settlement | +125.00 | 625.00 2026-03-11 | Bank Fee | -35.00 | 590.00",
+        "description": "Card Settlement",
+        "balance_raw": "625.00",
+        "balance_minor": 62500
+      },
+      {
+        "id": "scan-bank-statement-row-2",
+        "date": "2026-03-11",
+        "amount_raw": "-35.00",
+        "amount_minor": -3500,
+        "source_page": 1,
+        "source_line": 2,
+        "source_char_span": [
+          118,
+          157
+        ],
+        "source_text": "OPENING BALANCE: 500.00 DATE | DESCRIPTION | AMOUNT | RUNNING BALANCE 2026-03-02 | Card Settlement | +125.00 | 625.00 2026-03-11 | Bank Fee | -35.00 | 590.00",
+        "description": "Bank Fee",
+        "balance_raw": "590.00",
+        "balance_minor": 59000
+      }
+    ],
+    "opening_minor": 50000,
+    "closing_minor": 59000,
+    "calculated_closing_minor": 59000,
+    "duplicate_ids": [],
+    "arithmetic_status": "PASS",
+    "silent_repair_performed": false
+  },
+  "worker_peak_rss_bytes": 2109767680,
+  "stderr": "[INFO] 2026-09-05 20:41:41,682 [RapidOCR] base.py:23: Using engine_name: torch\n[INFO] 2026-09-05 20:41:41,685 [RapidOCR] device_config.py:57: Using CPU device\n[INFO] 2026-09-05 20:41:41,698 [RapidOCR] download_file.py:60: File exists and is valid: /workspace/scratch/ae360d63e7a9/mho254-venv/lib/python3.12/site-packages/rapidocr/models/PP-OCRv6_det_small.pth\n[INFO] 2026-09-05 20:41:41,698 [RapidOCR] main.py:50: Using /workspace/scratch/ae360d63e7a9/mho254-venv/lib/python3.12/site-packages/rapidocr/models/PP-OCRv6_det_small.pth\n[INFO] 2026-09-05 20:41:41,965 [RapidOCR] base.py:23: Using engine_name: torch\n[INFO] 2026-09-05 20:41:41,966 [RapidOCR] device_config.py:57: Using CPU device\n[INFO] 2026-09-05 20:41:41,967 [RapidOCR] download_file.py:60: File exists and is valid: /workspace/scratch/ae360d63e7a9/mho254-venv/lib/python3.12/site-packages/rapidocr/models/ch_ptocr_mobile_v2.0_cls_mobile.pth\n[INFO] 2026-09-05 20:41:41,967 [RapidOCR] main.py:50: Using /workspace/scratch/ae360d63e7a9/mho254-venv/lib/python3.12/site-packages/rapidocr/models/ch_ptocr_mobile_v2.0_cls_mobile.pth\n[INFO] 2026-09-05 20:41:42,056 [RapidOCR] base.py:23: Using engine_name: torch\n[INFO] 2026-09-05 20:41:42,057 [RapidOCR] device_config.py:57: Using CPU device\n[INFO] 2026-09-05 20:41:42,085 [RapidOCR] download_file.py:60: File exists and is valid: /workspace/scratch/ae360d63e7a9/mho254-venv/lib/python3.12/site-packages/rapidocr/models/PP-OCRv6_rec_small.pth\n[INFO] 2026-09-05 20:41:42,086 [RapidOCR] main.py:50: Using /workspace/scratch/ae360d63e7a9/mho254-venv/lib/python3.12/site-packages/rapidocr/models/PP-OCRv6_rec_small.pth\n\nLoading weights:   0%|          | 0/770 [00:00<?, ?it/s]\nLoading weights:  46%|\u2588\u2588\u2588\u2588\u258c     | 351/770 [00:00<00:00, 3464.27it/s]\nLoading weights:  98%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a| 758/770 [00:00<00:00, 3797.70it/s]\nLoading weights: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 770/770 [00:00<00:00, 3780.15it/s]\n/workspace/scratch/ae360d63e7a9/mho254-venv/lib/python3.12/site-packages/torch/nn/modules/conv.py:543: UserWarning: Using padding='same' with even kernel lengths and odd dilation may require a zero-padded copy of the input be created (Triggered internally at /pytorch/aten/src/ATen/native/Convolution.cpp:1027.)\n  return F.conv2d(\n"
+}

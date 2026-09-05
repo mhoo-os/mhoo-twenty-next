@@ -1,0 +1,24 @@
+{
+  "engine": "pdfplumber",
+  "input": "corpus/originals/scan-bank-statement.pdf",
+  "network_disabled": true,
+  "pages": [
+    {
+      "page": 1,
+      "text": ""
+    }
+  ],
+  "extraction": {
+    "document_id": "scan-bank-statement",
+    "kind": "bank_statement",
+    "rows": [],
+    "opening_minor": null,
+    "closing_minor": null,
+    "calculated_closing_minor": null,
+    "duplicate_ids": [],
+    "arithmetic_status": "REJECTED_INCOMPLETE",
+    "silent_repair_performed": false
+  },
+  "worker_peak_rss_bytes": 31715328,
+  "stderr": ""
+}

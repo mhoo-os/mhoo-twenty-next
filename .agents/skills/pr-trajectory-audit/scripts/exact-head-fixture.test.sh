@@ -82,6 +82,7 @@ grep -Fq "trajectory fixture rejected: $suffix_path" "$temporary_directory/suffi
 }
 
 allowed_paths=(
+  evaluations/finance/mho-254/README.md
   packages/twenty-front/src/locales/ja-JP.po
   packages/twenty-front/src/locales/generated/ja-JP.ts
   packages/twenty-emails/src/locales/ja-JP.po
@@ -116,6 +117,7 @@ for index in "${!allowed_paths[@]}"; do
 done
 
 rogue_allowed_paths=(
+  evaluations/finance/mho-254-backup/README.md
   packages/twenty-emails/src/locales/ja-JP.po.backup
   packages/twenty-emails/src/locales/rogue/ja-JP.po
   packages/twenty-server/src/engine/core-modules/i18n/locales.generated/ja-JP.ts

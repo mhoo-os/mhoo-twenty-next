@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "engines": {
+    "docling": {
+      "documents": 4,
+      "rows_extracted": 10,
+      "rows_expected": 10,
+      "row_recall": 1.0,
+      "amount_accuracy": 1.0,
+      "date_accuracy": 1.0,
+      "missing_rows": 0,
+      "unexpected_rows": 0,
+      "all_rows_traceable": true,
+      "all_expected_arithmetic_outcomes": true,
+      "runtime_seconds_total": 78.678646,
+      "runtime_seconds_median": 17.262287,
+      "peak_rss_bytes_max": 2109767680
+    },
+    "pdfplumber": {
+      "documents": 4,
+      "rows_extracted": 8,
+      "rows_expected": 10,
+      "row_recall": 0.8,
+      "amount_accuracy": 0.8,
+      "date_accuracy": 0.8,
+      "missing_rows": 2,
+      "unexpected_rows": 0,
+      "all_rows_traceable": true,
+      "all_expected_arithmetic_outcomes": false,
+      "runtime_seconds_total": 0.697868,
+      "runtime_seconds_median": 0.175764,
+      "peak_rss_bytes_max": 32595968
+    }
+  }
+}
