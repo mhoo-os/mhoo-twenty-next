@@ -37,9 +37,13 @@ yarn lint
 yarn typecheck
 ```
 
-The local fixture preview is development evidence only. Workspace installation,
-role and cross-workspace enforcement, and client-visible proof remain separate
-closed-beta gates. Real source adapters must later write through these same
-objects and lineage contracts; no dashboard-only authority is allowed.
+The local fixture preview is development evidence only. A single source-level
+fixture adapter maps generated packs, native-object-shaped records, and
+dashboard selection. Its explicit synthetic Workspace/role gate fails closed
+for a missing role or another Workspace, but it is not runtime UI proof:
+Workspace installation, server role and cross-workspace enforcement, and
+client-visible proof remain separate Phase B gates. Real source adapters must
+later write through these same objects and lineage contracts; no dashboard-only
+authority is allowed.
 
 See [PORTING.md](./PORTING.md) for the exact carry-forward/discard matrix.

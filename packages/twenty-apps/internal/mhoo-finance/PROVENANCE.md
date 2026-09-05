@@ -35,5 +35,8 @@ POS overlap and reconciliation semantics.
 ## Verification scope
 
 Fixture generation, behavioral unit tests, lint, App manifest build, and
-typecheck are source evidence. A mounted Workspace preview, role/cross-workspace
-enforcement, client installation, and any real data are separate gates.
+typecheck are source evidence. The Phase A fixture adapter intentionally has a
+fail-closed synthetic Workspace/role selection contract, but it does not prove
+runtime authorization. A mounted Workspace preview, server role and
+cross-workspace enforcement, client installation, and any real data remain
+separate Phase B gates.

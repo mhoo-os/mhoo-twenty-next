@@ -20,6 +20,11 @@ import {
   type ReconciliationException,
   FIXTURE_DASHBOARD,
 } from 'src/fixtures/fixture-pack';
+import {
+  FINANCE_FIXTURE_READER_ROLE,
+  FINANCE_FIXTURE_WORKSPACE_ID,
+  financeFixtureAdapter,
+} from 'src/fixtures/fixture-adapter';
 
 type PreviewState =
   | 'populated'
@@ -346,7 +351,26 @@ const PreviewStateNotice = ({ state }: { state: PreviewState }) => {
 const FinanceAuditDashboard = () => {
   const [previewState, setPreviewState] = useState<PreviewState>('populated');
   const [showTrace, setShowTrace] = useState(false);
-  const data = FIXTURE_DASHBOARD;
+  // The Phase A component has no installed Workspace session. It exercises the
+  // same source-level adapter that later runtime code must use, but it is not
+  // evidence of Twenty server-side role or cross-workspace enforcement.
+  const selection = financeFixtureAdapter.select(
+    {
+      workspaceId: FINANCE_FIXTURE_WORKSPACE_ID,
+      roleIds: [FINANCE_FIXTURE_READER_ROLE],
+    },
+    FIXTURE_DASHBOARD,
+  );
+
+  if (selection.status === 'DENIED') {
+    return (
+      <StyledDashboard>
+        <PreviewStateNotice state="denied" />
+      </StyledDashboard>
+    );
+  }
+
+  const data = selection.dataset;
 
   return (
     <StyledDashboard>
@@ -354,7 +378,7 @@ const FinanceAuditDashboard = () => {
         <StyledHeaderText>
           <H1Title title="Finance audit" />
           <Label>
-            Synthetic, read-only review · {data.datasetId} · corrected fixture revision
+            Synthetic, read-only review · {data.datasetId} · corrected fixture revision · Phase A adapter preview
           </Label>
         </StyledHeaderText>
         <Tag color="green" text="Synthetic only" variant="solid" />

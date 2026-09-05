@@ -153,6 +153,20 @@ export type FixtureDataset = DashboardModel & {
 export const FIXTURE_DATASET_ID = 'mhoo-finance-fixture-2026-09-v1';
 export const FIXTURE_GENERATED_AT = '2026-09-01T00:00:00.000Z';
 
+// These are canonical, synthetic source payloads. Their SHA-256 identities are
+// deliberately stored with the immutable artifact revision rather than derived
+// from a dashboard row. The unit suite recomputes the hashes with node:crypto.
+export const CORRECTED_SOURCE_ARTIFACT_CONTENT = {
+  'artifact-card-2026-02-v1':
+    '{"period":"2026-02","revision":1,"source":"CARD","rows":[{"amountCents":-1800,"eventKey":"card-expense-2026-02-001","status":"PENDING"},{"amountCents":-1400,"eventKey":"card-expense-2026-02-002","status":"POSTED"}]}',
+  'artifact-card-2026-02-v2':
+    '{"period":"2026-02","revision":2,"source":"CARD","rows":[{"amountCents":-1800,"eventKey":"card-expense-2026-02-001","status":"POSTED"},{"amountCents":-1400,"eventKey":"card-expense-2026-02-002","status":"POSTED"}]}',
+  'artifact-toast-2026-02-v1':
+    '{"period":"2026-02","revision":1,"source":"TOAST","rows":[{"amountCents":12500,"eventKey":"pos-revenue-2026-02","status":"POSTED"},{"amountCents":11900,"eventKey":"pos-corrected-revenue-2026-02","status":"POSTED"}]}',
+  'artifact-toast-2026-02-v2':
+    '{"period":"2026-02","revision":2,"source":"TOAST","rows":[{"amountCents":12500,"eventKey":"pos-revenue-2026-02","status":"POSTED"},{"amountCents":12100,"eventKey":"pos-corrected-revenue-2026-02","status":"POSTED"}]}',
+} as const;
+
 const ARTIFACTS: SourceArtifact[] = [
   {
     artifactId: 'artifact-bank-2026-01',
@@ -206,21 +220,41 @@ const ARTIFACTS: SourceArtifact[] = [
     rowCount: 2,
   },
   {
-    artifactId: 'artifact-card-2026-02',
-    fileName: 'synthetic-card-2026-02.csv',
+    artifactId: 'artifact-card-2026-02-v1',
+    fileName: 'synthetic-card-2026-02-v1.csv',
     sourceKind: 'CARD',
     period: '2026-02',
-    contentHash: 'fixture-card-2026-02-v2',
-    revision: 2,
+    contentHash: '7f9b958a63aadbcf2f4519cf11be95a8516347d10016a9009e5a75f02cde9f37',
+    revision: 1,
     freshness: 'FRESH',
-    rowCount: 3,
+    rowCount: 2,
   },
   {
-    artifactId: 'artifact-toast-2026-02',
-    fileName: 'synthetic-toast-2026-02.json',
+    artifactId: 'artifact-card-2026-02-v2',
+    fileName: 'synthetic-card-2026-02-v2.csv',
+    sourceKind: 'CARD',
+    period: '2026-02',
+    contentHash: 'ab9e676d3ef759a0c01750b058ad6fb88f85bc58c4b92fb081522489cd5c7315',
+    revision: 2,
+    freshness: 'FRESH',
+    rowCount: 2,
+  },
+  {
+    artifactId: 'artifact-toast-2026-02-v1',
+    fileName: 'synthetic-toast-2026-02-v1.json',
     sourceKind: 'TOAST',
     period: '2026-02',
-    contentHash: 'fixture-toast-2026-02-v2',
+    contentHash: 'fb74c41b56131e72fd8e9c273b424be89fc5afe56910ef0cb129e7281356e94b',
+    revision: 1,
+    freshness: 'FRESH',
+    rowCount: 2,
+  },
+  {
+    artifactId: 'artifact-toast-2026-02-v2',
+    fileName: 'synthetic-toast-2026-02-v2.json',
+    sourceKind: 'TOAST',
+    period: '2026-02',
+    contentHash: '3c9a9d11c088faf550be18d7f7c3e891b4ed4d3fd2fdfd52fb33162fa57a982c',
     revision: 2,
     freshness: 'FRESH',
     rowCount: 2,
@@ -316,10 +350,10 @@ export const createFixtureRows = (variant: FixtureVariant): SourceRow[] => {
     row('toast-2026-01-003', 'artifact-toast-2026-01', 3, '2026-01', 'TOAST', 'pos-discount-2026-01', -50, 'Synthetic promotional discount', 'DISCOUNT', 'POSTED', 1),
     row('bank-2026-02-001', 'artifact-bank-2026-02', 1, '2026-02', 'BANK', 'bank-settlement-2026-02', 15000, 'Synthetic February settlement', 'REVENUE', 'POSTED', 1),
     row('bank-2026-02-002', 'artifact-bank-2026-02', 2, '2026-02', 'BANK', 'card-payment-2026-02', -2700, 'Synthetic credit-card payment', 'CARD_PAYMENT', 'POSTED', 1),
-    row('card-2026-02-001', 'artifact-card-2026-02', 1, '2026-02', 'CARD', 'card-expense-2026-02-001', -1800, 'Synthetic expense pending settlement', 'OPERATING_EXPENSE', variant === 'original' ? 'PENDING' : 'SUPERSEDED', 1),
-    row('card-2026-02-002', 'artifact-card-2026-02', 2, '2026-02', 'CARD', 'card-expense-2026-02-002', -1400, 'Synthetic travel expense', 'OPERATING_EXPENSE', 'POSTED', 1),
-    row('toast-2026-02-001', 'artifact-toast-2026-02', 1, '2026-02', 'TOAST', 'pos-revenue-2026-02', 12500, 'Synthetic Toast revenue before POS overlap review', 'REVENUE', 'POSTED', 1),
-    row('toast-2026-02-002', 'artifact-toast-2026-02', 2, '2026-02', 'TOAST', 'pos-corrected-revenue-2026-02', variant === 'original' ? 11900 : 11900, 'Synthetic Toast revenue corrected by source revision', 'REVENUE', variant === 'original' ? 'POSTED' : 'SUPERSEDED', 1),
+    row('card-2026-02-001', 'artifact-card-2026-02-v1', 1, '2026-02', 'CARD', 'card-expense-2026-02-001', -1800, 'Synthetic expense pending settlement', 'OPERATING_EXPENSE', variant === 'original' ? 'PENDING' : 'SUPERSEDED', 1),
+    row('card-2026-02-002', 'artifact-card-2026-02-v1', 2, '2026-02', 'CARD', 'card-expense-2026-02-002', -1400, 'Synthetic travel expense', 'OPERATING_EXPENSE', 'POSTED', 1),
+    row('toast-2026-02-001', 'artifact-toast-2026-02-v1', 1, '2026-02', 'TOAST', 'pos-revenue-2026-02', 12500, 'Synthetic Toast revenue before POS overlap review', 'REVENUE', 'POSTED', 1),
+    row('toast-2026-02-002', 'artifact-toast-2026-02-v1', 2, '2026-02', 'TOAST', 'pos-corrected-revenue-2026-02', 11900, 'Synthetic Toast revenue before source correction', 'REVENUE', variant === 'original' ? 'POSTED' : 'SUPERSEDED', 1),
     row('bank-2026-03-001', 'artifact-bank-2026-03', 1, '2026-03', 'BANK', 'bank-settlement-2026-03', 17000, 'Synthetic March settlement control total', 'REVENUE', 'POSTED', 1),
     row('bank-2026-03-002', 'artifact-bank-2026-03', 2, '2026-03', 'BANK', 'transfer-2026-03', -1200, 'Transfer between synthetic business accounts', 'INTERNAL_TRANSFER', 'POSTED', 1),
     row('card-2026-03-001', 'artifact-card-2026-03', 1, '2026-03', 'CARD', 'card-expense-2026-03-001', -6500, 'Synthetic March expense with stale statement source', 'OPERATING_EXPENSE', 'POSTED', 1),
@@ -330,13 +364,21 @@ export const createFixtureRows = (variant: FixtureVariant): SourceRow[] => {
 
   if (variant === 'corrected') {
     rows.push(
-      row('card-2026-02-001', 'artifact-card-2026-02', 1, '2026-02', 'CARD', 'card-expense-2026-02-001', -1800, 'Synthetic expense posted after pending state', 'OPERATING_EXPENSE', 'POSTED', 2),
-      row('toast-2026-02-002', 'artifact-toast-2026-02', 2, '2026-02', 'TOAST', 'pos-corrected-revenue-2026-02', 12100, 'Synthetic Toast revenue corrected by source revision', 'REVENUE', 'POSTED', 2),
+      row('card-2026-02-001', 'artifact-card-2026-02-v2', 1, '2026-02', 'CARD', 'card-expense-2026-02-001', -1800, 'Synthetic expense posted after pending state', 'OPERATING_EXPENSE', 'POSTED', 2),
+      row('toast-2026-02-002', 'artifact-toast-2026-02-v2', 2, '2026-02', 'TOAST', 'pos-corrected-revenue-2026-02', 12100, 'Synthetic Toast revenue corrected by source revision', 'REVENUE', 'POSTED', 2),
     );
   }
 
   return rows;
 };
+
+const artifactsFor = (variant: FixtureVariant): SourceArtifact[] =>
+  ARTIFACTS.filter(
+    (artifact) =>
+      variant === 'corrected' ||
+      (artifact.artifactId !== 'artifact-card-2026-02-v2' &&
+        artifact.artifactId !== 'artifact-toast-2026-02-v2'),
+  );
 
 type IngestionResult = {
   artifacts: SourceArtifact[];
@@ -466,6 +508,18 @@ const normalizeFacts = (
     .sort((left, right) => left.factKey.localeCompare(right.factKey));
 };
 
+const latestRowsFor = (rows: SourceRow[]): SourceRow[] => {
+  const latestBySourceRowKey = new Map<string, SourceRow>();
+  for (const sourceRow of rows) {
+    const current = latestBySourceRowKey.get(sourceRow.sourceRowKey);
+    if (current === undefined || sourceRow.revision > current.revision) {
+      latestBySourceRowKey.set(sourceRow.sourceRowKey, sourceRow);
+    }
+  }
+
+  return [...latestBySourceRowKey.values()];
+};
+
 const coverageFor = (
   artifacts: SourceArtifact[],
   rows: SourceRow[],
@@ -489,8 +543,7 @@ const coverageFor = (
             ? 'NO_DATA'
             : observedRows === 0
               ? 'NO_ACTIVITY'
-              : matchingArtifacts.length > 1 ||
-                  (period === '2026-02' && sourceKind === 'TOAST')
+              : matchingArtifacts.some((artifact) => artifact.duplicateOf !== undefined)
                 ? 'PARTIAL'
                 : 'COMPLETE';
       return {
@@ -593,9 +646,10 @@ const traceFor = (exception: ReconciliationException, fact: NormalizedFact | und
 export const buildFixtureDataset = (variant: FixtureVariant = 'corrected'): FixtureDataset => {
   const rawRows = createFixtureRows(variant);
   const replayedRows = [...rawRows, ...rawRows];
-  const ingestion = ingestFixturePack(ARTIFACTS, replayedRows);
-  const facts = normalizeFacts(ingestion.canonicalRows, ARTIFACTS);
-  const coverage = coverageFor(ARTIFACTS, rawRows);
+  const artifacts = artifactsFor(variant);
+  const ingestion = ingestFixturePack(artifacts, replayedRows);
+  const facts = normalizeFacts(ingestion.canonicalRows, artifacts);
+  const coverage = coverageFor(artifacts, latestRowsFor(rawRows));
   const exceptions = reconciliationFor(variant);
   const openExceptions = exceptions.filter((exception) => exception.status === 'OPEN');
   const firstException = openExceptions[0];
@@ -606,7 +660,7 @@ export const buildFixtureDataset = (variant: FixtureVariant = 'corrected'): Fixt
   );
   const periods = periodSummariesFor(coverage, facts);
   const headline = {
-    artifactCount: ARTIFACTS.length,
+    artifactCount: ingestion.artifacts.length,
     receiptCount: ingestion.receipts.length,
     factCount: facts.length,
     completeCoverageCount: coverage.filter((item) => item.status === 'COMPLETE').length,
