@@ -1,0 +1,39 @@
+# Mhoo Finance provenance
+
+## Destination custody
+
+- Destination: `mhoo-os/mhoo-twenty-next`
+- Destination path: `packages/twenty-apps/internal/mhoo-finance`
+- Destination base: `88a21f624f17ecce805fb7fd6f9d8dc3f7d3c8b6`
+- Phase A issue: MHO-146
+- Port seed: `mhoo-os/mhoo-twenty` PR #45 at
+  `6bef8da9004ea67607315422454a6aa52a65dfd3`
+
+## Accepted carry-forward
+
+The seed contributes deterministic synthetic fixtures, immutable artifact and
+receipt concepts, revision-aware normalized facts, coverage periods,
+deterministic reconciliation exceptions, bounded lineage, native object/view
+definitions, standalone navigation, and native graph configuration.
+
+The dashboard presentation is redesigned against the canonical Twenty UI
+package and theme. The complete path classification is in [PORTING.md](./PORTING.md).
+
+## Explicit exclusions
+
+This Phase A App contains no:
+
+- real Hass record, account number, credential, token, or provider request;
+- Clover OAuth configuration, client secret, connection provider, tool, or
+  role-based provider authority;
+- deployed Workspace state, installation, user invitation, production setting,
+  Cloudflare mutation, or live dashboard claim.
+
+The only Clover-shaped entries are clearly synthetic fixture rows used to test
+POS overlap and reconciliation semantics.
+
+## Verification scope
+
+Fixture generation, behavioral unit tests, lint, App manifest build, and
+typecheck are source evidence. A mounted Workspace preview, role/cross-workspace
+enforcement, client installation, and any real data are separate gates.
