@@ -29,7 +29,23 @@ jobs:
       - run: npx nx build twenty-server
       - name: Verify database initialization guards
         working-directory: packages/twenty-server
-        run: yarn jest --config jest.config.mjs --runInBand --runTestsByPath src/database/scripts/__tests__/check-db-initialization.spec.ts src/database/scripts/__tests__/setup-db-utils.spec.ts
+        run: >-
+          yarn jest --config jest.config.mjs --runInBand --runTestsByPath
+          src/database/scripts/__tests__/check-db-initialization.spec.ts
+          src/database/scripts/__tests__/setup-db-utils.spec.ts
+          src/database/scripts/__tests__/setup-db.spec.ts
+          --coverage
+          --collectCoverageFrom='src/database/scripts/{check-db-initialization,setup-db-utils,setup-db}.ts'
+          --coverageReporters=text --coverageReporters=json-summary --coverageReporters=lcov
+          --coverageDirectory=coverage/startup
+          --coverageThreshold='{"./src/database/scripts/check-db-initialization.ts":{"branches":95,"functions":95,"lines":95},"./src/database/scripts/setup-db-utils.ts":{"branches":95,"functions":95,"lines":95},"./src/database/scripts/setup-db.ts":{"branches":95,"functions":95,"lines":95}}'
+      - name: Preserve startup coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: startup-coverage-${{ github.sha }}
+          path: packages/twenty-server/coverage/startup/
+          if-no-files-found: warn
       - run: npx nx build twenty-front
       - run: npx nx build twenty-sdk
       - run: docker compose --env-file deploy/twenty-next/env/validation.env.example -f deploy/twenty-next/compose.yaml config --quiet
