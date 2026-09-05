@@ -24,7 +24,8 @@ export const performQuery = async <T = unknown>(
     if (ignoreAlreadyExistsError && `${err}`.includes('already exists')) {
       message = `Performed '${consoleDescription}' successfully`;
     } else {
-      message = `Failed to perform '${consoleDescription}': ${err}`;
+      // Required setup failures must reach the caller and fail container startup.
+      throw err;
     }
     if (withLog) {
       // oxlint-disable-next-line no-console
