@@ -91,7 +91,7 @@ $$;`,
     console.error('Error during Data Source initialization:', err);
     process.exitCode = 1;
   })
-  .finally(async () => {
+  .then(async () => {
     if (rawDataSource.isInitialized) {
       await rawDataSource.destroy();
     }

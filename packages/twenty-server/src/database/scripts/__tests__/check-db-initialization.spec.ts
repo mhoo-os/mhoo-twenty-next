@@ -3,7 +3,10 @@ const mockDataSource = {
   query: jest.fn(),
   destroy: jest.fn(),
   isInitialized: true,
-  migrations: [{ name: 'Initial1700000000000' }, { name: 'Later1700000000001' }],
+  migrations: [
+    { name: 'Initial1700000000000' },
+    { name: 'Later1700000000001' },
+  ],
 };
 
 jest.mock('typeorm', () => ({
@@ -41,8 +44,12 @@ it('rejects initialization interrupted after an earlier migration committed', as
 });
 
 it('rejects a missing migration ledger without creating it', async () => {
-  mockDataSource.query.mockRejectedValueOnce(new Error('relation does not exist'));
-  await expect(checkInitialization()).rejects.toThrow('relation does not exist');
+  mockDataSource.query.mockRejectedValueOnce(
+    new Error('relation does not exist'),
+  );
+  await expect(checkInitialization()).rejects.toThrow(
+    'relation does not exist',
+  );
   expect(mockDataSource.query).toHaveBeenCalledTimes(1);
   expect(mockDataSource.destroy).toHaveBeenCalledTimes(1);
 });
@@ -50,5 +57,7 @@ it('rejects a missing migration ledger without creating it', async () => {
 it('rejects an image with missing migration artifacts', async () => {
   mockDataSource.migrations = [];
   mockDataSource.query.mockResolvedValue([]);
-  await expect(checkInitialization()).rejects.toThrow('initialization is incomplete');
+  await expect(checkInitialization()).rejects.toThrow(
+    'initialization is incomplete',
+  );
 });
