@@ -15,8 +15,10 @@ legal_allowed='^(docs/legal/mhoo/v2\.0/(01-mhoo-master-terms-v2\.0\.md|02-mhoo-p
 
 evaluation_allowed='^evaluations/finance/mho-254/.+$'
 
+startup_allowed='^packages/twenty-server/src/database/scripts/((setup-db|setup-db-utils|check-db-initialization)\.ts|__tests__/(check-db-initialization|setup-db-utils)\.spec\.ts)$'
+
 git diff --name-only "$base" "$head" | while IFS= read -r path; do
-  [[ "$path" =~ $allowed || "$path" =~ $email_allowed || "$path" =~ $distribution_allowed || "$path" =~ $scanner_allowed || "$path" =~ $legal_allowed || "$path" =~ $evaluation_allowed ]] || { printf 'trajectory fixture rejected: %s\n' "$path" >&2; exit 1; }
+  [[ "$path" =~ $allowed || "$path" =~ $email_allowed || "$path" =~ $distribution_allowed || "$path" =~ $scanner_allowed || "$path" =~ $legal_allowed || "$path" =~ $evaluation_allowed || "$path" =~ $startup_allowed ]] || { printf 'trajectory fixture rejected: %s\n' "$path" >&2; exit 1; }
 done
 
 assert_manual_only_workflow() {
