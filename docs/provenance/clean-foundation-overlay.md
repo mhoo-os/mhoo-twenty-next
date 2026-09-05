@@ -33,6 +33,26 @@ Trajectory-eval paths:
 - `.agents/skills/pr-trajectory-audit/scripts/exact-head-fixture.test.sh`
 - `.github/workflows/trajectory-eval.yml`
 
+MHO-146 Phase A source authorization:
+
+- `packages/twenty-apps/internal/mhoo-finance/` is the exact internal App
+  subtree authorized for the fixture-first Finance Phase A slice in PR #22.
+  It contains only the native Twenty Finance objects, views, navigation,
+  dashboard, deterministic synthetic fixtures, focused tests, and their
+  source documentation. Authorization of this subtree does not authorize a
+  neighboring App, provider/OAuth integration, credentials, real data,
+  installation, deployment, or production mutation.
+- `.github/workflows/ci-create-app-e2e-minimal.yaml` is the exact workflow
+  path retained for the upstream create-app publish/scaffold integration
+  check. Merged PR #21 changed only its unavailable runner label to the
+  available `ubuntu-latest` runner; the path is authorized here solely to
+  preserve that CI runner compatibility adjustment. This does not authorize
+  another workflow, trigger, deployment, credential, or product path.
+
+These are exact source-custody boundaries. A path that is adjacent, nested
+under another root, has a suffix or lookalike name, or belongs to another App
+or workflow remains rejected by the trajectory fixture.
+
 Upstream dispatch boundary paths:
 
 - `.github/workflows/pr-review-dispatch.yaml`

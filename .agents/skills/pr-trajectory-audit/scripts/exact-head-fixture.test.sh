@@ -17,6 +17,10 @@ cleanup() {
 }
 trap cleanup EXIT
 
+upstream_base="$(sed -n 's/^TWENTY_UPSTREAM_COMMIT=//p' .twenty-source)"
+bash "$fixture" "$upstream_base" HEAD \
+  >"$temporary_directory/cumulative-head-output"
+
 unsafe_blob="$({
   sed 's/^  workflow_dispatch:$/  pull_request_target:/' "$workflow"
 } | git hash-object -w --stdin)"
@@ -151,6 +155,142 @@ for index in "${!rogue_allowed_paths[@]}"; do
       printf 'exact-head fixture test failed: unexpected locale/catalog rejection\n' >&2
       sed -n '1,120p' \
         "$temporary_directory/rogue-locale-catalog-$index-output" >&2
+      exit 1
+    }
+done
+
+finance_allowed_paths=(
+  packages/twenty-apps/internal/mhoo-finance/.gitignore
+  packages/twenty-apps/internal/mhoo-finance/README.md
+  packages/twenty-apps/internal/mhoo-finance/fixtures/mhoo-finance-fixture-pack.json
+  packages/twenty-apps/internal/mhoo-finance/src/application.config.ts
+  packages/twenty-apps/internal/mhoo-finance/src/front-components/finance-audit-dashboard.front-component.tsx
+)
+
+for index in "${!finance_allowed_paths[@]}"; do
+  path="${finance_allowed_paths[$index]}"
+  blob="$({ git show "HEAD:$path"; printf '\n# exact-root Finance fixture\n'; } | git hash-object -w --stdin)"
+  fixture_index="$temporary_directory/index"
+  GIT_INDEX_FILE="$fixture_index" git read-tree HEAD
+  GIT_INDEX_FILE="$fixture_index" git update-index \
+    --cacheinfo 100644 "$blob" "$path"
+  tree="$(GIT_INDEX_FILE="$fixture_index" git write-tree)"
+  candidate_head="$(
+    printf 'test: allow exact Finance source root path\n' |
+      GIT_AUTHOR_NAME='Trajectory fixture' \
+      GIT_AUTHOR_EMAIL='trajectory-fixture@example.invalid' \
+      GIT_AUTHOR_DATE="2000-01-01T00:07:0${index}Z" \
+      GIT_COMMITTER_NAME='Trajectory fixture' \
+      GIT_COMMITTER_EMAIL='trajectory-fixture@example.invalid' \
+      GIT_COMMITTER_DATE="2000-01-01T00:07:0${index}Z" \
+      git commit-tree "$tree" -p HEAD
+  )"
+
+  bash "$fixture" HEAD "$candidate_head" \
+    >"$temporary_directory/finance-allowed-$index-output"
+done
+
+rogue_finance_paths=(
+  packages/twenty-apps/internal/mhoo-finance.backup/README.md
+  nested/packages/twenty-apps/internal/mhoo-finance/README.md
+  packages/twenty-apps/internal/mhoo-financeish/README.md
+  packages/twenty-apps/internal/mhoo-finance-archive/README.md
+)
+
+for index in "${!rogue_finance_paths[@]}"; do
+  path="${rogue_finance_paths[$index]}"
+  blob="$(printf 'rogue Finance source fixture\n' | git hash-object -w --stdin)"
+  fixture_index="$temporary_directory/index"
+  GIT_INDEX_FILE="$fixture_index" git read-tree HEAD
+  GIT_INDEX_FILE="$fixture_index" git update-index --add \
+    --cacheinfo 100644 "$blob" "$path"
+  tree="$(GIT_INDEX_FILE="$fixture_index" git write-tree)"
+  candidate_head="$(
+    printf 'test: reject inexact Finance source root path\n' |
+      GIT_AUTHOR_NAME='Trajectory fixture' \
+      GIT_AUTHOR_EMAIL='trajectory-fixture@example.invalid' \
+      GIT_AUTHOR_DATE="2000-01-01T00:08:0${index}Z" \
+      GIT_COMMITTER_NAME='Trajectory fixture' \
+      GIT_COMMITTER_EMAIL='trajectory-fixture@example.invalid' \
+      GIT_COMMITTER_DATE="2000-01-01T00:08:0${index}Z" \
+      git commit-tree "$tree" -p HEAD
+  )"
+
+  if bash "$fixture" HEAD "$candidate_head" \
+    >"$temporary_directory/rogue-finance-$index-output" 2>&1; then
+    printf 'exact-head fixture test failed: rogue Finance source path passed: %s\n' \
+      "$path" >&2
+    exit 1
+  fi
+
+  grep -Fq "trajectory fixture rejected: $path" \
+    "$temporary_directory/rogue-finance-$index-output" || {
+      printf 'exact-head fixture test failed: unexpected Finance source rejection\n' >&2
+      sed -n '1,120p' "$temporary_directory/rogue-finance-$index-output" >&2
+      exit 1
+    }
+done
+
+workflow_allowed_path=.github/workflows/ci-create-app-e2e-minimal.yaml
+workflow_blob="$({ git show "HEAD:$workflow_allowed_path"; printf '\n# exact PR21 workflow fixture\n'; } | git hash-object -w --stdin)"
+fixture_index="$temporary_directory/index"
+GIT_INDEX_FILE="$fixture_index" git read-tree HEAD
+GIT_INDEX_FILE="$fixture_index" git update-index \
+  --cacheinfo 100644 "$workflow_blob" "$workflow_allowed_path"
+workflow_tree="$(GIT_INDEX_FILE="$fixture_index" git write-tree)"
+workflow_head="$(
+  printf 'test: allow exact PR21 create-app workflow path\n' |
+    GIT_AUTHOR_NAME='Trajectory fixture' \
+    GIT_AUTHOR_EMAIL='trajectory-fixture@example.invalid' \
+    GIT_AUTHOR_DATE='2000-01-01T00:09:00Z' \
+    GIT_COMMITTER_NAME='Trajectory fixture' \
+    GIT_COMMITTER_EMAIL='trajectory-fixture@example.invalid' \
+    GIT_COMMITTER_DATE='2000-01-01T00:09:00Z' \
+    git commit-tree "$workflow_tree" -p HEAD
+  )"
+
+bash "$fixture" HEAD "$workflow_head" \
+  >"$temporary_directory/workflow-allowed-output"
+
+rogue_workflow_paths=(
+  .github/workflows/ci-create-app-e2e-minimal.yaml.backup
+  .github/workflows/ci-create-app-e2e-minimal.yml
+  .github/workflows/ci-create-app-e2e-minimalXyaml
+  .github/workflows/ci-create-app-e2e-minimal-other.yaml
+  nested/.github/workflows/ci-create-app-e2e-minimal.yaml
+  .github/workflows/ci-create-app-e2e.yaml
+)
+
+for index in "${!rogue_workflow_paths[@]}"; do
+  path="${rogue_workflow_paths[$index]}"
+  blob="$(printf 'rogue workflow source fixture\n' | git hash-object -w --stdin)"
+  fixture_index="$temporary_directory/index"
+  GIT_INDEX_FILE="$fixture_index" git read-tree HEAD
+  GIT_INDEX_FILE="$fixture_index" git update-index --add \
+    --cacheinfo 100644 "$blob" "$path"
+  tree="$(GIT_INDEX_FILE="$fixture_index" git write-tree)"
+  candidate_head="$(
+    printf 'test: reject inexact PR21 workflow path\n' |
+      GIT_AUTHOR_NAME='Trajectory fixture' \
+      GIT_AUTHOR_EMAIL='trajectory-fixture@example.invalid' \
+      GIT_AUTHOR_DATE="2000-01-01T00:10:0${index}Z" \
+      GIT_COMMITTER_NAME='Trajectory fixture' \
+      GIT_COMMITTER_EMAIL='trajectory-fixture@example.invalid' \
+      GIT_COMMITTER_DATE="2000-01-01T00:10:0${index}Z" \
+      git commit-tree "$tree" -p HEAD
+  )"
+
+  if bash "$fixture" HEAD "$candidate_head" \
+    >"$temporary_directory/rogue-workflow-$index-output" 2>&1; then
+    printf 'exact-head fixture test failed: rogue workflow path passed: %s\n' \
+      "$path" >&2
+    exit 1
+  fi
+
+  grep -Fq "trajectory fixture rejected: $path" \
+    "$temporary_directory/rogue-workflow-$index-output" || {
+      printf 'exact-head fixture test failed: unexpected workflow rejection\n' >&2
+      sed -n '1,120p' "$temporary_directory/rogue-workflow-$index-output" >&2
       exit 1
     }
 done
