@@ -249,3 +249,15 @@ or second financial source of truth.
 
 These paths authorize source-level branding work only. They do not authorize
 runtime deployment, publication, legal approval, or production mutation.
+
+MHO-240 system SMTP acknowledgement correction (source-only):
+
+- `packages/twenty-server/src/engine/core-modules/email/drivers/smtp.driver.ts`
+- `packages/twenty-server/src/engine/core-modules/email/drivers/smtp.driver.spec.ts`
+
+These exact paths permit awaiting SMTP acknowledgement and propagating rejection,
+with mock-only regression tests. Existing EmailService retryLimit3 (four total
+BullMQ attempts) is unchanged; no new retry loop or exactly-once guarantee is
+introduced. A connection failure after provider acceptance may still be ambiguous;
+manual retries require provider/inbox reconciliation. This source correction does
+not authorize SMTP configuration, credentials, sends, or deployment.
