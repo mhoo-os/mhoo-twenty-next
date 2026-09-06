@@ -73,7 +73,7 @@ retention or automatic provider revocation is claimed.
 - 4 frontend tests: disabled state, clearing before submission, lost-response
   recovery and Workspace-switch cleanup.
 - Front/server typechecks and focused type-aware lint/format checks passed.
-- Native server build and source ancestry verification passed.
+- Native server/front production builds and source ancestry verification passed.
 
 Reproduce the focused backend tests with package Jest and
 `src/engine/core-modules/clover-token/*.spec.ts`. The PostgreSQL suite skips unless
