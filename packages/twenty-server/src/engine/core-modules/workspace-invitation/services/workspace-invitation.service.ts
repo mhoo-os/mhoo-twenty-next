@@ -7,7 +7,7 @@ import { msg } from '@lingui/core/macro';
 import { addMilliseconds } from 'date-fns';
 import ms from 'ms';
 import { SendInviteLinkEmail, renderEmail } from 'twenty-emails';
-import { AppPath, FileFolder } from 'twenty-shared/types';
+import { AppPath } from 'twenty-shared/types';
 import { getAppPath, isDefined } from 'twenty-shared/utils';
 import {
   In,
@@ -31,7 +31,8 @@ import {
 import { WorkspaceDomainsService } from 'src/engine/core-modules/domain/workspace-domains/services/workspace-domains.service';
 import { EmailService } from 'src/engine/core-modules/email/email.service';
 import { buildEmailSender } from 'src/engine/core-modules/email/utils/build-email-sender';
-import { FileUrlService } from 'src/engine/core-modules/file/file-url/file-url.service';
+import { FileService } from 'src/engine/core-modules/file/services/file.service';
+import { prepareWorkspaceEmailLogo } from 'src/engine/core-modules/email/utils/prepare-workspace-email-logo';
 import { I18nService } from 'src/engine/core-modules/i18n/i18n.service';
 import { OnboardingService } from 'src/engine/core-modules/onboarding/onboarding.service';
 import { ThrottlerService } from 'src/engine/core-modules/throttler/throttler.service';
@@ -64,7 +65,7 @@ export class WorkspaceInvitationService {
     private readonly workspaceDomainsService: WorkspaceDomainsService,
     private readonly i18nService: I18nService,
     private readonly throttlerService: ThrottlerService,
-    private readonly fileUrlService: FileUrlService,
+    private readonly fileService: FileService,
   ) {}
 
   async validatePersonalInvitation({
@@ -357,6 +358,12 @@ export class WorkspaceInvitationService {
       }),
     );
 
+    const logoAttachment =
+      isDefined(sender.userEmail) &&
+      invitationResults.some((invitation) => invitation.status === 'fulfilled')
+        ? await prepareWorkspaceEmailLogo(this.fileService, workspace)
+        : undefined;
+
     for (const invitation of invitationResults) {
       if (invitation.status === 'fulfilled') {
         const link = this.workspaceDomainsService.buildWorkspaceURL({
@@ -377,20 +384,13 @@ export class WorkspaceInvitationService {
           );
         }
 
-        const logo = isDefined(workspace.logoFileId)
-          ? await this.fileUrlService.signFileByIdUrl({
-              fileId: workspace.logoFileId,
-              workspaceId: workspace.id,
-              fileFolder: FileFolder.CorePicture,
-            })
-          : undefined;
         const brand = this.productBrandResolverService.resolve();
 
         const emailData = {
           link: link.toString(),
           workspace: {
             name: workspace.displayName,
-            logo,
+            logo: logoAttachment ? `cid:${logoAttachment.cid}` : undefined,
           },
           sender: {
             email: sender.userEmail,
@@ -422,6 +422,7 @@ export class WorkspaceInvitationService {
           subject,
           text,
           html,
+          attachments: logoAttachment ? [logoAttachment] : [],
         });
       }
     }

@@ -40,7 +40,9 @@ export const SendInviteLinkEmail = ({
 }: SendInviteLinkEmailProps) => {
   const i18n = createI18nInstance(locale);
   const workspaceLogo = workspace.logo
-    ? getImageAbsoluteURI({ imageUrl: workspace.logo, baseUrl: serverUrl })
+    ? workspace.logo.startsWith('cid:')
+      ? workspace.logo
+      : getImageAbsoluteURI({ imageUrl: workspace.logo, baseUrl: serverUrl })
     : null;
 
   const senderName = capitalize(sender.firstName);

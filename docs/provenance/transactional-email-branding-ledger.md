@@ -72,3 +72,28 @@ links the attribution to `twenty.com`.
 
 This is source and render evidence for MHO-175. It does not claim provider,
 DNS, disposable-runtime, release, recovery, production, or cutover proof.
+
+
+## Private-deployment inline images (MHO-240)
+
+The server prepares the product mark as an inline MIME attachment before adding
+an email job. It reads only the immutable selected preset's bundled raster from
+`dist/front`; it never fetches an HTML image URL. HTML image sources become CID
+references, while existing text, transactional links and attachments are retained.
+No Cloudflare Access exception or public workspace-file route is needed.
+
+Invitations obtain an optional workspace logo once per batch using the existing
+`FileService.getFileStreamById` workspace and CorePicture scope. No signed file
+URL is added to the email. The template also accepts server-supplied CID sources;
+ordinary HTTP preview sources retain their existing behavior.
+
+Both paths sniff raster types (PNG/JPEG/GIF/WebP), limit each image to 1 MiB,
+close streams, and enqueue base64 strings rather than streams, Buffers, or file
+paths. Missing, unreadable, oversized, or unsupported optional images are omitted
+so a logo cannot prevent the transactional message from being delivered. This
+changes transport representation, not brand or workspace presentation authority.
+
+Deployment is explicitly held for the next combined application release. Source
+and MIME tests do not prove production delivery, native reset/verification, or
+email-client rendering. Existing accepted owner invitation/Google/SMTP evidence
+is retained; do not send test emails or reset the owner's password for this repair.
