@@ -53,3 +53,11 @@ See [PORTING.md](./PORTING.md) for the exact carry-forward/discard matrix.
 See [Finance contract v1](src/contracts/README.md) for exact money, dataset
 manifests, immutable observation/snapshot identities and synthetic golden proof
 (MHO-257). These source contracts do not install or migrate native records.
+
+## Governed statement-import source slice
+
+MHO-126 adds deterministic QFX/OFX and a documented **synthetic-only** CSV
+profile, immutable byte receipts, row lineage, correction revisions, bounded
+hash-bound checkpoints, and native-record projection through this App’s merged
+object vocabulary. See [INGESTION.md](./INGESTION.md) for supported semantics,
+fixture commands, and the remaining real-source acceptance gaps.

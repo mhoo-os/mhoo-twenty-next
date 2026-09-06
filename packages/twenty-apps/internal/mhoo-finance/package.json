@@ -20,7 +20,8 @@
     "fixtures:generate": "node --experimental-strip-types scripts/generate-fixture-pack.mjs",
     "typecheck": "twenty dev:build && tsgo --noEmit -p tsconfig.spec.json",
     "test:unit": "vitest run --config vitest.unit.config.ts",
-    "test:watch": "vitest --config vitest.unit.config.ts"
+    "test:watch": "vitest --config vitest.unit.config.ts",
+    "fixtures:validate-ingestion": "node --experimental-strip-types scripts/validate-ingestion-fixtures.mjs"
   },
   "devDependencies": {
     "@emotion/react": "^11.14.0",
