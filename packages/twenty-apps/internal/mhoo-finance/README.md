@@ -47,3 +47,9 @@ later write through these same objects and lineage contracts; no dashboard-only
 authority is allowed.
 
 See [PORTING.md](./PORTING.md) for the exact carry-forward/discard matrix.
+
+## Shared logical contracts
+
+See [Finance contract v1](src/contracts/README.md) for exact money, dataset
+manifests, immutable observation/snapshot identities and synthetic golden proof
+(MHO-257). These source contracts do not install or migrate native records.
