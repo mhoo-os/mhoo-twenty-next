@@ -2,6 +2,7 @@ import 'twenty-ui/style.css';
 
 import styled from '@emotion/styled';
 import { useState } from 'react';
+import { FinanceSavedSamples } from 'src/components/finance-saved-samples';
 import { defineFrontComponent } from 'twenty-sdk/define';
 import { Status, Tag, type TagColor } from 'twenty-ui/data-display';
 import { Callout, Loader } from 'twenty-ui/feedback';
@@ -475,11 +476,7 @@ export const FinanceWorkspacePreparation = () => {
         </StyledHeaderText>
         <Tag color="gray" text="Setup" variant="solid" />
       </StyledHeader>
-      <Callout
-        variant="neutral"
-        title="Financial results are not connected yet"
-        description="This preparation page does not read a published dataset. It does not indicate that an account has zero transactions."
-      />
+      <FinanceSavedSamples />
       <StyledMetricGrid>
         {[
           ['Accounts', 'Map each bank account and credit card explicitly.'],

@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
+import {
+  FINANCE_FACT_OBJECT_UNIVERSAL_IDENTIFIER,
+  FINANCIAL_ACCOUNT_OBJECT_UNIVERSAL_IDENTIFIER,
+} from 'src/constants/universal-identifiers';
 import application from 'src/application.config';
 import financeFixtureReaderRole from 'src/roles/finance-fixture-reader.role';
 
@@ -9,7 +13,7 @@ describe('@mhoo/finance fixture manifest contracts', () => {
     expect(application.config?.serverVariables).toBeUndefined();
   });
 
-  it('uses a default synthetic-only reader with zero Twenty authority', () => {
+  it('grants only Finance facts and accounts read access, without mutation authority', () => {
     expect(financeFixtureReaderRole.success).toBe(true);
     expect(financeFixtureReaderRole.config).toMatchObject({
       canAccessAllTools: false,
@@ -21,7 +25,16 @@ describe('@mhoo/finance fixture manifest contracts', () => {
       canBeAssignedToAgents: false,
       canBeAssignedToUsers: true,
       canBeAssignedToApiKeys: false,
-      objectPermissions: [],
+      objectPermissions: [
+        FINANCE_FACT_OBJECT_UNIVERSAL_IDENTIFIER,
+        FINANCIAL_ACCOUNT_OBJECT_UNIVERSAL_IDENTIFIER,
+      ].map((objectUniversalIdentifier) => ({
+        objectUniversalIdentifier,
+        canReadObjectRecords: true,
+        canUpdateObjectRecords: false,
+        canSoftDeleteObjectRecords: false,
+        canDestroyObjectRecords: false,
+      })),
       fieldPermissions: [],
       permissionFlagUniversalIdentifiers: [],
     });
