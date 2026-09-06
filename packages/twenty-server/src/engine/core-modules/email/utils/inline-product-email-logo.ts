@@ -6,7 +6,10 @@ import { join } from 'path';
 import { type SendMailOptions } from 'nodemailer';
 import { BRAND_PRESETS, type ResolvedBrand } from 'twenty-shared/branding';
 
-import { readInlineEmailImage } from 'src/engine/core-modules/email/utils/inline-email-image';
+import {
+  type InlineEmailImage,
+  readInlineEmailImage,
+} from 'src/engine/core-modules/email/utils/inline-email-image';
 
 const logger = new Logger('InlineProductEmailLogo');
 
@@ -28,7 +31,7 @@ export const inlineProductEmailLogo = async (
     return mail;
   }
 
-  let attachment;
+  let attachment: InlineEmailImage | undefined;
 
   try {
     // Matches AppModule's dist/front root in both server and worker images.
