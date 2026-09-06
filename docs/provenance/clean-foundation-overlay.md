@@ -35,6 +35,16 @@ Trajectory-eval paths:
 
 MHO-146 Phase A source authorization:
 
+- MHO-259 owner-authorized loader authentication source repair permits
+  `packages/twenty-front-component-renderer/src/host/component-source/utils/fetchComponentSourceFromNetwork.ts`,
+  `fetchJavaScriptModuleSourceText.ts` and their corresponding tests in that
+  directory's `__tests__/`, plus
+  `scripts/provenance/front-component-cookie-browser.cjs` and
+  `docs/provenance/front-component-cookie-auth.md`. Scope: same-origin code
+  loading through an existing authenticated edge, preserving cross-origin
+  cookie omission and storage handoff isolation. This authorizes no Access
+  policy change, deployment, or expanded App record permissions.
+
 - `packages/twenty-apps/internal/mhoo-finance/` is the exact internal App
   subtree authorized for the fixture-first Finance Phase A slice in PR #22.
   It contains only the native Twenty Finance objects, views, navigation,
@@ -119,7 +129,7 @@ Browser shell paths:
 - `packages/twenty-front/src/modules/client-config/types/ClientConfig.ts`
 - `packages/twenty-front/src/generated-metadata/graphql.ts`
 - `packages/twenty-front/src/testing/mock-data/config.ts`
-Workspace presentation policy paths:
+  Workspace presentation policy paths:
 
 - `packages/twenty-shared/src/branding/workspace-presentation.ts`
 - `packages/twenty-shared/src/branding/__tests__/brand-presets.test.ts`
