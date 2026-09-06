@@ -31,7 +31,8 @@ export const fetchComponentSourceFromNetwork = async ({
 }): Promise<string> => {
   const response = await fetch(appendCacheBustQueryParameter(url), {
     headers,
-    credentials: 'omit',
+    // Preserve same-origin edge authentication without sending cookies to storage.
+    credentials: 'same-origin',
   });
 
   if (!response.ok) {

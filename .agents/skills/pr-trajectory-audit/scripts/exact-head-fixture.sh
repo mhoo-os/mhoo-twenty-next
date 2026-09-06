@@ -15,8 +15,10 @@ legal_allowed='^(docs/legal/mhoo/v2\.0/(01-mhoo-master-terms-v2\.0\.md|02-mhoo-p
 
 evaluation_allowed='^evaluations/finance/mho-254/.+$'
 
+loader_allowed='^(docs/provenance/front-component-cookie-auth\.md|scripts/provenance/front-component-cookie-browser\.cjs|packages/twenty-front-component-renderer/src/host/component-source/utils/(fetchComponentSourceFromNetwork|fetchJavaScriptModuleSourceText)\.ts|packages/twenty-front-component-renderer/src/host/component-source/utils/__tests__/(fetchComponentSourceFromNetwork|fetchJavaScriptModuleSourceText)\.spec\.ts)$'
+
 git diff --name-only "$base" "$head" | while IFS= read -r path; do
-  [[ "$path" =~ $allowed || "$path" =~ $email_allowed || "$path" =~ $distribution_allowed || "$path" =~ $scanner_allowed || "$path" =~ $legal_allowed || "$path" =~ $evaluation_allowed ]] || { printf 'trajectory fixture rejected: %s\n' "$path" >&2; exit 1; }
+  [[ "$path" =~ $allowed || "$path" =~ $email_allowed || "$path" =~ $distribution_allowed || "$path" =~ $scanner_allowed || "$path" =~ $legal_allowed || "$path" =~ $evaluation_allowed || "$path" =~ $loader_allowed ]] || { printf 'trajectory fixture rejected: %s\n' "$path" >&2; exit 1; }
 done
 
 assert_manual_only_workflow() {
