@@ -476,6 +476,11 @@ export const FinanceWorkspacePreparation = () => {
         </StyledHeaderText>
         <Tag color="gray" text="Setup" variant="solid" />
       </StyledHeader>
+      <Callout
+        variant="warning"
+        title="Exploratory workspace"
+        description="Record counts describe stored records visible to you, not complete account history. Samples remain unclassified and excluded. Financial totals require reviewed coverage, reconciliation and a published snapshot."
+      />
       <FinanceSavedSamples />
       <StyledMetricGrid>
         {[
