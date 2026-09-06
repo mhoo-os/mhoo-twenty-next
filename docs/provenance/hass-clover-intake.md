@@ -6,6 +6,10 @@ Not deployed. The owner approved the bounded live-source amendment in
 `07ee3f49a3f5fb6ff9129c1867e7ec8469b59c77` without importing legacy commits.
 The exact upstream v2.37.0 ancestry is unchanged.
 
+Owner clarification: the product has one address, `https://mhoo.app`.
+`https://admin.mhoo.app` is the existing Coolify deployment dashboard, not a
+Workspace or signup address. No Hass or MHOO Workspace subdomain is selected.
+
 ## Behavior and ownership
 
 The Cloudflare guide links to native Twenty Settings → Accounts. Twenty owns
@@ -95,11 +99,14 @@ outputs and `--excludeTaskDependencies` without changing upstream scripts.
    release/recovery receipt. Deploy server and worker from the same digest,
    initially leaving the two Clover settings empty. Verify native module startup
    and existing Workspace behavior; local builds alone do not prove these.
-3. Verify existing Workspace subdomain and arrange protected root, existing
-   Workspace and Hass routes with the current deployment owner. The observed
-   runtime has `IS_MULTIWORKSPACE_ENABLED=false`; `hass.mhoo.app` and
-   `mhoo.mhoo.app` did not resolve. Do not flip multi-Workspace mode or create a
-   second Workspace before the routing transition is verified.
+3. Prove native Workspace selection and onboarding on `https://mhoo.app`.
+   The observed runtime has `IS_MULTIWORKSPACE_ENABLED=false`; the current
+   upstream `WorkspaceDomainsService` generates subdomain URLs when enabled
+   and chooses a default Workspace when disabled. This is a single-origin
+   application gap, not a requirement to create DNS records. Keep native
+   membership/session authority and do not flip the flag or create a second
+   Workspace before the same-origin flow is proven. The legacy stable-host
+   implementation is evidence for reuse assessment, not an implicit import.
 4. Create Hass Kitchen through native Twenty's administrator-controlled
    Workspace lifecycle. Record its real UUID and verify the intended role has
    connection-management permission. Keep unrelated Workspace membership private.
@@ -116,7 +123,7 @@ outputs and `--excludeTaskDependencies` without changing upstream scripts.
    Record the exact Worker version and native image digest together.
 
 Disabling `CLOVER_TOKEN_WORKSPACE_ID` closes intake without removing data. A code
-rollback does not undo Workspace creation, DNS, invitations or stored grants.
+rollback does not undo Workspace creation, invitations or stored grants.
 An older image does not know the new provider value; compatibility with new
 rows must be proved before rollback. Do not delete credentials or Workspaces
 to make an unproved rollback appear successful.
