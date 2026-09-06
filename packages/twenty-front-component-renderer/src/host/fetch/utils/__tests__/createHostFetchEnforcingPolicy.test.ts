@@ -153,3 +153,61 @@ describe('createHostFetchEnforcingPolicy', () => {
     );
   });
 });
+
+describe('configured GraphQL edge authentication', () => {
+  afterEach(() => {
+    globalThis.fetch = originalFetch;
+  });
+  it('limits same-origin credentials to bearer-authenticated POST at the exact configured endpoint', async () => {
+    const fetchSpy = jest.fn(async () => createFakeResponse());
+    globalThis.fetch = fetchSpy as unknown as typeof fetch;
+    const hostFetch = createHostFetchEnforcingPolicy({
+      allowedOrigins: ['https://api.twenty.test', 'https://storage.test'],
+      fileStorageRedirectableUrls: [],
+      graphqlUrl: 'https://api.twenty.test/graphql',
+    });
+    await hostFetch({
+      url: 'https://api.twenty.test/graphql',
+      method: 'POST',
+      headers: { Authorization: 'Bearer test' },
+    });
+    expect(fetchSpy).toHaveBeenLastCalledWith(
+      'https://api.twenty.test/graphql',
+      expect.objectContaining({
+        credentials: 'same-origin',
+        redirect: 'error',
+      }),
+    );
+    for (const request of [
+      { url: 'https://api.twenty.test/graphql', method: 'GET' },
+      { url: 'https://api.twenty.test/graphql?query=x', method: 'POST' },
+      { url: 'https://api.twenty.test/metadata', method: 'POST' },
+      { url: 'https://storage.test/graphql', method: 'POST' },
+      { url: 'https://api.twenty.test/graphql/other', method: 'POST' },
+    ]) {
+      await hostFetch({
+        ...request,
+        headers: { Authorization: 'Bearer test' },
+      });
+      expect(fetchSpy).toHaveBeenLastCalledWith(
+        request.url,
+        expect.objectContaining({ credentials: 'omit' }),
+      );
+    }
+    for (const headers of [
+      {},
+      { authorization: 'Basic test' },
+      { authorization: 'Bearer ' },
+    ]) {
+      await hostFetch({
+        url: 'https://api.twenty.test/graphql',
+        method: 'POST',
+        headers,
+      });
+      expect(fetchSpy).toHaveBeenLastCalledWith(
+        'https://api.twenty.test/graphql',
+        expect.objectContaining({ credentials: 'omit' }),
+      );
+    }
+  });
+});

@@ -162,6 +162,10 @@ for index in "${!rogue_allowed_paths[@]}"; do
 done
 
 finance_allowed_paths=(
+  docs/provenance/front-component-graphql-edge-auth.md
+  packages/twenty-front-component-renderer/src/types/HostFetchPolicy.ts
+  packages/twenty-front-component-renderer/src/host/fetch/utils/createHostFetchEnforcingPolicy.ts
+  packages/twenty-front-component-renderer/src/host/fetch/utils/buildHostFetchPolicyFromFrontComponentUrls.ts
   docs/provenance/front-component-cookie-auth.md
   scripts/provenance/front-component-cookie-browser.cjs
   packages/twenty-front-component-renderer/src/host/component-source/utils/fetchComponentSourceFromNetwork.ts
@@ -197,8 +201,9 @@ for index in "${!finance_allowed_paths[@]}"; do
 done
 
 rogue_finance_paths=(
+  packages/twenty-front-component-renderer/src/host/fetch/utils/createHostFetchEnforcingPolicy.ts.backup
   packages/twenty-front-component-renderer/src/host/component-source/utils/fetchComponentSourceFromNetwork.ts.backup
-  packages/twenty-front-component-renderer/src/host/fetch/utils/createHostFetchEnforcingPolicy.ts
+  packages/twenty-front-component-renderer/src/host/fetch/utils/resolveHostFetchRedirectMode.ts
   nested/docs/provenance/front-component-cookie-auth.md
   packages/twenty-apps/internal/mhoo-finance.backup/README.md
   nested/packages/twenty-apps/internal/mhoo-finance/README.md
