@@ -118,3 +118,55 @@ transfer/card pairs, refunds/reversals/owner flows, deliberate reconciliation
 mismatch, unknown source controls, immutable replay and scenario separation.
 No source/fixture result establishes an installed App, real financial finding,
 provider authority, reviewer approval, scale verdict or completed MHO-128.
+
+## Read-contract parity fixture — MHO-258
+
+`read-fixture.ts` consumes this same snapshot and its artifact/receipt identities.
+It is a local synthetic harness, not an installed tool, public endpoint, second
+identity service or persistent cache. `ui`, `tool` and `dataset` are adapters to
+one deterministic read function. No LLM, polling, SQL or export capability exists.
+The future production binding must use Twenty's canonical role-aware tool surface,
+the triggering person's role intersected with the App role, and durable verified
+snapshot publication. Do not expose this fixture factory as a server handler.
+
+The authoritative caller resolves permission on every invocation before cached
+results or metadata can be returned. The supplied identity is opaque to the
+fixture. Resolved subject, permission revision, Workspace, engagement, permitted
+accounts/actions and approved snapshot set bind cache/query identity. Request
+scope never grants authority. Revocation denies cached reads and invalidates old
+cursors. Unknown fields (including scope-expansion prompts), export actions,
+wrong scopes, unsupported page sizes and malformed/mismatched cursors deny.
+The maximum page size is 50. Cursors are local issued handles bound to the entire
+query and permission boundary; a runtime implementation needs durable, expiring
+handles or authenticated cursors and current authorization, not this process map.
+
+Summary results use the whole eligible baseline, independent of page size.
+Coverage and unresolved lists are filtered before delivery. Source traces expose
+only eligible selected-bank observations after verifying the one referenced
+artifact's locator/bytes/SHA-256. They repeat this targeted check even on repeated
+reads; unrelated artifacts are not loaded. Non-trace reads reuse detached results,
+and no read rehashes the entire corpus. Snapshot construction validates once at
+fixture creation; this is not performance or atomic-publication proof. Returned
+objects cannot mutate the internal scope or cached result.
+
+Every read supplies scope, source-date basis, requested period, as-of value (null
+when unavailable), snapshot/manifest/fact hashes, exact currency/metric convention,
+selected eligible/excluded/unresolved counts, coverage/reconciliation limitations,
+procedure version/receipt, stable ordering and pagination metadata. Neither a
+complete page nor an exhausted cursor establishes source completeness. READY is
+only readiness of the synthetic baseline, not PROVEN_COMPLETE. PARTIAL/STALE/FAILED
+can answer from the prior baseline with explicit limitations; missing-evidence
+procedures remain withheld. EMPTY returns null totals, never fabricated zero cash.
+A missing or corrupted target artifact withholds the trace; permission denial
+returns no dataset metadata. Scenario results retain their separate baseline hash,
+assumptions and unreviewed result identity and never replace observed reads.
+
+The source-only end-to-end tests run coverage → unresolved item → source trace
+with the agent disabled. They cover UI/tool/notebook parity, transfer/card/unknown
+populations inherited from the golden fixture, access revocation, row/field
+restriction, page/cursor boundaries, evidence corruption, missing/partial/stale/
+failed/denied states, output-mutation isolation and scenario separation. These
+checks cannot establish installed Workspace RLS, actual reviewer permissions,
+provider consent, durable cache behavior, live evidence custody or a storage SLO.
+MHO-135 retains its procedure/case/privacy/runtime gates; MHO-124 owns scale and
+recovery proof. A later production adapter must supply those proofs before use.
