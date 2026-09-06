@@ -3,9 +3,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 import { type FindOptionsWhere, In, Repository } from 'typeorm';
 
+import { PermissionFlagType } from 'twenty-shared/constants';
+import { PermissionsService } from 'src/engine/metadata-modules/permissions/permissions.service';
 import { ConnectedAccountProvider } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
 
+import { ApplicationEntity } from 'src/engine/core-modules/application/application.entity';
 import { ConnectionProviderEntity } from 'src/engine/core-modules/application/connection-provider/connection-provider.entity';
 import { type AppConnectionDto } from 'src/engine/core-modules/application/connection-provider/connections/dtos/app-connection.dto';
 import { UserWorkspaceEntity } from 'src/engine/core-modules/user-workspace/user-workspace.entity';
@@ -50,6 +53,9 @@ export class ApplicationConnectionsListService {
     private readonly oauthProviderRepository: Repository<ConnectionProviderEntity>,
     @InjectRepository(UserWorkspaceEntity)
     private readonly userWorkspaceRepository: Repository<UserWorkspaceEntity>,
+    private readonly permissions: PermissionsService,
+    @InjectRepository(ApplicationEntity)
+    private readonly applicationRepository: Repository<ApplicationEntity>,
   ) {}
 
   async list({
@@ -101,6 +107,7 @@ export class ApplicationConnectionsListService {
           account,
           workspaceId,
           providerById,
+          requestUserWorkspaceId,
           await resolveWorkspaceMemberId({
             userWorkspaceId: account.userWorkspaceId,
             workspaceId,
@@ -151,12 +158,14 @@ export class ApplicationConnectionsListService {
     const provider = await this.oauthProviderRepository.findOneByOrFail({
       id: account.connectionProviderId,
       workspaceId,
+      applicationId,
     });
 
     const dto = await this.refreshAndMap(
       account,
       workspaceId,
       new Map([[provider.id, provider]]),
+      requestUserWorkspaceId,
       await resolveWorkspaceMemberId({
         userWorkspaceId: account.userWorkspaceId,
         workspaceId,
@@ -213,6 +222,7 @@ export class ApplicationConnectionsListService {
     account: ConnectedAccountEntity,
     workspaceId: string,
     providerById: Map<string, ConnectionProviderEntity>,
+    requestUserWorkspaceId: string | null,
     workspaceMemberId: string | null,
   ): Promise<AppConnectionDto | null> {
     const provider = isDefined(account.connectionProviderId)
@@ -231,11 +241,46 @@ export class ApplicationConnectionsListService {
       return null;
     }
 
+    if (
+      provider.applicationId !== account.applicationId ||
+      provider.workspaceId !== workspaceId
+    )
+      return null;
+
+    // Manual grants are interactive in this first slice. Never let a background
+    // application identity or a deleted membership inherit a shared credential.
+    if (provider.type === 'manualToken') {
+      const application = await this.applicationRepository.findOne({
+        where: { id: account.applicationId!, workspaceId },
+      });
+      if (
+        !application?.defaultRoleId ||
+        provider.oauthConfig ||
+        account.authFailedAt ||
+        account.archivedAt ||
+        !requestUserWorkspaceId ||
+        !workspaceMemberId ||
+        (account.visibility === 'user' &&
+          account.userWorkspaceId !== requestUserWorkspaceId) ||
+        !(await this.userWorkspaceRepository.findOne({
+          where: { id: requestUserWorkspaceId, workspaceId },
+        })) ||
+        !(await this.permissions.userHasWorkspaceSettingPermission({
+          workspaceId,
+          userWorkspaceId: requestUserWorkspaceId,
+          applicationId: account.applicationId!,
+          setting: PermissionFlagType.CONNECTED_ACCOUNTS,
+        }))
+      )
+        return null;
+    }
+
     try {
-      const encryptedTokens = await this.refreshTokensService.resolveTokens(
-        account,
-        workspaceId,
-      );
+      const encryptedTokens =
+        provider.type === 'manualToken'
+          ? { accessToken: account.accessToken }
+          : await this.refreshTokensService.resolveTokens(account, workspaceId);
+      if (!encryptedTokens.accessToken) return null;
 
       return {
         id: account.id,
@@ -249,12 +294,15 @@ export class ApplicationConnectionsListService {
           ciphertext: encryptedTokens.accessToken,
           workspaceId,
         }),
-        scopes: account.scopes ?? provider.oauthConfig?.scopes ?? [],
+        scopes:
+          provider.type === 'manualToken'
+            ? []
+            : (account.scopes ?? provider.oauthConfig?.scopes ?? []),
         authFailedAt: account.authFailedAt?.toISOString() ?? null,
       };
-    } catch (error) {
+    } catch {
       this.logger.warn(
-        `Failed to refresh tokens for connection ${account.id}: ${(error as Error).message}`,
+        `Connection ${account.id} is unavailable; reconnect required`,
       );
 
       return null;

@@ -15,6 +15,12 @@ import {
   AppTokenEntity,
   AppTokenType,
 } from 'src/engine/core-modules/app-token/app-token.entity';
+import { ApplicationEntity } from 'src/engine/core-modules/application/application.entity';
+import { ConnectionProviderEntity } from 'src/engine/core-modules/application/connection-provider/connection-provider.entity';
+import {
+  CLOVER_FINANCE_APPLICATION,
+  CLOVER_MANUAL_PROVIDER,
+} from 'src/engine/core-modules/clover-token/clover-connection.constants';
 import { plaintextStringSchema } from 'src/engine/core-modules/secret-encryption/branded-strings/plaintext-string.type';
 import { SecureHttpClientService } from 'src/engine/core-modules/secure-http-client/secure-http-client.service';
 import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
@@ -182,6 +188,7 @@ export class CloverTokenService {
         );
       }
 
+      const binding = await this.resolveBinding(manager, actor.workspaceId);
       const merchantName = await this.verifyMerchant(
         handoff.merchantId,
         input.accessToken,
@@ -195,7 +202,9 @@ export class CloverTokenService {
         accounts.create({
           workspaceId: actor.workspaceId,
           userWorkspaceId: actor.userWorkspaceId,
-          provider: ConnectedAccountProvider.CLOVER,
+          provider: ConnectedAccountProvider.APP,
+          applicationId: binding.applicationId,
+          connectionProviderId: binding.id,
           handle: handoff.merchantId,
           name: merchantName,
           visibility: 'workspace',
@@ -259,9 +268,40 @@ export class CloverTokenService {
     }
   }
 
-  private findAccount(manager: EntityManager, workspaceId: string) {
+  private async resolveBinding(manager: EntityManager, workspaceId: string) {
+    const application = await manager.getRepository(ApplicationEntity).findOne({
+      where: { workspaceId, universalIdentifier: CLOVER_FINANCE_APPLICATION },
+    });
+    const provider =
+      application &&
+      (await manager.getRepository(ConnectionProviderEntity).findOne({
+        where: {
+          workspaceId,
+          applicationId: application.id,
+          universalIdentifier: CLOVER_MANUAL_PROVIDER,
+          type: 'manualToken',
+        },
+      }));
+    if (!application?.defaultRoleId || !provider || provider.oauthConfig) {
+      throw new ForbiddenException(
+        'Install the Finance manual Clover provider before connecting.',
+      );
+    }
+    return provider;
+  }
+
+  private async findAccount(manager: EntityManager, workspaceId: string) {
+    const binding = await this.resolveBinding(manager, workspaceId);
     return manager.getRepository(ConnectedAccountEntity).findOne({
-      where: { workspaceId, provider: ConnectedAccountProvider.CLOVER },
+      where: [
+        { workspaceId, provider: ConnectedAccountProvider.CLOVER },
+        {
+          workspaceId,
+          provider: ConnectedAccountProvider.APP,
+          applicationId: binding.applicationId,
+          connectionProviderId: binding.id,
+        },
+      ],
       select: { id: true, handle: true, name: true, updatedAt: true },
     });
   }
@@ -296,7 +336,8 @@ export class CloverTokenService {
         });
       if (
         response.data?.id !== merchantId ||
-        typeof response.data?.name !== 'string'
+        typeof response.data?.name !== 'string' ||
+        response.data.name.includes(accessToken)
       ) {
         throw new Error('Invalid merchant response');
       }

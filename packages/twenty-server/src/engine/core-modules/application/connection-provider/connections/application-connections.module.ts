@@ -1,6 +1,8 @@
+import { PermissionsModule } from 'src/engine/metadata-modules/permissions/permissions.module';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { ApplicationEntity } from 'src/engine/core-modules/application/application.entity';
 import { ConnectionProviderEntity } from 'src/engine/core-modules/application/connection-provider/connection-provider.entity';
 import { ApplicationConnectionsController } from 'src/engine/core-modules/application/connection-provider/connections/application-connections.controller';
 import { ApplicationConnectionsResolver } from 'src/engine/core-modules/application/connection-provider/connections/application-connections.resolver';
@@ -22,10 +24,12 @@ import { RefreshTokensManagerModule } from 'src/modules/connected-account/refres
 @Module({
   imports: [
     TypeOrmModule.forFeature([
+      ApplicationEntity,
       ConnectedAccountEntity,
       ConnectionProviderEntity,
       UserWorkspaceEntity,
     ]),
+    PermissionsModule,
     TokenModule,
     WorkspaceCacheStorageModule,
     WorkspaceCacheModule,

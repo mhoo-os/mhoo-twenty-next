@@ -26,6 +26,7 @@ export type ListConnectionsFilter = {
 
 export const listConnections = async (
   filter: ListConnectionsFilter = {},
+  options: { runAs?: 'user' | 'application' } = {},
 ): Promise<AppConnection[]> => {
   const { appConnections } = await postGraphqlRequest<
     { filter: ListConnectionsFilter },
@@ -34,6 +35,7 @@ export const listConnections = async (
     query: LIST_APP_CONNECTIONS_QUERY,
     variables: { filter },
     caller: 'listConnections',
+    runAs: options.runAs,
   });
 
   return appConnections;

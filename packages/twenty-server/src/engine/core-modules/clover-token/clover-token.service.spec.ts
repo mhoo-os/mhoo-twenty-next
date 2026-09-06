@@ -1,3 +1,5 @@
+import { ApplicationEntity } from 'src/engine/core-modules/application/application.entity';
+import { ConnectionProviderEntity } from 'src/engine/core-modules/application/connection-provider/connection-provider.entity';
 import { randomUUID } from 'crypto';
 
 import { WorkspaceActivationStatus } from 'twenty-shared/workspace';
@@ -94,6 +96,21 @@ describe('native Clover token handoff', () => {
     };
     const manager = {
       getRepository: jest.fn((entity) => {
+        if (entity === ApplicationEntity)
+          return {
+            findOne: async () => ({
+              id: 'synthetic-app',
+              defaultRoleId: 'synthetic-app-role',
+            }),
+          };
+        if (entity === ConnectionProviderEntity)
+          return {
+            findOne: async () => ({
+              id: 'synthetic-provider',
+              applicationId: 'synthetic-app',
+              oauthConfig: null,
+            }),
+          };
         if (entity === WorkspaceEntity) return { findOne: workspace };
         if (entity === UserWorkspaceEntity) return { findOne: membership };
         if (entity === AppTokenEntity) return requests;
