@@ -249,3 +249,40 @@ or second financial source of truth.
 
 These paths authorize source-level branding work only. They do not authorize
 runtime deployment, publication, legal approval, or production mutation.
+
+
+Hass native Clover intake source paths authorized by the owner's 2026-09-06
+approval of ADR-0013's live-source amendment in the coordination repository:
+
+- `packages/twenty-front/src/modules/accounts/utils/hasMissingCreateCalendarEventScopes.ts`
+- `packages/twenty-front/src/modules/accounts/utils/hasMissingDraftEmailScopes.ts`
+- `packages/twenty-front/src/modules/settings/accounts/components/SettingsCloverConnection.tsx`
+- `packages/twenty-front/src/modules/settings/accounts/components/__tests__/SettingsCloverConnection.test.tsx`
+- `packages/twenty-front/src/modules/ui/field/display/components/ActorDisplay.tsx`
+- `packages/twenty-front/src/pages/settings/accounts/SettingsAccounts.tsx`
+- `packages/twenty-server/src/engine/core-modules/app-token/app-token.entity.ts`
+- `packages/twenty-server/src/engine/core-modules/auth/services/auth.service.ts`
+- `packages/twenty-server/src/engine/core-modules/clover-token/clover-token.controller.spec.ts`
+- `packages/twenty-server/src/engine/core-modules/clover-token/clover-token.controller.ts`
+- `packages/twenty-server/src/engine/core-modules/clover-token/clover-token.module.ts`
+- `packages/twenty-server/src/engine/core-modules/clover-token/clover-token.postgres.spec.ts`
+- `packages/twenty-server/src/engine/core-modules/clover-token/clover-token.service.spec.ts`
+- `packages/twenty-server/src/engine/core-modules/clover-token/clover-token.service.ts`
+- `packages/twenty-server/src/engine/core-modules/core-engine.module.ts`
+- `packages/twenty-server/src/engine/core-modules/tool/tools/email-tool/utils/get-missing-draft-email-scopes.util.ts`
+- `packages/twenty-server/src/engine/core-modules/twenty-config/config-variables.ts`
+- `packages/twenty-server/src/engine/core-modules/workspace-invitation/services/workspace-invitation.service.ts`
+- `packages/twenty-server/src/instrument.ts`
+- `packages/twenty-server/src/modules/calendar/calendar-event-creation-manager/utils/get-missing-create-event-scopes.util.ts`
+- `packages/twenty-server/src/modules/connected-account/email-alias-manager/services/email-alias-manager.service.ts`
+- `packages/twenty-server/src/modules/connected-account/refresh-tokens-manager/services/connected-account-refresh-tokens.service.ts`
+- `packages/twenty-server/src/modules/messaging/message-outbound-manager/services/messaging-message-outbound.service.ts`
+- `packages/twenty-shared/src/types/ConnectedAccountProvider.ts`
+- `docs/provenance/hass-clover-intake.md`
+
+This bounded overlay extends native Twenty authentication, invitations,
+AppToken request state and ConnectedAccount encryption. It adds no separate
+credential database, identity service, OAuth callback, provider sync, or legacy
+import. The owner requested deployment; source authorization and local checks
+still do not establish runtime readiness. The activation procedure and its
+remaining evidence are recorded in `hass-clover-intake.md`.

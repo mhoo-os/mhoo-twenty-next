@@ -174,7 +174,7 @@ export class WorkspaceInvitationService {
 
   async createWorkspaceInvitation(
     email: string,
-    workspace: WorkspaceEntity,
+    workspace: Pick<WorkspaceEntity, 'id'>,
     roleId?: string,
     isOnboardingInvitation = false,
   ) {

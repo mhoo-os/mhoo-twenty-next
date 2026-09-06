@@ -35,6 +35,7 @@ const PROVIDERS_ICON_MAPPING = {
     // App-managed connections aren't email accounts; this case is unreachable
     // for the EMAIL source but the lookup type still requires every provider.
     [ConnectedAccountProvider.APP]: IconMail,
+    [ConnectedAccountProvider.CLOVER]: IconMail,
     default: IconMail,
   },
   CALENDAR: {
