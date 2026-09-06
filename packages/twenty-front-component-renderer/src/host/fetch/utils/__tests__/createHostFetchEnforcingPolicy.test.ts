@@ -194,11 +194,12 @@ describe('configured GraphQL edge authentication', () => {
         expect.objectContaining({ credentials: 'omit' }),
       );
     }
-    for (const headers of [
+    const invalidHeaders: Record<string, string>[] = [
       {},
       { authorization: 'Basic test' },
       { authorization: 'Bearer ' },
-    ]) {
+    ];
+    for (const headers of invalidHeaders) {
       await hostFetch({
         url: 'https://api.twenty.test/graphql',
         method: 'POST',
