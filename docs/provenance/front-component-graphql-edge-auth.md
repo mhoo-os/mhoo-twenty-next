@@ -25,4 +25,3 @@ Existing component/SDK cross-origin cookie and Authorization leak checks also
 pass. Reproduce with `node scripts/provenance/front-component-cookie-browser.cjs`
 and its Run checks button. No real credentials or Workspace data are used.
 No live image, Access policy or stored record change is part of this increment.
-
