@@ -259,3 +259,18 @@ or second financial source of truth.
 
 These paths authorize source-level branding work only. They do not authorize
 runtime deployment, publication, legal approval, or production mutation.
+
+## GraphQL edge authentication follow-up
+
+The owner-authorized saved-sample integration requires native Core API reads
+behind the existing same-origin edge login. Enumerated paths:
+
+- `packages/twenty-front-component-renderer/src/types/HostFetchPolicy.ts`
+- `packages/twenty-front-component-renderer/src/host/fetch/utils/createHostFetchEnforcingPolicy.ts`
+- `packages/twenty-front-component-renderer/src/host/fetch/utils/buildHostFetchPolicyFromFrontComponentUrls.ts`
+- Their exact `__tests__/<name>.test.ts` counterparts.
+- `docs/provenance/front-component-graphql-edge-auth.md`
+
+Only bearer-authenticated POST to the host-configured GraphQL URL may use
+browser same-origin credentials. Other App fetches and redirect restrictions
+retain their previous policy. This source permission is not deployed proof.
