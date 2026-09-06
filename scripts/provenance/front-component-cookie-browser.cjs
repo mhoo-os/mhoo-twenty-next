@@ -5,29 +5,49 @@ const path = require('node:path'),
 const proofDir = fs.mkdtempSync(
   path.join(os.tmpdir(), 'finance-loader-cookie-proof-'),
 );
+const sharedProofExports = path.join(proofDir, 'shared.ts');
+fs.writeFileSync(
+  sharedProofExports,
+  [
+    ['CustomError', 'errors/CustomError'],
+    ['getURLSafely', 'getURLSafely'],
+    ['isDefined', 'validation/isDefined'],
+  ]
+    .map(
+      ([name, file]) =>
+        `export { ${name} } from '${path.resolve('packages/twenty-shared/src/utils', file)}';`,
+    )
+    .join('\n'),
+);
 require('esbuild').buildSync({
   stdin: {
     contents:
-      "export {fetchComponentSourceFromNetwork} from './packages/twenty-front-component-renderer/src/host/component-source/utils/fetchComponentSourceFromNetwork'; export {fetchJavaScriptModuleSourceText} from './packages/twenty-front-component-renderer/src/host/component-source/utils/fetchJavaScriptModuleSourceText';",
+      "export {createHostFetchEnforcingPolicy} from './packages/twenty-front-component-renderer/src/host/fetch/utils/createHostFetchEnforcingPolicy'; export {fetchComponentSourceFromNetwork} from './packages/twenty-front-component-renderer/src/host/component-source/utils/fetchComponentSourceFromNetwork'; export {fetchJavaScriptModuleSourceText} from './packages/twenty-front-component-renderer/src/host/component-source/utils/fetchJavaScriptModuleSourceText';",
     resolveDir: process.cwd(),
   },
   bundle: true,
   format: 'esm',
   platform: 'browser',
   alias: {
-    'twenty-shared/utils': path.resolve(
-      'packages/twenty-shared/src/utils/errors/CustomError.ts',
-    ),
+    'twenty-shared/utils': sharedProofExports,
   },
   outfile: path.join(proofDir, 'loader.js'),
 });
 const seen = [];
 const page = `<h1>Finance loader cookie boundary</h1><button id="run">Run checks</button><pre id="result">Ready</pre><script type="module">
-import {fetchComponentSourceFromNetwork as component,fetchJavaScriptModuleSourceText as sdk} from '/loader.js';
+import {fetchComponentSourceFromNetwork as component,fetchJavaScriptModuleSourceText as sdk,createHostFetchEnforcingPolicy as createHostFetch} from '/loader.js';
 document.querySelector('#run').onclick=async()=>{const out=[];try{
  await fetch('/logout');
+ const hostFetch=createHostFetch({allowedOrigins:[location.origin],fileStorageRedirectableUrls:[],graphqlUrl:location.origin+'/graphql'});
+ const graph={url:location.origin+'/graphql',method:'POST',headers:{Authorization:'Bearer synthetic-only'}};
+ if((await hostFetch(graph)).status!==401)throw Error('GraphQL without edge login allowed');out.push('PASS GraphQL without edge login denied');
  for(const [name,load] of [['component',url=>component({url})],['SDK',sdk]]){let denied=false;try{await load(location.origin+'/protected')}catch{denied=true}if(!denied)throw Error('Unauthenticated '+name+' was allowed');out.push('PASS unauthenticated '+name+' rejected');}
  await fetch('/login');
+ if((await hostFetch(graph)).status!==200)throw Error('Authenticated GraphQL failed');out.push('PASS authenticated GraphQL');
+ for(const request of [{...graph,headers:{}},{...graph,method:'GET'},{...graph,url:location.origin+'/other'},{...graph,url:location.origin+'/graphql?x=1'}]){
+   if((await hostFetch(request)).status!==401)throw Error('Unexpected ambient cookie outside GraphQL boundary');
+ }out.push('PASS other paths, query variants, methods and missing bearer omit cookies');
+ let redirectDenied=false;try{await hostFetch({...graph,body:'redirect'})}catch{redirectDenied=true}if(!redirectDenied)throw Error('GraphQL redirect followed');out.push('PASS GraphQL redirect denied');
  if(await component({url:location.origin+'/protected'})!=='bundle')throw Error('Component not loaded');out.push('PASS authenticated component');
  if(await sdk(location.origin+'/protected')!=='bundle')throw Error('SDK not loaded');out.push('PASS authenticated SDK');
  await component({url:location.origin+'/handoff',headers:{Authorization:'Bearer synthetic-only'}});
@@ -82,6 +102,24 @@ http
     if (!req.headers.cookie?.includes('edgeSession=synthetic')) {
       res.statusCode = 401;
       return res.end('Login required');
+    }
+    if (route === '/graphql' && req.method === 'POST') {
+      if (req.headers.authorization !== 'Bearer synthetic-only') {
+        res.statusCode = 403;
+        return res.end('Bearer required');
+      }
+      let body = '';
+      req.on('data', (x) => (body += x));
+      req.on('end', () => {
+        if (body === 'redirect') {
+          res.statusCode = 302;
+          res.setHeader('Location', 'http://127.0.0.1:8798/graphql-redirect');
+          return res.end();
+        }
+        res.setHeader('Content-Type', 'application/json');
+        res.end('{"data":{"ok":true}}');
+      });
+      return;
     }
     if (route === '/handoff') {
       res.setHeader('Content-Type', 'application/json');
