@@ -162,6 +162,10 @@ for index in "${!rogue_allowed_paths[@]}"; do
 done
 
 finance_allowed_paths=(
+  docs/provenance/front-component-cookie-auth.md
+  scripts/provenance/front-component-cookie-browser.cjs
+  packages/twenty-front-component-renderer/src/host/component-source/utils/fetchComponentSourceFromNetwork.ts
+  packages/twenty-front-component-renderer/src/host/component-source/utils/fetchJavaScriptModuleSourceText.ts
   packages/twenty-apps/internal/mhoo-finance/.gitignore
   packages/twenty-apps/internal/mhoo-finance/README.md
   packages/twenty-apps/internal/mhoo-finance/fixtures/mhoo-finance-fixture-pack.json
@@ -193,6 +197,9 @@ for index in "${!finance_allowed_paths[@]}"; do
 done
 
 rogue_finance_paths=(
+  packages/twenty-front-component-renderer/src/host/component-source/utils/fetchComponentSourceFromNetwork.ts.backup
+  packages/twenty-front-component-renderer/src/host/fetch/utils/createHostFetchEnforcingPolicy.ts
+  nested/docs/provenance/front-component-cookie-auth.md
   packages/twenty-apps/internal/mhoo-finance.backup/README.md
   nested/packages/twenty-apps/internal/mhoo-finance/README.md
   packages/twenty-apps/internal/mhoo-financeish/README.md

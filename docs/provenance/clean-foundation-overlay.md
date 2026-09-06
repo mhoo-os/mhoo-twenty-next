@@ -129,7 +129,7 @@ Browser shell paths:
 - `packages/twenty-front/src/modules/client-config/types/ClientConfig.ts`
 - `packages/twenty-front/src/generated-metadata/graphql.ts`
 - `packages/twenty-front/src/testing/mock-data/config.ts`
-  Workspace presentation policy paths:
+Workspace presentation policy paths:
 
 - `packages/twenty-shared/src/branding/workspace-presentation.ts`
 - `packages/twenty-shared/src/branding/__tests__/brand-presets.test.ts`
