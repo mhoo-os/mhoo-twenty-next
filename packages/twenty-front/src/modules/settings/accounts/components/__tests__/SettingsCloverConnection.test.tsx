@@ -112,7 +112,10 @@ describe('Clover native form', () => {
     ).not.toBeInTheDocument();
     const [, request] = mockFetch.mock.calls.at(-1)!;
     expect(request.cache).toBe('no-store');
-    expect(request.credentials).toBe('omit');
+    expect(request.credentials).toBe('same-origin');
+    expect(request.headers.Authorization).toBe(
+      'Bearer synthetic-native-session',
+    );
     expect(request.redirect).toBe('error');
     await act(async () => complete(reply(receipt)));
     expect(

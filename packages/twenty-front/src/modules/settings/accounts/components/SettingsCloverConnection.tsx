@@ -80,7 +80,10 @@ export async function cloverRequest<T>(
       },
       ...(body ? { body: JSON.stringify(body) } : {}),
       cache: 'no-store',
-      credentials: 'omit',
+      // Preserve the same-origin Cloudflare Access session. Native Twenty
+      // authorization still requires the explicit bearer above; cookies alone
+      // cannot authorize intake. Never send cookies to a different origin.
+      credentials: 'same-origin',
       redirect: 'error',
       signal,
     },

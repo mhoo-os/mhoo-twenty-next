@@ -24,6 +24,9 @@ The REST controller rejects noninteractive principals and requires an explicit
 native bearer session. Every operation checks the active native Workspace,
 current membership and `CONNECTED_ACCOUNTS` setting permission. The browser
 cannot select a Workspace by supplying an ID in the request body.
+Requests preserve same-origin cookies for Cloudflare Access while still requiring
+the separate native bearer. Cross-origin cookies are not sent. Runtime proof
+must verify that the deployed browser's server base URL uses its Workspace origin.
 
 `POST /clover-token/begin` creates a ten-minute native AppToken bound to the
 user, user-Workspace membership, Workspace and 13-character merchant ID. A new

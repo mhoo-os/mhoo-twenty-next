@@ -279,6 +279,7 @@ approval of ADR-0013's live-source amendment in the coordination repository:
 - `packages/twenty-server/src/modules/messaging/message-outbound-manager/services/messaging-message-outbound.service.ts`
 - `packages/twenty-shared/src/types/ConnectedAccountProvider.ts`
 - `docs/provenance/hass-clover-intake.md`
+- `packages/twenty-docs/developers/extend/apps/logic/connections.mdx`
 
 This bounded overlay extends native Twenty authentication, invitations,
 AppToken request state and ConnectedAccount encryption. It adds no separate
