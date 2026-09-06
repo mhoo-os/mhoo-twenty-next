@@ -33,10 +33,13 @@ intentionally unchanged.
 ## Legal and attribution behavior
 
 The Mhoo preset carries the approved Mhoo LLC legal entity and the five
-hash-pinned public legal routes from MHO-226. Email footers render Terms,
+hash-pinned public legal routes from MHO-226. Default email footers render Terms,
 Privacy, Acceptable Use, Open Source, and DPA Status links from the resolved
 deployment origin. The DPA agreement itself remains unavailable and URL-less;
 no upstream legal or DPA destination is substituted for an Mhoo document.
+Invitations use the owner-requested compact variant: Support, Terms and Privacy,
+plus the approved legal entity and exact attribution linked to the Open Source
+Notice. The unavailable DPA is hidden; approved document contents are unchanged.
 
 The explicit upstream preset retains its approved upstream legal identity and
 bounded `Powered by Twenty` attribution. The Mhoo preset renders that exact
@@ -61,10 +64,10 @@ links the attribution to `twenty.com`.
 
 | Case | Expected proof |
 | --- | --- |
-| Mhoo HTML and plain text | Product identity, all five approved legal URLs, Mhoo LLC, and the exact bounded attribution use the resolved Mhoo origin; no upstream destination appears |
+| Mhoo HTML and plain text | Product identity, approved legal links, Mhoo LLC, and exact attribution use the resolved Mhoo origin; the compact invitation retains Terms/Privacy/Open Source, while other templates retain all five legal URLs |
 | Upstream HTML and plain text | Twenty identity, upstream asset, documentation, legal, and bounded attribution behavior remain coherent |
 | Relative Mhoo asset path | URL is absolute, uses the resolved deployment origin, and preserves the governed asset path |
-| Human invitation sender | Display name is scoped as `Sender (via Product)` and uses the existing configured envelope address |
+| Invitation sender | Brand-only `MHOO` uses the existing configured envelope address; inviter identity remains in the body and the profile is unchanged |
 | Header injection input | CR/LF in sender name or address is removed before formatting the display header |
 | Missing legal document | No dead link or false approved claim is rendered |
 | Workspace-specific email | Authorized workspace name/logo remains data input; product/legal identity remains global |
@@ -74,26 +77,32 @@ This is source and render evidence for MHO-175. It does not claim provider,
 DNS, disposable-runtime, release, recovery, production, or cutover proof.
 
 
-## Private-deployment inline images (MHO-240)
+## Minimal private-deployment invitations (MHO-240)
+
+The owner requested one product logo, inviter/workspace identity, a clear action,
+no generic CRM positioning, and a shorter footer. Invitations omit the promotional
+What Is Product block and redundant workspace image/card. The workspace remains
+text data, so invitation delivery no longer reads, signs or transmits a private
+workspace logo. Existing invitation URL, expiry, authorization and locale behavior
+are unchanged.
+
+The canonical Mhoo sender display name is now `MHOO`. Invitations omit the human
+From-name override; other brand-only transactional senders also use this canonical
+capitalization. The configured sending address and user profile are unchanged.
 
 The server prepares the product mark as an inline MIME attachment before adding
 an email job. It reads only the immutable selected preset's bundled raster from
 `dist/front`; it never fetches an HTML image URL. HTML image sources become CID
-references, while existing text, transactional links and attachments are retained.
-No Cloudflare Access exception or public workspace-file route is needed.
+references and matching remote image preloads are removed. Existing text,
+transactional links and attachments are retained. No Cloudflare Access exception
+or public workspace-file route is needed.
 
-Invitations obtain an optional workspace logo once per batch using the existing
-`FileService.getFileStreamById` workspace and CorePicture scope. No signed file
-URL is added to the email. The template also accepts server-supplied CID sources;
-ordinary HTTP preview sources retain their existing behavior.
+Image bytes are sniffed as PNG/JPEG/GIF/WebP and limited to 1 MiB. Streams are
+closed and base64 strings are queued rather than streams, Buffers, or file paths.
+Missing, unreadable, oversized, or unsupported optional images are omitted so a
+logo cannot prevent delivery. No new dependencies or storage backend are added.
 
-Both paths sniff raster types (PNG/JPEG/GIF/WebP), limit each image to 1 MiB,
-close streams, and enqueue base64 strings rather than streams, Buffers, or file
-paths. Missing, unreadable, oversized, or unsupported optional images are omitted
-so a logo cannot prevent the transactional message from being delivered. This
-changes transport representation, not brand or workspace presentation authority.
-
-Deployment is explicitly held for the next combined application release. Source
-and MIME tests do not prove production delivery, native reset/verification, or
-email-client rendering. Existing accepted owner invitation/Google/SMTP evidence
-is retained; do not send test emails or reset the owner's password for this repair.
+Deployment is explicitly held for the next combined application release. Source,
+preview and MIME tests do not prove production delivery, native reset/verification,
+or Gmail rendering. Existing owner-confirmed invitation delivery/acceptance is
+retained; no test emails or owner password resets are authorized for this repair.

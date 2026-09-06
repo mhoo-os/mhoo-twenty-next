@@ -12,6 +12,7 @@ import { type APP_LOCALES } from 'twenty-shared/translations';
 type BaseEmailProps = {
   children: JSX.Element | JSX.Element[] | string;
   width?: number;
+  compactFooter?: boolean;
   locale: keyof typeof APP_LOCALES;
   brand: ResolvedBrand;
 };
@@ -19,6 +20,7 @@ type BaseEmailProps = {
 export const BaseEmail = ({
   children,
   width,
+  compactFooter = false,
   locale,
   brand,
 }: BaseEmailProps) => {
@@ -28,10 +30,13 @@ export const BaseEmail = ({
     <I18nProvider i18n={i18nInstance}>
       <Html lang={locale}>
         <BaseHead brand={brand} />
-        <Container width={width || 290}>
+        <Container
+          width={width || 290}
+          style={compactFooter ? { maxWidth: '100%' } : undefined}
+        >
           <Logo brand={brand} />
           {children}
-          <Footer brand={brand} i18n={i18nInstance} />
+          <Footer brand={brand} i18n={i18nInstance} compact={compactFooter} />
         </Container>
       </Html>
     </I18nProvider>

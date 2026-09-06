@@ -85,7 +85,6 @@ allowed_paths=(
   packages/twenty-server/src/engine/core-modules/email/email.service.ts
   packages/twenty-server/src/engine/core-modules/email/utils/inline-email-image.ts
   packages/twenty-server/src/engine/core-modules/email/utils/inline-product-email-logo.ts
-  packages/twenty-server/src/engine/core-modules/email/utils/prepare-workspace-email-logo.ts
   packages/twenty-server/src/engine/core-modules/email/__tests__/inline-email-images.spec.ts
   packages/twenty-server/src/engine/core-modules/email/__tests__/inline-invitation-rendering.spec.ts
   evaluations/finance/mho-254/README.md

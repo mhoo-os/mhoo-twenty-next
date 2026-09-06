@@ -1,21 +1,16 @@
 import { Trans } from '@lingui/react';
-import { Img } from 'react-email';
 import { canvasTheme } from 'src/common-style';
 
 import { BaseEmail } from 'src/components/BaseEmail';
 import { CallToAction } from 'src/components/CallToAction';
-import { HighlightedContainer } from 'src/components/HighlightedContainer';
-import { HighlightedText } from 'src/components/HighlightedText';
 import { Link } from 'src/components/Link';
 import { MainText } from 'src/components/MainText';
 import { Title } from 'src/components/Title';
-import { WhatIsProduct } from 'src/components/WhatIsTwenty';
 import { capitalize } from 'src/utils/capitalize';
 import { createI18nInstance } from 'src/utils/i18n.utils';
 import { MHO_PREVIEW_BRAND } from 'src/utils/preview-brand';
 import { type ResolvedBrand } from 'twenty-shared/branding';
 import { type APP_LOCALES } from 'twenty-shared/translations';
-import { getImageAbsoluteURI } from 'twenty-shared/utils';
 
 type SendInviteLinkEmailProps = {
   link: string;
@@ -34,23 +29,16 @@ export const SendInviteLinkEmail = ({
   link,
   workspace,
   sender,
-  serverUrl,
   locale,
   brand,
 }: SendInviteLinkEmailProps) => {
   const i18n = createI18nInstance(locale);
-  const workspaceLogo = workspace.logo
-    ? workspace.logo.startsWith('cid:')
-      ? workspace.logo
-      : getImageAbsoluteURI({ imageUrl: workspace.logo, baseUrl: serverUrl })
-    : null;
-
   const senderName = capitalize(sender.firstName);
   const senderEmail = sender.email;
   const workspaceName = workspace.name;
 
   return (
-    <BaseEmail width={333} locale={locale} brand={brand}>
+    <BaseEmail width={400} locale={locale} brand={brand} compactFooter>
       <Title
         value={
           <Trans
@@ -74,23 +62,8 @@ export const SendInviteLinkEmail = ({
             1: <b />,
           }}
         />
-        <br />
       </MainText>
-      <HighlightedContainer>
-        {workspaceLogo ? (
-          <Img
-            src={workspaceLogo}
-            width={40}
-            height={40}
-            alt="Workspace logo"
-          />
-        ) : (
-          <></>
-        )}
-        {workspace.name ? <HighlightedText value={workspace.name} /> : <></>}
-        <CallToAction href={link} value={i18n._('Accept invite')} />
-      </HighlightedContainer>
-      <WhatIsProduct i18n={i18n} brand={brand} />
+      <CallToAction href={link} value={i18n._('Accept invite')} />
     </BaseEmail>
   );
 };

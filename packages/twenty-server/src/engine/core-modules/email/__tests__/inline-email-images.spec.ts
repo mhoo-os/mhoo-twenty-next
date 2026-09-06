@@ -8,7 +8,6 @@ import {
   TWENTY_BRAND,
   type ResolvedBrand,
 } from 'twenty-shared/branding';
-import { FileFolder } from 'twenty-shared/types';
 
 import { EmailService } from 'src/engine/core-modules/email/email.service';
 
@@ -16,8 +15,8 @@ import {
   MAX_INLINE_EMAIL_IMAGE_BYTES,
   readInlineEmailImage,
 } from 'src/engine/core-modules/email/utils/inline-email-image';
+import { buildEmailSender } from 'src/engine/core-modules/email/utils/build-email-sender';
 import { inlineProductEmailLogo } from 'src/engine/core-modules/email/utils/inline-product-email-logo';
-import { prepareWorkspaceEmailLogo } from 'src/engine/core-modules/email/utils/prepare-workspace-email-logo';
 
 jest.mock('src/engine/core-modules/email/email-sender.job', () => ({
   EmailSenderJob: class EmailSenderJob {},
@@ -245,78 +244,24 @@ describe('bundled product mark', () => {
   });
 });
 
-describe('workspace logo custody', () => {
-  it('loads only the invited workspace uploaded core picture through FileService', async () => {
-    const getFileStreamById = jest
-      .fn()
-      .mockResolvedValue({ stream: stream(), mimeType: 'image/png' });
-    const result = await prepareWorkspaceEmailLogo(
-      { getFileStreamById },
-      { id: 'invited-workspace', logoFileId: 'logo-id' },
-    );
-
-    expect(getFileStreamById).toHaveBeenCalledWith({
-      workspaceId: 'invited-workspace',
-      fileId: 'logo-id',
-      allowedFileFolders: [FileFolder.CorePicture],
-    });
-    expect(result!.contentType).toBe('image/png');
-    expect(JSON.stringify(result)).not.toContain('logo-id');
-    expect(JSON.stringify(result)).not.toContain('token=');
-  });
-
-  it('does not read an absent logo', async () => {
-    const getFileStreamById = jest.fn();
-
-    expect(
-      await prepareWorkspaceEmailLogo(
-        { getFileStreamById },
-        { id: 'workspace', logoFileId: null },
-      ),
-    ).toBeUndefined();
-    expect(getFileStreamById).not.toHaveBeenCalled();
-  });
-
-  it('omits a missing or wrong-workspace file denied by the existing scoped service', async () => {
-    const getFileStreamById = jest.fn().mockResolvedValue(null);
-
-    expect(
-      await prepareWorkspaceEmailLogo(
-        { getFileStreamById },
-        { id: 'workspace', logoFileId: 'other-file' },
-      ),
-    ).toBeUndefined();
-  });
-
-  it('does not trust the declared MIME of uploaded bytes', async () => {
-    const getFileStreamById = jest.fn().mockResolvedValue({
-      stream: Readable.from([Buffer.from('<svg/>')]),
-      mimeType: 'image/png',
-    });
-
-    expect(
-      await prepareWorkspaceEmailLogo(
-        { getFileStreamById },
-        { id: 'workspace', logoFileId: 'logo' },
-      ),
-    ).toBeUndefined();
-  });
-
-  it('allows invitation delivery to continue when storage is unavailable', async () => {
-    const getFileStreamById = jest
-      .fn()
-      .mockRejectedValue(new Error('private storage detail'));
-
-    expect(
-      await prepareWorkspaceEmailLogo(
-        { getFileStreamById },
-        { id: 'workspace', logoFileId: 'logo' },
-      ),
-    ).toBeUndefined();
-  });
-});
-
 describe('email queue integration', () => {
+  it('composes the approved brand From header without changing the sending address', async () => {
+    const from = buildEmailSender({ brand, address: 'notifications@mhoo.app' });
+    expect(from).toBe('MHOO <notifications@mhoo.app>');
+    const result = await createTransport({
+      streamTransport: true,
+      buffer: true,
+    }).sendMail({
+      from,
+      to: 'qa@example.invalid',
+      subject: 'Fixture',
+      text: 'Invitation',
+    });
+    expect(result.message.toString()).toContain(
+      'From: MHOO <notifications@mhoo.app>',
+    );
+  });
+
   it('enqueues inline bytes and preserves the original retry policy', async () => {
     const add = jest.fn().mockResolvedValue(undefined);
     const resolve = jest.fn().mockReturnValue(brand);

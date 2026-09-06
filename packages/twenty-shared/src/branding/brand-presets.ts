@@ -108,7 +108,7 @@ const mhooBrand: ProductBrand = {
   legal: {
     legalEntity: 'Mhoo LLC',
     legalEntityStatus: 'approved',
-    senderDisplayName: 'Mhoo',
+    senderDisplayName: 'MHOO',
     privacy: { status: 'approved', url: '/legal/privacy' },
     terms: { status: 'approved', url: '/legal/terms' },
     acceptableUse: { status: 'approved', url: '/legal/acceptable-use' },
