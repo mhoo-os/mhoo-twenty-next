@@ -2,6 +2,7 @@ import 'twenty-ui/style.css';
 
 import styled from '@emotion/styled';
 import { useState } from 'react';
+import { FinanceSavedSamples } from 'src/components/finance-saved-samples';
 import { defineFrontComponent } from 'twenty-sdk/define';
 import { Status, Tag, type TagColor } from 'twenty-ui/data-display';
 import { Callout, Loader } from 'twenty-ui/feedback';
@@ -11,9 +12,7 @@ import { Card, CardContent } from 'twenty-ui/surfaces';
 import { themeCssVariables } from 'twenty-ui/theme-constants';
 import { H1Title, H2Title, Label } from 'twenty-ui/typography';
 
-import {
-  FINANCE_AUDIT_DASHBOARD_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER,
-} from 'src/constants/universal-identifiers';
+import { FINANCE_AUDIT_DASHBOARD_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER } from 'src/constants/universal-identifiers';
 import {
   type CoveragePeriod,
   type DashboardModel,
@@ -27,13 +26,7 @@ import {
 } from 'src/fixtures/fixture-adapter';
 
 type PreviewState =
-  | 'populated'
-  | 'loading'
-  | 'empty'
-  | 'partial'
-  | 'stale'
-  | 'failed'
-  | 'denied';
+  'populated' | 'loading' | 'empty' | 'partial' | 'stale' | 'failed' | 'denied';
 
 const PREVIEW_STATES: Array<{ value: PreviewState; label: string }> = [
   { value: 'populated', label: 'Populated' },
@@ -159,9 +152,7 @@ const coverageStatusColor = (status: CoveragePeriod['status']): TagColor => {
   }
 };
 
-const exceptionStatusColor = (
-  exception: ReconciliationException,
-): TagColor => {
+const exceptionStatusColor = (exception: ReconciliationException): TagColor => {
   if (exception.status === 'RESOLVED') {
     return 'green';
   }
@@ -175,7 +166,9 @@ const DashboardMetrics = ({ data }: { data: DashboardModel }) => (
       <CardContent>
         <StyledMetric>
           <Label>Coverage</Label>
-          <StyledMetricValue>{data.headline.completeCoverageCount}</StyledMetricValue>
+          <StyledMetricValue>
+            {data.headline.completeCoverageCount}
+          </StyledMetricValue>
           <Label>
             {data.headline.noDataCoverageCount} no data ·{' '}
             {data.headline.noActivityCoverageCount} no activity
@@ -196,8 +189,12 @@ const DashboardMetrics = ({ data }: { data: DashboardModel }) => (
       <CardContent>
         <StyledMetric>
           <Label>Open exposure</Label>
-          <StyledMetricValue>{formatUsd(data.headline.exposureCents)}</StyledMetricValue>
-          <Label>{data.headline.openExceptionCount} deterministic exceptions</Label>
+          <StyledMetricValue>
+            {formatUsd(data.headline.exposureCents)}
+          </StyledMetricValue>
+          <Label>
+            {data.headline.openExceptionCount} deterministic exceptions
+          </Label>
         </StyledMetric>
       </CardContent>
     </Card>
@@ -206,7 +203,10 @@ const DashboardMetrics = ({ data }: { data: DashboardModel }) => (
         <StyledMetric>
           <Label>Custody controls</Label>
           <StyledMetricValue>{data.headline.revisionCount}</StyledMetricValue>
-          <Label>{data.headline.duplicateSuppressedCount} duplicate or retry rows suppressed</Label>
+          <Label>
+            {data.headline.duplicateSuppressedCount} duplicate or retry rows
+            suppressed
+          </Label>
         </StyledMetric>
       </CardContent>
     </Card>
@@ -232,7 +232,10 @@ const Coverage = ({ data }: { data: DashboardModel }) => (
           <Card key={item.coverageKey} rounded fullWidth>
             <CardContent>
               <StyledRow>
-                <Status text={`${item.period} · ${item.sourceKind}`} color="blue" />
+                <Status
+                  text={`${item.period} · ${item.sourceKind}`}
+                  color="blue"
+                />
                 <Tag
                   color={coverageStatusColor(item.status)}
                   text={item.status.replace('_', ' ')}
@@ -281,9 +284,15 @@ const Exceptions = ({
                   {formatUsd(exception.observedCents)} · difference{' '}
                   {formatUsd(exception.differenceCents)}
                 </span>
-                <span><strong>Evidence:</strong> {exception.supportingEvidence}</span>
-                <span><strong>Limit:</strong> {exception.limitingEvidence}</span>
-                <span><strong>Next:</strong> {exception.nextAction}</span>
+                <span>
+                  <strong>Evidence:</strong> {exception.supportingEvidence}
+                </span>
+                <span>
+                  <strong>Limit:</strong> {exception.limitingEvidence}
+                </span>
+                <span>
+                  <strong>Next:</strong> {exception.nextAction}
+                </span>
               </StyledExceptionDetails>
               <div>
                 <Button
@@ -348,7 +357,7 @@ const PreviewStateNotice = ({ state }: { state: PreviewState }) => {
   }
 };
 
-const FinanceAuditDashboard = () => {
+const FinanceFixturePreview = () => {
   const [previewState, setPreviewState] = useState<PreviewState>('populated');
   const [showTrace, setShowTrace] = useState(false);
   // The Phase A component has no installed Workspace session. It exercises the
@@ -378,7 +387,8 @@ const FinanceAuditDashboard = () => {
         <StyledHeaderText>
           <H1Title title="Finance audit" />
           <Label>
-            Synthetic, read-only review · {data.datasetId} · corrected fixture revision · Phase A adapter preview
+            Synthetic, read-only review · {data.datasetId} · corrected fixture
+            revision · Phase A adapter preview
           </Label>
         </StyledHeaderText>
         <Tag color="green" text="Synthetic only" variant="solid" />
@@ -428,7 +438,8 @@ const FinanceAuditDashboard = () => {
                   <StyledTrace>
                     {data.trace.map((step) => (
                       <li key={`${step.kind}-${step.reference}`}>
-                        <strong>{step.kind}</strong> · {step.label} · {step.reference}
+                        <strong>{step.kind}</strong> · {step.label} ·{' '}
+                        {step.reference}
                       </li>
                     ))}
                   </StyledTrace>
@@ -442,9 +453,76 @@ const FinanceAuditDashboard = () => {
   );
 };
 
+export const FinanceWorkspacePreparation = () => {
+  const [showExample, setShowExample] = useState(false);
+  if (showExample)
+    return (
+      <>
+        <Button
+          title="Back to workspace preparation"
+          onClick={() => setShowExample(false)}
+        />
+        <FinanceFixturePreview />
+      </>
+    );
+  return (
+    <StyledDashboard>
+      <StyledHeader>
+        <StyledHeaderText>
+          <H1Title title="Finance workspace" />
+          <Label>
+            Prepare accounts and evidence before reviewing financial results.
+          </Label>
+        </StyledHeaderText>
+        <Tag color="gray" text="Setup" variant="solid" />
+      </StyledHeader>
+      <FinanceSavedSamples />
+      <StyledMetricGrid>
+        {[
+          ['Accounts', 'Map each bank account and credit card explicitly.'],
+          [
+            'Source files',
+            'Keep the original export and its acquisition receipt.',
+          ],
+          [
+            'Validation',
+            'Check dates, currency, signs and duplicate transaction IDs.',
+          ],
+          [
+            'Reconciliation',
+            'Add statements to verify opening and closing balances.',
+          ],
+          [
+            'Review',
+            'Publish a verified dataset before serving dashboard totals.',
+          ],
+        ].map(([title, description]) => (
+          <Card key={title} rounded fullWidth>
+            <CardContent>
+              <H2Title title={title} description={description} />
+            </CardContent>
+          </Card>
+        ))}
+      </StyledMetricGrid>
+      <Section>
+        <H2Title
+          title="Preview the review experience"
+          description="Explore clearly labeled example data. Examples do not create records or represent this client's accounts."
+        />
+        <Button
+          title="Open synthetic example"
+          onClick={() => setShowExample(true)}
+        />
+      </Section>
+    </StyledDashboard>
+  );
+};
+
 export default defineFrontComponent({
-  universalIdentifier: FINANCE_AUDIT_DASHBOARD_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER,
+  universalIdentifier:
+    FINANCE_AUDIT_DASHBOARD_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER,
   name: 'finance-audit-dashboard',
-  description: 'Synthetic read-only finance coverage, exceptions, and source-lineage preview.',
-  component: FinanceAuditDashboard,
+  description:
+    'Empty-first Finance preparation with an explicit synthetic review example.',
+  component: FinanceWorkspacePreparation,
 });

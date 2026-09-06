@@ -9,9 +9,9 @@ source lineage. It is deliberately provider-free and credential-free.
 - Canonical source: `mhoo-os/mhoo-twenty-next`
 - Port seed: `mhoo-os/mhoo-twenty` PR #45 at
   `6bef8da9004ea67607315422454a6aa52a65dfd3`
-- Data: deterministic, fully synthetic fixtures only
-- Provider calls, OAuth, credentials, Hass records, installation, deployment,
-  and production mutation: absent and not authorized
+- Committed data: deterministic, fully synthetic fixtures only; bounded supplied-file validation is supported locally
+- Provider calls, OAuth, credentials, persisted Hass records, installation,
+  deployment, and production mutation: absent from this source increment
 
 ## What the fixture pack proves
 
@@ -61,3 +61,9 @@ profile, immutable byte receipts, row lineage, correction revisions, bounded
 hash-bound checkpoints, and native-record projection through this App’s merged
 object vocabulary. See [INGESTION.md](./INGESTION.md) for supported semantics,
 fixture commands, and the remaining real-source acceptance gaps.
+
+## Client workspace preparation
+
+See [PREPARATION.md](PREPARATION.md) for the native account model, empty-first
+landing page, exact-money projection and bounded Plaid export validation
+function. Installation, durable import and live dashboard reads remain open.

@@ -8,5 +8,5 @@ export default defineApplication({
   universalIdentifier: APPLICATION_UNIVERSAL_IDENTIFIER,
   displayName: 'Mhoo Finance',
   description:
-    'Synthetic-only, fixture-first finance evidence, coverage, and reconciliation review.',
+    'Finance workspace preparation, bounded export validation, and evidence review previews.',
 });

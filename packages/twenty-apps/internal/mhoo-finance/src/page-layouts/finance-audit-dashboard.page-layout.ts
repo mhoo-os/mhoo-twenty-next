@@ -26,14 +26,14 @@ export default definePageLayout({
   tabs: [
     {
       universalIdentifier: 'b9e1d2f3-a4b5-4678-9012-3456789abf11',
-      title: 'Audit overview',
+      title: 'Workspace preparation',
       position: 0,
       icon: 'IconDashboard',
       layoutMode: PageLayoutTabLayoutMode.CANVAS,
       widgets: [
         {
           universalIdentifier: 'b9e1d2f3-a4b5-4678-9012-3456789abf12',
-          title: 'Fixture audit dashboard',
+          title: 'Finance workspace',
           type: 'FRONT_COMPONENT',
           position: { layoutMode: PageLayoutTabLayoutMode.CANVAS },
           configuration: {
@@ -46,7 +46,7 @@ export default definePageLayout({
     },
     {
       universalIdentifier: 'b9e1d2f3-a4b5-4678-9012-3456789abf13',
-      title: 'Native rollups',
+      title: 'Fixture rollups',
       position: 50,
       icon: 'IconChartBar',
       layoutMode: PageLayoutTabLayoutMode.GRID,
