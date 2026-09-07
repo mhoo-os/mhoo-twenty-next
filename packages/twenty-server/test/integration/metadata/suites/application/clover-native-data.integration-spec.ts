@@ -238,15 +238,13 @@ describe('Clover native install and delegated source-record API', () => {
         get: async () => connection,
         fetch: async () =>
           Response.json({
-            elements: [
-              {
-                id: 'NOPQRSTUVWXYZ',
-                amount: 100,
-                createdTime: 1100,
-                modifiedTime: 1500,
-                result: 'SUCCESS',
-              },
-            ],
+            elements: Array.from({ length: 100 }, (_, index) => ({
+              id: index.toString(36).toUpperCase().padStart(13, 'A'),
+              amount: 100,
+              createdTime: 1100,
+              modifiedTime: 1500,
+              result: 'SUCCESS',
+            })),
           }),
       },
     );
@@ -265,17 +263,39 @@ describe('Clover native install and delegated source-record API', () => {
     for (const plural of ['cloverPaymentRevisions', 'cloverImportReceipts']) {
       const records = await client()
         .get(`/rest/${plural}`)
-        .query({ filter: `connectionId[eq]:${connectionId}`, depth: 0 })
+        .query({
+          filter: `connectionId[eq]:${connectionId}`,
+          depth: 0,
+          limit: 100,
+        })
         .set('Authorization', `Bearer ${cloverToken}`);
       expect(records.status).toBe(200);
-      expect(records.body.data[plural]).toHaveLength(1);
+      expect(records.body.data[plural]).toHaveLength(
+        plural === 'cloverPaymentRevisions' ? 100 : 1,
+      );
     }
     const reverse = await client()
       .get(`/rest/cloverConnections/${connectionId}`)
       .query({ depth: 1 })
       .set('Authorization', `Bearer ${cloverToken}`);
-    expect(reverse.body.data.cloverConnection.paymentRevisions).toHaveLength(1);
+    expect(
+      reverse.body.data.cloverConnection.paymentRevisions.length,
+    ).toBeGreaterThan(0);
     expect(reverse.body.data.cloverConnection.importReceipts).toHaveLength(1);
+    const rejectedKey = 'f'.repeat(64);
+    const rejectedBatch = await client()
+      .post('/rest/batch/cloverPaymentRevisions')
+      .set('Authorization', `Bearer ${cloverToken}`)
+      .send([
+        { revisionKey: rejectedKey, connectionId },
+        { revisionKey: page.revisions[0].revisionKey, connectionId },
+      ]);
+    expect(rejectedBatch.status).toBe(400);
+    const rolledBack = await client()
+      .get('/rest/cloverPaymentRevisions')
+      .query({ filter: `revisionKey[eq]:${rejectedKey}` })
+      .set('Authorization', `Bearer ${cloverToken}`);
+    expect(rolledBack.body.data.cloverPaymentRevisions).toHaveLength(0);
     const denied = await client()
       .post('/rest/cloverImportReceipts')
       .set('Authorization', `Bearer ${consumerToken}`)

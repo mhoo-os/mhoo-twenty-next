@@ -10,54 +10,80 @@ const hash = (value: unknown) =>
   createHash('sha256').update(JSON.stringify(value)).digest('hex');
 
 // Private fixed native routes. Neither provider bodies nor job payloads select a URL.
-const ensureRecord = async (
+const ensureRecords = async (
   client: RestApiClient,
   kind: 'payment' | 'receipt',
-  identity: RecordValues,
+  identities: RecordValues[],
   observedAt: string,
 ) => {
+  if (!identities.length) return [];
   const plural =
     kind === 'payment' ? 'cloverPaymentRevisions' : 'cloverImportReceipts';
   const keyField = kind === 'payment' ? 'revisionKey' : 'pageKey';
-  const key = identity[keyField];
-  if (typeof key !== 'string' || !/^[a-f0-9]{64}$/.test(key))
-    throw new Error('Invalid native record key');
+  const keys = identities.map((identity) => identity[keyField]);
+  if (
+    keys.length > 100 ||
+    new Set(keys).size !== keys.length ||
+    keys.some((key) => typeof key !== 'string' || !/^[a-f0-9]{64}$/.test(key))
+  )
+    throw new Error('Invalid native record keys');
   const read = async () => {
     const response = await client.get<{
       data: Record<string, (RecordValues & { id: string })[]>;
     }>(`/rest/${plural}`, {
-      query: { filter: `${keyField}[eq]:${key}`, limit: 2, depth: 0 },
+      query: {
+        filter: `${keyField}[in]:${JSON.stringify(keys)}`,
+        limit: 100,
+        depth: 0,
+      },
       signal: AbortSignal.timeout(4000),
     });
     const rows = response.data[plural];
-    if (!Array.isArray(rows) || rows.length > 1)
-      throw new Error('Ambiguous native revision');
-    return rows[0];
+    if (
+      !Array.isArray(rows) ||
+      rows.length > keys.length ||
+      new Set(rows.map((row) => row[keyField])).size !== rows.length ||
+      rows.some((row) => !keys.includes(row[keyField]))
+    )
+      throw new Error('Ambiguous native revisions');
+    for (const row of rows) {
+      const identity = identities.find(
+        (item) => item[keyField] === row[keyField],
+      )!;
+      if (
+        typeof row.id !== 'string' ||
+        !row.id ||
+        Object.entries(identity).some(
+          ([field, value]) =>
+            JSON.stringify(row[field]) !== JSON.stringify(value),
+        )
+      )
+        throw new Error('Native revision identity mismatch');
+    }
+    return rows;
   };
-  let record = await read();
-  if (!record) {
+  let records = await read();
+  const missing = identities.filter(
+    (identity) => !records.some((row) => row[keyField] === identity[keyField]),
+  );
+  if (missing.length) {
     try {
       await client.post(
-        `/rest/${plural}`,
-        { ...identity, observedAt },
+        `/rest/batch/${plural}`,
+        missing.map((identity) => ({ ...identity, observedAt })),
         { signal: AbortSignal.timeout(4000) },
       );
     } catch {
-      /* A competing identical save may have committed. Re-read and verify. */
+      // A concurrent batch or lost response may have committed. Verify the stored result.
     }
-    record = await read();
+    records = await read();
   }
-  if (
-    !record ||
-    typeof record.id !== 'string' ||
-    !record.id ||
-    Object.entries(identity).some(
-      ([field, value]) =>
-        JSON.stringify(record[field]) !== JSON.stringify(value),
-    )
-  )
-    throw new Error('Native revision was not confirmed');
-  return record.id;
+  if (records.length !== identities.length)
+    throw new Error('Native revisions were not confirmed');
+  return identities.map(
+    (identity) =>
+      records.find((row) => row[keyField] === identity[keyField])!.id,
+  );
 };
 
 // No mutable watermark is advanced. The receipt is the durable acknowledgement.
@@ -89,33 +115,29 @@ export const persistCloverPaymentPage = async (
       connectedAccountId: binding.connectionId,
       merchantId: binding.merchantId,
     });
-    for (const revision of page.revisions) {
+    const records = page.revisions.map((revision) => {
       const { revisionKey, ...facts } = revision;
       if (hash(facts) !== revisionKey) throw new Error('Invalid revision');
-      await ensureRecord(
-        dependencies.client,
-        'payment',
-        {
-          revisionKey,
-          sourceKey: cloverSourceKey(
-            binding.connectionId,
-            'payment',
-            revision.paymentId,
-          ),
-          connectionId: binding.connectionId,
-          paymentId: revision.paymentId,
-          merchantId: revision.merchantId,
-          amountMinor: revision.amountMinor,
-          // Twenty normalizes an absent TEXT value to an empty string.
-          currencyCode: revision.currency ?? '',
-          createdTimeMs: revision.createdTimeMs,
-          modifiedTimeMs: revision.modifiedTimeMs,
-          result: revision.result,
-          voided: revision.voided,
-        },
-        observedAt,
-      );
-    }
+      return {
+        revisionKey,
+        sourceKey: cloverSourceKey(
+          binding.connectionId,
+          'payment',
+          revision.paymentId,
+        ),
+        connectionId: binding.connectionId,
+        paymentId: revision.paymentId,
+        merchantId: revision.merchantId,
+        amountMinor: revision.amountMinor,
+        // Twenty normalizes an absent TEXT value to an empty string.
+        currencyCode: revision.currency ?? '',
+        createdTimeMs: revision.createdTimeMs,
+        modifiedTimeMs: revision.modifiedTimeMs,
+        result: revision.result,
+        voided: revision.voided,
+      };
+    });
+    await ensureRecords(dependencies.client, 'payment', records, observedAt);
     // Revocation during data writes leaves partial data but no new progress receipt.
     await dependencies.authorize();
     const revisionKeys = page.revisions
@@ -132,21 +154,23 @@ export const persistCloverPaymentPage = async (
       binding.grantId,
       revisionKeys,
     ]);
-    const receiptId = await ensureRecord(
+    const [receiptId] = await ensureRecords(
       dependencies.client,
       'receipt',
-      {
-        pageKey,
-        requestKey,
-        connectionId: binding.connectionId,
-        dataset: 'payments',
-        grantId: binding.grantId,
-        ...page.range,
-        nextOffset: page.nextOffset,
-        rowCount: revisionKeys.length,
-        revisionKeys,
-        coverage: 'unverified',
-      },
+      [
+        {
+          pageKey,
+          requestKey,
+          connectionId: binding.connectionId,
+          dataset: 'payments',
+          grantId: binding.grantId,
+          ...page.range,
+          nextOffset: page.nextOffset,
+          rowCount: revisionKeys.length,
+          revisionKeys,
+          coverage: 'unverified',
+        },
+      ],
       observedAt,
     );
     return {

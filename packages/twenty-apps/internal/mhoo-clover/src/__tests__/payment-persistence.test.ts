@@ -60,22 +60,27 @@ const native = () => {
   const transport = vi.fn(
     async (input: RequestInfo | URL, init?: RequestInit) => {
       const url = new URL(String(input));
-      const [, , kind, id] = url.pathname.split('/');
+      const parts = url.pathname.split('/');
+      const isBatch = parts[2] === 'batch';
+      const kind = parts[isBatch ? 3 : 2];
+      const id = isBatch ? undefined : parts[3];
       const rows = records.get(kind) ?? [];
       if (init?.method === 'POST') {
         const body = JSON.parse(String(init.body));
-        if (
-          kind === 'cloverPaymentRevisions' &&
-          failPayment &&
-          rows.length === 1
-        )
-          return new Response('{}', { status: 503 });
-        const record = { ...body, id: body.id ?? randomUUID() };
-        rows.push(record);
-        records.set(kind, rows);
+        const inputs = isBatch ? body : [body];
+        for (const values of inputs) {
+          if (
+            kind === 'cloverPaymentRevisions' &&
+            failPayment &&
+            rows.length === 1
+          )
+            return new Response('{}', { status: 503 });
+          rows.push({ ...values, id: values.id ?? randomUUID() });
+          records.set(kind, rows);
+        }
         if (kind === 'cloverImportReceipts' && loseReceiptResponse)
           throw new Error('Lost response after commit');
-        return Response.json({ data: record });
+        return Response.json({ data: rows });
       }
       if (id) {
         const record = rows.find((row) => row.id === id);
@@ -83,11 +88,12 @@ const native = () => {
           ? Response.json({ data: { cloverConnection: record } })
           : new Response('{}', { status: 404 });
       }
-      const [field, value] = (url.searchParams.get('filter') ?? '').split(
-        '[eq]:',
+      const [field, encoded] = (url.searchParams.get('filter') ?? '').split(
+        '[in]:',
       );
+      const values = JSON.parse(encoded);
       return Response.json({
-        data: { [kind]: rows.filter((row) => row[field] === value) },
+        data: { [kind]: rows.filter((row) => values.includes(row[field])) },
       });
     },
   );

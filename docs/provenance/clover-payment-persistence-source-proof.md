@@ -23,7 +23,7 @@ no new receipt. It cannot undo a request already in flight.
 
 ## Evidence
 
-- App unit suite: 41 tests, including interrupted page/replay, changed revisions,
+- App unit suite: 54 tests, including interrupted page/replay, changed revisions,
   separate connection lineages, lost response, authorization loss and conflicting
   persisted facts. App typecheck and lint passed.
 - App build passed with the actual manifest and current stable identifiers.
@@ -38,11 +38,45 @@ no new receipt. It cannot undo a request already in flight.
 
 This is replay-safe persistence, not an all-or-nothing transaction spanning
 source rows and the receipt. No mutable cursor/watermark is advanced. The returned
-next offset is available only after a confirmed receipt; durable job chaining,
-restart dispatch, atomic page/cursor transaction proof, incremental recovery and
+next offset is available only after a confirmed receipt; restart dispatch, atomic page/cursor transaction proof, incremental recovery and
 full catalog adapters remain subsequent work. Full pages at the offset cap need
 range subdivision or an explicit partial result. No complete-history claim is
-made. Per-row calls are not yet suitable for the scheduled full-page executor.
+made. The initial per-row implementation was replaced by the bounded batch follow-up below.
 
 At the preceding pushed grant head GitHub showed only Danger and skipped preview
 jobs. PR32 had merge conflicts against main; those checks were not broad source CI.
+
+## Bounded batch and receipt-gated continuation
+
+Follow-up source uses native same-object batch creation for payment revisions,
+with exact reread verification of the entire page. It replaces the per-row loop
+and bounds each native request to four seconds. The separate receipt write still
+follows the verified data batch. A unique-conflict batch rollback is exercised
+against the disposable native database; this does not prove a transaction spanning
+both object types.
+
+The private `clover-payment-import` logic function accepts a bounded range and
+pins the native connection/grant. Every nonzero offset requires the previous
+native receipt's exact connection, grant, dataset, range, previous/next offset
+and row count before any provider read. After persistence it rechecks the grant
+and uses native `enqueueJobs` with three retries. Failed/ambiguous dispatch fails
+the job for replay; duplicate delivery can reprocess a page and deduplicates source
+records. The receipt and enqueue are not one atomic operation; exhausted retries
+still require recovery dispatch. No scheduler/root-run planner is enabled.
+
+Full pages beyond the supported offset cap return `needsRangeSubdivision` rather
+than an invalid next job or a complete-history claim. An empty page returns
+`rangeRead` with coverage still unverified. The job helper's ordering and negative
+cases are tested with synthetic provider responses and injected persistence/queue
+boundaries. Actual provider execution and queue-worker continuation remain unproven.
+
+Validation of the batch follow-up: 54 App tests, App typecheck/lint/build, and six
+actual native integration cases passed. The payment case saves and replays 100
+revisions, verifies one receipt and relation lookup, and checks that a duplicate-key
+batch failure leaves no new revision from that batch. The opt-in native grant and
+disconnect/executor negatives remain green. Test environment restored byte-for-byte.
+
+CI admission at `7fd1908ec029945a249abae9e05f08fee9f2ce61` is corrected: PR32
+is mergeable and GitHub's trajectory evaluation passed. Broad checks were still
+queued/running at this receipt, not reported as successful. Local exact-head
+fixture regression and source custody passed.
