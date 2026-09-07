@@ -35,6 +35,18 @@ Run the native frontend Jest configuration against the advanced-text-editor
 module. Source custody and exact-path fixture tests retain the enumerated
 repair boundary. Local checks and hosted CI are source evidence only.
 
+## Hosted CI corrections
+
+The first hosted fixture run exposed two new `git commit-tree` calls relying on
+local author identity. Both now supply deterministic fixture author/committer
+identity and timestamps, like the existing fixture cases.
+
+The frontend formatter also rejected a pre-existing generated legal module.
+The Python generator now emits repository-compatible quotes and line breaks.
+The generated values retain the exact approved Markdown bytes and hashes;
+no legal content or formatter gate is changed. The generator remains usable
+in the Python-only legal verification job without adding Node dependencies.
+
 ## Boundaries
 
 This is a generally useful shared frontend correctness fix, suitable for an

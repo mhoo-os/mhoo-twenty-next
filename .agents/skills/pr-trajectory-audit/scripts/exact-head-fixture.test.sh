@@ -610,7 +610,16 @@ for path in "${ai_editor_paths[@]}"; do
   GIT_INDEX_FILE="$temporary_directory/index" git read-tree HEAD
   GIT_INDEX_FILE="$temporary_directory/index" git update-index --add --cacheinfo 100644 "$blob" "$path"
   tree="$(GIT_INDEX_FILE="$temporary_directory/index" git write-tree)"
-  candidate_head="$(printf 'test: exact editor path\n' | git commit-tree "$tree" -p HEAD)"
+  candidate_head="$(
+    printf 'test: exact editor path\n' |
+      GIT_AUTHOR_NAME='Trajectory fixture' \
+      GIT_AUTHOR_EMAIL='trajectory-fixture@example.invalid' \
+      GIT_AUTHOR_DATE='2000-01-01T00:11:00Z' \
+      GIT_COMMITTER_NAME='Trajectory fixture' \
+      GIT_COMMITTER_EMAIL='trajectory-fixture@example.invalid' \
+      GIT_COMMITTER_DATE='2000-01-01T00:11:00Z' \
+      git commit-tree "$tree" -p HEAD
+  )"
   bash "$fixture" HEAD "$candidate_head" >"$temporary_directory/ai-editor-output"
 done
 for path in \
@@ -622,7 +631,16 @@ for path in \
   GIT_INDEX_FILE="$temporary_directory/index" git read-tree HEAD
   GIT_INDEX_FILE="$temporary_directory/index" git update-index --add --cacheinfo 100644 "$blob" "$path"
   tree="$(GIT_INDEX_FILE="$temporary_directory/index" git write-tree)"
-  candidate_head="$(printf 'test: reject adjacent editor path\n' | git commit-tree "$tree" -p HEAD)"
+  candidate_head="$(
+    printf 'test: reject adjacent editor path\n' |
+      GIT_AUTHOR_NAME='Trajectory fixture' \
+      GIT_AUTHOR_EMAIL='trajectory-fixture@example.invalid' \
+      GIT_AUTHOR_DATE='2000-01-01T00:11:00Z' \
+      GIT_COMMITTER_NAME='Trajectory fixture' \
+      GIT_COMMITTER_EMAIL='trajectory-fixture@example.invalid' \
+      GIT_COMMITTER_DATE='2000-01-01T00:11:00Z' \
+      git commit-tree "$tree" -p HEAD
+  )"
   if bash "$fixture" HEAD "$candidate_head" >"$temporary_directory/ai-editor-output" 2>&1; then
     printf 'exact-head fixture test failed: unapproved editor path passed: %s\n' "$path" >&2
     exit 1
