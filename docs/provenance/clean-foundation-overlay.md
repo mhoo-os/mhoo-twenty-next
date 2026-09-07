@@ -296,3 +296,10 @@ previous editor has been destroyed. The shared helper safely rejects missing
 or destroyed editors; the selector uses the current editor instance and emits
 no options while it is unavailable. This authorizes no editor redesign,
 dependency update, manifest/CORS change, Workspace mutation or deployment.
+
+PR37 CI test-maintenance scope additionally permits exactly
+`packages/twenty-front/src/testing/constants/UntestedAppPaths.ts` to classify
+six public Legal App routes outside the authenticated navigation test matrix.
+`DomainShell.test.tsx` already verifies these exact public routes bypass
+WorkspaceApp. The exhaustive count assertion and production navigation behavior
+remain unchanged; no adjacent test constants or hook implementation are included.

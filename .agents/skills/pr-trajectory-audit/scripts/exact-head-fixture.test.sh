@@ -599,6 +599,7 @@ done
 
 # AI editor repair and runner compatibility retain exact, bounded paths.
 repair_paths=(
+  packages/twenty-front/src/testing/constants/UntestedAppPaths.ts
   .github/workflows/ci-front.yaml
   docs/provenance/ai-editor-lifecycle.md
   packages/twenty-front/src/modules/advanced-text-editor/utils/hasEditorExtension.ts
@@ -630,7 +631,10 @@ for path in \
   packages/twenty-front/src/modules/advanced-text-editor/components/AdvancedTextEditor.tsx \
   .github/workflows/ci-front.yaml.backup \
   .github/workflows/nested/ci-front.yaml \
-  .github/workflows/ci-front-component-renderer.yaml; do
+  .github/workflows/ci-front-component-renderer.yaml \
+  packages/twenty-front/src/testing/constants/UntestedAppPaths.ts.backup \
+  packages/twenty-front/src/testing/constants/nested/UntestedAppPaths.ts \
+  packages/twenty-front/src/testing/constants/PropertyMockStyles.ts; do
   blob="$(printf 'unauthorized editor fixture\n' | git hash-object -w --stdin)"
   GIT_INDEX_FILE="$temporary_directory/index" git read-tree HEAD
   GIT_INDEX_FILE="$temporary_directory/index" git update-index --add --cacheinfo 100644 "$blob" "$path"
