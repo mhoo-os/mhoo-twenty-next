@@ -86,3 +86,76 @@ and its pinned README sources. Repo head task
 this section extends the existing receipt rather than creating another ledger.
 Next owner action is source review of the local commit. No source dependency is
 blocked; installed sandbox/role acceptance remains outside this trial.
+
+
+## Actual local Twenty renderer continuation — 2026-09-07
+
+ARCHITECTURE IMPACT: LOCAL
+
+MHO-146 continuation starts at accepted local trial
+`c1ab8e8d2151f11b09431b6ea8ce14d25ca488d7`, on child branch
+`codex/finance-remote-dom-proof`. The retained Finance executor and repo head
+`01a07aa7-944a-70c3-bf77-d51b9fc766f2` keep the same ownership. Existing trial
+receipt and its 18 domain/preparation tests are reused: no money, fixture,
+reducer or saved-sample behavior changed. The missing evidence was execution
+through actual Twenty Remote DOM instead of standalone React DOM.
+
+The local harness reuses the pattern from governed Clover commit
+`9b26a064b4e63e9591e11f1197ec495ddf3bf455`, paths
+`packages/twenty-apps/internal/mhoo-clover/harness/{remote-host.jsx,remote-fixture.tsx,verify-remote.mjs}`.
+It imports this checkout's `FrontComponentRenderer`, generates the upstream
+sandbox document, and bundles the Finance component with SDK remote JSX/CSS
+plugins. No legacy commit, host modification, new framework or dependency was
+imported. The fixture exports the worker render-container ABI, not an App
+manifest. Host APIs are injected to deny; the browser blocks external requests.
+
+Preserved attempts, all in a protected `finance-remote-dom` artifact folder:
+
+- Attempt 1, 2026-09-07 11:39:49 UTC: host failed before creating a worker,
+  with null React dispatcher (`useState`). Existing App/root dependencies
+  resolved two React copies. The harness now aliases host React/React DOM to
+  one existing copy. No Finance adaptation was made for this setup failure.
+- Attempt 2, 11:40:29 UTC: real worker and CSS passed; an immediate row-count
+  assertion ran before the remote click completed. Its failure snapshot already
+  showed the correct four February records. The harness now waits for the
+  January row to disappear before asserting the count.
+- Attempt 3, 11:41:38 UTC: chart-to-d4/source passed, but the implicit Account
+  label was not found by exact label lookup. Five explicit `aria-label` values
+  were added to the existing Finance input/select controls. This is the sole
+  App-source adaptation; no state/data behavior changed.
+- Attempt 4 passed the native selection/scope/delayed-response case. A final
+  extension checked the previously missing native question input/submission
+  path and all five accessible control names; prior passing proof was retained.
+- Attempt 5, 11:43:41 UTC: PASS, one actual worker, iframe `allow-scripts`, CSS
+  color/radius, question input and submission, coverage chart, February's four
+  records, d4/CSV row 5/excerpt, account change clearing evidence, and a delayed
+  response unable to overwrite denial after 2600ms. No browser errors. Existing
+  shared-locale side-effect build warnings remain visible in the logs.
+
+Changed-source validation: SDK App build/typecheck passed (six files); focused
+component/fixture lint passed. The native case tests the accessibility change;
+unchanged domain/standalone tests were not repeated. Exact committed custody,
+overlay and diff checks are recorded in the terminal receipt. Failed attempts,
+script copies, generated bundle/metafile, screenshots and logs are preserved;
+no timestamps were backdated and no failures replaced by the passing result.
+
+Reproduce with existing dependencies/SDK/UI builds available, from the repository
+root in an isolated checkout:
+
+```
+node_modules/.bin/tsx packages/twenty-front-component-renderer/scripts/front-component-sandbox/build-sandbox-document.ts
+node packages/twenty-apps/internal/mhoo-finance/harness/verify-remote.mjs /path/to/new-protected-attempt-folder
+```
+
+Preserve any pre-existing generated sandbox file; this run created and removed
+only its own ignored generated document and temporary dependency links. The
+harness binds loopback 4334, closes its browser/server, and never stops another
+listener. Use a fresh artifact directory to preserve previous failures. The
+accepted standalone preview on 4331 remains owned and unchanged for review.
+
+This proves local compatibility with the actual source renderer and generated
+sandbox. It does not prove installed Workspace roles, authenticated host API
+behavior, cross-Workspace switching, deployment, Files custody or real totals.
+There was no install, live read/write, credential operation, host change, push
+or publication. Next owner action is repo-head source review of this child
+commit; installed authority acceptance requires separate scoped authorization.

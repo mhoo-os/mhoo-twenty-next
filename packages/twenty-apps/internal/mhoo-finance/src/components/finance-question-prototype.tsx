@@ -304,6 +304,7 @@ export const FinanceQuestionPrototype = ({
           Account
           <select
             className="mhoo-fq-input"
+            aria-label="Account"
             value={state.scope.account}
             onChange={(event) =>
               changeScope({
@@ -320,6 +321,7 @@ export const FinanceQuestionPrototype = ({
           Period
           <select
             className="mhoo-fq-input"
+            aria-label="Period"
             value={state.scope.period}
             onChange={(event) =>
               changeScope({ period: event.target.value as DemoScope['period'] })
@@ -334,6 +336,7 @@ export const FinanceQuestionPrototype = ({
           Snapshot
           <select
             className="mhoo-fq-input"
+            aria-label="Snapshot"
             value={state.scope.snapshot}
             onChange={(event) =>
               changeScope({
@@ -354,6 +357,7 @@ export const FinanceQuestionPrototype = ({
             Your question
             <input
               className="mhoo-fq-input"
+              aria-label="Your question"
               value={questionDraft}
               onChange={(event) => setQuestionDraft(event.target.value)}
             />
@@ -597,6 +601,7 @@ export const FinanceQuestionPrototype = ({
           Demo response simulation
           <select
             className="mhoo-fq-input"
+            aria-label="Demo response simulation"
             value={state.scenario}
             onChange={(event) =>
               request(
