@@ -4,6 +4,7 @@ import styled from '@emotion/styled';
 import { useState } from 'react';
 import { FinanceSourceEntry } from 'src/components/finance-source-entry';
 import { FinanceSavedSamples } from 'src/components/finance-saved-samples';
+import { FinanceQuestionPrototype } from 'src/components/finance-question-prototype';
 import { defineFrontComponent } from 'twenty-sdk/define';
 import { Status, Tag, type TagColor } from 'twenty-ui/data-display';
 import { Callout, Loader } from 'twenty-ui/feedback';
@@ -456,6 +457,9 @@ const FinanceFixturePreview = () => {
 
 export const FinanceWorkspacePreparation = () => {
   const [showExample, setShowExample] = useState(false);
+  const [showQuestionDemo, setShowQuestionDemo] = useState(false);
+  if (showQuestionDemo)
+    return <FinanceQuestionPrototype onExit={() => setShowQuestionDemo(false)} />;
   if (showExample)
     return (
       <>
@@ -519,6 +523,10 @@ export const FinanceWorkspacePreparation = () => {
         <Button
           title="Open synthetic example"
           onClick={() => setShowExample(true)}
+        />
+        <Button
+          title="Explore the question-to-evidence demo"
+          onClick={() => setShowQuestionDemo(true)}
         />
       </Section>
     </StyledDashboard>

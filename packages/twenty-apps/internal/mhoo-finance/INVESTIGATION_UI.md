@@ -29,3 +29,60 @@ The preparation screen now distinguishes financial accounts from provider connec
 Exact source: SDK `front-component/functions/navigate.ts` and host `useFrontComponentExecutionContext.ts` support the native route; server `application-install.resolver.ts` requires APPLICATIONS for findOne/findManyApplications. Finance's role deliberately gains no such permission. Tests cover the Apps route, unavailable statement/CSV options, and rejected host navigation. The mocked rejection is not a live authorization test.
 
 Validation: 100 unit tests, App build/full typecheck, lint and source custody pass. A static local render of the actual React source was produced; it has no active host navigation and does not prove sandbox behavior. The updated live SDK dry-run again passed with 13 additions, 16 updates and 0 deletions, with a new front-component checksum. No apply occurred. Existing 3a66255 plan remains historical evidence for the earlier component; installation requires the latest reviewed build and CI. After authorized installation, verify allowed/denied native Apps navigation in the real workspace, absence of connector-success claims, unavailable upload, and all 20 samples still unclassified/excluded.
+
+## Question-to-evidence implementation trial — 2026-09-07
+
+ARCHITECTURE IMPACT: LOCAL
+
+MHO-146's authorized source/synthetic trial adds an explicit optional entry from
+workspace preparation. It renders the actual Finance React component with fixed
+invented fixtures; no data adapter, live agent, provider connection, Files read,
+manifest, permission or host change is included. Existing saved-sample readers
+and their accepted installed journeys are retained without repeating live reads.
+
+Question, account, period, snapshot and simulation state produce one deterministic
+result. Both outflow and excerpt-coverage charts use its records. A chart selection
+filters contributing transactions; a transaction opens its matching synthetic CSV
+row locator and excerpt, or an explicit unavailable state. Existing integer-money
+contracts calculate totals. All seven fixtures are excluded from real totals.
+Profit, fraud and unsupported questions return bounded explanations instead of
+findings. Request identity and scope checks reject late responses and clear old
+records/evidence; an old explanation is labeled stale while loading.
+
+Changed-input check rationale: the new result/reducer and optional React surface
+required focused scope, precision, selection, refusal and stale-response checks,
+plus the existing preparation tests and native App compiler. No shared host or
+dependency input changed, so whole-repository/Docker checks were not repeated.
+Focused validation passed: 18 tests across two files, native `twenty dev:build`
+(six files and typecheck), `tsgo --noEmit -p tsconfig.spec.json`, and four-file
+lint with zero warnings/errors. Subsequent formatting changed no behavior.
+
+Local browser verification used the actual component at `http://127.0.0.1:4331`:
+January $750 / February $1400; February selection to row d4 / CSV row 5; missing
+excerpt d6 / CSV row 7; coverage 3/3 and 3/4; reserve/February scope of one $200
+record; six-year-profit refusal; loading/stale clear; a slow response superseded
+by denial without restoring records; failed and empty responses. Browser logs
+contained no errors/warnings. A 390-pixel layout had a 390-pixel document width
+and stacked the panels. Desktop evidence and narrow-layout screenshots were
+saved outside Git under the retained task's `finance-question-trial` artifact
+folder. Snapshot consistency and remaining refusal cases also have unit proof.
+
+Reproduce the local preview from this package with
+`node scripts/preview-question-prototype.mjs` (port 4331 must be free), or use
+`--build-only`. It binds loopback only and serves its generated local bundle;
+generated files remain ignored under `.twenty/question-preview`. The retained
+Finance task owns the preview process and its shutdown. This standalone React
+preview does not establish Twenty Remote DOM execution, host navigation, live
+Workspace switching, installed permissions or deployed behavior. Those require a
+separately authorized disposable-Workspace acceptance step. No install, live
+query/write, credential operation, push, merge or publication occurred here.
+
+Custody/handoff: implementation owner `mhoo-twenty-next`; branch
+`codex/finance-question-prototype`, exact base
+`6a1dec473a3d6c303697bca044e3e7d3681e7b72` (merged PR39). Authoritative instructions
+were adopted from `CLAUDE.md` at `4b760df705c085b8b00bd0fde08d3f6aeeacc852`
+and its pinned README sources. Repo head task
+`01a07aa7-944a-70c3-bf77-d51b9fc766f2` coordinates the retained Finance executor;
+this section extends the existing receipt rather than creating another ledger.
+Next owner action is source review of the local commit. No source dependency is
+blocked; installed sandbox/role acceptance remains outside this trial.
