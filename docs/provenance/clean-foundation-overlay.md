@@ -296,6 +296,7 @@ performing those operations, retaining their existing conditions:
 | website-i18n-push.yaml | extract_website_translations | upstream website translation upload |
 | visual-regression-dispatch.yaml | dispatch-pixel-diff | twenty-factory visual comparison dispatch |
 | post-ci-comments.yaml | dispatch-breaking-changes | twenty-factory breaking-changes comment dispatch |
+| docs-i18n-pull.yaml | Eight Crowdin/writeback/infra steps only | upstream translation mutation, PR/branch push and automerge dispatch |
 | ci-e2e-main.yaml | notify-main-ci-failure; QA Scout prepare/run/comment | upstream engineering notification and cloud-agent/context publication |
 
 Each path is under `.github/workflows/` and is enumerated in the exact-head
@@ -322,3 +323,5 @@ that concrete sequencing condition before publication, without relying on absent
 secrets or implying production authorization. No publish/merge/deploy occurred in
 this preparation. Re-evaluate if workflow source, default branch or event policy
 changes; local validation is not a live GitHub execution claim.
+
+Follow-up inventory found docs-i18n-pull also runs on schedules and PR paths. Its local generation/check steps remain intact; only the eight external mutation/writeback steps gain owner guards. Observed PR run34165536337 completed without invoking its non-PR Crowdin steps; this does not establish safety of scheduled runs.
