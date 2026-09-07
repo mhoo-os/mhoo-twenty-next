@@ -68,7 +68,7 @@ Full pages beyond the supported offset cap return `needsRangeSubdivision` rather
 than an invalid next job or a complete-history claim. An empty page returns
 `rangeRead` with coverage still unverified. The job helper's ordering and negative
 cases are tested with synthetic provider responses and injected persistence/queue
-boundaries. Actual provider execution and queue-worker continuation remain unproven.
+boundaries. Actual provider execution remains unproven; the later synthetic native queue proof below covers continuation.
 
 Validation of the batch follow-up: 54 App tests, App typecheck/lint/build, and six
 actual native integration cases passed. The payment case saves and replays 100
@@ -88,3 +88,42 @@ uses the root lockfile and builds the repository SDK/client before Clover lint,
 typecheck, tests and manifest build. Other App jobs retain their existing path.
 The prior head's clean-foundation build and trajectory evaluation passed; this
 CI admission correction still requires its own remote result.
+
+## Native queue recovery proof
+
+The next source correction uses SDK `RetryableLogicFunctionError` for failed or
+ambiguous enqueue. An ordinary Error does not request application retry from
+Twenty's native `LogicFunctionTriggerJob`. Invalid input and grant denial remain
+nonretryable. The App test checks this exact error class.
+
+Six native integration cases passed with the expanded final case using native
+`ApplicationJobService` enqueue, dedicated Redis/BullMQ, the booted native
+request-scoped `LogicFunctionTriggerJob`, and the LOCAL executor. The disposable
+uploaded payment bundle has a prepended transport fixture: provider GET responses
+are synthetic, and native enqueue can fail before dispatch or lose its response
+after the real enqueue. The committed App bundle has no override/test switch.
+Only this disposable queue's existing workers are paused during the controlled
+worker test and resumed afterward; test jobs and fixture files are cleaned up.
+
+- A lost native enqueue response causes actual retry. Parent and duplicate child
+  delivery preserve one receipt per observed page and deduplicate source revisions.
+- A persistently unavailable enqueue exhausts three application retries. Native
+  job completion does not imply import completion: only the first page receipt
+  exists. Explicit continuation from that receipt recovers the missing next page.
+- The test worker is force-closed after the native handler saves/enqueues but
+  before BullMQ acknowledges the job. A replacement worker recovers the stalled
+  job; replay leaves two receipts for the range and no duplicate source revisions.
+- Three synthetic ranges retain exactly 300 revisions. The final check uses native
+  filtered `totalCount`, respecting REST's 200-row response cap.
+
+This proves bounded worker-abandonment/replay in the disposable runtime, not an OS
+crash, infrastructure restore, production queue, automatic recovery UI, continuous
+scheduler or full provider coverage. Source batch, receipt and enqueue remain
+separate operations. Root history planning, recurring sync and operator-facing
+recovery remain next work.
+
+Validation: 54 App tests, App typecheck/lint/build, six native integration cases
+passed (expanded suite 44.557 seconds). The test environment was restored exactly.
+Remote `b377907836f1e2595a23e6cbf4ee43a2030e4fc2` Clover App CI, clean-foundation
+build, shared CI and trajectory evaluation passed. Later source commits require
+their own CI receipts.

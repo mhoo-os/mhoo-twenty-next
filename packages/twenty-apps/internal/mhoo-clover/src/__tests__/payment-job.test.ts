@@ -1,6 +1,9 @@
 import { beforeEach, expect, it, vi } from 'vitest';
 import { RestApiClient } from 'twenty-client-sdk/rest';
-import { type AppConnection } from 'twenty-sdk/logic-function';
+import {
+  type AppConnection,
+  RetryableLogicFunctionError,
+} from 'twenty-sdk/logic-function';
 import {
   importCloverPaymentJob,
   type CloverPaymentJob,
@@ -132,7 +135,9 @@ it('never dispatches after an unconfirmed page save', async () => {
 it('fails ambiguous enqueue so native retry can replay the confirmed page', async () => {
   const d = deps();
   d.enqueue.mockRejectedValueOnce(new Error('lost response'));
-  await expect(importCloverPaymentJob(input, d)).rejects.toThrow();
+  await expect(importCloverPaymentJob(input, d)).rejects.toBeInstanceOf(
+    RetryableLogicFunctionError,
+  );
   await importCloverPaymentJob(input, d);
   expect(d.enqueue).toHaveBeenCalledTimes(2);
   expect(d.enqueue.mock.calls[0]).toEqual(d.enqueue.mock.calls[1]);

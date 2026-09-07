@@ -1,5 +1,8 @@
 import { type RestApiClient } from 'twenty-client-sdk/rest';
-import { type AppConnection } from 'twenty-sdk/logic-function';
+import {
+  type AppConnection,
+  RetryableLogicFunctionError,
+} from 'twenty-sdk/logic-function';
 import {
   authorizeCloverSync,
   type CloverSyncGrantInput,
@@ -94,15 +97,21 @@ export const importCloverPaymentJob = async (
       await authorize();
       // Commit and queue are separate native operations. Failed/ambiguous enqueue
       // fails this job so native retries can replay the page and retry dispatch.
-      await dependencies.enqueue({
-        connectionId: input.connectionId,
-        grantId: input.grantId,
-        fromMs: input.fromMs,
-        toMs: input.toMs,
-        timeField: input.timeField,
-        offset: saved.nextOffset,
-        previousReceiptId: saved.receiptId,
-      });
+      try {
+        await dependencies.enqueue({
+          connectionId: input.connectionId,
+          grantId: input.grantId,
+          fromMs: input.fromMs,
+          toMs: input.toMs,
+          timeField: input.timeField,
+          offset: saved.nextOffset,
+          previousReceiptId: saved.receiptId,
+        });
+      } catch {
+        throw new RetryableLogicFunctionError(
+          'Native next-page dispatch was not confirmed.',
+        );
+      }
     }
     return {
       ...saved,
@@ -113,7 +122,11 @@ export const importCloverPaymentJob = async (
             ? ('needsRangeSubdivision' as const)
             : ('nextPageQueued' as const),
     };
-  } catch {
+  } catch (error) {
+    if (error instanceof RetryableLogicFunctionError)
+      throw new RetryableLogicFunctionError(
+        'Clover payment job incomplete. Replay from the last confirmed receipt.',
+      );
     throw new Error(
       'Clover payment job incomplete. Replay from the last confirmed receipt.',
     );

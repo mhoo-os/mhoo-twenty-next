@@ -7,7 +7,13 @@ import { type TwentyConfigService } from 'src/engine/core-modules/twenty-config/
 import { type SecureHttpClientService } from 'src/engine/core-modules/secure-http-client/secure-http-client.service';
 import { executeLogicFunction } from 'test/integration/metadata/suites/logic-function/utils/execute-logic-function.util';
 import { randomUUID } from 'crypto';
-import { readFileSync } from 'fs';
+import { readFileSync, writeFileSync, rmSync } from 'fs';
+import { Queue, Worker } from 'bullmq';
+import { type ApplicationJobService } from 'src/engine/core-modules/application/application-job/services/application-job.service';
+import {
+  type LogicFunctionTriggerJob,
+  type LogicFunctionTriggerJobData,
+} from 'src/engine/core-modules/logic-function/logic-function-trigger/jobs/logic-function-trigger.job';
 import { resolve } from 'path';
 import request from 'supertest';
 import { type Manifest } from 'twenty-shared/application';
@@ -31,6 +37,35 @@ const output = resolve('../twenty-apps/internal/mhoo-clover/.twenty/output');
 const clover: Manifest = JSON.parse(
   readFileSync(resolve(output, 'manifest.json'), 'utf8'),
 );
+const paymentImportId = '1dbeb77b-d08e-4c36-90d8-e3012d14630b';
+const providerFixturePath = `/tmp/mhoo-clover-native-queue-${randomUUID()}.json`;
+// Only the disposable uploaded bundle gets this transport fault fixture.
+// The committed App bundle has no provider override or test transport switch.
+const providerFixturePrefix = `
+import { readFileSync as proofRead, writeFileSync as proofWrite } from 'node:fs';
+const proofOriginalFetch = globalThis.fetch;
+globalThis.fetch = async (input, init) => {
+  const url = new URL(String(input));
+  const mode = JSON.parse(proofRead(${JSON.stringify(providerFixturePath)}, 'utf8'));
+  if (url.origin === 'https://api.clover.com') {
+    if (init?.method !== 'GET' || url.pathname !== '/v3/merchants/ABCDEFGHIJKLM/payments')
+      throw new Error('Unexpected synthetic provider request');
+    const from = Number(url.searchParams.getAll('filter')[0].split('>=')[1]);
+    return Response.json({ elements: Number(url.searchParams.get('offset')) === 0 ?
+      Array.from({length:100},(_,i)=>({id:i.toString(36).toUpperCase().padStart(13,'A'),amount:100,
+        createdTime:from+1,modifiedTime:from+1,result:'SUCCESS'})) : [] });
+  }
+  if (url.origin !== 'http://localhost:4000') throw new Error('Unexpected proof egress');
+  const enqueues = String(init?.body ?? '').includes('enqueueJobs');
+  if (enqueues && mode.mode === 'fail-before') throw new Error('Synthetic unavailable dispatch');
+  const response = await proofOriginalFetch(input, init);
+  if (enqueues && mode.mode === 'lose-once') {
+    proofWrite(${JSON.stringify(providerFixturePath)}, JSON.stringify({mode:'pass'}));
+    throw new Error('Synthetic lost response after native enqueue');
+  }
+  return response;
+};
+`;
 const consumerId = randomUUID();
 const roleId = randomUUID();
 const consumer = buildBaseManifest({
@@ -87,9 +122,11 @@ describe('Clover native install and delegated source-record API', () => {
       sourcePath: 'clover-consumer-proof',
     });
     jest.useRealTimers();
+    writeFileSync(providerFixturePath, JSON.stringify({ mode: 'pass' }));
   }, 60000);
   afterAll(async () => {
     jest.restoreAllMocks();
+    rmSync(providerFixturePath, { force: true });
     await cleanupApplicationAndAppRegistration({
       applicationUniversalIdentifier: consumerId,
     });
@@ -123,7 +160,14 @@ describe('Clover native install and delegated source-record API', () => {
             clover.application.universalIdentifier,
           fileFolder,
           filePath,
-          fileBuffer: readFileSync(resolve(output, filePath)),
+          fileBuffer:
+            fn.universalIdentifier === paymentImportId &&
+            fileFolder === 'BuiltLogicFunction'
+              ? Buffer.concat([
+                  Buffer.from(providerFixturePrefix),
+                  readFileSync(resolve(output, filePath)),
+                ])
+              : readFileSync(resolve(output, filePath)),
           filename: filePath.split('/').pop()!,
           contentType: 'text/javascript',
         });
@@ -395,6 +439,212 @@ describe('Clover native install and delegated source-record API', () => {
     expect(JSON.stringify(allowedBackground)).not.toContain(
       'synthetic-native-clover-proof-token',
     );
+    // Real native enqueue -> Redis/BullMQ -> native trigger handler -> LOCAL executor.
+    // Provider transport and native-enqueue response loss are the only injected faults.
+    const [paymentFunction] = await globalThis.testDataSource.query(
+      'SELECT id, "applicationId" FROM core."logicFunction" WHERE "universalIdentifier"=$1 AND "workspaceId"=$2',
+      [paymentImportId, SEED_APPLE_WORKSPACE_ID],
+    );
+    const jobs = getAppProviderByClassName<ApplicationJobService>(
+      'ApplicationJobService',
+    );
+    // Resolve the already booted native request-scoped provider; importing it
+    // again through Jest would load a second engine dependency graph.
+    const booted = global.app as unknown as {
+      container: {
+        getModules: () => Map<string, { providers: Map<unknown, unknown> }>;
+      };
+      resolve: (token: unknown) => Promise<LogicFunctionTriggerJob>;
+    };
+    const triggerToken = [...booted.container.getModules().values()]
+      .flatMap((module) => [...module.providers.keys()])
+      .find(
+        (token) =>
+          typeof token === 'function' &&
+          token.name === 'LogicFunctionTriggerJob',
+      );
+    expect(triggerToken).toBeDefined();
+    const nativeHandler = await booted.resolve(triggerToken);
+    const redis = { host: '127.0.0.1', port: 56391 };
+    const queue = new Queue<LogicFunctionTriggerJobData>(
+      'logic-function-queue',
+      { connection: redis },
+    );
+    const poll = async (condition: () => Promise<boolean>, timeout = 40000) => {
+      const deadline = Date.now() + timeout;
+      while (!(await condition())) {
+        if (Date.now() > deadline)
+          throw new Error('Synthetic queue proof timed out');
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      }
+    };
+    let abandonAfterCommit = false;
+    let didAbandon = false;
+    const makeWorker = () => {
+      const worker = new Worker<LogicFunctionTriggerJobData>(
+        'logic-function-queue',
+        async (job) => {
+          if (job.data.logicFunctionId !== paymentFunction.id)
+            throw new Error('Foreign synthetic job');
+          await nativeHandler.handle(job.data, {
+            retryLimit: Math.max(0, (job.opts.attempts ?? 1) - 1),
+            updateData: (data) =>
+              job.updateData(data as LogicFunctionTriggerJobData),
+          });
+          const payload = job.data.payload as {
+            fromMs: number;
+            offset: number;
+          };
+          if (
+            abandonAfterCommit &&
+            payload.fromMs === 3000 &&
+            payload.offset === 0
+          ) {
+            abandonAfterCommit = false;
+            didAbandon = true;
+            await new Promise(() => {}); // Worker is force-closed before queue acknowledgement.
+          }
+        },
+        {
+          connection: redis,
+          concurrency: 1,
+          lockDuration: 5000,
+          stalledInterval: 500,
+          maxStalledCount: 1,
+        },
+      );
+      worker.on('error', () => {});
+      return worker;
+    };
+    // The booted test server may already consume this queue. Pause only those
+    // disposable native workers while controlling the acknowledgement-loss point.
+    const pausedNativeWorkers = new Set<Worker>();
+    for (const module of booted.container.getModules().values()) {
+      for (const wrapper of module.providers.values()) {
+        const instance = (
+          wrapper as { instance?: { workerMap?: Record<string, Worker> } }
+        ).instance;
+        const nativeWorker = instance?.workerMap?.['logic-function-queue'];
+        if (nativeWorker) pausedNativeWorkers.add(nativeWorker);
+      }
+    }
+    for (const nativeWorker of pausedNativeWorkers) await nativeWorker.pause();
+    let worker = makeWorker();
+    const enqueue = (
+      fromMs: number,
+      offset = 0,
+      previousReceiptId: string | null = null,
+    ) =>
+      jobs.enqueueJobs({
+        applicationId: paymentFunction.applicationId,
+        workspaceId: SEED_APPLE_WORKSPACE_ID,
+        userId: null,
+        userWorkspaceId: null,
+        input: {
+          logicFunctionUniversalIdentifier: paymentImportId,
+          retryLimit: 3,
+          payloads: [
+            {
+              connectionId: id,
+              grantId,
+              fromMs,
+              toMs: fromMs + 1000,
+              timeField: 'modifiedTime',
+              offset,
+              previousReceiptId,
+            },
+          ],
+        },
+      });
+    const ownedJobs = async () =>
+      (
+        await queue.getJobs([
+          'waiting',
+          'prioritized',
+          'active',
+          'delayed',
+          'completed',
+          'failed',
+        ])
+      ).filter((job) => job.data.logicFunctionId === paymentFunction.id);
+    const settled = async () => {
+      const pending = await queue.getJobs([
+        'waiting',
+        'prioritized',
+        'active',
+        'delayed',
+      ]);
+      return !pending.some(
+        (job) => job.data.logicFunctionId === paymentFunction.id,
+      );
+    };
+    const receipts = async (fromMs: number) => {
+      const result = await client()
+        .get('/rest/cloverImportReceipts')
+        .query({
+          filter: `and(connectionId[eq]:${id},fromMs[eq]:${fromMs})`,
+          limit: 100,
+        })
+        .set('Authorization', `Bearer ${cloverToken}`);
+      expect(result.status).toBe(200);
+      return result.body.data.cloverImportReceipts as {
+        id: string;
+        offset: number;
+      }[];
+    };
+    try {
+      writeFileSync(providerFixturePath, JSON.stringify({ mode: 'lose-once' }));
+      await enqueue(1000);
+      await poll(settled);
+      expect(await receipts(1000)).toHaveLength(2);
+      const first = (await ownedJobs()).find(
+        (job) =>
+          (job.data.payload as { fromMs: number; offset: number }).fromMs ===
+            1000 && (job.data.payload as { offset: number }).offset === 0,
+      )!;
+      expect(first.attemptsMade).toBeGreaterThan(1);
+
+      writeFileSync(
+        providerFixturePath,
+        JSON.stringify({ mode: 'fail-before' }),
+      );
+      await enqueue(2000);
+      await poll(settled);
+      const exhausted = (await ownedJobs()).find(
+        (job) =>
+          (job.data.payload as { fromMs: number; offset: number }).fromMs ===
+            2000 && (job.data.payload as { offset: number }).offset === 0,
+      )!;
+      expect(exhausted.data.applicationRetryCount).toBe(3);
+      const pendingReceipts = await receipts(2000);
+      expect(pendingReceipts).toHaveLength(1);
+      expect(pendingReceipts[0].offset).toBe(0);
+      writeFileSync(providerFixturePath, JSON.stringify({ mode: 'pass' }));
+      await enqueue(2000, 100, pendingReceipts[0].id);
+      await poll(settled);
+      expect(await receipts(2000)).toHaveLength(2);
+
+      abandonAfterCommit = true;
+      await enqueue(3000);
+      await poll(async () => didAbandon);
+      await worker.close(true);
+      worker = makeWorker();
+      await poll(settled);
+      expect(await receipts(3000)).toHaveLength(2);
+      const revisions = await client()
+        .get('/rest/cloverPaymentRevisions')
+        .query({ filter: `connectionId[eq]:${id}`, limit: 500 })
+        .set('Authorization', `Bearer ${cloverToken}`);
+      // Native REST caps returned rows at 200; totalCount is the filtered count.
+      expect(revisions.body.totalCount).toBe(300);
+      expect(revisions.body.pageInfo.hasNextPage).toBe(true);
+    } finally {
+      await worker.close(true);
+      for (const job of await ownedJobs()) await job.remove().catch(() => {});
+      await queue.close();
+      for (const nativeWorker of pausedNativeWorkers) nativeWorker.resume();
+      writeFileSync(providerFixturePath, JSON.stringify({ mode: 'pass' }));
+    }
     expect((await setGrant(false, null)).status).toBe(409);
     expect((await setGrant(false, grantId)).status).toBe(200);
     expect((await runBackground(grantId)).status).toBe('ERROR');
@@ -430,5 +680,5 @@ describe('Clover native install and delegated source-record API', () => {
     expect(
       execution.data.executeOneLogicFunction.error?.errorMessage,
     ).toContain('Clover connection unavailable');
-  }, 60000);
+  }, 150000);
 });
