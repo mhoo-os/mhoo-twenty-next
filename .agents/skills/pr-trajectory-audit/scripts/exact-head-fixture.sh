@@ -19,8 +19,10 @@ loader_allowed='^(docs/provenance/front-component-cookie-auth\.md|scripts/proven
 
 graphql_allowed='^(docs/provenance/front-component-graphql-edge-auth\.md|packages/twenty-front-component-renderer/src/types/HostFetchPolicy\.ts|packages/twenty-front-component-renderer/src/host/fetch/utils/(createHostFetchEnforcingPolicy|buildHostFetchPolicyFromFrontComponentUrls)\.ts|packages/twenty-front-component-renderer/src/host/fetch/utils/__tests__/(createHostFetchEnforcingPolicy|buildHostFetchPolicyFromFrontComponentUrls)\.test\.ts)$'
 
+upstream_dispatch_allowed='^\.github/workflows/(cd-deploy-main|app-prod-parity-e2e-dispatch|i18n-push|docs-i18n-push|website-i18n-push|visual-regression-dispatch|post-ci-comments|ci-e2e-main)\.yaml$'
+
 git diff --name-only "$base" "$head" | while IFS= read -r path; do
-  [[ "$path" =~ $allowed || "$path" =~ $email_allowed || "$path" =~ $distribution_allowed || "$path" =~ $scanner_allowed || "$path" =~ $legal_allowed || "$path" =~ $evaluation_allowed || "$path" =~ $loader_allowed || "$path" =~ $graphql_allowed ]] || { printf 'trajectory fixture rejected: %s\n' "$path" >&2; exit 1; }
+  [[ "$path" =~ $allowed || "$path" =~ $email_allowed || "$path" =~ $distribution_allowed || "$path" =~ $scanner_allowed || "$path" =~ $legal_allowed || "$path" =~ $evaluation_allowed || "$path" =~ $loader_allowed || "$path" =~ $graphql_allowed || "$path" =~ $upstream_dispatch_allowed ]] || { printf 'trajectory fixture rejected: %s\n' "$path" >&2; exit 1; }
 done
 
 assert_manual_only_workflow() {
