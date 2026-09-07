@@ -14,6 +14,8 @@ type Receipt = {
   merchantId: string;
   merchantName: string;
   savedAt: string;
+  backgroundSyncGrantId?: string | null;
+  backgroundSyncEnabled?: boolean;
 };
 type Status = {
   enabled: boolean;
@@ -198,6 +200,47 @@ const CloverForm = ({ workspaceName }: { workspaceName: string }) => {
               <small>
                 To stop access, revoke this token in your Clover dashboard.
               </small>
+              <p>
+                {saved.backgroundSyncEnabled
+                  ? 'Scheduled read access allowed.'
+                  : 'Scheduled read access off.'}
+              </p>
+              <Button
+                title={
+                  saved.backgroundSyncEnabled
+                    ? 'Stop scheduled access'
+                    : 'Allow scheduled reads'
+                }
+                disabled={busy}
+                onClick={async () => {
+                  setBusy(true);
+                  setError('');
+                  try {
+                    await cloverRequest<Receipt>(
+                      'background-grant',
+                      {
+                        connectedAccountId: saved.connectedAccountId,
+                        enabled: !saved.backgroundSyncEnabled,
+                        expectedGrantId: saved.backgroundSyncGrantId ?? null,
+                      },
+                      abort.current.signal,
+                    );
+                    const latest = await cloverRequest<Status>(
+                      'status',
+                      undefined,
+                      abort.current.signal,
+                    );
+                    if (!abort.current.signal.aborted) setStatus(latest);
+                  } catch {
+                    if (!abort.current.signal.aborted)
+                      setError(
+                        'We could not confirm scheduled access. Refresh to check before trying again.',
+                      );
+                  } finally {
+                    if (!abort.current.signal.aborted) setBusy(false);
+                  }
+                }}
+              />
             </div>
           ),
         )}

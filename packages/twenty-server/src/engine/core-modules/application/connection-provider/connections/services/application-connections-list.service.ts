@@ -1,3 +1,4 @@
+import { parseActiveManualTokenWorkspaceGrant } from 'src/engine/core-modules/application/connection-provider/connections/services/manual-token-workspace-grant.util';
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
@@ -247,8 +248,7 @@ export class ApplicationConnectionsListService {
     )
       return null;
 
-    // Manual grants are interactive in this first slice. Never let a background
-    // application identity or a deleted membership inherit a shared credential.
+    let manualTokenWorkspaceGrantId: string | null = null;
     if (provider.type === 'manualToken') {
       const application = await this.applicationRepository.findOne({
         where: { id: account.applicationId!, workspaceId },
@@ -257,17 +257,34 @@ export class ApplicationConnectionsListService {
         !application?.defaultRoleId ||
         provider.oauthConfig ||
         account.authFailedAt ||
-        account.archivedAt ||
-        !requestUserWorkspaceId ||
+        account.archivedAt
+      )
+        return null;
+      let authorizingUserWorkspaceId = requestUserWorkspaceId;
+      if (!requestUserWorkspaceId) {
+        const grant = parseActiveManualTokenWorkspaceGrant(
+          account.manualTokenWorkspaceGrant,
+        );
+        if (account.visibility !== 'workspace' || !grant) return null;
+        authorizingUserWorkspaceId = grant.grantedByUserWorkspaceId;
+        manualTokenWorkspaceGrantId = grant.id;
+      } else if (
         !workspaceMemberId ||
         (account.visibility === 'user' &&
-          account.userWorkspaceId !== requestUserWorkspaceId) ||
+          account.userWorkspaceId !== requestUserWorkspaceId)
+      ) {
+        return null;
+      }
+      // Explicit grantor authority is rechecked, not inherited from the account
+      // owner or a job payload. The App's current role remains the ceiling.
+      if (
+        !authorizingUserWorkspaceId ||
         !(await this.userWorkspaceRepository.findOne({
-          where: { id: requestUserWorkspaceId, workspaceId },
+          where: { id: authorizingUserWorkspaceId, workspaceId },
         })) ||
         !(await this.permissions.userHasWorkspaceSettingPermission({
           workspaceId,
-          userWorkspaceId: requestUserWorkspaceId,
+          userWorkspaceId: authorizingUserWorkspaceId,
           applicationId: account.applicationId!,
           setting: PermissionFlagType.CONNECTED_ACCOUNTS,
         }))
@@ -299,6 +316,9 @@ export class ApplicationConnectionsListService {
             ? []
             : (account.scopes ?? provider.oauthConfig?.scopes ?? []),
         authFailedAt: account.authFailedAt?.toISOString() ?? null,
+        ...(provider.type === 'manualToken'
+          ? { manualTokenWorkspaceGrantId }
+          : {}),
       };
     } catch {
       this.logger.warn(

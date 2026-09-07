@@ -300,6 +300,25 @@ suite('Clover PostgreSQL atomicity', () => {
       'already has',
     );
     const accounts = db.getRepository(ConnectedAccountEntity);
+    const firstGrant = await service.setBackgroundGrant(actor, {
+      connectedAccountId: first.connectedAccountId,
+      enabled: true,
+      expectedGrantId: null,
+    });
+    const secondGrant = await service.setBackgroundGrant(actor, {
+      connectedAccountId: second.connectedAccountId,
+      enabled: true,
+      expectedGrantId: null,
+    });
+    await service.setBackgroundGrant(actor, {
+      connectedAccountId: first.connectedAccountId,
+      enabled: false,
+      expectedGrantId: firstGrant.backgroundSyncGrantId,
+    });
+    expect(
+      (await accounts.findOneByOrFail({ id: second.connectedAccountId }))
+        .manualTokenWorkspaceGrant?.id,
+    ).toBe(secondGrant.backgroundSyncGrantId);
     const retained = await accounts.findOneByOrFail({
       id: second.connectedAccountId,
     });

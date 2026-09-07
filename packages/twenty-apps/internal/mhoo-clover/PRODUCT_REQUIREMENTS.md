@@ -45,9 +45,10 @@ does not imply a scheduler, granted background access or committed coverage.
    per-connection filtering, allowed/denied writes and disconnect isolation.
 2. Persist typed order/payment/refund/line-item source revisions and native page
    receipts with idempotent restart. Advance progress only after committed data.
-3. Implement explicit native Workspace background grants bound to the App and
-   connection, narrow read capabilities, revocation and executor proof. Current
-   manual readers remain user-initiated until that contract passes.
+3. Native explicit per-connection Workspace grants and actual background
+   executor authorization are now source-proven. Persisted grants are absent by
+   default; revoke/regrant changes the revision and rejects stale queued input.
+   Scheduled dispatch and provider ingestion still need their own implementation.
 4. Expand inventory, merchant configuration, employees/shifts/customers/cash
    events and MSC families. Conditional ecommerce, provider App billing and
    device APIs require their own supported credential/API evidence. They are

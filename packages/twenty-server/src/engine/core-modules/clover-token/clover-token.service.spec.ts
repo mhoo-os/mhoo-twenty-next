@@ -72,7 +72,7 @@ describe('native Clover token handoff', () => {
       .fn()
       .mockResolvedValue({ data: { id: merchantId, name: 'Synthetic Hass' } });
     accountSave = jest.fn(async (row) => {
-      account = { ...row, id: randomUUID(), updatedAt: new Date() };
+      account = { ...row, id: row.id ?? randomUUID(), updatedAt: new Date() };
       return account;
     });
     requestSave = jest.fn(async (row) => row);
@@ -118,7 +118,7 @@ describe('native Clover token handoff', () => {
           return {
             findOne: jest.fn(async ({ where }) =>
               account &&
-              where.some(
+              (Array.isArray(where) ? where : [where]).some(
                 (condition: { handle?: string }) =>
                   !condition.handle || condition.handle === account?.handle,
               )
@@ -177,6 +177,34 @@ describe('native Clover token handoff', () => {
     );
   });
 
+  it('requires explicit grant revision and revokes without changing custody', async () => {
+    const receipt = await service.submit(actor, input());
+    expect(receipt.backgroundSyncEnabled).toBe(false);
+    const enabled = await service.setBackgroundGrant(actor, {
+      connectedAccountId: receipt.connectedAccountId,
+      enabled: true,
+      expectedGrantId: null,
+    });
+    expect(enabled.backgroundSyncEnabled).toBe(true);
+    expect(enabled.connectedAccountId).toBe(receipt.connectedAccountId);
+    await expect(
+      service.setBackgroundGrant(actor, {
+        connectedAccountId: receipt.connectedAccountId,
+        enabled: false,
+        expectedGrantId: null,
+      }),
+    ).rejects.toThrow('changed');
+    account!.archivedAt = new Date();
+    const revoked = await service.setBackgroundGrant(actor, {
+      connectedAccountId: receipt.connectedAccountId,
+      enabled: false,
+      expectedGrantId: enabled.backgroundSyncGrantId,
+    });
+    expect(revoked.backgroundSyncEnabled).toBe(false);
+    expect(revoked.backgroundSyncGrantId).toBe(enabled.backgroundSyncGrantId);
+    expect(account?.accessToken).toBeTruthy();
+  });
+
   it('encrypts with native workspace-bound encryption and returns only a receipt', async () => {
     const result = await service.submit(actor, input());
     const saved = accountSave.mock.calls[0][0];
@@ -197,6 +225,8 @@ describe('native Clover token handoff', () => {
     expect(saved.scopes).toBeNull();
     expect(JSON.stringify(result)).not.toContain(syntheticToken);
     expect(Object.keys(result).sort()).toEqual([
+      'backgroundSyncEnabled',
+      'backgroundSyncGrantId',
       'connectedAccountId',
       'merchantId',
       'merchantName',

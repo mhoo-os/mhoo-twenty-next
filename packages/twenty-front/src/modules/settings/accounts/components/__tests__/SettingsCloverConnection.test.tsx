@@ -104,6 +104,37 @@ describe('Clover native form', () => {
     ).toBeInTheDocument();
   });
 
+  it('requests scheduled access only for the selected merchant and current revision', async () => {
+    const granted = {
+      ...receipt,
+      backgroundSyncGrantId: 'revision-one',
+      backgroundSyncEnabled: true,
+    };
+    mockFetch
+      .mockResolvedValueOnce(
+        reply({ enabled: true, receipt, receipts: [receipt] }),
+      )
+      .mockResolvedValueOnce(reply(granted))
+      .mockResolvedValueOnce(
+        reply({ enabled: true, receipt: granted, receipts: [granted] }),
+      );
+    render(<SettingsCloverConnection />);
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'Allow scheduled reads' }),
+    );
+    expect(
+      await screen.findByRole('button', { name: 'Stop scheduled access' }),
+    ).toBeInTheDocument();
+    const grantCall = mockFetch.mock.calls.find(([url]) =>
+      String(url).endsWith('/background-grant'),
+    );
+    expect(JSON.parse(grantCall?.[1].body)).toEqual({
+      connectedAccountId: receipt.connectedAccountId,
+      enabled: true,
+      expectedGrantId: null,
+    });
+  });
+
   it('keeps intake hidden when the native Workspace is not enabled', async () => {
     mockFetch.mockResolvedValue(reply({ enabled: false, receipt: null }));
     render(<SettingsCloverConnection />);

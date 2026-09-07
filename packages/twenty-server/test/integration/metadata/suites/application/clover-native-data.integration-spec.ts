@@ -1,3 +1,4 @@
+import { type LogicFunctionExecutorService } from 'src/engine/core-modules/logic-function/logic-function-executor/logic-function-executor.service';
 import { getAppProviderByClassName } from 'test/integration/utils/get-app-provider-by-class-name.util';
 import { type TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
 import { type SecureHttpClientService } from 'src/engine/core-modules/secure-http-client/secure-http-client.service';
@@ -251,6 +252,64 @@ describe('Clover native install and delegated source-record API', () => {
     expect((await lookup(consumerToken)).body.errors?.length).toBeGreaterThan(
       0,
     );
+    const [syncFunction] = await globalThis.testDataSource.query(
+      'SELECT id FROM core."logicFunction" WHERE "universalIdentifier"=$1 AND "workspaceId"=$2',
+      ['8105a614-4235-4131-a363-b82a27f72be1', SEED_APPLE_WORKSPACE_ID],
+    );
+    const executor = getAppProviderByClassName<LogicFunctionExecutorService>(
+      'LogicFunctionExecutorService',
+    );
+    const runBackground = (grantId: string) =>
+      executor.execute({
+        logicFunctionId: syncFunction.id,
+        workspaceId: SEED_APPLE_WORKSPACE_ID,
+        payload: { connectionId: id, grantId },
+      });
+    expect((await runBackground(randomUUID())).status).toBe('ERROR');
+    const setGrant = (enabled: boolean, expectedGrantId: string | null) =>
+      client()
+        .post('/clover-token/background-grant')
+        .set('Authorization', `Bearer ${APPLE_JANE_ADMIN_ACCESS_TOKEN}`)
+        .send({ connectedAccountId: id, enabled, expectedGrantId });
+    const untrustedGrant = {
+      connectedAccountId: id,
+      enabled: true,
+      expectedGrantId: null,
+    };
+    expect(
+      (
+        await client()
+          .post('/clover-token/background-grant')
+          .send(untrustedGrant)
+      ).status,
+    ).toBe(403);
+    expect(
+      (
+        await client()
+          .post('/clover-token/background-grant')
+          .set('Authorization', `Bearer ${consumerToken}`)
+          .send(untrustedGrant)
+      ).status,
+    ).toBe(403);
+    const granted = await setGrant(true, null);
+    expect(granted.status).toBe(200);
+    expect(granted.body.backgroundSyncEnabled).toBe(true);
+    const grantId = granted.body.backgroundSyncGrantId;
+    const allowedBackground = await runBackground(grantId);
+    expect(allowedBackground.status).toBe('SUCCESS');
+    expect(JSON.stringify(allowedBackground)).not.toContain(
+      'synthetic-native-clover-proof-token',
+    );
+    expect((await setGrant(false, null)).status).toBe(409);
+    expect((await setGrant(false, grantId)).status).toBe(200);
+    expect((await runBackground(grantId)).status).toBe('ERROR');
+    const regranted = await setGrant(true, grantId);
+    expect(regranted.status).toBe(200);
+    expect(regranted.body.backgroundSyncGrantId).not.toBe(grantId);
+    expect((await runBackground(grantId)).status).toBe('ERROR');
+    expect(
+      (await runBackground(regranted.body.backgroundSyncGrantId)).status,
+    ).toBe('SUCCESS');
     const disconnected = await client()
       .post('/metadata')
       .set('Authorization', `Bearer ${APPLE_JANE_ADMIN_ACCESS_TOKEN}`)
@@ -260,6 +319,9 @@ describe('Clover native install and delegated source-record API', () => {
         variables: { id },
       });
     expect(disconnected.body.errors).toBeUndefined();
+    expect(
+      (await runBackground(regranted.body.backgroundSyncGrantId)).status,
+    ).toBe('ERROR');
     expect((await lookup(cloverToken)).body.errors?.length).toBeGreaterThan(0);
     const [fn] = await globalThis.testDataSource.query(
       'SELECT id FROM core."logicFunction" WHERE "universalIdentifier"=$1 AND "workspaceId"=$2',

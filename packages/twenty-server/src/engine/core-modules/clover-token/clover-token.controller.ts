@@ -22,6 +22,8 @@ import {
   Equals,
   isEmail,
   IsString,
+  IsBoolean,
+  ValidateIf,
   IsUUID,
   Matches,
   MaxLength,
@@ -58,6 +60,18 @@ export class SubmitCloverTokenInput {
 
   @Equals(true)
   readOnlyConfirmed: boolean;
+}
+
+export class SetCloverBackgroundGrantInput {
+  @IsUUID('4')
+  connectedAccountId: string;
+
+  @IsBoolean()
+  enabled: boolean;
+
+  @ValidateIf((_object, value) => value !== null)
+  @IsUUID('4')
+  expectedGrantId: string | null;
 }
 
 // Never pass credential request bodies or underlying errors to shared logging.
@@ -116,6 +130,16 @@ export class CloverTokenController {
           setting: PermissionFlagType.WORKSPACE_MEMBERS,
         })),
     };
+  }
+
+  @Post('background-grant')
+  @HttpCode(200)
+  @Header('Cache-Control', 'no-store')
+  async backgroundGrant(
+    @Req() request: Request,
+    @Body() input: SetCloverBackgroundGrantInput,
+  ) {
+    return this.service.setBackgroundGrant(this.actor(request), input);
   }
 
   @Post('prepare-invitation')

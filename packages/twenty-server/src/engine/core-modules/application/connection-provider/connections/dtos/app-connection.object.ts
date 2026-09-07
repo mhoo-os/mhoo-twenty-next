@@ -32,5 +32,8 @@ export class AppConnectionObjectDto implements AppConnection {
   scopes: string[];
 
   @Field(() => String, { nullable: true })
+  manualTokenWorkspaceGrantId?: string | null;
+
+  @Field(() => String, { nullable: true })
   authFailedAt: string | null;
 }

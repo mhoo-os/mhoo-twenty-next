@@ -1,3 +1,6 @@
+import { randomUUID } from 'crypto';
+import { isUUID } from 'class-validator';
+import { parseActiveManualTokenWorkspaceGrant } from 'src/engine/core-modules/application/connection-provider/connections/services/manual-token-workspace-grant.util';
 import {
   BadRequestException,
   ConflictException,
@@ -41,6 +44,8 @@ export type CloverReceipt = {
   merchantId: string;
   merchantName: string;
   savedAt: string;
+  backgroundSyncGrantId: string | null;
+  backgroundSyncEnabled: boolean;
 };
 
 // Multiple merchants per enabled Workspace. Native membership and permissions are
@@ -69,7 +74,13 @@ export class CloverTokenService {
       .getRepository(ConnectedAccountEntity)
       .find({
         where: this.accountWhere(actor.workspaceId, binding),
-        select: { id: true, handle: true, name: true, updatedAt: true },
+        select: {
+          id: true,
+          handle: true,
+          name: true,
+          updatedAt: true,
+          manualTokenWorkspaceGrant: true,
+        },
         order: { id: 'ASC' },
       });
     const receipts = accounts.map((account) => this.receipt(account));
@@ -244,6 +255,79 @@ export class CloverTokenService {
     });
   }
 
+  async setBackgroundGrant(
+    actor: CloverActor,
+    input: {
+      connectedAccountId: string;
+      enabled: boolean;
+      expectedGrantId: string | null;
+    },
+  ) {
+    if (
+      !isUUID(input.connectedAccountId, '4') ||
+      typeof input.enabled !== 'boolean' ||
+      (input.expectedGrantId !== null && !isUUID(input.expectedGrantId, '4'))
+    )
+      throw new BadRequestException(
+        'Check the connection and current grant revision.',
+      );
+    return this.dataSource.transaction(async (manager) => {
+      await this.authorize(actor, manager, true);
+      const binding = await this.resolveBinding(manager, actor.workspaceId);
+      if (
+        !(await this.permissions.userHasWorkspaceSettingPermission({
+          workspaceId: actor.workspaceId,
+          userWorkspaceId: actor.userWorkspaceId,
+          applicationId: binding.applicationId,
+          setting: PermissionFlagType.CONNECTED_ACCOUNTS,
+        }))
+      )
+        throw new ForbiddenException(
+          'This App and Workspace role cannot manage background access.',
+        );
+      const accounts = manager.getRepository(ConnectedAccountEntity);
+      const account = await accounts.findOne({
+        where: {
+          id: input.connectedAccountId,
+          workspaceId: actor.workspaceId,
+          applicationId: binding.applicationId,
+          connectionProviderId: binding.id,
+          provider: ConnectedAccountProvider.APP,
+        },
+        lock: { mode: 'pessimistic_write' },
+      });
+      if (
+        !account ||
+        (input.enabled &&
+          (account.visibility !== 'workspace' ||
+            account.authFailedAt ||
+            account.archivedAt))
+      )
+        throw new ForbiddenException(
+          'This connection cannot grant background access.',
+        );
+      const previous = account.manualTokenWorkspaceGrant;
+      if ((previous?.id ?? null) !== input.expectedGrantId)
+        throw new ConflictException(
+          'Background access changed. Refresh before trying again.',
+        );
+      account.manualTokenWorkspaceGrant = input.enabled
+        ? {
+            version: 1,
+            id: randomUUID(),
+            capability: 'provider-readonly-sync',
+            grantedByUserWorkspaceId: actor.userWorkspaceId,
+            grantedAt: new Date().toISOString(),
+            revokedAt: null,
+          }
+        : previous
+          ? { ...previous, revokedAt: new Date().toISOString() }
+          : null;
+      await accounts.save(account);
+      return this.receipt(account);
+    });
+  }
+
   private async authorize(
     actor: CloverActor,
     manager: EntityManager,
@@ -338,12 +422,22 @@ export class CloverTokenService {
     const binding = await this.resolveBinding(manager, workspaceId);
     return manager.getRepository(ConnectedAccountEntity).findOne({
       where: this.accountWhere(workspaceId, binding, merchantId),
-      select: { id: true, handle: true, name: true, updatedAt: true },
+      select: {
+        id: true,
+        handle: true,
+        name: true,
+        updatedAt: true,
+        manualTokenWorkspaceGrant: true,
+      },
     });
   }
 
   private receipt(account: ConnectedAccountEntity): CloverReceipt {
     return {
+      backgroundSyncGrantId: account.manualTokenWorkspaceGrant?.id ?? null,
+      backgroundSyncEnabled: !!parseActiveManualTokenWorkspaceGrant(
+        account.manualTokenWorkspaceGrant,
+      ),
       connectedAccountId: account.id,
       merchantId: account.handle,
       merchantName: account.name ?? 'Clover merchant',

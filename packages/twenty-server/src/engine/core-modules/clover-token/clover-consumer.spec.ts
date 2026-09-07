@@ -114,8 +114,12 @@ describe('manual intake to native Clover consumption', () => {
       },
       create: (row: any) => row,
       save: async (row: any) => {
-        const saved = { ...row, id: randomUUID(), updatedAt: new Date() };
-        rows.push(saved);
+        const saved = {
+          ...row,
+          id: row.id ?? randomUUID(),
+          updatedAt: new Date(),
+        };
+        rows = [...rows.filter((existing) => existing.id !== saved.id), saved];
         return saved;
       },
       delete: async (where: any) => {
@@ -369,6 +373,37 @@ describe('manual intake to native Clover consumption', () => {
     await expect(read()).rejects.toThrow('Clover connection unavailable');
     expect(providerFetch).not.toHaveBeenCalled();
     expect(refresh).not.toHaveBeenCalled();
+  });
+
+  it('requires an explicit native Workspace grant for background reads and rechecks revocation and roles', async () => {
+    const receipt = await submit();
+    caller.requestUserWorkspaceId = null;
+    await expect(
+      reader.getOne({ ...caller, id: receipt.connectedAccountId }),
+    ).rejects.toThrow();
+    const enabled = await intake.setBackgroundGrant(actor, {
+      connectedAccountId: receipt.connectedAccountId,
+      enabled: true,
+      expectedGrantId: null,
+    });
+    expect(
+      (await reader.getOne({ ...caller, id: receipt.connectedAccountId }))
+        .manualTokenWorkspaceGrantId,
+    ).toBe(enabled.backgroundSyncGrantId);
+    appAllowed = false;
+    await expect(
+      reader.getOne({ ...caller, id: receipt.connectedAccountId }),
+    ).rejects.toThrow();
+    appAllowed = true;
+    await intake.setBackgroundGrant(actor, {
+      connectedAccountId: receipt.connectedAccountId,
+      enabled: false,
+      expectedGrantId: enabled.backgroundSyncGrantId,
+    });
+    await expect(
+      reader.getOne({ ...caller, id: receipt.connectedAccountId }),
+    ).rejects.toThrow();
+    expect(providerFetch).not.toHaveBeenCalled();
   });
 
   it('requires an installed matching manual provider before intake', async () => {
