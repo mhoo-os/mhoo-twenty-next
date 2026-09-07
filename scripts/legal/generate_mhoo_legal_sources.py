@@ -22,6 +22,14 @@ DOCUMENTS = (
 )
 
 
+def typescript_string(value: str) -> str:
+    """Serialize with the repository formatter's preferred quote style."""
+    encoded = json.dumps(value, ensure_ascii=False)
+    if value.count("'") > value.count('"'):
+        return encoded
+    return "'" + encoded[1:-1].replace('\\"', '"').replace("'", "\\'") + "'"
+
+
 def render_generated_module(repository_root: Path) -> str:
     entries: list[str] = []
     for key, filename in DOCUMENTS:
@@ -30,9 +38,9 @@ def render_generated_module(repository_root: Path) -> str:
         digest = hashlib.sha256(data).hexdigest()
         entries.append(
             f"  {key}: {{\n"
-            f"    sourcePath: {json.dumps((PACKET_DIRECTORY / filename).as_posix())},\n"
-            f"    sha256: {json.dumps(digest)},\n"
-            f"    source: {json.dumps(source, ensure_ascii=False)},\n"
+            f"    sourcePath: {typescript_string((PACKET_DIRECTORY / filename).as_posix())},\n"
+            f"    sha256: {typescript_string(digest)},\n"
+            f"    source:\n      {typescript_string(source)},\n"
             "  },"
         )
 
