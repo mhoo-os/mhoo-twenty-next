@@ -368,3 +368,10 @@ This is source admission, not live intake, provider access or activation.
 - `packages/twenty-shared/src/application/appConnectionType.ts`
 - `packages/twenty-shared/src/application/connectionProviderManifestType.ts`
 - `packages/twenty-shared/src/application/connectionProviderType.ts`
+
+MHO266 CI admission also permits the exact `.github/workflows/ci-twenty-apps.yaml`
+file to select the repository lockfile and build the current native SDK/client
+for Clover's source-only checks. Other Apps retain their standalone dependency
+workflow. The App consumes the modified native manual-token/grant contracts,
+which are absent from the published 2.37 SDK. No dependency, trigger, credential
+or deployment permission is added.

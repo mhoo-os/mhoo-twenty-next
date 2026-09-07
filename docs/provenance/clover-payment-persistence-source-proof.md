@@ -80,3 +80,11 @@ CI admission at `7fd1908ec029945a249abae9e05f08fee9f2ce61` is corrected: PR32
 is mergeable and GitHub's trajectory evaluation passed. Broad checks were still
 queued/running at this receipt, not reported as successful. Local exact-head
 fixture regression and source custody passed.
+
+The newly admitted CI Twenty Apps job failed during cache setup because Clover
+has no standalone `yarn.lock`. Its native manual-token/grant SDK contract must
+come from this repository, not the published SDK. The existing App workflow now
+uses the root lockfile and builds the repository SDK/client before Clover lint,
+typecheck, tests and manifest build. Other App jobs retain their existing path.
+The prior head's clean-foundation build and trajectory evaluation passed; this
+CI admission correction still requires its own remote result.
