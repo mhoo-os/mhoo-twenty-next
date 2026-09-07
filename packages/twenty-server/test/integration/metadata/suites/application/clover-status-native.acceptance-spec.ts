@@ -50,7 +50,7 @@ beforeEach(async () => {
 let cleanupToken = APPLE_JANE_ADMIN_ACCESS_TOKEN;
 let created = false;
 const guard = `const nativeStatusFetch = globalThis.fetch; globalThis.fetch = (input, init) => { const u = new URL(String(input)); if(u.origin !== 'http://localhost:4000') throw new Error('Synthetic proof blocks external egress'); return nativeStatusFetch(input, init); };\n`;
-const status = (token: string, body: unknown) =>
+const status = (token: string, body: object) =>
   api()
     .post('/s/clover/operator-status')
     .set('Authorization', `Bearer ${token}`)
@@ -234,7 +234,7 @@ const prepareStatusData = async (
   const granted = await grant(true, null);
   expect(granted.status).toBe(200);
   const grantId = granted.body.backgroundSyncGrantId;
-  const write = (path: string, body: unknown) =>
+  const write = (path: string, body: object) =>
     api()
       .post(`/rest/${path}`)
       .set('Authorization', `Bearer ${background}`)
