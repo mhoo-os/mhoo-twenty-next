@@ -597,6 +597,39 @@ for index in "${!rogue_legal_paths[@]}"; do
   }
 done
 
+# AI editor authority is limited to the exact helper, selector and regressions.
+ai_editor_paths=(
+  docs/provenance/ai-editor-lifecycle.md
+  packages/twenty-front/src/modules/advanced-text-editor/utils/hasEditorExtension.ts
+  packages/twenty-front/src/modules/advanced-text-editor/utils/__tests__/hasEditorExtension.test.ts
+  packages/twenty-front/src/modules/advanced-text-editor/hooks/useTurnIntoBlockOptions.ts
+  packages/twenty-front/src/modules/advanced-text-editor/hooks/__tests__/useTurnIntoBlockOptions.test.tsx
+)
+for path in "${ai_editor_paths[@]}"; do
+  blob="$(printf 'bounded editor fixture\n' | git hash-object -w --stdin)"
+  GIT_INDEX_FILE="$temporary_directory/index" git read-tree HEAD
+  GIT_INDEX_FILE="$temporary_directory/index" git update-index --add --cacheinfo 100644 "$blob" "$path"
+  tree="$(GIT_INDEX_FILE="$temporary_directory/index" git write-tree)"
+  candidate_head="$(printf 'test: exact editor path\n' | git commit-tree "$tree" -p HEAD)"
+  bash "$fixture" HEAD "$candidate_head" >"$temporary_directory/ai-editor-output"
+done
+for path in \
+  packages/twenty-front/src/modules/advanced-text-editor/utils/hasEditorExtension.ts.backup \
+  packages/twenty-front/src/modules/advanced-text-editor/hooks/nested/useTurnIntoBlockOptions.ts \
+  packages/twenty-front/src/modules/advanced-text-editor/hooks/useTextBubbleState.ts \
+  packages/twenty-front/src/modules/advanced-text-editor/components/AdvancedTextEditor.tsx; do
+  blob="$(printf 'unauthorized editor fixture\n' | git hash-object -w --stdin)"
+  GIT_INDEX_FILE="$temporary_directory/index" git read-tree HEAD
+  GIT_INDEX_FILE="$temporary_directory/index" git update-index --add --cacheinfo 100644 "$blob" "$path"
+  tree="$(GIT_INDEX_FILE="$temporary_directory/index" git write-tree)"
+  candidate_head="$(printf 'test: reject adjacent editor path\n' | git commit-tree "$tree" -p HEAD)"
+  if bash "$fixture" HEAD "$candidate_head" >"$temporary_directory/ai-editor-output" 2>&1; then
+    printf 'exact-head fixture test failed: unapproved editor path passed: %s\n' "$path" >&2
+    exit 1
+  fi
+  grep -Fq "trajectory fixture rejected: $path" "$temporary_directory/ai-editor-output"
+done
+
 unrelated_head="$(
   printf 'test: unrelated source ancestry\n' |
     GIT_AUTHOR_NAME='Trajectory fixture' \

@@ -274,3 +274,19 @@ behind the existing same-origin edge login. Enumerated paths:
 Only bearer-authenticated POST to the host-configured GraphQL URL may use
 browser same-origin credentials. Other App fetches and redirect restrictions
 retain their previous policy. This source permission is not deployed proof.
+
+## AI editor lifecycle repair
+
+The September 7 owner-authorized, source-only MHO-259 repair permits exactly:
+
+- `packages/twenty-front/src/modules/advanced-text-editor/utils/hasEditorExtension.ts`
+- `packages/twenty-front/src/modules/advanced-text-editor/utils/__tests__/hasEditorExtension.test.ts`
+- `packages/twenty-front/src/modules/advanced-text-editor/hooks/useTurnIntoBlockOptions.ts`
+- `packages/twenty-front/src/modules/advanced-text-editor/hooks/__tests__/useTurnIntoBlockOptions.test.tsx`
+- `docs/provenance/ai-editor-lifecycle.md`
+
+Scope is the confirmed AI instructions formatting-selector crash when a
+previous editor has been destroyed. The shared helper safely rejects missing
+or destroyed editors; the selector uses the current editor instance and emits
+no options while it is unavailable. This authorizes no editor redesign,
+dependency update, manifest/CORS change, Workspace mutation or deployment.
