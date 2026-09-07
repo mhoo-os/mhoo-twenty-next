@@ -1,4 +1,4 @@
-import { isDefined } from 'twenty-shared/utils';
+import { getURLSafely, isDefined } from 'twenty-shared/utils';
 
 import { getUniqueHttpOriginsFromUrls } from '@/host/fetch/utils/getUniqueHttpOriginsFromUrls';
 import { type HostFetchPolicy } from '@/types/HostFetchPolicy';
@@ -33,5 +33,11 @@ export const buildHostFetchPolicyFromFrontComponentUrls = ({
     sharedDependenciesUrl,
   ].filter(isDefined);
 
-  return { allowedOrigins, fileStorageRedirectableUrls };
+  const apiOrigin = apiUrl ? getURLSafely(apiUrl)?.origin : undefined;
+  const graphqlUrl =
+    apiOrigin && allowedOrigins.includes(apiOrigin)
+      ? `${apiOrigin}/graphql`
+      : undefined;
+
+  return { allowedOrigins, fileStorageRedirectableUrls, graphqlUrl };
 };
