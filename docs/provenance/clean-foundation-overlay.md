@@ -266,6 +266,16 @@ or second financial source of truth.
 These paths authorize source-level branding work only. They do not authorize
 runtime deployment, publication, legal approval, or production mutation.
 
+MHO-255 image identity and fail-closed startup paths:
+
+- `packages/twenty-docker/twenty/Dockerfile`
+- `packages/twenty-docker/twenty/entrypoint.sh`
+- `packages/twenty-docker/twenty/test_entrypoint.py`
+- `packages/twenty-server/src/database/scripts/` (initialization validation and setup failure propagation)
+- `deploy/twenty-next/mho255-*` (disposable synthetic PG16 acceptance only)
+
+The Dockerfile custody hash follows the reviewed distribution Dockerfile; the upstream commit/tree and lockfile provenance remain unchanged. Runtime semantic version and OCI source revision are independent build inputs. No serving-host build, production promotion, or database repair is introduced.
+
 ## GraphQL edge authentication follow-up
 
 The owner-authorized saved-sample integration requires native Core API reads

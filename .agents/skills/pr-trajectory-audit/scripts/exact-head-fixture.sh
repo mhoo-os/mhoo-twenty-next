@@ -15,6 +15,8 @@ legal_allowed='^(docs/legal/mhoo/v2\.0/(01-mhoo-master-terms-v2\.0\.md|02-mhoo-p
 
 evaluation_allowed='^evaluations/finance/mho-254/.+$'
 
+startup_allowed='^packages/twenty-server/src/database/scripts/((setup-db|setup-db-utils|check-db-initialization)\.ts|__tests__/(check-db-initialization|setup-db-utils|setup-db)\.spec\.ts)$'
+
 loader_allowed='^(docs/provenance/front-component-cookie-auth\.md|scripts/provenance/front-component-cookie-browser\.cjs|packages/twenty-front-component-renderer/src/host/component-source/utils/(fetchComponentSourceFromNetwork|fetchJavaScriptModuleSourceText)\.ts|packages/twenty-front-component-renderer/src/host/component-source/utils/__tests__/(fetchComponentSourceFromNetwork|fetchJavaScriptModuleSourceText)\.spec\.ts)$'
 
 graphql_allowed='^(docs/provenance/front-component-graphql-edge-auth\.md|packages/twenty-front-component-renderer/src/types/HostFetchPolicy\.ts|packages/twenty-front-component-renderer/src/host/fetch/utils/(createHostFetchEnforcingPolicy|buildHostFetchPolicyFromFrontComponentUrls)\.ts|packages/twenty-front-component-renderer/src/host/fetch/utils/__tests__/(createHostFetchEnforcingPolicy|buildHostFetchPolicyFromFrontComponentUrls)\.test\.ts)$'
@@ -24,7 +26,7 @@ ai_editor_allowed='^(docs/provenance/ai-editor-lifecycle\.md|packages/twenty-fro
 upstream_dispatch_allowed='^\.github/workflows/(cd-deploy-main|app-prod-parity-e2e-dispatch|i18n-push|docs-i18n-push|website-i18n-push|docs-i18n-pull|visual-regression-dispatch|post-ci-comments|ci-e2e-main)\.yaml$'
 
 git diff --name-only "$base" "$head" | while IFS= read -r path; do
-  [[ "$path" =~ $allowed || "$path" =~ $email_allowed || "$path" =~ $distribution_allowed || "$path" =~ $scanner_allowed || "$path" =~ $legal_allowed || "$path" =~ $evaluation_allowed || "$path" =~ $loader_allowed || "$path" =~ $graphql_allowed || "$path" =~ $ai_editor_allowed || "$path" =~ $upstream_dispatch_allowed ]] || { printf 'trajectory fixture rejected: %s\n' "$path" >&2; exit 1; }
+  [[ "$path" =~ $allowed || "$path" =~ $email_allowed || "$path" =~ $distribution_allowed || "$path" =~ $scanner_allowed || "$path" =~ $legal_allowed || "$path" =~ $evaluation_allowed || "$path" =~ $loader_allowed || "$path" =~ $graphql_allowed || "$path" =~ $startup_allowed || "$path" =~ $ai_editor_allowed || "$path" =~ $upstream_dispatch_allowed ]] || { printf 'trajectory fixture rejected: %s\n' "$path" >&2; exit 1; }
 done
 
 assert_manual_only_workflow() {
