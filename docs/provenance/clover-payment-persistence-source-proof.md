@@ -465,3 +465,123 @@ exact local source and updates its existing Linear checkpoint. Retained Clover
 worker owns subsequent explicitly scoped work. Actual installed settings/route
 and native user/App/grant enforcement remain unproved; no publication, install,
 merge or provider access authority is inferred from this source increment.
+
+## Proposed disposable native status acceptance — not dispatched
+
+Receiving head accepted source `de136bfffa624aa2d591739d8cdd120191c322b1`.
+This proposal adds no execution authority. Candidate App output is the existing
+19-file build at that source; verify manifest/bundle hashes against its protected
+receipt before reuse. No new product framework, worker or runtime is proposed.
+
+### Exact resources and prerequisites
+
+- Existing owned PostgreSQL container `mhoo-clover-native-proof-db`, loopback
+  `127.0.0.1:55441`, database `clover_native_synthetic`; Redis
+  `mhoo-clover-native-proof-redis`, `127.0.0.1:56391`, database 0. These are
+  historical ownership references, not a fresh claim that they exist or run.
+- Existing native test server at `http://localhost:4000`, local synthetic file
+  storage `/tmp/mhoo-clover-native-proof-storage`. No port reuse if another
+  owner is listening. Do not touch preview databases/Redis or production.
+- Reuse standard integration bootstrap and seeded Apple Workspace/secondary
+  Workspace from the existing suite. First check schema/seed/candidate identity
+  and no foreign fixture ownership. No database reset, fresh migrations or seed
+  rebuild is included; missing/incompatible state returns a concrete scope gap.
+- Reuse `.env.test` override wrapper with byte-for-byte restore in finally;
+  logging-only email, billing/telemetry disabled as in the prior owned proof.
+  No credentials or env values in evidence. No new dependency installation.
+- For actual settings navigation, reuse a locally built Twenty frontend only
+  after identifying its source/artifact receipt. If unavailable, report that
+  exact missing artifact/build scope; do not silently launch a whole-repo build
+  or call a standalone renderer an installed settings-navigation proof.
+
+### Fixture identities and install delta
+
+Use only existing seeded test JWT identities from the integration fixture store:
+Apple Workspace administrator for setup, a synthetic restricted Workspace member,
+a different seeded Workspace member, and the installed Clover App with delegated
+user and App-only tokens minted through native test helpers. Never print tokens,
+copy a saved browser session or use a real Workspace. Scoped setup must create
+or modify only test-owned role/member fixtures needed for permission denial,
+then restore those exact fixtures. The original standard role must stay intact.
+
+Reuse `setupApplicationForSync`, `uploadApplicationFile`, `syncApplication` and
+`generateApplicationToken` from the existing application integration utilities.
+Synchronize the exact candidate Clover manifest once in the disposable Workspace;
+this includes existing objects/provider/role/private functions plus the new status
+HTTP route/settings component. Upload Source/BuiltLogicFunction files as before,
+and add Source/BuiltFrontComponent upload for the single settings component.
+Do not install Finance or broaden the Clover role. No cron or importer dispatch.
+
+Create two synthetic merchant connections through the existing native intake
+fixture/controller; the SecureHttpClient provider lookup is stubbed with fixed
+merchant responses and external egress denied before any fixture intake. Values
+are synthetic credentials only. Enable the existing native grant for A; keep B
+without it. Persist a small test-owned connection/receipt fixture under native
+App identity: one current-grant receipt and one historical-grant receipt. Test
+revoke/regrant only for A if explicitly included in acceptance authorization.
+Those are real writes to the disposable database, not read-only setup; no
+production/customer/grant mutation is included.
+
+### One focused acceptance case and reused proof
+
+Extend/select a status-only native case using existing
+`test/integration/metadata/suites/application/clover-native-data.integration-spec.ts`
+utilities and `jest-clover-proof.config.ts` bootstrap. Do not run its six existing
+cases wholesale or its queue-abandonment importer scenario. A narrowly selected
+case/profile must retain the dedicated DB/Redis/server assertions. Reuse prior
+queue, encryption, persistence and renderer receipts where inputs still match.
+
+1. With native delegated identity, POST `/s/clover/operator-status` list/status
+   returns only permitted selectors and bounded receipt display facts. Verify
+   actual routing/environment token propagation, `no-store`, native sort order,
+   settings manifest lookup and built component retrieval. Inspect route cutoff/
+   isolated-origin configuration first; do not disable its protection to pass.
+2. Without authentication, with App-only identity, restricted/removed membership,
+   or a foreign Workspace/connection selector, no protected records or secret
+   fields are returned. Do not require a fabricated denial label when the SDK
+   only supplies opaque errors: uncertain is acceptable if no data/read escapes.
+3. Off/revoked grant refuses receipt access; current grant allows A only. A stale
+   receipt remains stale after regrant; B never inherits A's access or history.
+   Use the smallest synthetic records and native grants; no provider/history job.
+4. Spoofed body/event/header identity cannot replace verified context. Unknown
+   payload fields fail closed. Opaque lookup/read failure contains no raw header,
+   body, credential or internal error. Existing source negatives need only the
+   new actual invocation boundary, not duplicate broad unit suites.
+5. In an isolated browser context, open actual native settings using the verified
+   local frontend and native synthetic sign-in. Select A, inspect saved status,
+   refresh and exercise a denied case. Capture sanitized screenshots/network
+   observations; no token in screenshots/storage dumps. If frontend provenance
+   is missing, keep settings navigation unproved even if HTTP checks pass.
+
+Outbound provider requests must be denied, not merely counted afterward. Use
+existing SecureHttpClient stubs for fixture intake and a test-only LOCAL bundle
+transport guard allowing the exact loopback native origin; no request to Clover
+is needed for status reads. Preserve original bundle plus fixture hash and
+transformation receipt. No production bundle test switch, new proxy or provider
+API call. Do not use the existing payment importer transport/retry scenario.
+
+### Cleanup, refusal and estimate
+
+Track every created App/file/connection/grant/receipt/role fixture by native ID.
+Remove only test-owned data via native cleanup and restore changed synthetic role
+fixtures in finally; verify residual IDs/owned files and restore `.env.test`.
+The existing cleanup helper deletes by App universal identifier across its DB:
+use it only after proving all matching rows belong to this run; otherwise refuse
+that cleanup and report scoped IDs to the owner. Never reset a shared database.
+Close the owned browser/native test server, stop only containers started by this
+run and restore previously running owned resources to their initial state.
+Record failures and cleanup even if acceptance fails; no process-wide kill.
+
+Estimated active effort: 1–2 hours to adapt/select the fixture and gather bounded
+native HTTP/settings evidence if existing seed/frontend artifacts are usable;
+a test execution should take minutes. Unknown seed/artifact compatibility may
+require a separately scoped repair/build and is not hidden in that estimate.
+
+Requested scope for receiving-head/user resolution: start the two exact owned
+containers and test server; synchronize exact candidate metadata/built settings;
+write and remove only the synthetic identities/connections/grants/receipts above;
+run one native status acceptance case plus isolated browser; enforce no provider
+egress and perform scoped cleanup. No execution, install or new test was run in
+preparing this proposal. Next owner is repo head
+`01a07aa7-944a-70c3-bf77-d51b9fc766f2` to resolve that exact authority before
+this retained Clover worker proceeds. Source remains unpublished.
