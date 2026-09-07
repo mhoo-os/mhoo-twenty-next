@@ -21,8 +21,10 @@ graphql_allowed='^(docs/provenance/front-component-graphql-edge-auth\.md|package
 
 ai_editor_allowed='^(docs/provenance/ai-editor-lifecycle\.md|packages/twenty-front/src/modules/advanced-text-editor/(utils/(hasEditorExtension\.ts|__tests__/hasEditorExtension\.test\.ts)|hooks/(useTurnIntoBlockOptions\.ts|__tests__/useTurnIntoBlockOptions\.test\.tsx)))$'
 
+upstream_dispatch_allowed='^\.github/workflows/(cd-deploy-main|app-prod-parity-e2e-dispatch|i18n-push|docs-i18n-push|website-i18n-push|docs-i18n-pull|visual-regression-dispatch|post-ci-comments|ci-e2e-main)\.yaml$'
+
 git diff --name-only "$base" "$head" | while IFS= read -r path; do
-  [[ "$path" =~ $allowed || "$path" =~ $email_allowed || "$path" =~ $distribution_allowed || "$path" =~ $scanner_allowed || "$path" =~ $legal_allowed || "$path" =~ $evaluation_allowed || "$path" =~ $loader_allowed || "$path" =~ $graphql_allowed || "$path" =~ $ai_editor_allowed ]] || { printf 'trajectory fixture rejected: %s\n' "$path" >&2; exit 1; }
+  [[ "$path" =~ $allowed || "$path" =~ $email_allowed || "$path" =~ $distribution_allowed || "$path" =~ $scanner_allowed || "$path" =~ $legal_allowed || "$path" =~ $evaluation_allowed || "$path" =~ $loader_allowed || "$path" =~ $graphql_allowed || "$path" =~ $ai_editor_allowed || "$path" =~ $upstream_dispatch_allowed ]] || { printf 'trajectory fixture rejected: %s\n' "$path" >&2; exit 1; }
 done
 
 assert_manual_only_workflow() {
