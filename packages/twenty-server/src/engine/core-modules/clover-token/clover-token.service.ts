@@ -43,7 +43,7 @@ export type CloverReceipt = {
   savedAt: string;
 };
 
-// One merchant per enabled Workspace. Native membership and permissions are
+// Multiple merchants per enabled Workspace. Native membership and permissions are
 // checked on every request; the deployment setting only narrows availability.
 @Injectable()
 export class CloverTokenService {
@@ -61,12 +61,24 @@ export class CloverTokenService {
     }
 
     await this.authorize(actor, this.dataSource.manager);
-    const account = await this.findAccount(
+    const binding = await this.resolveBinding(
       this.dataSource.manager,
       actor.workspaceId,
     );
-
-    return { enabled: true, receipt: account ? this.receipt(account) : null };
+    const accounts = await this.dataSource.manager
+      .getRepository(ConnectedAccountEntity)
+      .find({
+        where: this.accountWhere(actor.workspaceId, binding),
+        select: { id: true, handle: true, name: true, updatedAt: true },
+        order: { id: 'ASC' },
+      });
+    const receipts = accounts.map((account) => this.receipt(account));
+    // Legacy singular clients get no ambiguous first merchant.
+    return {
+      enabled: true,
+      receipt: receipts.length === 1 ? receipts[0] : null,
+      receipts,
+    };
   }
 
   async begin(actor: CloverActor, merchantId: string) {
@@ -78,9 +90,9 @@ export class CloverTokenService {
 
     return this.dataSource.transaction(async (manager) => {
       await this.authorize(actor, manager, true);
-      if (await this.findAccount(manager, actor.workspaceId)) {
+      if (await this.findAccount(manager, actor.workspaceId, merchantId)) {
         throw new ConflictException(
-          'This Workspace already has a Clover connection.',
+          'This merchant already has a Clover connection in this Workspace.',
         );
       }
 
@@ -174,7 +186,11 @@ export class CloverTokenService {
       }
 
       if (request.revokedAt && handoff.connectedAccountId) {
-        const account = await this.findAccount(manager, actor.workspaceId);
+        const account = await this.findAccount(
+          manager,
+          actor.workspaceId,
+          handoff.merchantId,
+        );
         if (account?.id === handoff.connectedAccountId)
           return this.receipt(account);
       }
@@ -182,9 +198,11 @@ export class CloverTokenService {
       if (request.revokedAt || request.expiresAt.getTime() <= Date.now()) {
         throw new ConflictException('This handoff expired. Start again.');
       }
-      if (await this.findAccount(manager, actor.workspaceId)) {
+      if (
+        await this.findAccount(manager, actor.workspaceId, handoff.merchantId)
+      ) {
         throw new ConflictException(
-          'This Workspace already has a Clover connection.',
+          'This merchant already has a Clover connection in this Workspace.',
         );
       }
 
@@ -290,18 +308,36 @@ export class CloverTokenService {
     return provider;
   }
 
-  private async findAccount(manager: EntityManager, workspaceId: string) {
+  private accountWhere(
+    workspaceId: string,
+    binding: ConnectionProviderEntity,
+    merchantId?: string,
+  ) {
+    return [
+      // Legacy custody blocks duplicate import, but never becomes App custody.
+      {
+        workspaceId,
+        provider: ConnectedAccountProvider.CLOVER,
+        ...(merchantId ? { handle: merchantId } : {}),
+      },
+      {
+        workspaceId,
+        provider: ConnectedAccountProvider.APP,
+        applicationId: binding.applicationId,
+        connectionProviderId: binding.id,
+        ...(merchantId ? { handle: merchantId } : {}),
+      },
+    ];
+  }
+
+  private async findAccount(
+    manager: EntityManager,
+    workspaceId: string,
+    merchantId: string,
+  ) {
     const binding = await this.resolveBinding(manager, workspaceId);
     return manager.getRepository(ConnectedAccountEntity).findOne({
-      where: [
-        { workspaceId, provider: ConnectedAccountProvider.CLOVER },
-        {
-          workspaceId,
-          provider: ConnectedAccountProvider.APP,
-          applicationId: binding.applicationId,
-          connectionProviderId: binding.id,
-        },
-      ],
+      where: this.accountWhere(workspaceId, binding, merchantId),
       select: { id: true, handle: true, name: true, updatedAt: true },
     });
   }

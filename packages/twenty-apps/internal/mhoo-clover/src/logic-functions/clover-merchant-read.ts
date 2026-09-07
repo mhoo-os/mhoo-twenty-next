@@ -1,3 +1,4 @@
+import { resolveCloverConnection } from './resolve-clover-connection';
 // Server-only implementation. Dependencies are supplied by the native function,
 // never by a request payload. The synthetic proof supplies an in-memory provider.
 export type CloverConnection = {
@@ -14,19 +15,15 @@ type Dependencies = {
   fetch: typeof fetch;
 };
 
-export const readCloverMerchant = async (dependencies: Dependencies) => {
+export const readCloverMerchant = async (
+  dependencies: Dependencies,
+  connectionId?: unknown,
+) => {
   try {
-    const connections = await dependencies.list();
-    if (connections.length !== 1) throw new Error('Ambiguous connection');
-    // Re-resolve immediately before use, so a disconnect after listing denies.
-    const connection = await dependencies.get(connections[0].id);
-    if (
-      connection.providerName !== 'clover-manual' ||
-      connection.authFailedAt ||
-      !/^[A-Z0-9]{13}$/.test(connection.handle)
-    ) {
-      throw new Error('Unavailable connection');
-    }
+    const connection = await resolveCloverConnection(
+      dependencies,
+      connectionId,
+    );
     const response = await dependencies.fetch(
       `https://api.clover.com/v3/merchants/${connection.handle}?fields=id,name`,
       {
@@ -67,6 +64,7 @@ export const readCloverMerchant = async (dependencies: Dependencies) => {
     )
       throw new Error('Invalid merchant');
     return {
+      connectedAccountId: connection.id,
       merchantId: connection.handle,
       merchantName: data.name.slice(0, 200),
       scopeVerification: 'unknown' as const,

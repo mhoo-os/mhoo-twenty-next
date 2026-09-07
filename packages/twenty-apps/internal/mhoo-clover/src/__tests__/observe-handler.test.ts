@@ -30,11 +30,20 @@ it('uses actual native REST client with delegated identity and secret-free obser
   };
   vi.mocked(listConnections).mockResolvedValue([connection] as never);
   vi.mocked(getConnection).mockResolvedValue(connection as never);
+  let stored: unknown;
   const transport = vi.fn(async (url: string, init?: RequestInit) => {
     if (url.startsWith('https://api.clover.com/'))
       return new Response(
         JSON.stringify({ id: connection.handle, name: 'Synthetic merchant' }),
       );
+    if (url.endsWith('/cloverConnections/connection'))
+      return stored
+        ? new Response(JSON.stringify({ data: { cloverConnection: stored } }))
+        : new Response('{}', { status: 404 });
+    if (url.endsWith('/cloverConnections')) {
+      stored = JSON.parse(String(init?.body));
+      return new Response('{}', { status: 201 });
+    }
     expect(url).toBe('https://native.invalid/rest/cloverMerchantObservations');
     expect(init?.method).toBe('POST');
     expect(new Headers(init?.headers).get('Authorization')).toBe(
@@ -52,7 +61,7 @@ it('uses actual native REST client with delegated identity and secret-free obser
     merchantId: connection.handle,
     sourceRevision: 'merchant-v1',
   });
-  expect(transport).toHaveBeenCalledTimes(2);
+  expect(transport).toHaveBeenCalledTimes(5);
 });
 
 it('rejects missing delegated token even with application-only fallback available', async () => {

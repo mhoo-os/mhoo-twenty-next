@@ -1,4 +1,15 @@
-import { defineObject, FieldType } from 'twenty-sdk/define';
+import {
+  CONNECTION_OBJECT,
+  CONNECTION_OBSERVATIONS_FIELD,
+  OBSERVATION_CONNECTION_FIELD,
+} from '../contracts/model-identifiers';
+import {
+  defineObject,
+  MetadataWritability,
+  FieldType,
+  RelationType,
+  OnDeleteAction,
+} from 'twenty-sdk/define';
 
 export default defineObject({
   universalIdentifier: '27e1bebd-b3f0-462a-acf5-352879f11c5d',
@@ -9,11 +20,28 @@ export default defineObject({
   description:
     'Provider merchant identity observed by Clover. Not financial evidence or permission verification.',
   icon: 'IconBuildingStore',
+  writability: MetadataWritability.APPLICATION,
   isUICreatable: false,
   isUIEditable: false,
   labelIdentifierFieldMetadataUniversalIdentifier:
     '0dc5c361-162f-45a6-b6b9-73d18c42e445',
   fields: [
+    {
+      universalIdentifier: OBSERVATION_CONNECTION_FIELD,
+      name: 'connection',
+      label: 'Connection',
+      type: FieldType.RELATION,
+      icon: 'IconLink',
+      isNullable: true,
+      relationTargetObjectMetadataUniversalIdentifier: CONNECTION_OBJECT,
+      relationTargetFieldMetadataUniversalIdentifier:
+        CONNECTION_OBSERVATIONS_FIELD,
+      universalSettings: {
+        relationType: RelationType.MANY_TO_ONE,
+        onDelete: OnDeleteAction.RESTRICT,
+        joinColumnName: 'connectionId',
+      },
+    },
     {
       universalIdentifier: '110dddc0-93c2-49e1-85d9-dc191228922e',
       name: 'merchantId',

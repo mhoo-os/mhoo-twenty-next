@@ -1,3 +1,7 @@
+import {
+  CONNECTION_OBJECT,
+  SYNC_STATE_OBJECT,
+} from '../contracts/model-identifiers';
 import { defineApplicationRole } from 'twenty-sdk/define';
 
 export default defineApplicationRole({
@@ -15,6 +19,15 @@ export default defineApplicationRole({
   canBeAssignedToUsers: false,
   canBeAssignedToApiKeys: false,
   objectPermissions: [
+    ...[CONNECTION_OBJECT, SYNC_STATE_OBJECT].map(
+      (objectUniversalIdentifier) => ({
+        objectUniversalIdentifier,
+        canReadObjectRecords: true,
+        canUpdateObjectRecords: true,
+        canSoftDeleteObjectRecords: false,
+        canDestroyObjectRecords: false,
+      }),
+    ),
     {
       objectUniversalIdentifier: '27e1bebd-b3f0-462a-acf5-352879f11c5d',
       canReadObjectRecords: true,

@@ -1,0 +1,87 @@
+import {
+  defineObject,
+  MetadataWritability,
+  FieldType,
+  RelationType,
+} from 'twenty-sdk/define';
+import {
+  CONNECTION_OBJECT,
+  SYNC_STATE_OBJECT,
+  CONNECTION_SYNC_STATES_FIELD,
+  SYNC_STATE_CONNECTION_FIELD,
+  CONNECTION_OBSERVATIONS_FIELD,
+  OBSERVATION_CONNECTION_FIELD,
+} from '../contracts/model-identifiers';
+export default defineObject({
+  universalIdentifier: CONNECTION_OBJECT,
+  nameSingular: 'cloverConnection',
+  namePlural: 'cloverConnections',
+  labelSingular: 'Clover connection',
+  labelPlural: 'Clover connections',
+  icon: 'IconPlug',
+  writability: MetadataWritability.APPLICATION,
+  isUICreatable: false,
+  isUIEditable: false,
+  fields: [
+    {
+      universalIdentifier: CONNECTION_OBSERVATIONS_FIELD,
+      name: 'observations',
+      label: 'Merchant observations',
+      type: FieldType.RELATION,
+      icon: 'IconLink',
+      isNullable: true,
+      relationTargetObjectMetadataUniversalIdentifier:
+        '27e1bebd-b3f0-462a-acf5-352879f11c5d',
+      relationTargetFieldMetadataUniversalIdentifier:
+        OBSERVATION_CONNECTION_FIELD,
+      universalSettings: { relationType: RelationType.ONE_TO_MANY },
+    },
+    {
+      universalIdentifier: '7ad7a97f-6041-4a1f-94e5-b7e98ecae77b',
+      name: 'connectionKey',
+      label: 'connectionKey',
+      type: FieldType.TEXT,
+      icon: 'IconInfoCircle',
+    },
+    {
+      universalIdentifier: 'af9fcd8b-cb01-4436-96b5-f1cb7f327750',
+      name: 'connectedAccountId',
+      label: 'connectedAccountId',
+      type: FieldType.UUID,
+      icon: 'IconInfoCircle',
+    },
+    {
+      universalIdentifier: '0b1549e7-761b-403c-b915-f10117f3ec94',
+      name: 'merchantId',
+      label: 'merchantId',
+      type: FieldType.TEXT,
+      icon: 'IconInfoCircle',
+    },
+    {
+      universalIdentifier: '07b7d968-6453-418e-9616-5cc9fbccba3c',
+      name: 'environment',
+      label: 'environment',
+      type: FieldType.TEXT,
+      icon: 'IconInfoCircle',
+    },
+    {
+      universalIdentifier: '9f801f1f-a6b4-4a38-8deb-fe868704e48a',
+      name: 'status',
+      label: 'status',
+      type: FieldType.TEXT,
+      icon: 'IconInfoCircle',
+    },
+    {
+      universalIdentifier: CONNECTION_SYNC_STATES_FIELD,
+      name: 'syncStates',
+      label: 'Sync states',
+      type: FieldType.RELATION,
+      icon: 'IconLink',
+      isNullable: true,
+      relationTargetObjectMetadataUniversalIdentifier: SYNC_STATE_OBJECT,
+      relationTargetFieldMetadataUniversalIdentifier:
+        SYNC_STATE_CONNECTION_FIELD,
+      universalSettings: { relationType: RelationType.ONE_TO_MANY },
+    },
+  ],
+});

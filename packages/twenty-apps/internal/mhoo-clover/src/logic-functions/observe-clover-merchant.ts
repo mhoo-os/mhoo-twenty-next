@@ -7,9 +7,10 @@ export const observeCloverMerchant = async (
     save: (observation: CloverMerchantObservation) => Promise<unknown>;
     now: () => Date;
   },
+  connectionId?: unknown,
 ) => {
   try {
-    const merchant = await readCloverMerchant(dependencies);
+    const merchant = await readCloverMerchant(dependencies, connectionId);
     const observation: CloverMerchantObservation = {
       ...merchant,
       observedAt: dependencies.now().toISOString(),

@@ -18,6 +18,7 @@ type Receipt = {
 type Status = {
   enabled: boolean;
   receipt: Receipt | null;
+  receipts?: Receipt[];
   canPrepareInvitation?: boolean;
 };
 type Handoff = { requestId: string; merchantId: string; expiresAt: string };
@@ -184,189 +185,212 @@ const CloverForm = ({ workspaceName }: { workspaceName: string }) => {
             {invitation && <p role="status">{invitation}</p>}
           </>
         )}
-        {status?.receipt ? (
-          <div role="status">
-            <p>
-              <strong>Clover token saved securely.</strong>
-            </p>
-            <p>
-              {status.receipt.merchantName} · {status.receipt.merchantId}
-            </p>
-            <p>Connected to {workspaceName}.</p>
-            <small>
-              To stop access, revoke this token in your Clover dashboard.
-            </small>
-          </div>
-        ) : (
-          status?.enabled && (
-            <>
-              {!handoff ? (
-                <form
-                  onSubmit={async (event) => {
-                    event.preventDefault();
-                    setBusy(true);
-                    setError('');
-                    try {
-                      setHandoff(
-                        await cloverRequest<Handoff>(
-                          'begin',
-                          { merchantId },
-                          abort.current.signal,
-                        ),
-                      );
-                    } catch (failure) {
-                      if (!abort.current.signal.aborted)
-                        setError(
-                          failure instanceof Error
-                            ? failure.message
-                            : 'Please try again.',
-                        );
-                    } finally {
-                      if (!abort.current.signal.aborted) setBusy(false);
-                    }
-                  }}
-                >
-                  <label htmlFor="clover-merchant-id">
-                    Clover merchant ID
-                    <input
-                      id="clover-merchant-id"
-                      type="text"
-                      value={merchantId}
-                      onChange={(event) =>
-                        setMerchantId(event.target.value.trim().toUpperCase())
-                      }
-                      autoComplete="off"
-                      spellCheck={false}
-                      required
-                      minLength={13}
-                      maxLength={13}
-                      pattern="[A-Z0-9]{13}"
-                      disabled={busy}
-                    />
-                    <small>
-                      The 13 characters after /merchants/ in your Clover
-                      dashboard address.
-                    </small>
-                  </label>
-                  <Button
-                    type="submit"
-                    title={busy ? 'Preparing…' : 'Continue'}
-                    accent="green"
-                    disabled={busy}
-                  />
-                </form>
-              ) : (
-                <form
-                  autoComplete="off"
-                  onSubmit={async (event) => {
-                    event.preventDefault();
-                    if (!tokenInput.current || !confirmed || busy) return;
-                    const accessToken = tokenInput.current.value.trim();
-                    tokenInput.current.value = '';
-                    setBusy(true);
-                    setError('');
-                    try {
-                      const receipt = await cloverRequest<Receipt>(
-                        'submit',
-                        {
-                          requestId: handoff.requestId,
-                          accessToken,
-                          readOnlyConfirmed: confirmed,
-                        },
+        {(status?.receipts ?? (status?.receipt ? [status.receipt] : [])).map(
+          (saved) => (
+            <div role="status" key={saved.connectedAccountId}>
+              <p>
+                <strong>Clover token saved securely.</strong>
+              </p>
+              <p>
+                {saved.merchantName} · {saved.merchantId}
+              </p>
+              <p>Connected to {workspaceName}.</p>
+              <small>
+                To stop access, revoke this token in your Clover dashboard.
+              </small>
+            </div>
+          ),
+        )}
+        {status?.enabled && (
+          <>
+            {!handoff ? (
+              <form
+                onSubmit={async (event) => {
+                  event.preventDefault();
+                  setBusy(true);
+                  setError('');
+                  try {
+                    setHandoff(
+                      await cloverRequest<Handoff>(
+                        'begin',
+                        { merchantId },
                         abort.current.signal,
+                      ),
+                    );
+                  } catch (failure) {
+                    if (!abort.current.signal.aborted)
+                      setError(
+                        failure instanceof Error
+                          ? failure.message
+                          : 'Please try again.',
                       );
-                      if (!abort.current.signal.aborted) {
-                        setStatus({ enabled: true, receipt });
-                        setHandoff(null);
-                      }
-                    } catch (failure) {
-                      if (!abort.current.signal.aborted) {
-                        // A lost response may follow a committed save. Check the native
-                        // receipt without resending or retaining the credential.
-                        try {
-                          const latest = await cloverRequest<Status>(
-                            'status',
-                            undefined,
-                            abort.current.signal,
-                          );
-                          setStatus(latest);
-                          if (!latest.receipt)
-                            setError(
-                              failure instanceof Error
-                                ? failure.message
-                                : 'Please try again.',
-                            );
-                        } catch {
-                          setError(
-                            'We could not confirm the save. Refresh to check before trying again.',
-                          );
-                        }
-                      }
-                    } finally {
-                      if (!abort.current.signal.aborted) setBusy(false);
+                  } finally {
+                    if (!abort.current.signal.aborted) setBusy(false);
+                  }
+                }}
+              >
+                <label htmlFor="clover-merchant-id">
+                  Clover merchant ID
+                  <input
+                    id="clover-merchant-id"
+                    type="text"
+                    value={merchantId}
+                    onChange={(event) =>
+                      setMerchantId(event.target.value.trim().toUpperCase())
                     }
-                  }}
-                >
-                  <p>
-                    Merchant <strong>{handoff.merchantId}</strong>
-                  </p>
-                  <label htmlFor="clover-token-value">
-                    Paste your Clover API token
-                    <input
-                      ref={bindTokenInput}
-                      id="clover-token-value"
-                      type="password"
-                      autoComplete="off"
-                      spellCheck={false}
-                      required
-                      minLength={20}
-                      maxLength={2048}
-                      disabled={busy}
-                      data-lpignore="true"
-                      data-1p-ignore="true"
-                    />
-                  </label>
-                  <label htmlFor="clover-read-only">
-                    <span>
-                      <input
-                        id="clover-read-only"
-                        type="checkbox"
-                        checked={confirmed}
-                        onChange={(event) => setConfirmed(event.target.checked)}
-                        required
-                        disabled={busy}
-                      />{' '}
-                      All six Read permissions are selected. Every Write
-                      permission is off.
-                    </span>
-                  </label>
-                  <small>
-                    Encrypted in your Workspace. This form expires after 10
-                    minutes.
-                  </small>
-                  <Button
-                    type="submit"
-                    title={
-                      busy ? 'Verifying and saving…' : 'Save encrypted token'
-                    }
-                    accent="green"
-                    disabled={busy || !confirmed}
-                  />
-                  <Button
-                    type="button"
-                    title="Start again"
-                    variant="tertiary"
+                    autoComplete="off"
+                    spellCheck={false}
+                    required
+                    minLength={13}
+                    maxLength={13}
+                    pattern="[A-Z0-9]{13}"
                     disabled={busy}
-                    onClick={() => {
-                      setHandoff(null);
-                      setConfirmed(false);
-                      setError('');
-                    }}
                   />
-                </form>
-              )}
-            </>
-          )
+                  <small>
+                    The 13 characters after /merchants/ in your Clover dashboard
+                    address.
+                  </small>
+                </label>
+                <Button
+                  type="submit"
+                  title={busy ? 'Preparing…' : 'Continue'}
+                  accent="green"
+                  disabled={busy}
+                />
+              </form>
+            ) : (
+              <form
+                autoComplete="off"
+                onSubmit={async (event) => {
+                  event.preventDefault();
+                  if (!tokenInput.current || !confirmed || busy) return;
+                  const accessToken = tokenInput.current.value.trim();
+                  tokenInput.current.value = '';
+                  setBusy(true);
+                  setError('');
+                  try {
+                    const receipt = await cloverRequest<Receipt>(
+                      'submit',
+                      {
+                        requestId: handoff.requestId,
+                        accessToken,
+                        readOnlyConfirmed: confirmed,
+                      },
+                      abort.current.signal,
+                    );
+                    if (!abort.current.signal.aborted) {
+                      setStatus((current) => ({
+                        enabled: true,
+                        receipt,
+                        receipts: [
+                          ...(
+                            current?.receipts ??
+                            (current?.receipt ? [current.receipt] : [])
+                          ).filter(
+                            (saved) =>
+                              saved.connectedAccountId !==
+                              receipt.connectedAccountId,
+                          ),
+                          receipt,
+                        ],
+                      }));
+                      setHandoff(null);
+                      setMerchantId('');
+                    }
+                  } catch (failure) {
+                    if (!abort.current.signal.aborted) {
+                      // A lost response may follow a committed save. Check the native
+                      // receipt without resending or retaining the credential.
+                      try {
+                        const latest = await cloverRequest<Status>(
+                          'status',
+                          undefined,
+                          abort.current.signal,
+                        );
+                        setStatus(latest);
+                        if (
+                          !(
+                            latest.receipts ??
+                            (latest.receipt ? [latest.receipt] : [])
+                          ).some(
+                            (saved) => saved.merchantId === handoff.merchantId,
+                          )
+                        )
+                          setError(
+                            failure instanceof Error
+                              ? failure.message
+                              : 'Please try again.',
+                          );
+                      } catch {
+                        setError(
+                          'We could not confirm the save. Refresh to check before trying again.',
+                        );
+                      }
+                    }
+                  } finally {
+                    if (!abort.current.signal.aborted) setBusy(false);
+                  }
+                }}
+              >
+                <p>
+                  Merchant <strong>{handoff.merchantId}</strong>
+                </p>
+                <label htmlFor="clover-token-value">
+                  Paste your Clover API token
+                  <input
+                    ref={bindTokenInput}
+                    id="clover-token-value"
+                    type="password"
+                    autoComplete="off"
+                    spellCheck={false}
+                    required
+                    minLength={20}
+                    maxLength={2048}
+                    disabled={busy}
+                    data-lpignore="true"
+                    data-1p-ignore="true"
+                  />
+                </label>
+                <label htmlFor="clover-read-only">
+                  <span>
+                    <input
+                      id="clover-read-only"
+                      type="checkbox"
+                      checked={confirmed}
+                      onChange={(event) => setConfirmed(event.target.checked)}
+                      required
+                      disabled={busy}
+                    />{' '}
+                    All six Read permissions are selected. Every Write
+                    permission is off.
+                  </span>
+                </label>
+                <small>
+                  Encrypted in your Workspace. This form expires after 10
+                  minutes.
+                </small>
+                <Button
+                  type="submit"
+                  title={
+                    busy ? 'Verifying and saving…' : 'Save encrypted token'
+                  }
+                  accent="green"
+                  disabled={busy || !confirmed}
+                />
+                <Button
+                  type="button"
+                  title="Start again"
+                  variant="tertiary"
+                  disabled={busy}
+                  onClick={() => {
+                    setHandoff(null);
+                    setConfirmed(false);
+                    setError('');
+                  }}
+                />
+              </form>
+            )}
+          </>
         )}
       </StyledPanel>
     </Section>

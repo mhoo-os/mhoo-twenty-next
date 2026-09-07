@@ -9,17 +9,20 @@ export default defineLogicFunction({
     'Read the connected merchant name. Does not verify provider scopes.',
   timeoutSeconds: 10,
   // No public route, tool, cron, webhook or workflow trigger in this slice.
-  handler: async (_payload, context) => {
+  handler: async (payload: { connectionId?: string }, context) => {
     if (!context.userWorkspaceId || !context.workspaceMemberId) {
       throw new Error(
         'An authorized Workspace member must initiate this read.',
       );
     }
-    return readCloverMerchant({
-      list: () =>
-        listConnections({ providerName: 'clover-manual' }, { runAs: 'user' }),
-      get: (id) => getConnection(id, { runAs: 'user' }),
-      fetch,
-    });
+    return readCloverMerchant(
+      {
+        list: () =>
+          listConnections({ providerName: 'clover-manual' }, { runAs: 'user' }),
+        get: (id) => getConnection(id, { runAs: 'user' }),
+        fetch,
+      },
+      payload?.connectionId,
+    );
   },
 });

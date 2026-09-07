@@ -116,7 +116,16 @@ describe('native Clover token handoff', () => {
         if (entity === AppTokenEntity) return requests;
         if (entity === ConnectedAccountEntity)
           return {
-            findOne: jest.fn(async () => account),
+            findOne: jest.fn(async ({ where }) =>
+              account &&
+              where.some(
+                (condition: { handle?: string }) =>
+                  !condition.handle || condition.handle === account?.handle,
+              )
+                ? account
+                : null,
+            ),
+            find: jest.fn(async () => (account ? [account] : [])),
             create: (row: object) => row,
             save: accountSave,
           };
@@ -151,6 +160,21 @@ describe('native Clover token handoff', () => {
     requestId: handoff.id,
     accessToken: syntheticToken,
     readOnlyConfirmed: true,
+  });
+
+  it('allows another merchant and rejects only duplicate merchant custody', async () => {
+    account = {
+      id: randomUUID(),
+      handle: 'OTHER12345678',
+      name: 'Other',
+      updatedAt: new Date(),
+    } as ConnectedAccountEntity;
+    await expect(service.begin(actor, merchantId)).resolves.toMatchObject({
+      merchantId,
+    });
+    await expect(service.begin(actor, 'OTHER12345678')).rejects.toThrow(
+      'already has',
+    );
   });
 
   it('encrypts with native workspace-bound encryption and returns only a receipt', async () => {

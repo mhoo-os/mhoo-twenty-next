@@ -319,6 +319,7 @@ describe('manual intake to native Clover consumption', () => {
     ).toThrow();
     const result = await read();
     expect(result).toEqual({
+      connectedAccountId: receipt.connectedAccountId,
       merchantId,
       merchantName: 'Synthetic merchant',
       scopeVerification: 'unknown',
@@ -445,6 +446,7 @@ describe('manual intake to native Clover consumption', () => {
     try {
       expect(merchantFunction.success).toBe(true);
       expect(await merchantFunction.config!.handler({}, context)).toEqual({
+        connectedAccountId: receipt.connectedAccountId,
         merchantId,
         merchantName: 'Synthetic merchant',
         scopeVerification: 'unknown',

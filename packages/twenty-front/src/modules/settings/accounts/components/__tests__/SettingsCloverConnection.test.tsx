@@ -80,6 +80,30 @@ describe('Clover native form', () => {
     return screen.findByLabelText('Paste your Clover API token');
   };
 
+  it('shows multiple saved merchants and keeps another-merchant intake available', async () => {
+    mockFetch.mockResolvedValue(
+      reply({
+        enabled: true,
+        receipt: null,
+        receipts: [
+          receipt,
+          {
+            ...receipt,
+            connectedAccountId: 'second',
+            merchantId: 'OTHER12345678',
+            merchantName: 'Second merchant',
+          },
+        ],
+      }),
+    );
+    render(<SettingsCloverConnection />);
+    expect(await screen.findByText(/Second merchant/)).toBeInTheDocument();
+    expect(screen.getByText(/Synthetic Hass/)).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Continue' }),
+    ).toBeInTheDocument();
+  });
+
   it('keeps intake hidden when the native Workspace is not enabled', async () => {
     mockFetch.mockResolvedValue(reply({ enabled: false, receipt: null }));
     render(<SettingsCloverConnection />);

@@ -33,6 +33,7 @@ describe('Clover-owned merchant observation', () => {
     expect(observationObject.success).toBe(true);
     expect(observationObject.config?.fields.map((field) => field.name)).toEqual(
       [
+        'connection',
         'merchantId',
         'merchantName',
         'observedAt',
@@ -46,6 +47,7 @@ describe('Clover-owned merchant observation', () => {
     const dependencies = makeDependencies();
     const result = await observeCloverMerchant(dependencies);
     expect(result).toEqual({
+      connectedAccountId: connection.id,
       merchantId,
       merchantName: 'Synthetic merchant',
       observedAt: '2026-09-07T00:00:00.000Z',

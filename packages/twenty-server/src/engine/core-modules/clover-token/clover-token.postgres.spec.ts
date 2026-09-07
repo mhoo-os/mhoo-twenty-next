@@ -229,9 +229,14 @@ suite('Clover PostgreSQL atomicity', () => {
       ),
       {
         getHttpClient: () => ({
-          get: async () => {
+          get: async (url: string) => {
             providerCalls++;
-            return { data: { id: merchantId, name: 'Synthetic Hass' } };
+            return {
+              data: {
+                id: new URL(url).pathname.split('/').pop(),
+                name: 'Synthetic Hass',
+              },
+            };
           },
         }),
       } as unknown as SecureHttpClientService,
@@ -271,6 +276,41 @@ suite('Clover PostgreSQL atomicity', () => {
       .findOneByOrFail({ id: receipts[0].connectedAccountId });
     expect(stored.accessToken).toMatch(/^enc:v2:/);
     expect(stored.accessToken).not.toContain(input.accessToken);
+  });
+
+  it('keeps two merchants isolated, rejects duplicates and deletes only the selected account', async () => {
+    const otherMerchant = 'OTHER12345678';
+    const connect = async (id: string) => {
+      const handoff = await service.begin(actor, id);
+      return service.submit(actor, {
+        requestId: handoff.requestId,
+        accessToken: `synthetic-token-for-${id}`,
+        readOnlyConfirmed: true,
+      });
+    };
+    const first = await connect(merchantId);
+    const second = await connect(otherMerchant);
+    expect(first.connectedAccountId).not.toBe(second.connectedAccountId);
+    const before = await service.status(actor);
+    expect(before.receipt).toBeNull();
+    expect(before.receipts?.map((r) => r.merchantId).sort()).toEqual(
+      [merchantId, otherMerchant].sort(),
+    );
+    await expect(service.begin(actor, merchantId)).rejects.toThrow(
+      'already has',
+    );
+    const accounts = db.getRepository(ConnectedAccountEntity);
+    const retained = await accounts.findOneByOrFail({
+      id: second.connectedAccountId,
+    });
+    await accounts.delete({ id: first.connectedAccountId });
+    expect(
+      (await accounts.findOneByOrFail({ id: second.connectedAccountId }))
+        .accessToken,
+    ).toBe(retained.accessToken);
+    expect((await service.status(actor)).receipt?.connectedAccountId).toBe(
+      second.connectedAccountId,
+    );
   });
 
   it('rolls back the encrypted insert when consuming the request fails', async () => {

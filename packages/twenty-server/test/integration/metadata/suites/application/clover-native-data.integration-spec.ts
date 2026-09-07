@@ -155,6 +155,58 @@ describe('Clover native install and delegated source-record API', () => {
       (await client().get('/rest/cloverMerchantObservations')).status,
     ).toBe(403);
   });
+  it('persists independent connection progress, unique keys and native relation filters', async () => {
+    const a = randomUUID();
+    const b = randomUUID();
+    const post = (path: string, body: object) =>
+      client()
+        .post(`/rest/${path}`)
+        .set('Authorization', `Bearer ${cloverToken}`)
+        .send(body);
+    for (const id of [a, b]) {
+      const result = await post('cloverConnections', {
+        id,
+        connectedAccountId: id,
+        connectionKey: id,
+        merchantId: id === a ? 'ABCDEFGHIJKLM' : 'NOPQRSTUVWXYZ',
+        environment: 'production-na',
+        status: 'observed',
+      });
+      expect(result.status).toBe(201);
+    }
+    const duplicate = await post('cloverConnections', { connectionKey: a });
+    expect(duplicate.status).toBe(400);
+    for (const id of [a, b]) {
+      const result = await post('cloverSyncStates', {
+        syncKey: `${id}:payments`,
+        connectionId: id,
+        dataset: 'payments',
+        status: 'notStarted',
+        coverage: 'unverified',
+        grantRevision: 0,
+      });
+      expect(result.status).toBe(201);
+    }
+    const read = await client()
+      .get('/rest/cloverSyncStates')
+      .query({ filter: `connectionId[eq]:${a}` })
+      .set('Authorization', `Bearer ${cloverToken}`);
+    expect(read.status).toBe(200);
+    expect(JSON.stringify(read.body)).toContain(a);
+    expect(JSON.stringify(read.body)).not.toContain(b);
+    const reverse = await client()
+      .get(`/rest/cloverConnections/${a}`)
+      .query({ depth: 1 })
+      .set('Authorization', `Bearer ${cloverToken}`);
+    expect(reverse.status).toBe(200);
+    expect(JSON.stringify(reverse.body)).toContain('payments');
+    const directUserWrite = await client()
+      .post('/rest/cloverConnections')
+      .set('Authorization', `Bearer ${APPLE_JANE_ADMIN_ACCESS_TOKEN}`)
+      .send({ connectionKey: randomUUID() });
+    expect(directUserWrite.status).toBe(400);
+  });
+
   it('uses real authenticated intake/custody, denies another App credential access and disconnects natively', async () => {
     const config = getAppProviderByClassName<TwentyConfigService>(
       'TwentyConfigService',

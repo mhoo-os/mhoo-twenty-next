@@ -1,53 +1,77 @@
-# Clover native integration
+# Clover native integration — phased source build
 
-Standalone native Twenty App. Twenty owns identity, Workspace permissions,
-ConnectedAccount encryption, generated APIs and function execution. Clover owns
-provider lifecycle and observations. Finance owns its financial interpretation.
+Owner approved finalization and phased source implementation on 2026-09-07.
+Standalone Clover App; required coverage is every available authorized read-only
+Clover data object, persisted provider records, background sync, and multiple
+merchant connections per native Twenty Workspace.
 
-Phase one: manual read-only intake, merchant identity read, native disconnect
-and a secret-free Clover-owned merchant observation. No payment/order/employee
-data, provider writes, background activation or arbitrary provider URL.
+## Authority and custody
 
-## Data contract merchant-v1
+Twenty owns identity, membership, permissions, encrypted native Connections,
+records, functions, jobs, App lifecycle and MCP. Clover owns provider reads,
+source observations and sync state. Finance and other Apps consume native
+records with their own permissions, without receiving Clover credentials.
+No additional worker, vault, identity or database.
 
-App: `813784c7-5dc1-438c-badb-012ab73483c2`.
-Object: `27e1bebd-b3f0-462a-acf5-352879f11c5d`,
-`cloverMerchantObservation` / `cloverMerchantObservations`.
-Native record ID identifies each observation. Fields: merchantId, merchantName,
-observedAt (server UTC), sourceRevision (`merchant-v1`, schema version, not a
-provider revision), sourcePath, scopeVerification (`unknown`). No credentials,
-provider raw body, amount, currency, account mapping or original artifact.
-This is merchant context, not transaction evidence or financial coverage.
+Each merchant has a separate App-bound native account. Intake rejects duplicate
+merchant custody in the Workspace under a Workspace transaction lock. Existing
+legacy custody blocks duplicate onboarding but is never relabeled. A new
+merchant may connect independently. Reconnection creates a new account lineage.
+Readers select a visible connection explicitly when several exist and re-resolve
+it before use; selectors do not grant access. Disconnecting one account must
+leave the others and historical observations intact.
 
-Producer uses fixed provider GET and native REST write with delegated user
-identity. Native user + Clover App permissions must allow both connection
-access and observation creation. Native create/update permission is combined;
-the producer appends but storage is not immutable/WORM. UI editing is disabled.
-No consumer is allowed access merely by supplying App, merchant or Workspace ID.
+## First source slice
 
-Consumers declare READ on this installed object's universal ID in their own
-roles, use native APIs with delegated identity, and receive the user/consumer
-permission intersection. Do not invoke another App's credential helper or a
-general function executor. Missing metadata/provider means unavailable; never
-substitute an empty financial dataset. No automatic dependency install exists
-in the inspected manifest. Install Clover before a role references the object.
-Finance PR36 remains unchanged until a relevant finance data contract exists.
+- Native connection and per-dataset sync-state objects, bidirectional relations,
+  unique identity keys, App-only writability and bounded App role permissions.
+- Merchant observation records linked to their native Clover connection. The
+  native account UUID is an opaque system reference, not a second credential.
+- Payment-page projection uses a fixed provider origin, GET only, 89-day
+  windows, 100 records, bounded response/deadline and explicit native account.
+  Returned revisions include connection identity, raw integer amounts, provider
+  times and a content revision hash. Currency remains unresolved.
+- Native settings lists multiple receipts and permits another merchant form.
+  A lost submission response is reconciled to that form's merchant, not any
+  existing Workspace receipt. No token retained in browser storage.
 
-Disconnect removes the native account and denies further reads. Historical
-observations remain; provider token revocation is separate in Clover. Uninstall
-uses native destructive App lifecycle; no survival of Clover data is promised,
-and no cross-App uninstall block is claimed. Consumers must preserve their own
-approved derived evidence and handle absent producer data. No cascade relation
-from Finance to this object is introduced.
+These are source capabilities, not live activation or full ingestion. Connection
+status is an observation, not a permanent access guarantee. Sync-state metadata
+does not imply a scheduler, granted background access or committed coverage.
 
-## Delivery limits
+## Continuing phases and acceptance
 
-Source and synthetic proof only. Read/observe functions have no public, cron,
-workflow or MCP trigger. UI intake uses the existing native Settings surface.
-No live App install, signed-session/executor integration proof, data permission
-HTTP runtime proof, real provider scope verification, immutable artifact, or
-customer activation follows from unit tests. Financial ingestion is a later
-phase requiring its own amount/currency/sign/revision/lineage contract.
+1. Prove native model installation, uniqueness, both relation directions,
+   per-connection filtering, allowed/denied writes and disconnect isolation.
+2. Persist typed order/payment/refund/line-item source revisions and native page
+   receipts with idempotent restart. Advance progress only after committed data.
+3. Implement explicit native Workspace background grants bound to the App and
+   connection, narrow read capabilities, revocation and executor proof. Current
+   manual readers remain user-initiated until that contract passes.
+4. Expand inventory, merchant configuration, employees/shifts/customers/cash
+   events and MSC families. Conditional ecommerce, provider App billing and
+   device APIs require their own supported credential/API evidence. They are
+   coverage gaps, never silently claimed complete.
+5. Expose bounded native read tools and per-connection/combined views under
+   native role/row permissions. Finance amount/currency/sign/lineage acceptance
+   remains separate from provider ingestion.
 
-Existing accounts are never relabeled. Finance-bound first-slice accounts
-require explicit inventory and approved reconnect/migration if installed.
+For each dataset record scope evidence, endpoint/schema version, provider IDs
+and relationships, historical intervals, incremental filters, failure state and
+confirmed deletion/void/correction limitations. Missing pages/403 are not zero
+activity or deletion. Offset pagination is not a stable snapshot.
+
+The source-backed catalog is in mhoo PR51 at
+`docs/reuse/CLOVER_READONLY_OBJECT_CATALOG_2026-09-07.md`; the coordinated plan
+is `docs/reuse/CLOVER_PRODUCT_PLAN_PROPOSED_2026-09-07.md` (historical filename).
+Provider sources: [index](https://docs.clover.com/dev/llms.txt),
+[filters](https://docs.clover.com/dev/docs/applying-filters),
+[payments](https://docs.clover.com/dev/docs/get-all-payments), and
+[permissions](https://docs.clover.com/dev/docs/gdp-set-app-permissions).
+
+## Release boundary
+
+Synthetic source proof only. No real credentials, scope expansion, invitations,
+provisioning, migration, provider writes, production install or activation.
+Native uninstall is destructive; no source-survival guarantee or cross-App
+dependency blocker is implemented. Finance production release is independent.
