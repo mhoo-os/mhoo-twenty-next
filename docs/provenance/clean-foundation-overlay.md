@@ -59,6 +59,12 @@ MHO-146 Phase A source authorization:
   preserve that CI runner compatibility adjustment. This does not authorize
   another workflow, trigger, deployment, credential, or product path.
 
+- `.github/workflows/ci-front.yaml` is authorized solely for replacing the
+  unavailable `ubuntu-latest-8-cores` label with `ubuntu-latest` in the existing
+  `front-build` and `front-sb-build` jobs. All commands, gates, dependencies,
+  timeouts, heap settings, events and permissions remain unchanged. This adds
+  no deployment, runner purchase or other workflow authority.
+
 These are exact source-custody boundaries. A path that is adjacent, nested
 under another root, has a suffix or lookalike name, or belongs to another App
 or workflow remains rejected by the trajectory fixture.

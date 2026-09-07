@@ -597,15 +597,16 @@ for index in "${!rogue_legal_paths[@]}"; do
   }
 done
 
-# AI editor authority is limited to the exact helper, selector and regressions.
-ai_editor_paths=(
+# AI editor repair and runner compatibility retain exact, bounded paths.
+repair_paths=(
+  .github/workflows/ci-front.yaml
   docs/provenance/ai-editor-lifecycle.md
   packages/twenty-front/src/modules/advanced-text-editor/utils/hasEditorExtension.ts
   packages/twenty-front/src/modules/advanced-text-editor/utils/__tests__/hasEditorExtension.test.ts
   packages/twenty-front/src/modules/advanced-text-editor/hooks/useTurnIntoBlockOptions.ts
   packages/twenty-front/src/modules/advanced-text-editor/hooks/__tests__/useTurnIntoBlockOptions.test.tsx
 )
-for path in "${ai_editor_paths[@]}"; do
+for path in "${repair_paths[@]}"; do
   blob="$(printf 'bounded editor fixture\n' | git hash-object -w --stdin)"
   GIT_INDEX_FILE="$temporary_directory/index" git read-tree HEAD
   GIT_INDEX_FILE="$temporary_directory/index" git update-index --add --cacheinfo 100644 "$blob" "$path"
@@ -626,7 +627,10 @@ for path in \
   packages/twenty-front/src/modules/advanced-text-editor/utils/hasEditorExtension.ts.backup \
   packages/twenty-front/src/modules/advanced-text-editor/hooks/nested/useTurnIntoBlockOptions.ts \
   packages/twenty-front/src/modules/advanced-text-editor/hooks/useTextBubbleState.ts \
-  packages/twenty-front/src/modules/advanced-text-editor/components/AdvancedTextEditor.tsx; do
+  packages/twenty-front/src/modules/advanced-text-editor/components/AdvancedTextEditor.tsx \
+  .github/workflows/ci-front.yaml.backup \
+  .github/workflows/nested/ci-front.yaml \
+  .github/workflows/ci-front-component-renderer.yaml; do
   blob="$(printf 'unauthorized editor fixture\n' | git hash-object -w --stdin)"
   GIT_INDEX_FILE="$temporary_directory/index" git read-tree HEAD
   GIT_INDEX_FILE="$temporary_directory/index" git update-index --add --cacheinfo 100644 "$blob" "$path"
