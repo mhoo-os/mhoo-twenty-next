@@ -1,6 +1,7 @@
 import { hasEditorExtension } from '@/advanced-text-editor/utils/hasEditorExtension';
 import { useLingui } from '@lingui/react/macro';
 import { type Editor, useEditorState } from '@tiptap/react';
+import { isDefined } from 'twenty-shared/utils';
 import {
   type IconComponent,
   IconH1,
@@ -24,7 +25,7 @@ const HEADING_ICONS: Record<number, IconComponent> = {
   3: IconH3,
 };
 
-export const useTurnIntoBlockOptions = (editor: Editor) => {
+export const useTurnIntoBlockOptions = (editor: Editor | null) => {
   const { t } = useLingui();
 
   const headingTitles: Record<number, string> = {
@@ -33,39 +34,49 @@ export const useTurnIntoBlockOptions = (editor: Editor) => {
     3: t`Heading 3`,
   };
 
-  return useEditorState({
-    editor,
-    selector: ({ editor }): TurnIntoBlockOptions[] => [
-      {
-        id: 'paragraph',
-        title: t`Paragraph`,
-        icon: IconPilcrow,
-        onClick: () => {
-          return editor.chain().focus().setParagraph().run();
-        },
-        disabled: () => {
-          return !editor.can().setParagraph();
-        },
-        isActive: () => {
-          return editor.isActive('paragraph');
-        },
-      },
-      ...(hasEditorExtension(editor, 'heading')
-        ? ([1, 2, 3] as const).map((level) => ({
-            id: `heading${level}`,
-            title: headingTitles[level],
-            icon: HEADING_ICONS[level],
+  return (
+    useEditorState({
+      editor,
+      // Tiptap can cache the previous editor snapshot across instance replacement.
+      // Read the current editor prop so destroyed snapshots cannot drive the menu.
+      selector: (): TurnIntoBlockOptions[] => {
+        if (!isDefined(editor) || editor.isDestroyed) {
+          return [];
+        }
+
+        return [
+          {
+            id: 'paragraph',
+            title: t`Paragraph`,
+            icon: IconPilcrow,
             onClick: () => {
-              return editor.chain().focus().setHeading({ level }).run();
+              return editor.chain().focus().setParagraph().run();
             },
             disabled: () => {
-              return !editor.can().setHeading({ level });
+              return !editor.can().setParagraph();
             },
             isActive: () => {
-              return editor.isActive('heading', { level });
+              return editor.isActive('paragraph');
             },
-          }))
-        : []),
-    ],
-  });
+          },
+          ...(hasEditorExtension(editor, 'heading')
+            ? ([1, 2, 3] as const).map((level) => ({
+                id: `heading${level}`,
+                title: headingTitles[level],
+                icon: HEADING_ICONS[level],
+                onClick: () => {
+                  return editor.chain().focus().setHeading({ level }).run();
+                },
+                disabled: () => {
+                  return !editor.can().setHeading({ level });
+                },
+                isActive: () => {
+                  return editor.isActive('heading', { level });
+                },
+              }))
+            : []),
+        ];
+      },
+    }) ?? []
+  );
 };

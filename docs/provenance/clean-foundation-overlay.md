@@ -59,6 +59,12 @@ MHO-146 Phase A source authorization:
   preserve that CI runner compatibility adjustment. This does not authorize
   another workflow, trigger, deployment, credential, or product path.
 
+- `.github/workflows/ci-front.yaml` is authorized solely for replacing the
+  unavailable `ubuntu-latest-8-cores` label with `ubuntu-latest` in the existing
+  `front-build` and `front-sb-build` jobs. All commands, gates, dependencies,
+  timeouts, heap settings, events and permissions remain unchanged. This adds
+  no deployment, runner purchase or other workflow authority.
+
 These are exact source-custody boundaries. A path that is adjacent, nested
 under another root, has a suffix or lookalike name, or belongs to another App
 or workflow remains rejected by the trajectory fixture.
@@ -296,3 +302,26 @@ behind the existing same-origin edge login. Enumerated paths:
 Only bearer-authenticated POST to the host-configured GraphQL URL may use
 browser same-origin credentials. Other App fetches and redirect restrictions
 retain their previous policy. This source permission is not deployed proof.
+
+## AI editor lifecycle repair
+
+The September 7 owner-authorized, source-only MHO-259 repair permits exactly:
+
+- `packages/twenty-front/src/modules/advanced-text-editor/utils/hasEditorExtension.ts`
+- `packages/twenty-front/src/modules/advanced-text-editor/utils/__tests__/hasEditorExtension.test.ts`
+- `packages/twenty-front/src/modules/advanced-text-editor/hooks/useTurnIntoBlockOptions.ts`
+- `packages/twenty-front/src/modules/advanced-text-editor/hooks/__tests__/useTurnIntoBlockOptions.test.tsx`
+- `docs/provenance/ai-editor-lifecycle.md`
+
+Scope is the confirmed AI instructions formatting-selector crash when a
+previous editor has been destroyed. The shared helper safely rejects missing
+or destroyed editors; the selector uses the current editor instance and emits
+no options while it is unavailable. This authorizes no editor redesign,
+dependency update, manifest/CORS change, Workspace mutation or deployment.
+
+PR37 CI test-maintenance scope additionally permits exactly
+`packages/twenty-front/src/testing/constants/UntestedAppPaths.ts` to classify
+six public Legal App routes outside the authenticated navigation test matrix.
+`DomainShell.test.tsx` already verifies these exact public routes bypass
+WorkspaceApp. The exhaustive count assertion and production navigation behavior
+remain unchanged; no adjacent test constants or hook implementation are included.
