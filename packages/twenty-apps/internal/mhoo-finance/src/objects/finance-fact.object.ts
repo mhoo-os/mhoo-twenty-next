@@ -1,3 +1,4 @@
+import * as PreparationIds from 'src/constants/universal-identifiers';
 import {
   defineObject,
   FieldType,
@@ -8,6 +9,12 @@ import {
 import {
   FINANCE_FACT_AMOUNT_FIELD_UNIVERSAL_IDENTIFIER,
   FINANCE_FACT_ARTIFACT_FIELD_UNIVERSAL_IDENTIFIER,
+  FINANCE_FACT_SOURCE_LOCATION_FIELD_UNIVERSAL_IDENTIFIER,
+  FINANCE_FACT_SOURCE_AMOUNT_FIELD_UNIVERSAL_IDENTIFIER,
+  FINANCE_FACT_SOURCE_SIGN_FIELD_UNIVERSAL_IDENTIFIER,
+  FINANCE_FACT_TRANSACTION_DATE_FIELD_UNIVERSAL_IDENTIFIER,
+  FINANCE_FACT_POSTED_DATE_FIELD_UNIVERSAL_IDENTIFIER,
+  FINANCE_FACT_RAW_VALUES_FIELD_UNIVERSAL_IDENTIFIER,
   FINANCE_FACT_CLASSIFICATION_FIELD_UNIVERSAL_IDENTIFIER,
   FINANCE_FACT_DESCRIPTION_FIELD_UNIVERSAL_IDENTIFIER,
   FINANCE_FACT_EXCLUSION_FIELD_UNIVERSAL_IDENTIFIER,
@@ -30,6 +37,7 @@ enum Classification {
   DISCOUNT = 'DISCOUNT',
   INTERNAL_TRANSFER = 'INTERNAL_TRANSFER',
   CARD_PAYMENT = 'CARD_PAYMENT',
+  UNCLASSIFIED = 'UNCLASSIFIED',
 }
 
 enum FactStatus {
@@ -44,11 +52,50 @@ export default defineObject({
   namePlural: 'financeFacts',
   labelSingular: 'Finance fact',
   labelPlural: 'Finance facts',
-  description: 'Normalized, revision-aware financial fact with bounded source lineage.',
+  description:
+    'Normalized, revision-aware financial fact with bounded source lineage.',
   icon: 'IconCurrencyDollar',
   labelIdentifierFieldMetadataUniversalIdentifier:
     FINANCE_FACT_KEY_FIELD_UNIVERSAL_IDENTIFIER,
   fields: [
+    {
+      universalIdentifier:
+        PreparationIds.FINANCE_FACT_ACCOUNT_FIELD_UNIVERSAL_IDENTIFIER,
+      type: FieldType.RELATION,
+      name: 'financialAccount',
+      label: 'Financial account',
+      icon: 'IconBuildingBank',
+      isNullable: true,
+      relationTargetObjectMetadataUniversalIdentifier:
+        PreparationIds.FINANCIAL_ACCOUNT_OBJECT_UNIVERSAL_IDENTIFIER,
+      relationTargetFieldMetadataUniversalIdentifier:
+        PreparationIds.FINANCIAL_ACCOUNT_FACTS_FIELD_UNIVERSAL_IDENTIFIER,
+      universalSettings: {
+        relationType: RelationType.MANY_TO_ONE,
+        onDelete: OnDeleteAction.SET_NULL,
+        joinColumnName: 'financialAccountId',
+      },
+    },
+    {
+      universalIdentifier:
+        PreparationIds.FINANCE_FACT_MINOR_FIELD_UNIVERSAL_IDENTIFIER,
+      type: FieldType.TEXT,
+      name: 'exactAmountMinor',
+      label: 'Exact amount (minor units)',
+      icon: 'IconCurrencyDollar',
+      isNullable: true,
+      description:
+        'Canonical signed integer text, inflow-positive. Validate with the shared money contract before publication.',
+    },
+    {
+      universalIdentifier:
+        PreparationIds.FINANCE_FACT_CURRENCY_FIELD_UNIVERSAL_IDENTIFIER,
+      type: FieldType.TEXT,
+      name: 'sourceCurrency',
+      label: 'Source currency',
+      icon: 'IconCurrencyDollar',
+      isNullable: true,
+    },
     {
       universalIdentifier: FINANCE_FACT_KEY_FIELD_UNIVERSAL_IDENTIFIER,
       type: FieldType.TEXT,
@@ -62,6 +109,53 @@ export default defineObject({
       name: 'sourceRowKey',
       label: 'Source row key',
       icon: 'IconTable',
+    },
+    {
+      universalIdentifier:
+        FINANCE_FACT_SOURCE_LOCATION_FIELD_UNIVERSAL_IDENTIFIER,
+      type: FieldType.TEXT,
+      name: 'sourceLocation',
+      label: 'Source location',
+      description: 'Exact file row or source record location.',
+      icon: 'IconMapPin',
+    },
+    {
+      universalIdentifier:
+        FINANCE_FACT_SOURCE_AMOUNT_FIELD_UNIVERSAL_IDENTIFIER,
+      type: FieldType.TEXT,
+      name: 'sourceAmount',
+      label: 'Original source amount',
+      icon: 'IconReceipt',
+    },
+    {
+      universalIdentifier: FINANCE_FACT_SOURCE_SIGN_FIELD_UNIVERSAL_IDENTIFIER,
+      type: FieldType.TEXT,
+      name: 'sourceSignConvention',
+      label: 'Source sign convention',
+      icon: 'IconArrowsExchange',
+    },
+    {
+      universalIdentifier:
+        FINANCE_FACT_TRANSACTION_DATE_FIELD_UNIVERSAL_IDENTIFIER,
+      type: FieldType.TEXT,
+      name: 'transactionDate',
+      label: 'Transaction date',
+      icon: 'IconCalendar',
+    },
+    {
+      universalIdentifier: FINANCE_FACT_POSTED_DATE_FIELD_UNIVERSAL_IDENTIFIER,
+      type: FieldType.TEXT,
+      name: 'postedDate',
+      label: 'Posted date',
+      icon: 'IconCalendarCheck',
+      isNullable: true,
+    },
+    {
+      universalIdentifier: FINANCE_FACT_RAW_VALUES_FIELD_UNIVERSAL_IDENTIFIER,
+      type: FieldType.TEXT,
+      name: 'rawValues',
+      label: 'Unmodified source values',
+      icon: 'IconBraces',
     },
     {
       universalIdentifier: FINANCE_FACT_ARTIFACT_FIELD_UNIVERSAL_IDENTIFIER,
@@ -95,19 +189,69 @@ export default defineObject({
       icon: 'IconCurrencyDollar',
     },
     {
-      universalIdentifier: FINANCE_FACT_CLASSIFICATION_FIELD_UNIVERSAL_IDENTIFIER,
+      universalIdentifier:
+        FINANCE_FACT_CLASSIFICATION_FIELD_UNIVERSAL_IDENTIFIER,
       type: FieldType.SELECT,
       name: 'classification',
       label: 'Classification',
       icon: 'IconCategory',
       options: [
-        { id: 'e9e1d2f3-a4b5-4678-9012-3456789abd01', value: Classification.REVENUE, label: 'Revenue', color: 'green', position: 0 },
-        { id: 'e9e1d2f3-a4b5-4678-9012-3456789abd02', value: Classification.OPERATING_EXPENSE, label: 'Operating expense', color: 'red', position: 1 },
-        { id: 'e9e1d2f3-a4b5-4678-9012-3456789abd03', value: Classification.REFUND, label: 'Refund', color: 'orange', position: 2 },
-        { id: 'e9e1d2f3-a4b5-4678-9012-3456789abd04', value: Classification.VOID, label: 'Void', color: 'gray', position: 3 },
-        { id: 'e9e1d2f3-a4b5-4678-9012-3456789abd05', value: Classification.DISCOUNT, label: 'Discount', color: 'yellow', position: 4 },
-        { id: 'e9e1d2f3-a4b5-4678-9012-3456789abd06', value: Classification.INTERNAL_TRANSFER, label: 'Internal transfer', color: 'purple', position: 5 },
-        { id: 'e9e1d2f3-a4b5-4678-9012-3456789abd07', value: Classification.CARD_PAYMENT, label: 'Card payment', color: 'blue', position: 6 },
+        {
+          id: 'e9e1d2f3-a4b5-4678-9012-3456789abd01',
+          value: Classification.REVENUE,
+          label: 'Revenue',
+          color: 'green',
+          position: 0,
+        },
+        {
+          id: 'e9e1d2f3-a4b5-4678-9012-3456789abd02',
+          value: Classification.OPERATING_EXPENSE,
+          label: 'Operating expense',
+          color: 'red',
+          position: 1,
+        },
+        {
+          id: 'e9e1d2f3-a4b5-4678-9012-3456789abd03',
+          value: Classification.REFUND,
+          label: 'Refund',
+          color: 'orange',
+          position: 2,
+        },
+        {
+          id: 'e9e1d2f3-a4b5-4678-9012-3456789abd04',
+          value: Classification.VOID,
+          label: 'Void',
+          color: 'gray',
+          position: 3,
+        },
+        {
+          id: 'e9e1d2f3-a4b5-4678-9012-3456789abd05',
+          value: Classification.DISCOUNT,
+          label: 'Discount',
+          color: 'yellow',
+          position: 4,
+        },
+        {
+          id: 'e9e1d2f3-a4b5-4678-9012-3456789abd06',
+          value: Classification.INTERNAL_TRANSFER,
+          label: 'Internal transfer',
+          color: 'purple',
+          position: 5,
+        },
+        {
+          id: 'e9e1d2f3-a4b5-4678-9012-3456789abd07',
+          value: Classification.CARD_PAYMENT,
+          label: 'Card payment',
+          color: 'blue',
+          position: 6,
+        },
+        {
+          id: 'e9e1d2f3-a4b5-4678-9012-3456789abd10',
+          value: Classification.UNCLASSIFIED,
+          label: 'Unclassified source row',
+          color: 'gray',
+          position: 7,
+        },
       ],
     },
     {
@@ -117,9 +261,27 @@ export default defineObject({
       label: 'Status',
       icon: 'IconProgress',
       options: [
-        { id: 'e9e1d2f3-a4b5-4678-9012-3456789abd08', value: FactStatus.POSTED, label: 'Posted', color: 'green', position: 0 },
-        { id: 'e9e1d2f3-a4b5-4678-9012-3456789abd09', value: FactStatus.PENDING, label: 'Pending', color: 'yellow', position: 1 },
-        { id: 'e9e1d2f3-a4b5-4678-9012-3456789abda0', value: FactStatus.SUPERSEDED, label: 'Superseded', color: 'gray', position: 2 },
+        {
+          id: 'e9e1d2f3-a4b5-4678-9012-3456789abd08',
+          value: FactStatus.POSTED,
+          label: 'Posted',
+          color: 'green',
+          position: 0,
+        },
+        {
+          id: 'e9e1d2f3-a4b5-4678-9012-3456789abd09',
+          value: FactStatus.PENDING,
+          label: 'Pending',
+          color: 'yellow',
+          position: 1,
+        },
+        {
+          id: 'e9e1d2f3-a4b5-4678-9012-3456789abda0',
+          value: FactStatus.SUPERSEDED,
+          label: 'Superseded',
+          color: 'gray',
+          position: 2,
+        },
       ],
     },
     {

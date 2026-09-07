@@ -35,6 +35,16 @@ Trajectory-eval paths:
 
 MHO-146 Phase A source authorization:
 
+- MHO-259 owner-authorized loader authentication source repair permits
+  `packages/twenty-front-component-renderer/src/host/component-source/utils/fetchComponentSourceFromNetwork.ts`,
+  `fetchJavaScriptModuleSourceText.ts` and their corresponding tests in that
+  directory's `__tests__/`, plus
+  `scripts/provenance/front-component-cookie-browser.cjs` and
+  `docs/provenance/front-component-cookie-auth.md`. Scope: same-origin code
+  loading through an existing authenticated edge, preserving cross-origin
+  cookie omission and storage handoff isolation. This authorizes no Access
+  policy change, deployment, or expanded App record permissions.
+
 - `packages/twenty-apps/internal/mhoo-finance/` is the exact internal App
   subtree authorized for the fixture-first Finance Phase A slice in PR #22.
   It contains only the native Twenty Finance objects, views, navigation,
@@ -249,3 +259,40 @@ or second financial source of truth.
 
 These paths authorize source-level branding work only. They do not authorize
 runtime deployment, publication, legal approval, or production mutation.
+
+MHO-240 system SMTP acknowledgement correction (source-only):
+
+- `packages/twenty-server/src/engine/core-modules/email/drivers/smtp.driver.ts`
+- `packages/twenty-server/src/engine/core-modules/email/drivers/smtp.driver.spec.ts`
+
+These exact paths permit awaiting SMTP acknowledgement and propagating rejection,
+with mock-only regression tests. Existing EmailService retryLimit3 (four total
+BullMQ attempts) is unchanged; no new retry loop or exactly-once guarantee is
+introduced. A connection failure after provider acceptance may still be ambiguous;
+manual retries require provider/inbox reconciliation. This source correction does
+not authorize SMTP configuration, credentials, sends, or deployment.
+
+MHO-255 image identity and fail-closed startup paths:
+
+- `packages/twenty-docker/twenty/Dockerfile`
+- `packages/twenty-docker/twenty/entrypoint.sh`
+- `packages/twenty-docker/twenty/test_entrypoint.py`
+- `packages/twenty-server/src/database/scripts/` (initialization validation and setup failure propagation)
+- `deploy/twenty-next/mho255-*` (disposable synthetic PG16 acceptance only)
+
+The Dockerfile custody hash follows the reviewed distribution Dockerfile; the upstream commit/tree and lockfile provenance remain unchanged. Runtime semantic version and OCI source revision are independent build inputs. No serving-host build, production promotion, or database repair is introduced.
+
+## GraphQL edge authentication follow-up
+
+The owner-authorized saved-sample integration requires native Core API reads
+behind the existing same-origin edge login. Enumerated paths:
+
+- `packages/twenty-front-component-renderer/src/types/HostFetchPolicy.ts`
+- `packages/twenty-front-component-renderer/src/host/fetch/utils/createHostFetchEnforcingPolicy.ts`
+- `packages/twenty-front-component-renderer/src/host/fetch/utils/buildHostFetchPolicyFromFrontComponentUrls.ts`
+- Their exact `__tests__/<name>.test.ts` counterparts.
+- `docs/provenance/front-component-graphql-edge-auth.md`
+
+Only bearer-authenticated POST to the host-configured GraphQL URL may use
+browser same-origin credentials. Other App fetches and redirect restrictions
+retain their previous policy. This source permission is not deployed proof.
