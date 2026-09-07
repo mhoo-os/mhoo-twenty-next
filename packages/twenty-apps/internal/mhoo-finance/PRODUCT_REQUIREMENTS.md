@@ -1,4 +1,4 @@
-# Finance investigation workspace
+# Finance: structured data, validated functions and flexible analysis
 
 Status: consolidated product requirements and bounded implementation plan, September 7, 2026. This document records existing owner decisions and MHO146/Finance project requirements; explicitly proposed extensions are not implementation or operational authorization.
 
@@ -6,7 +6,9 @@ ARCHITECTURE IMPACT: LOCAL
 
 ## Product outcome
 
-A reviewer should understand what source data is available, identify a justified reconciliation question, inspect the affected transactions, and verify the exact original evidence without needing an agent. Agents can help choose and explain the investigation, but cannot own arithmetic, source completeness or approved findings.
+Finance is an independent reusable financial-data App: structured source-backed records, validated financial functions, and bounded agent skills/tools that support different audits and analytical questions. Hass Kitchen is the first engagement and the transaction-to-evidence journey is the first usable slice, not a hardcoded product-wide workflow.
+
+A user can explore available records, compare periods, investigate a reconciliation question or verify original evidence without an agent. Approved functions compose around a selected scope and question; users do not have to traverse every exception/review screen for ordinary read-only analysis. An agent may select, sequence and explain authorized tools, but cannot own arithmetic, source completeness or approved findings. Native workflows coordinate repeatable work where useful, rather than replacing flexible investigation with one mandatory script.
 
 This is a purpose-built Finance App on Twenty, not a bookkeeping replacement or a collection of generic lists. Twenty owns identities, memberships, permissions, records, Files, workflows, App execution and native UI. Finance owns financial definitions and deterministic procedures inside that framework. Providers own their source facts; human reviewers own final dispositions. The owner has settled a standalone native Twenty Clover App as the owner of Clover connection lifecycle and ingestion. Finance consumes its authorized relevant data, never its credentials. Existing synthetic Cloudflare work and Data Analytics are governed consumers, not another authoritative ledger.
 
@@ -14,13 +16,22 @@ This is a purpose-built Finance App on Twenty, not a bookkeeping replacement or 
 
 - Working horizon is approximately 2020–2026; do not repeatedly ask for exact dates. Actual examined periods must always be reported separately.
 - Prepare the workspace model, functions and layouts using the data already available, before clients join with more data.
+- Current intake modes are manually supplied bank statements/exports and ChatGPT Finance/Plaid CSV exports referenced in Linear. No live connector is a prerequisite for the reusable Finance data/function layer. Statements are an intake mode; this does not claim that balance-control statements or their original Files have already been supplied and verified for the current sample.
 - The supplied recent exports came from the Finance plugin in ChatGPT using Plaid, according to the owner. This does not establish a live Workspace Plaid connection or independently attest the plugin's transformations.
 - Available combined export contains 3,432 unique transactions, the union of checking/card exports, spanning 2024-09-02–2026-09-04. Never count the combined file and constituent files as separate populations.
 - Twenty currently holds a bounded 20-row sample selection, two sample accounts and two partial source references. Samples remain UNCLASSIFIED, excluded from totals and unreconciled. Uploaded original Files and statement balance controls are not established.
 - Known engagement inputs already recorded in Linear: Specialized Chubby Group LLC; Narttapart Sintupanpratu and Punnada Limphoka. Recorded names are not substitutes for the engagement/source attestations required by the existing gates.
 - Host release approval applies to its existing frozen image/packet. PR36 App merge/install is separate. No new provider connection, import, permission expansion or production effect follows from this PRD.
 
-## Core journey and screens
+## Reusable function and tool contract
+
+Expose bounded operations over the same governed model: source/coverage inspection, filtered transaction reads, exact-money summaries where qualified, reconciliation procedures, and fact/source traces. Their shared input envelope names the authorized scope, account/source/period, version or snapshot, metric/procedure and pagination limits. Outputs carry provenance, exclusions, coverage and exploratory/reviewed state. Missing prerequisites return an explicit incomplete/not-applicable result; an analytical question must not silently trigger ingestion, classification or publishing.
+
+Validated functions own financial arithmetic and deterministic logic. Agent skills teach how to select those functions, distinguish evidence from inference and follow a source trace. Tools expose explicit schemas and permissions rather than an arbitrary financial code executor. A new audit should reuse the same records/functions with a different authorized scope or registered procedure, not clone an App or fork a dashboard. New procedures still require their own definitions and tests before use.
+
+Acceptance must include at least two distinct questions over the same fixture/snapshot (for example, source coverage and an account-period transaction breakdown), proving common scope/provenance and no duplicated ledger or special Hass-only schema. A statement reconciliation is one procedure with additional prerequisites, not the only supported entry point. This broad product contract does not claim the functions or agent skills are all installed today.
+
+## First vertical slice: journey and screens
 
 | Screen | Question answered | Required behavior |
 | --- | --- | --- |
@@ -51,7 +62,7 @@ Historical completion, pagination, removals/corrections and acquisition failures
 
 ## Deterministic reconciliation and review
 
-The first complete procedure should be one account/month statement balance and continuity check against a named eligible snapshot. Explicitly record opening/closing controls, transaction eligibility, exact money, tolerance and exclusions. Separate internal transfers/card payments before interpreting revenue or expenses. Full restaurant procedures and many-to-many settlements remain existing later issue scope.
+The first complete reconciliation procedure should be one account/month statement balance and continuity check against a named eligible snapshot; ordinary exploratory reads can run independently with their own honest coverage limits. Explicitly record opening/closing controls, transaction eligibility, exact money, tolerance and exclusions. Separate internal transfers/card payments before interpreting revenue or expenses. Full restaurant procedures and many-to-many settlements remain existing later issue scope.
 
 A completed validated import can trigger a bounded reconciliation function. Publish its run receipt and exception records through native APIs; use a native workflow to route a review/evidence task. Scope database-event triggers to relevant status changes and make retries idempotent. Do not run duplicate financial logic in UI, workflow Code steps and agent prompts.
 
