@@ -32,12 +32,17 @@ const jestConfig: JestConfigWithTsJest = {
     // Requires an app booted as a secure deployment; run through
     // jest-integration-secure.config.ts (nx test:integration:secure).
     '<rootDir>/test/integration/secure-deployment',
+    // Dedicated App-install/queue proof requires its disposable DB/Redis and
+    // built Clover manifest. Run via jest-clover-proof.config.ts.
+    '<rootDir>/test/integration/metadata/suites/application/clover-native-data.integration-spec.ts',
   ],
   testRegex: '\\.integration-spec\\.ts$',
   modulePathIgnorePatterns: ['<rootDir>/dist'],
   globalSetup: '<rootDir>/test/integration/utils/setup-test.ts',
   globalTeardown: '<rootDir>/test/integration/utils/teardown-test.ts',
-  setupFilesAfterEnv: ['<rootDir>/test/integration/utils/setup-wait-for-all-jobs-between-tests.ts'],
+  setupFilesAfterEnv: [
+    '<rootDir>/test/integration/utils/setup-wait-for-all-jobs-between-tests.ts',
+  ],
   testTimeout: 20000,
   maxWorkers: 1,
   // jsdom 29 and msw ship ESM-only transitive deps (parse5, entities,

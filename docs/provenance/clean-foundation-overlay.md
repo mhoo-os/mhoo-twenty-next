@@ -375,3 +375,9 @@ for Clover's source-only checks. Other Apps retain their standalone dependency
 workflow. The App consumes the modified native manual-token/grant contracts,
 which are absent from the published 2.37 SDK. No dependency, trigger, credential
 or deployment permission is added.
+
+The exact `packages/twenty-server/jest-clover-proof.config.ts` and
+`packages/twenty-server/jest-integration.config.ts` files select the dedicated
+Clover App-install/queue proof separately from generic integration discovery.
+The suite's fixed disposable database guard and prerequisites remain intact;
+this test profile creates no production or provider authority.

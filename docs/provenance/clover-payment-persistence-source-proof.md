@@ -127,3 +127,19 @@ passed (expanded suite 44.557 seconds). The test environment was restored exactl
 Remote `b377907836f1e2595a23e6cbf4ee43a2030e4fc2` Clover App CI, clean-foundation
 build, shared CI and trajectory evaluation passed. Later source commits require
 their own CI receipts.
+
+## Dedicated test profile
+
+Run the App build first, then the disposable native suite using
+`NODE_ENV=test jest --config jest-clover-proof.config.ts --runInBand` from the
+server package. It retains standard engine setup and selects the same six cases.
+The suite hard-requires database `clover_native_synthetic` on loopback port 55441,
+Redis on loopback port 56391, and server URL `http://localhost:4000`. Generic
+integration discovery excludes this resource-bound suite so ordinary CI cannot
+accidentally run the App-install/worker fixture against its general test database.
+The dedicated proof remains a separately run local receipt, not a broad-CI claim.
+
+Dedicated-profile validation passed all six cases in 71.286 seconds. Discovery
+selects exactly the Clover suite; the generic profile retains 593 other suites.
+The suite now explicitly checks the dedicated Redis URL and server URL as well
+as the database before any fixture activity. Test environment restored exactly.

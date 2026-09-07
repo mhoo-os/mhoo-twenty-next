@@ -27,12 +27,21 @@ import { SEED_APPLE_WORKSPACE_ID } from 'src/engine/workspace-manager/dev-seeder
 
 // This suite installs metadata and writes synthetic records. Never run on another DB.
 const isolated = new URL(process.env.PG_DATABASE_URL!);
+const isolatedQueue = new URL(
+  process.env.REDIS_QUEUE_URL || process.env.REDIS_URL!,
+);
 if (
   isolated.hostname !== '127.0.0.1' ||
   isolated.port !== '55441' ||
-  isolated.pathname !== '/clover_native_synthetic'
+  isolated.pathname !== '/clover_native_synthetic' ||
+  isolatedQueue.hostname !== '127.0.0.1' ||
+  isolatedQueue.port !== '56391' ||
+  !['', '/', '/0'].includes(isolatedQueue.pathname) ||
+  process.env.SERVER_URL !== 'http://localhost:4000'
 )
-  throw new Error('Dedicated Clover synthetic database required');
+  throw new Error(
+    'Dedicated Clover synthetic database, queue and server required',
+  );
 const output = resolve('../twenty-apps/internal/mhoo-clover/.twenty/output');
 const clover: Manifest = JSON.parse(
   readFileSync(resolve(output, 'manifest.json'), 'utf8'),
