@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { ForbiddenException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { isNonEmptyString } from '@sniptt/guards';
@@ -62,6 +62,28 @@ export class WorkspaceDomainsService {
     });
 
     return url.toString();
+  }
+
+  isSameOriginWorkspaceMode(): boolean {
+    return (
+      this.twentyConfigService.get('IS_MULTIWORKSPACE_ENABLED') &&
+      this.twentyConfigService.get('IS_SAME_ORIGIN_WORKSPACE_ENABLED')
+    );
+  }
+
+  // Call only after native cryptographic login-token verification. This method
+  // does not grant membership; the caller must still recheck user access/MFA.
+  async getWorkspaceForVerifiedLoginToken(origin: string, workspaceId: string) {
+    if (!this.isSameOriginWorkspaceMode()) {
+      return this.getWorkspaceByOriginOrDefaultWorkspace(origin);
+    }
+    if (origin !== this.domainServerConfigService.getFrontUrl().origin) {
+      throw new ForbiddenException('Use the canonical application origin.');
+    }
+    return this.workspaceRepository.findOne({
+      where: { id: workspaceId },
+      relations: ['workspaceSSOIdentityProviders'],
+    });
   }
 
   private async getDefaultWorkspace() {
@@ -240,9 +262,11 @@ export class WorkspaceDomainsService {
   private getTwentyWorkspaceUrl(subdomain: string) {
     const url = this.domainServerConfigService.getFrontUrl();
 
-    url.hostname = this.twentyConfigService.get('IS_MULTIWORKSPACE_ENABLED')
-      ? `${subdomain}.${url.hostname}`
-      : url.hostname;
+    url.hostname =
+      this.twentyConfigService.get('IS_MULTIWORKSPACE_ENABLED') &&
+      !this.isSameOriginWorkspaceMode()
+        ? `${subdomain}.${url.hostname}`
+        : url.hostname;
 
     return url.toString();
   }
@@ -276,7 +300,9 @@ export class WorkspaceDomainsService {
   }: WorkspaceDomainConfig) {
     return {
       customUrl:
-        isCustomDomainEnabled && customDomain
+        !this.isSameOriginWorkspaceMode() &&
+        isCustomDomainEnabled &&
+        customDomain
           ? this.getCustomWorkspaceUrl(customDomain)
           : undefined,
       subdomainUrl: this.getTwentyWorkspaceUrl(subdomain),

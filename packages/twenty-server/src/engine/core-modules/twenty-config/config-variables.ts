@@ -1941,6 +1941,15 @@ export class ConfigVariables {
   IS_MULTIWORKSPACE_ENABLED = false;
 
   @ConfigVariablesMetadata({
+    group: ConfigVariablesGroup.SERVER_CONFIG,
+    description:
+      'Use the canonical frontend origin for native Workspace sessions; requires multi-workspace mode',
+    type: ConfigVariableType.BOOLEAN,
+  })
+  @IsOptional()
+  IS_SAME_ORIGIN_WORKSPACE_ENABLED = false;
+
+  @ConfigVariablesMetadata({
     group: ConfigVariablesGroup.ADVANCED_SETTINGS,
     description:
       'Number of inactive days before sending a deletion warning for workspaces. Used in the workspace deletion cron job to determine when to send warning emails.',
