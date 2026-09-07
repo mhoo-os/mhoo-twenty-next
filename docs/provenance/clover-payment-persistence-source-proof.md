@@ -396,3 +396,72 @@ this Clover worker. HTTP event adaptation, handler/UI invocation, installed
 settings and native permission/grant acceptance remain separately unproved.
 No publication or broader authority is implied. Changed adapter inputs/native
 SDK contracts invalidate affected local evidence; none is a runtime claim.
+
+## Authenticated status source wiring
+
+Source-only follow-up on `32929b86c2210e9dc4b8c26859a5eefb16817425`, isolated
+`codex/clover-status-route`. Reuse existing native route, runtime and status
+adapter; only merchant-list/status reads, no history or grant mutation. Preserve
+original dirty7fb and accepted local commits. Status/settings IDs are selectively
+reused from the previously hashed dirty identifier file; handler is newly wired,
+not a copy of its unsafe generic executor path.
+
+Native source inspection: jwt.auth.strategy validates delegated App tokens and
+resolves user/Workspace membership; authenticated route-trigger verifies the
+Workspace and forwards user identifiers to the executor. The executor resolves
+workspaceMemberId and generates separate delegated-user/App tokens. Handler uses
+only that verified execution context, never event.userWorkspaceId, headers,
+rawBody or body identity claims. Native buildLogicFunctionEvent wraps JSON as
+body. Although forwardedRequestHeaders is empty, isolated-origin routes use
+forwardAllHeaders; no claim is made that the platform never forwards headers.
+The new handler ignores and never returns those fields.
+
+New focused tests are justified by route/event/body/context and client wiring:
+actual native event builder/response mapper plus injected SDK/fetch transport.
+No service or metadata writes. Existing adapter/history/grant/queue/UI tests are
+reused, not rerun. Settings uses shared PaymentStatus and native RestApiClient
+runAs:user at /s/clover/operator-status. No executeOne, WORKFLOWS expansion,
+cron, tool exposure or provider read. Actual installed route/permissions remain
+unproved; local mocks do not grant acceptance.
+
+Focused source result: six route/client tests passed, affected lint and App
+TypeScript passed. Native App `dev:build` passed (19 files), including typecheck.
+Built manifest inspection confirms one authenticated POST status route, one
+settings component using the retained stable UID, and existing role ceilings:
+only CONNECTED_ACCOUNTS flag, no all-tools/all-settings expansion. No other
+logic functions acquire HTTP/tool/cron exposure. Tests use native event/response
+builders but mocked SDK/fetch; they do not prove deployed authentication.
+
+During packaging inspection an assertion incorrectly expected usesSdkClient=true.
+The actual SDK build-result processor marks external generated SDK imports only;
+front-component external modules include core/metadata, not rest. RestApiClient
+is bundled, so false is correct. Direct delegated client construction now lives
+in the settings entrypoint and is injected into the helpers; its changed wiring
+was followed by the same six focused tests and build. Corrected manifest
+assertion passed. Native worker environment injection is independent of that
+external-module flag. No native host changes were made. Existing deprecated
+application default-role declaration warning remains; it is not a new failure.
+
+UX limitation: after initial merchant-list success, Refresh status reloads the
+selected status rather than the connection list. Reopening settings reloads the
+list; post-revocation selection still rechecks the server adapter's current
+user/App/grant path. Do not claim dynamic connection-list refresh or installed
+revocation proof. Broad isolated-origin header forwarding remains a platform
+behavior; tests deliberately include raw headers and spoofed event identity,
+while the handler reads only body selectors and verified execution context.
+
+Reproduction references from App root: Vitest `vitest.unit.config.ts` target
+`src/__tests__/status-route.test.ts`, affected-file oxlint, native SDK CLI
+`dev:build`. Initial focused completion was observed at 2026-09-07 12:43:44 UTC;
+final detailed source/build/artifact timestamp and hashes are in
+`/Users/mhoooo/.codex/visualizations/2026/09/05/01a073d5-22c3-7123-89ad-ebf486cdc93a/clover-status-route/receipt.json`.
+No unchanged history/grant/queue/renderer tests were rerun. Original dirty7fb
+files remain separate and are hash-checked at closeout. No service started;
+only the owned dependency link is removed. Ignored local App build output is
+retained as evidence, not installed or published.
+
+Next owner: coordinating head `01a07aa7-944a-70c3-bf77-d51b9fc766f2` reviews
+exact local source and updates its existing Linear checkpoint. Retained Clover
+worker owns subsequent explicitly scoped work. Actual installed settings/route
+and native user/App/grant enforcement remain unproved; no publication, install,
+merge or provider access authority is inferred from this source increment.
