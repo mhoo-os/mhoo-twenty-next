@@ -2,6 +2,7 @@ import 'twenty-ui/style.css';
 
 import styled from '@emotion/styled';
 import { useState } from 'react';
+import { FinanceSourceEntry } from 'src/components/finance-source-entry';
 import { FinanceSavedSamples } from 'src/components/finance-saved-samples';
 import { defineFrontComponent } from 'twenty-sdk/define';
 import { Status, Tag, type TagColor } from 'twenty-ui/data-display';
@@ -481,6 +482,7 @@ export const FinanceWorkspacePreparation = () => {
         title="Exploratory workspace"
         description="Record counts describe stored records visible to you, not complete account history. Samples remain unclassified and excluded. Financial totals require reviewed coverage, reconciliation and a published snapshot."
       />
+      <FinanceSourceEntry />
       <FinanceSavedSamples />
       <StyledMetricGrid>
         {[
