@@ -18,7 +18,7 @@ import {
 import { ApplicationEntity } from 'src/engine/core-modules/application/application.entity';
 import { ConnectionProviderEntity } from 'src/engine/core-modules/application/connection-provider/connection-provider.entity';
 import {
-  CLOVER_FINANCE_APPLICATION,
+  CLOVER_APPLICATION,
   CLOVER_MANUAL_PROVIDER,
 } from 'src/engine/core-modules/clover-token/clover-connection.constants';
 import { plaintextStringSchema } from 'src/engine/core-modules/secret-encryption/branded-strings/plaintext-string.type';
@@ -270,7 +270,7 @@ export class CloverTokenService {
 
   private async resolveBinding(manager: EntityManager, workspaceId: string) {
     const application = await manager.getRepository(ApplicationEntity).findOne({
-      where: { workspaceId, universalIdentifier: CLOVER_FINANCE_APPLICATION },
+      where: { workspaceId, universalIdentifier: CLOVER_APPLICATION },
     });
     const provider =
       application &&
@@ -284,7 +284,7 @@ export class CloverTokenService {
       }));
     if (!application?.defaultRoleId || !provider || provider.oauthConfig) {
       throw new ForbiddenException(
-        'Install the Finance manual Clover provider before connecting.',
+        'Install the Clover App and its manual-token provider before connecting.',
       );
     }
     return provider;

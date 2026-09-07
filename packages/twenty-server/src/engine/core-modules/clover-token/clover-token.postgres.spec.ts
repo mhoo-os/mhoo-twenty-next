@@ -3,7 +3,7 @@ import { SyncableEntity } from 'src/engine/workspace-manager/types/syncable-enti
 import { ApplicationEntity } from 'src/engine/core-modules/application/application.entity';
 import { ConnectionProviderEntity } from 'src/engine/core-modules/application/connection-provider/connection-provider.entity';
 import {
-  CLOVER_FINANCE_APPLICATION,
+  CLOVER_APPLICATION,
   CLOVER_MANUAL_PROVIDER,
 } from 'src/engine/core-modules/clover-token/clover-connection.constants';
 import { randomUUID } from 'crypto';
@@ -201,7 +201,7 @@ suite('Clover PostgreSQL atomicity', () => {
     });
     const app = await db.getRepository(ApplicationEntity).save({
       workspaceId: actor.workspaceId,
-      universalIdentifier: CLOVER_FINANCE_APPLICATION,
+      universalIdentifier: CLOVER_APPLICATION,
       defaultRoleId: randomUUID(),
     });
     await db.getRepository(ConnectionProviderEntity).save({

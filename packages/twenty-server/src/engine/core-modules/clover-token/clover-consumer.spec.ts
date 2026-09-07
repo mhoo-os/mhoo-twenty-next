@@ -1,4 +1,4 @@
-import merchantFunction from '../../../../../twenty-apps/internal/mhoo-finance/src/logic-functions/clover-merchant-read.logic-function';
+import merchantFunction from '../../../../../twenty-apps/internal/mhoo-clover/src/logic-functions/clover-merchant-read.logic-function';
 import { ConnectedAccountResolver } from 'src/engine/metadata-modules/connected-account/resolvers/connected-account.resolver';
 import { randomUUID } from 'crypto';
 import { ApplicationEntity } from 'src/engine/core-modules/application/application.entity';
@@ -11,7 +11,7 @@ import {
 } from 'src/engine/core-modules/app-token/app-token.entity';
 import { CloverTokenService } from 'src/engine/core-modules/clover-token/clover-token.service';
 import {
-  CLOVER_FINANCE_APPLICATION,
+  CLOVER_APPLICATION,
   CLOVER_MANUAL_PROVIDER,
 } from 'src/engine/core-modules/clover-token/clover-connection.constants';
 import { SecretEncryptionService } from 'src/engine/core-modules/secret-encryption/secret-encryption.service';
@@ -23,11 +23,11 @@ import { ConnectedAccountMetadataService } from 'src/engine/metadata-modules/con
 import { PermissionsService } from 'src/engine/metadata-modules/permissions/permissions.service';
 import { WorkspaceActivationStatus } from 'twenty-shared/workspace';
 import { SystemPermissionFlag } from 'twenty-shared/constants';
-import { readCloverMerchant } from '../../../../../twenty-apps/internal/mhoo-finance/src/logic-functions/clover-merchant-read';
+import { readCloverMerchant } from '../../../../../twenty-apps/internal/mhoo-clover/src/logic-functions/clover-merchant-read';
 
-// Composed native services + actual Finance read, with synthetic repositories,
+// Composed native services + actual Clover read, with synthetic repositories,
 // cached role metadata and provider transport. This is not a deployed JWT/E2E proof.
-describe('manual intake to native Finance consumption', () => {
+describe('manual intake to native Clover consumption', () => {
   const actor = {
     userId: randomUUID(),
     workspaceId: randomUUID(),
@@ -64,7 +64,7 @@ describe('manual intake to native Finance consumption', () => {
     application = {
       id: randomUUID(),
       workspaceId: actor.workspaceId,
-      universalIdentifier: CLOVER_FINANCE_APPLICATION,
+      universalIdentifier: CLOVER_APPLICATION,
       defaultRoleId: 'app-role',
     };
     provider = {
@@ -372,7 +372,7 @@ describe('manual intake to native Finance consumption', () => {
 
   it('requires an installed matching manual provider before intake', async () => {
     provider = null;
-    await expect(submit()).rejects.toThrow('Install the Finance');
+    await expect(submit()).rejects.toThrow('Install the Clover App');
     expect(rows).toHaveLength(0);
   });
 
@@ -397,7 +397,7 @@ describe('manual intake to native Finance consumption', () => {
     ).rejects.toThrow('permission');
     expect(rows).toHaveLength(1);
   });
-  it('runs the Finance handler and SDK as the user and denies reuse after disconnect', async () => {
+  it('runs the Clover handler and SDK as the user and denies reuse after disconnect', async () => {
     const receipt = await submit();
     const keys = [
       'TWENTY_API_URL',
