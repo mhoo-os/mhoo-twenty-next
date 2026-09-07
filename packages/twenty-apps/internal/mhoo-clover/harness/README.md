@@ -23,3 +23,24 @@ All responses are injected fixtures. No provider requests, credentials, native
 records, queue dispatch, new backend, install or deployment. Browser query
 parameters choose a harness label only and carry no authority. A real adapter
 must independently resolve native user/App/Workspace permission before access.
+
+## Actual local Remote DOM case
+
+This follow-up uses the source `FrontComponentRenderer`, its sandbox iframe and
+worker, and the SDK's normal remote JSX/CSS build plugins. It does not install an
+App. With the existing repository dependencies/SDK/UI builds available, run from
+repository root:
+
+```
+node_modules/.bin/tsx packages/twenty-front-component-renderer/scripts/front-component-sandbox/build-sandbox-document.ts
+node packages/twenty-apps/internal/mhoo-clover/harness/verify-remote.mjs /tmp/clover-remote-proof
+```
+
+The first command generates the ignored sandbox document in an isolated
+checkout. Preserve any pre-existing file; remove only a file this run created
+when finished. The second binds only loopback 4332, refuses non-local requests,
+and closes its browser/server. `remote-host.jsx` is a JavaScript browser fixture
+so the App compiler does not typecheck the host package through its different
+path aliases. Its actual renderer imports are bundled and exercised, not mocked.
+`remote-fixture.tsx` uses the worker module's render-container ABI and shares the
+unchanged PaymentStatus. Neither file declares an installable App definition.

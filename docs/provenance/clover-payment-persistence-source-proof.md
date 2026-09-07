@@ -253,3 +253,71 @@ worker after separate scoped dispatch. Separate repository ownership remains
 proposed. Source or adapter changes invalidate affected local proof; none of
 this establishes deployed behavior. The final commit and source-gate results
 are supplied in the handoff; existing queue evidence was not rerun.
+
+
+## Actual Remote DOM compatibility follow-up
+
+New scoped dispatch permits one local native renderer case; do not rerun the
+accepted ordinary-DOM/domain/queue proof. Base is local
+`8adde912c490e96947e9286f86e1c03bc6c97696`, isolated branch
+`codex/clover-remote-dom-trial` in the existing trial worktree. The accepted
+commit remains reachable; original 7fb dirty checkout remains separate.
+Changed input: a native worker module wrapper and actual FrontComponentRenderer
+host fixture. Shared PaymentStatus/domain/CSS and fixture responses stay unchanged.
+
+Source inspection found the frontend provider test mocks the renderer and is
+insufficient. Reuse native Storybook's SDK build-plugin path and actual
+FrontComponentRenderer -> sandbox iframe (allow-scripts) -> worker ->
+RemoteReceiver/RemoteRootRenderer. The existing sandbox-document generator is
+a narrow build of its bootstrap/worker, not a whole-repository build. Its
+generated file is temporary/ignored in this isolated checkout; no host source
+changes or installed Workspace, token, backend or job dispatch are involved.
+The new case must prove actual worker rendering, native select event propagation,
+CSS injection and effect updates; ordinary DOM wrapping is not a substitute.
+
+Actual local renderer case **PASS**, `2026-09-07T09:40:32.511Z`. One sandbox
+iframe with exactly `allow-scripts` and an actual worker were observed. Native
+select events drove the shared React effect, four saved-page states rendered,
+CSS text color and panel radius matched, and a slow prior response did not
+replace a later denied selection. Refresh worked. No external request or page
+error was observed. This narrows the rendering gap for this exact component;
+it does not prove native authorization, installed settings integration, every
+DOM API, all browser sizes or production operation.
+
+Earlier attempts are preserved: the SDK strip-comments plugin resolved relative
+metafile paths against process cwd and failed before rendering; using App cwd
+fixed that fixture mismatch. The first native attempt created a worker but timed
+out (`2026-09-07T09:38:23.509Z`); diagnostic capture at
+`2026-09-07T09:39:40.672Z` showed the local server returned 404 because native
+fetch appends `cacheBust=v2`. Matching the pathname fixed the fixture; no renderer
+or shared component change was needed. Build warnings about existing locale
+modules marked side-effect-free are retained as dependency-build limitations,
+not hidden or treated as translation proof.
+
+Artifacts under the same protected visualization parent as the prior receipt:
+`clover-remote-dom-trial/failure.json`,
+`clover-remote-dom-diagnostic/failure.json` and `failure.png`, and
+`clover-remote-dom-final/receipt.json`, `native-remote-partial.png`,
+`native-remote-denied.png`, component metafile and actual bundled JS. The desktop
+result was visually inspected. Shared component/domain/CSS hashes match the
+accepted trial; no previous domain, queue or ordinary-DOM tests were rerun.
+
+Final fixture uses a JavaScript host wrapper instead of the executed TypeScript
+wrapper, avoiding importing host-package alias/type configuration into the App.
+A targeted bundle comparison passed: generated code is identical after source
+filename normalization; `host-equivalence.txt` records this, so browser proof
+was reused. App typecheck, focused three-file lint and runner syntax check pass.
+Final runner SHA-256:
+`0aadc6d920ae1ed732c9a42b47bc4a7e9b267522b31f8f21401ccd70913293a9`.
+The worker wrapper/component are unchanged; the host JSX fixture is checked by
+bundling/browser execution, not claimed as App TypeScript coverage.
+
+Next owner: coordinating head `01a07aa7-944a-70c3-bf77-d51b9fc766f2` reviews
+this local increment. Remaining proof belongs to this retained Clover worker:
+native authenticated operator route, installed user/App/grant enforcement and
+settings integration. No request for broader WORKFLOWS permission is made.
+No publication, merge, install, credentials, external provider or data effects.
+Owned server/browser closed; temporary generated sandbox document and dependency
+link are removed after checks. Source-gate results and exact final commit go in
+the existing artifact receipt/handoff. Renderer/build/dependency changes
+invalidate affected local compatibility evidence; this is never deployment proof.
