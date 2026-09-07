@@ -599,6 +599,65 @@ for index in "${!rogue_legal_paths[@]}"; do
   }
 done
 
+# AI editor repair and runner compatibility retain exact, bounded paths.
+repair_paths=(
+  packages/twenty-front/src/testing/constants/UntestedAppPaths.ts
+  .github/workflows/ci-front.yaml
+  docs/provenance/ai-editor-lifecycle.md
+  packages/twenty-front/src/modules/advanced-text-editor/utils/hasEditorExtension.ts
+  packages/twenty-front/src/modules/advanced-text-editor/utils/__tests__/hasEditorExtension.test.ts
+  packages/twenty-front/src/modules/advanced-text-editor/hooks/useTurnIntoBlockOptions.ts
+  packages/twenty-front/src/modules/advanced-text-editor/hooks/__tests__/useTurnIntoBlockOptions.test.tsx
+)
+for path in "${repair_paths[@]}"; do
+  blob="$(printf 'bounded editor fixture\n' | git hash-object -w --stdin)"
+  GIT_INDEX_FILE="$temporary_directory/index" git read-tree HEAD
+  GIT_INDEX_FILE="$temporary_directory/index" git update-index --add --cacheinfo 100644 "$blob" "$path"
+  tree="$(GIT_INDEX_FILE="$temporary_directory/index" git write-tree)"
+  candidate_head="$(
+    printf 'test: exact editor path\n' |
+      GIT_AUTHOR_NAME='Trajectory fixture' \
+      GIT_AUTHOR_EMAIL='trajectory-fixture@example.invalid' \
+      GIT_AUTHOR_DATE='2000-01-01T00:11:00Z' \
+      GIT_COMMITTER_NAME='Trajectory fixture' \
+      GIT_COMMITTER_EMAIL='trajectory-fixture@example.invalid' \
+      GIT_COMMITTER_DATE='2000-01-01T00:11:00Z' \
+      git commit-tree "$tree" -p HEAD
+  )"
+  bash "$fixture" HEAD "$candidate_head" >"$temporary_directory/ai-editor-output"
+done
+for path in \
+  packages/twenty-front/src/modules/advanced-text-editor/utils/hasEditorExtension.ts.backup \
+  packages/twenty-front/src/modules/advanced-text-editor/hooks/nested/useTurnIntoBlockOptions.ts \
+  packages/twenty-front/src/modules/advanced-text-editor/hooks/useTextBubbleState.ts \
+  packages/twenty-front/src/modules/advanced-text-editor/components/AdvancedTextEditor.tsx \
+  .github/workflows/ci-front.yaml.backup \
+  .github/workflows/nested/ci-front.yaml \
+  .github/workflows/ci-front-component-renderer.yaml \
+  packages/twenty-front/src/testing/constants/UntestedAppPaths.ts.backup \
+  packages/twenty-front/src/testing/constants/nested/UntestedAppPaths.ts \
+  packages/twenty-front/src/testing/constants/PropertyMockStyles.ts; do
+  blob="$(printf 'unauthorized editor fixture\n' | git hash-object -w --stdin)"
+  GIT_INDEX_FILE="$temporary_directory/index" git read-tree HEAD
+  GIT_INDEX_FILE="$temporary_directory/index" git update-index --add --cacheinfo 100644 "$blob" "$path"
+  tree="$(GIT_INDEX_FILE="$temporary_directory/index" git write-tree)"
+  candidate_head="$(
+    printf 'test: reject adjacent editor path\n' |
+      GIT_AUTHOR_NAME='Trajectory fixture' \
+      GIT_AUTHOR_EMAIL='trajectory-fixture@example.invalid' \
+      GIT_AUTHOR_DATE='2000-01-01T00:11:00Z' \
+      GIT_COMMITTER_NAME='Trajectory fixture' \
+      GIT_COMMITTER_EMAIL='trajectory-fixture@example.invalid' \
+      GIT_COMMITTER_DATE='2000-01-01T00:11:00Z' \
+      git commit-tree "$tree" -p HEAD
+  )"
+  if bash "$fixture" HEAD "$candidate_head" >"$temporary_directory/ai-editor-output" 2>&1; then
+    printf 'exact-head fixture test failed: unapproved editor path passed: %s\n' "$path" >&2
+    exit 1
+  fi
+  grep -Fq "trajectory fixture rejected: $path" "$temporary_directory/ai-editor-output"
+done
+
 unrelated_head="$(
   printf 'test: unrelated source ancestry\n' |
     GIT_AUTHOR_NAME='Trajectory fixture' \
