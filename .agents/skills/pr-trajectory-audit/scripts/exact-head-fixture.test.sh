@@ -599,6 +599,13 @@ done
 
 # AI editor repair and runner compatibility retain exact, bounded paths.
 repair_paths=(
+  docs/provenance/linear-issue-status.md
+  packages/twenty-apps/public/linear/src/constants/universal-identifiers.ts
+  packages/twenty-apps/public/linear/src/logic-functions/get-linear-issue-status.ts
+  packages/twenty-apps/public/linear/src/logic-functions/handlers/get-linear-issue-status-handler.ts
+  packages/twenty-apps/public/linear/src/logic-functions/__tests__/get-linear-issue-status.test.ts
+  packages/twenty-apps/public/linear/src/logic-functions/utils/call-linear-graphql.ts
+  packages/twenty-apps/public/linear/src/logic-functions/utils/types/linear-graphql-result.type.ts
   packages/twenty-front/src/testing/constants/UntestedAppPaths.ts
   .github/workflows/ci-front.yaml
   docs/provenance/ai-editor-lifecycle.md
@@ -625,6 +632,9 @@ for path in "${repair_paths[@]}"; do
   bash "$fixture" HEAD "$candidate_head" >"$temporary_directory/ai-editor-output"
 done
 for path in \
+  packages/twenty-apps/public/linear/src/roles/default-function.role.ts \
+  packages/twenty-apps/public/linear/src/logic-functions/get-linear-issue-status.ts.backup \
+  packages/twenty-apps/public/linear/src/logic-functions/handlers/nested/get-linear-issue-status-handler.ts \
   packages/twenty-front/src/modules/advanced-text-editor/utils/hasEditorExtension.ts.backup \
   packages/twenty-front/src/modules/advanced-text-editor/hooks/nested/useTurnIntoBlockOptions.ts \
   packages/twenty-front/src/modules/advanced-text-editor/hooks/useTextBubbleState.ts \

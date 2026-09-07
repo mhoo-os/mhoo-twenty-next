@@ -353,3 +353,11 @@ this preparation. Re-evaluate if workflow source, default branch or event policy
 changes; local validation is not a live GitHub execution claim.
 
 Follow-up inventory found docs-i18n-pull also runs on schedules and PR paths. Its local generation/check steps remain intact; only the eight external mutation/writeback steps gain owner guards. Observed PR run34165536337 completed without invoking its non-PR Crowdin steps; this does not establish safety of scheduled runs.
+
+## Native Linear issue status lookup
+
+MHO-267 authorizes a bounded read-only tool in the existing public Linear App.
+The exact-file allowance covers its identifier constant, tool/handler/mock test,
+shared GraphQL helper/result metadata and `linear-issue-status.md` receipt only.
+No App role, provider grant, manifest/version or runtime install change is included.
+See [the source and installed-mapping limits](linear-issue-status.md).
