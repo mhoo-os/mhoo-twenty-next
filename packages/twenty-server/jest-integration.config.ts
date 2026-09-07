@@ -35,6 +35,8 @@ const jestConfig: JestConfigWithTsJest = {
     // Dedicated App-install/queue proof requires its disposable DB/Redis and
     // built Clover manifest. Run via jest-clover-proof.config.ts.
     '<rootDir>/test/integration/metadata/suites/application/clover-native-data.integration-spec.ts',
+    // Dedicated Workspace auth proof requires its guarded synthetic DB.
+    '<rootDir>/test/integration/graphql/suites/auth/same-origin-workspaces.integration-spec.ts',
   ],
   testRegex: '\\.integration-spec\\.ts$',
   modulePathIgnorePatterns: ['<rootDir>/dist'],
