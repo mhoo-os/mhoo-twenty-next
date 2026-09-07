@@ -30,11 +30,23 @@ export const createHostFetchEnforcingPolicy = (
       ? input.method.toUpperCase()
       : 'GET';
 
+    // Only the configured GraphQL endpoint can carry same-origin edge cookies.
+    // The explicit bearer remains necessary; redirects and other App fetches
+    // retain their existing credential policy.
+    const hasBearer = Object.entries(input.headers ?? {}).some(
+      ([name, value]) =>
+        name.toLowerCase() === 'authorization' && /^Bearer \S+$/i.test(value),
+    );
+    const useSameOriginCredentials =
+      requestMethod === 'POST' &&
+      input.url === hostFetchPolicy.graphqlUrl &&
+      hasBearer;
+
     const response = await fetch(input.url, {
       method: requestMethod,
       headers: input.headers,
       body: input.body,
-      credentials: 'omit',
+      credentials: useSameOriginCredentials ? 'same-origin' : 'omit',
       redirect: resolveHostFetchRedirectMode(
         requestMethod,
         input.url,

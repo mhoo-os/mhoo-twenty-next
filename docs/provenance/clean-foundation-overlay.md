@@ -35,6 +35,16 @@ Trajectory-eval paths:
 
 MHO-146 Phase A source authorization:
 
+- MHO-259 owner-authorized loader authentication source repair permits
+  `packages/twenty-front-component-renderer/src/host/component-source/utils/fetchComponentSourceFromNetwork.ts`,
+  `fetchJavaScriptModuleSourceText.ts` and their corresponding tests in that
+  directory's `__tests__/`, plus
+  `scripts/provenance/front-component-cookie-browser.cjs` and
+  `docs/provenance/front-component-cookie-auth.md`. Scope: same-origin code
+  loading through an existing authenticated edge, preserving cross-origin
+  cookie omission and storage handoff isolation. This authorizes no Access
+  policy change, deployment, or expanded App record permissions.
+
 - `packages/twenty-apps/internal/mhoo-finance/` is the exact internal App
   subtree authorized for the fixture-first Finance Phase A slice in PR #22.
   It contains only the native Twenty Finance objects, views, navigation,
@@ -287,3 +297,74 @@ credential database, identity service, OAuth callback, provider sync, or legacy
 import. The owner requested deployment; source authorization and local checks
 still do not establish runtime readiness. The activation procedure and its
 remaining evidence are recorded in `hass-clover-intake.md`.
+## GraphQL edge authentication follow-up
+
+The owner-authorized saved-sample integration requires native Core API reads
+behind the existing same-origin edge login. Enumerated paths:
+
+- `packages/twenty-front-component-renderer/src/types/HostFetchPolicy.ts`
+- `packages/twenty-front-component-renderer/src/host/fetch/utils/createHostFetchEnforcingPolicy.ts`
+- `packages/twenty-front-component-renderer/src/host/fetch/utils/buildHostFetchPolicyFromFrontComponentUrls.ts`
+- Their exact `__tests__/<name>.test.ts` counterparts.
+- `docs/provenance/front-component-graphql-edge-auth.md`
+
+Only bearer-authenticated POST to the host-configured GraphQL URL may use
+browser same-origin credentials. Other App fetches and redirect restrictions
+retain their previous policy. This source permission is not deployed proof.
+
+## MHO265 / MHO266 phased native source inventory
+
+ADR-0014 in the coordination repository and the owner's phased-source approval
+authorize the standalone `packages/twenty-apps/internal/mhoo-clover/` App subtree
+(MHO266). MHO265 reuses native Connection custody, explicit background grants,
+SDK retrieval and the previously approved opt-in Workspace session path. The
+exact supplemental host and proof paths are below, matching the trajectory gate.
+This is source admission, not live intake, provider access or activation.
+
+- `docs/provenance/clover-background-grant-source-proof.md`
+- `docs/provenance/clover-multimerchant-source-proof.md`
+- `docs/provenance/clover-native-runtime-proof.md`
+- `docs/provenance/clover-payment-persistence-source-proof.md`
+- `docs/provenance/clover-standalone-source-proof.md`
+- `docs/provenance/hass-manual-consumer-source-proof.md`
+- `docs/provenance/same-origin-workspace-source-proof.md`
+- `packages/twenty-front/src/modules/auth/effect-components/SignOutOnOtherTabSignOutEffect.tsx`
+- `packages/twenty-front/src/modules/auth/hooks/useAuth.ts`
+- `packages/twenty-front/src/modules/auth/utils/__tests__/crossTabSignOut.test.ts`
+- `packages/twenty-front/src/modules/auth/utils/crossTabSignOut.ts`
+- `packages/twenty-front/src/modules/client-config/states/isSameOriginWorkspaceEnabledState.ts`
+- `packages/twenty-front/src/modules/domain-manager/hooks/useIsCurrentLocationOnAWorkspace.ts`
+- `packages/twenty-front/src/modules/domain-manager/hooks/useRedirectToWorkspaceDomain.ts`
+- `packages/twenty-sdk/src/sdk/define/connection-providers/__tests__/define-connection-provider.spec.ts`
+- `packages/twenty-sdk/src/sdk/define/connection-providers/define-connection-provider.ts`
+- `packages/twenty-sdk/src/sdk/logic-function/connections/__tests__/get-connection.spec.ts`
+- `packages/twenty-sdk/src/sdk/logic-function/connections/get-connection.ts`
+- `packages/twenty-sdk/src/sdk/logic-function/connections/list-connections.ts`
+- `packages/twenty-sdk/src/sdk/logic-function/utils/post-graphql-request.util.ts`
+- `packages/twenty-server/jest.config.mjs`
+- `packages/twenty-server/src/database/commands/upgrade-version-command/2-37/2-37-instance-command-fast-1788751203788-add-manual-token-workspace-grant.ts`
+- `packages/twenty-server/src/database/commands/upgrade-version-command/instance-commands.constant.ts`
+- `packages/twenty-server/src/engine/core-modules/application/application-manifest/converters/__tests__/from-connection-provider-manifest-to-universal-flat-connection-provider.util.spec.ts`
+- `packages/twenty-server/src/engine/core-modules/application/connection-provider/connections/application-connections.module.ts`
+- `packages/twenty-server/src/engine/core-modules/application/connection-provider/connections/dtos/app-connection.object.ts`
+- `packages/twenty-server/src/engine/core-modules/application/connection-provider/connections/services/application-connections-list.service.ts`
+- `packages/twenty-server/src/engine/core-modules/application/connection-provider/connections/services/manual-token-workspace-grant.util.spec.ts`
+- `packages/twenty-server/src/engine/core-modules/application/connection-provider/connections/services/manual-token-workspace-grant.util.ts`
+- `packages/twenty-server/src/engine/core-modules/application/connection-provider/connections/types/manual-token-workspace-grant.type.ts`
+- `packages/twenty-server/src/engine/core-modules/auth/auth.resolver.ts`
+- `packages/twenty-server/src/engine/core-modules/clover-token/clover-connection.constants.ts`
+- `packages/twenty-server/src/engine/core-modules/clover-token/clover-consumer.spec.ts`
+- `packages/twenty-server/src/engine/core-modules/clover-token/clover-data-contract.spec.ts`
+- `packages/twenty-server/src/engine/core-modules/clover-token/manual-provider-validation.spec.ts`
+- `packages/twenty-server/src/engine/core-modules/domain/workspace-domains/services/workspace-domains.service.ts`
+- `packages/twenty-server/src/engine/core-modules/two-factor-authentication/two-factor-authentication.resolver.spec.ts`
+- `packages/twenty-server/src/engine/core-modules/two-factor-authentication/two-factor-authentication.resolver.ts`
+- `packages/twenty-server/src/engine/metadata-modules/connected-account/connected-account-metadata.service.ts`
+- `packages/twenty-server/src/engine/metadata-modules/connected-account/entities/connected-account.entity.ts`
+- `packages/twenty-server/src/engine/metadata-modules/connected-account/resolvers/connected-account.resolver.ts`
+- `packages/twenty-server/src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-connection-provider-validator.service.ts`
+- `packages/twenty-server/test/integration/graphql/suites/auth/same-origin-workspaces.integration-spec.ts`
+- `packages/twenty-server/test/integration/metadata/suites/application/clover-native-data.integration-spec.ts`
+- `packages/twenty-shared/src/application/appConnectionType.ts`
+- `packages/twenty-shared/src/application/connectionProviderManifestType.ts`
+- `packages/twenty-shared/src/application/connectionProviderType.ts`

@@ -79,3 +79,17 @@ describe('buildHostFetchPolicyFromFrontComponentUrls', () => {
     ]);
   });
 });
+
+it('uses only the trusted API origin for the GraphQL credential endpoint', () => {
+  expect(
+    buildHostFetchPolicyFromFrontComponentUrls({
+      componentUrl: 'https://storage.test/component.js',
+      apiUrl: 'https://api.twenty.test',
+    }).graphqlUrl,
+  ).toBe('https://api.twenty.test/graphql');
+  expect(
+    buildHostFetchPolicyFromFrontComponentUrls({
+      componentUrl: 'https://storage.test/component.js',
+    }).graphqlUrl,
+  ).toBeUndefined();
+});
