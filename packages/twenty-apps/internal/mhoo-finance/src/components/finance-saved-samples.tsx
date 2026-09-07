@@ -1,3 +1,6 @@
+import { AppPath, navigate } from 'twenty-sdk/front-component';
+import { FinanceSampleEvidence } from 'src/components/finance-sample-evidence';
+import { SAMPLE_FILTER, displaySampleAmount } from 'src/investigation/sample-evidence';
 import { useEffect, useState } from 'react';
 import { CoreApiClient } from 'twenty-client-sdk/core';
 import { Callout, Loader } from 'twenty-ui/feedback';
@@ -13,6 +16,7 @@ type Sample = {
 };
 
 export const FinanceSavedSamples = () => {
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [rows, setRows] = useState<Sample[]>([]);
   const [state, setState] = useState<'loading' | 'ready' | 'failed'>('loading');
   const [hasMore, setHasMore] = useState(false);
@@ -21,6 +25,7 @@ export const FinanceSavedSamples = () => {
   useEffect(() => {
     let cancelled = false;
     setRows([]);
+    setSelectedId(null);
     setState('loading');
     const load = async () => {
       try {
@@ -28,13 +33,7 @@ export const FinanceSavedSamples = () => {
           financeFacts: {
             __args: {
               first: 60,
-              filter: {
-                exclusionReason: {
-                  eq: 'SAMPLE_ONLY_UNRECONCILED_DO_NOT_PUBLISH',
-                },
-                includedInTotals: { eq: false },
-                classification: { eq: 'UNCLASSIFIED' },
-              },
+              filter: SAMPLE_FILTER,
             },
             pageInfo: { hasNextPage: true },
             edges: {
@@ -94,12 +93,15 @@ export const FinanceSavedSamples = () => {
           <Callout
             variant="warning"
             title={`${rows.length}${hasMore ? '+' : ''} saved samples`}
-            description="Partial CSV selection, not complete account history. Amounts below are exact signed minor units (USD cents); no income, spending or balance totals are calculated."
+            description="Partial CSV selection, not complete account history. Amounts preserve the recorded sign; no income, spending or balance totals are calculated."
           />
           {rows.length === 0 && (
             <p>No unreviewed sample rows are available to your role.</p>
           )}
-          {rows.map((row) => (
+          {selectedId ? <>
+            <Button title="Back to saved samples" onClick={() => setSelectedId(null)} />
+            <FinanceSampleEvidence key={selectedId} id={selectedId} />
+          </> : rows.map((row) => (
             <div
               key={row.id}
               style={{ padding: '12px 0', borderBottom: '1px solid #ddd' }}
@@ -107,11 +109,13 @@ export const FinanceSavedSamples = () => {
               <strong>{row.name}</strong>
               <div>{row.account}</div>
               <div>
-                {row.exactAmountMinor} minor units · {row.sourceCurrency} ·
+                {displaySampleAmount(row.exactAmountMinor, row.sourceCurrency)} ·
                 Unclassified · Excluded
               </div>
+              <Button title="Inspect source evidence" onClick={() => setSelectedId(row.id)} />
             </div>
           ))}
+          <Button title="Open transaction table" onClick={() => navigate(AppPath.RecordIndexPage, { objectNamePlural: 'financeFacts' })} />
           {hasMore && (
             <p>
               Showing the first 60 matching rows. Open Finance facts for the
