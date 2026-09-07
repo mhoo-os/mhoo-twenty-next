@@ -321,3 +321,78 @@ Owned server/browser closed; temporary generated sandbox document and dependency
 link are removed after checks. Source-gate results and exact final commit go in
 the existing artifact receipt/handoff. Renderer/build/dependency changes
 invalidate affected local compatibility evidence; this is never deployment proof.
+
+## Isolated status read adapter hardening
+
+Dispatch checkpoint `2026-09-07 11:40:48 UTC`: MHO-266/MHO-265 retained owner,
+coordinating head `01a07aa7-944a-70c3-bf77-d51b9fc766f2`. New isolated
+`codex/clover-status-adapter`, base `9b26a064b4e63e9591e11f1197ec495ddf3bf455`.
+Only extracted server-side status adapter, focused tests and this ledger change.
+No unfinished handler, UI invocation, HTTP trigger or manifest wiring is adopted.
+
+Selective reuse source is the uncommitted status handler in the retained
+`mhoo-twenty-next-hass` checkout at `7fb5501bdc108df9ace0c619f7cafe258dde9fcc`,
+path `packages/twenty-apps/internal/mhoo-clover/src/logic-functions/clover-operator-status.logic-function.ts`,
+SHA-256 `c0452293e1a56821283815569c223f3a64afaa8434eab99c36e7ecfc8484e14b`.
+Reuse is its user-list -> App lookup -> filtered receipt-read intent, rewritten
+as an injected server adapter with the accepted display StatusResult contract.
+The unfinished definition and its IDs are not copied or activated.
+Other dirty-file preservation hashes before work:
+- front-components/clover-operator.settings-front-component.tsx:
+  `8c9be749f0b6ac13662fb40ffb5de5f45097050184cb31873f64ed97db80ccca`
+- contracts/model-identifiers.ts:
+  `2a5d5a37419b91ddc4df0d8d7d85079c0cdf103a2605312ccaa6624f0680bdcb`
+- tsconfig.json: `9475253ce27518417cebfef6cb40e1b31da0866967fa34dd4df1b18cdeb8e793`.
+These paths are relative to the retained Clover App; final hashes must match.
+
+Native error inspection: SDK connections get/list call
+`sdk/logic-function/utils/post-graphql-request.util.ts`, which throws plain
+Error for HTTP/GraphQL failures. It does not preserve a reliable denial/missing
+code. No message parsing or invented "grant off" result is permitted. A failed
+lookup, null grant or malformed response is uncertain. A selected ID absent
+from a successful bounded authorized list is missing (unavailable to this user,
+not a provider-existence claim). Validated scope/identity ineligibility denies.
+The current native REST order parser reads `order_by`, not `orderBy`.
+
+New focused tests are necessary for this changed adapter's query, receipt
+validation, uncertainty and sanitized output. Prior history/grant/queue and both
+UI trials remain unchanged and are reused without reruns. Integration into the
+unfinished native status handler and actual invocation are explicitly unproved.
+
+Final focused result recorded `2026-09-07 11:45:10 UTC`: nine adapter tests,
+App typecheck and affected-file lint **PASS**. Initial test-file creation used
+the wrong working-directory prefix, so that invocation found no tests; no test
+pass was claimed. After correcting the path, eight tests passed. Review then
+added explicit malformed connection-metadata rejection (uncertain, not denied);
+the changed adapter/new ninth case justified the final targeted rerun. No other
+suites/builds, browser, database, provider or network adapter calls were run.
+All dependencies in these tests are injected synthetic functions.
+
+Evidence covers exact native `order_by` query and limit/depth/connection filter;
+invalid selectors; missing selection after a successful list; failed/null grant
+lookup uncertainty; malformed/duplicate/overbound connection and receipt inputs;
+foreign dataset/connection; bounded ranges/timestamps/page offsets; stale grant,
+terminal and subdivision states; and omission of synthetic credential/error and
+non-allowlisted fields. No native handler integration or authorization proof is
+claimed. The adapter reads only an explicitly supplied user-list/App-read/REST
+boundary; future wiring must retain interactive native context and native role
+checks. A full list beyond 50 yields uncertain rather than false missing.
+
+Exact source SHA-256:
+`8b15a8e410b4df4ae8fe1253e02eaaa90cc8c87f8fe73d84f48b80b9c8dcaa82`.
+Focused test SHA-256:
+`198027510d2af10cca5fe3934092bf6259377a38fb133d9098ef61bfce34531f`.
+Safe command references from App root: Vitest with `vitest.unit.config.ts` and
+only `src/__tests__/operator-status-adapter.test.ts`; `tsgo --noEmit -p tsconfig.json`;
+oxlint on that test and `src/logic-functions/read-clover-operator-status.ts`.
+All four retained dirty-file hashes were rechecked and match the above inventory.
+
+Final source gates/commit are recorded in the protected artifact receipt at
+`/Users/mhoooo/.codex/visualizations/2026/09/05/01a073d5-22c3-7123-89ad-ebf486cdc93a/clover-status-adapter/receipt.json`
+and the receiving-head handoff. No temporary service was started; the owned
+local dependency symlink is removed after checks. Next owner is coordinating
+head `01a07aa7-944a-70c3-bf77-d51b9fc766f2` for review. Retained executor stays
+this Clover worker. HTTP event adaptation, handler/UI invocation, installed
+settings and native permission/grant acceptance remain separately unproved.
+No publication or broader authority is implied. Changed adapter inputs/native
+SDK contracts invalidate affected local evidence; none is a runtime claim.
