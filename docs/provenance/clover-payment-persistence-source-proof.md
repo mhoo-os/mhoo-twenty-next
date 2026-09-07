@@ -143,3 +143,39 @@ Dedicated-profile validation passed all six cases in 71.286 seconds. Discovery
 selects exactly the Clover suite; the generic profile retains 593 other suites.
 The suite now explicitly checks the dedicated Redis URL and server URL as well
 as the database before any fixture activity. Test environment restored exactly.
+
+## Explicit history and recovery operator entry points
+
+MHO266 adds private native `clover-payment-history` and
+`clover-payment-recover` logic functions. Both require interactive Workspace
+membership, a delegated user token and an explicit native App token. The helper
+resolves the user's connection before App-only custody or receipt access, then
+checks the current background grant and matching merchant identity.
+
+History accepts an explicit past range and supported time field, partitions it
+into contiguous windows no longer than 89 days (at most 200), and enqueues only
+connection/grant selectors and bounded ranges. Recovery reads the native receipt,
+checks connection/grant/dataset/range/offset/revision keys, rechecks both current
+authorities, and queues exactly its next offset. Short pages retain unverified
+coverage; the offset cap returns a subdivision requirement. Enqueue uncertainty
+never produces a successful queued result. Regrant does not relabel old receipts.
+
+Dispatch explicitly uses the native App token through the generated Metadata API
+client even when a delegated user token is present. This preserves background
+execution for the queued importer, while the operator helpers independently
+enforce current user access before dispatch. No credentials enter job payloads.
+There is no public HTTP, tool or cron trigger. Native execution/installation and
+a visible operator UI for these new entry points remain separate proof gates.
+
+Focused App tests cover range partitioning, invalid/future/oversized ranges,
+user-denial ordering, stale grants, changed merchant identity, receipt binding,
+terminal/subdivision states, revocation between lookup and dispatch, ambiguous
+enqueue and explicit App-identity dispatch. The prior native queue proof was not
+rerun because its implementation is unchanged. Recurring scheduling remains
+disabled pending a proved durable progress and recovery contract.
+
+Planner/recovery validation: 74 App tests passed, followed by the four-case
+manifest target including two new operator-entry negative cases (76 covered
+cases in total). App typecheck, lint and the 15-file App build passed. This is
+source/local proof; the new operator functions have not been installed or invoked
+in a live Workspace.

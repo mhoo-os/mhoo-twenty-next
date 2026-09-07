@@ -4,6 +4,8 @@ import manualProvider from '../connection-providers/clover-manual.connection-pro
 import cloverReaderRole from '../roles/clover-reader.role';
 import merchantRead from '../logic-functions/clover-merchant-read.logic-function';
 import paymentImport from '../logic-functions/clover-payment-import.logic-function';
+import history from '../logic-functions/clover-payment-history.logic-function';
+import recovery from '../logic-functions/clover-payment-recover.logic-function';
 
 it('binds the manual provider and least-privilege App ceiling without public triggers', () => {
   expect(manualProvider.success).toBe(true);
@@ -31,3 +33,19 @@ it('keeps payment import private and rejects interactive invocation', async () =
     ),
   ).rejects.toThrow('background execution');
 });
+
+it.each([history, recovery])(
+  'keeps operator entry points explicit and unscheduled',
+  async (entry) => {
+    expect(entry.success).toBe(true);
+    expect(entry.config?.httpRouteTriggerSettings).toBeUndefined();
+    expect(entry.config?.toolTriggerSettings).toBeUndefined();
+    expect(entry.config?.cronTriggerSettings).toBeUndefined();
+    await expect(
+      entry.config!.handler(
+        {} as never,
+        { userWorkspaceId: null, workspaceMemberId: null } as never,
+      ),
+    ).rejects.toThrow('Workspace member');
+  },
+);
