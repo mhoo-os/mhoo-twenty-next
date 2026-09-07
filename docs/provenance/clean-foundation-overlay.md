@@ -274,3 +274,54 @@ behind the existing same-origin edge login. Enumerated paths:
 Only bearer-authenticated POST to the host-configured GraphQL URL may use
 browser same-origin credentials. Other App fetches and redirect restrictions
 retain their previous policy. This source permission is not deployed proof.
+
+
+## Inherited upstream external-effect guards
+
+ARCHITECTURE IMPACT: LOCAL
+
+A normal main merge must not implicitly execute inherited upstream operations.
+The source owner is `twentyhq/twenty`, pinned in `.twenty-source`; existing
+workflows explicitly target `twentyhq/twenty-infra`, `twentyhq/twenty-factory`,
+`twenty.api.crowdin.com` and `engineering.twenty.com`. The following exact
+workflow jobs now require `github.repository == 'twentyhq/twenty'` before
+performing those operations, retaining their existing conditions:
+
+| Workflow | Guarded job/step | Existing effect |
+| --- | --- | --- |
+| cd-deploy-main.yaml | deploy-main | twenty-infra deployment dispatch |
+| app-prod-parity-e2e-dispatch.yaml | dispatch | twenty-factory prod-parity dispatch and status |
+| i18n-push.yaml | extract_translations | translation branch/PR, Twenty Crowdin and infra automerge |
+| docs-i18n-push.yaml | push_docs | upstream documentation translation upload |
+| website-i18n-push.yaml | extract_website_translations | upstream website translation upload |
+| visual-regression-dispatch.yaml | dispatch-pixel-diff | twenty-factory visual comparison dispatch |
+| post-ci-comments.yaml | dispatch-breaking-changes | twenty-factory breaking-changes comment dispatch |
+| docs-i18n-pull.yaml | Eight Crowdin/writeback/infra steps only | upstream translation mutation, PR/branch push and automerge dispatch |
+| ci-e2e-main.yaml | notify-main-ci-failure; QA Scout prepare/run/comment | upstream engineering notification and cloud-agent/context publication |
+
+Each path is under `.github/workflows/` and is enumerated in the exact-head
+fixture. This is a source execution guard, not deletion, account-level workflow
+disabling, token rotation or a replacement integration. Local E2E/build/test jobs,
+runner-local postcard installation and manual clean-foundation image semantics
+are unchanged. QA preparation, the agent run and comment publication have direct
+guards; downstream receipt-only steps retain their existing output conditions.
+
+Source base: `6a1dec473a3d6c303697bca044e3e7d3681e7b72`. Retained Finance/shared-AI
+executor prepares this isolated prerequisite for PR37; coordinating repo head
+`01a07aa7-944a-70c3-bf77-d51b9fc766f2` owns independent review and publication
+sequencing. Local validation compares parsed YAML to the exact base, allowing
+only repository guards while preserving original predicates and all other
+workflow structure; checks fork/upstream outcomes and rejects missing/OR-bypass
+guards. Detailed inputs/results live in the protected upstream-workflow-guards
+receipt folder. No existing source tests are rerun without changed inputs.
+
+A push from the eventual merged revision reads its guarded workflows. Before
+that merge, `workflow_run` callbacks use the existing default branch: publishing
+this guard PR can still invoke the old post-CI dispatcher. Therefore this local
+candidate does not itself prove safe pre-merge publication. The head must resolve
+that concrete sequencing condition before publication, without relying on absent
+secrets or implying production authorization. No publish/merge/deploy occurred in
+this preparation. Re-evaluate if workflow source, default branch or event policy
+changes; local validation is not a live GitHub execution claim.
+
+Follow-up inventory found docs-i18n-pull also runs on schedules and PR paths. Its local generation/check steps remain intact; only the eight external mutation/writeback steps gain owner guards. Observed PR run34165536337 completed without invoking its non-PR Crowdin steps; this does not establish safety of scheduled runs.
