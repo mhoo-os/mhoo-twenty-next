@@ -29,6 +29,25 @@ const manifest: Manifest = JSON.parse(
 const uid = manifest.application.universalIdentifier;
 const api = () => request('http://localhost:4000');
 const ids: string[] = [];
+const handoffIds: string[] = [];
+const authBaselines = new Map<string, Set<string>>();
+const syntheticUserIds = [
+  '20202020-e6b5-4680-8a32-b8209737156b',
+  '20202020-9e3b-46d4-a556-88b9ddc2b034',
+];
+beforeEach(async () => {
+  for (const table of ['userSession', 'appToken']) {
+    const rows = await globalThis.testDataSource.query(
+      `SELECT id FROM core."${table}" WHERE "userId" = ANY($1::uuid[])`,
+      [syntheticUserIds],
+    );
+    authBaselines.set(
+      table,
+      new Set(rows.map((row: { id: string }) => row.id)),
+    );
+  }
+});
+let cleanupToken = APPLE_JANE_ADMIN_ACCESS_TOKEN;
 let created = false;
 const guard = `const nativeStatusFetch = globalThis.fetch; globalThis.fetch = (input, init) => { const u = new URL(String(input)); if(u.origin !== 'http://localhost:4000') throw new Error('Synthetic proof blocks external egress'); return nativeStatusFetch(input, init); };\n`;
 const status = (token: string, body: unknown) =>
@@ -41,7 +60,7 @@ afterEach(async () => {
   for (const id of ids) {
     const result = await api()
       .post('/metadata')
-      .set('Authorization', `Bearer ${APPLE_JANE_ADMIN_ACCESS_TOKEN}`)
+      .set('Authorization', `Bearer ${cleanupToken}`)
       .send({
         query:
           'mutation($id: UUID!) { deleteConnectedAccount(id: $id) { id } }',
@@ -71,8 +90,27 @@ afterEach(async () => {
       ).length,
     ).toBe(0);
   }
+  for (const id of handoffIds)
+    await globalThis.testDataSource.query(
+      'DELETE FROM core."appToken" WHERE id=$1 AND type=$2 AND "workspaceId"=$3',
+      [id, 'CLOVER_TOKEN_HANDOFF', workspace],
+    );
+  for (const table of ['userSession', 'appToken']) {
+    const rows = await globalThis.testDataSource.query(
+      `SELECT id FROM core."${table}" WHERE "userId" = ANY($1::uuid[])`,
+      [syntheticUserIds],
+    );
+    for (const row of rows)
+      if (!authBaselines.get(table)?.has(row.id))
+        await globalThis.testDataSource.query(
+          `DELETE FROM core."${table}" WHERE id=$1 AND "userId" = ANY($2::uuid[])`,
+          [row.id, syntheticUserIds],
+        );
+  }
+  handoffIds.length = 0;
   ids.length = 0;
   created = false;
+  cleanupToken = APPLE_JANE_ADMIN_ACCESS_TOKEN;
   jest.restoreAllMocks();
 }, 60000);
 
@@ -132,8 +170,11 @@ const installCandidate = async () => {
   return app;
 };
 
-it('accepts bounded native status route and refuses untrusted identity/grants without provider egress', async () => {
-  const app = await installCandidate();
+const prepareStatusData = async (
+  app: { id: string },
+  actorToken = APPLE_JANE_ADMIN_ACCESS_TOKEN,
+) => {
+  cleanupToken = actorToken;
   const minted = await generateApplicationToken({ applicationId: app.id });
   expect(minted.errors).toBeUndefined();
   const delegated =
@@ -170,12 +211,13 @@ it('accepts bounded native status route and refuses untrusted identity/grants wi
     merchant = handle;
     const begin = await api()
       .post('/clover-token/begin')
-      .set('Authorization', `Bearer ${APPLE_JANE_ADMIN_ACCESS_TOKEN}`)
+      .set('Authorization', `Bearer ${actorToken}`)
       .send({ merchantId: handle });
     expect(begin.status).toBe(200);
+    handoffIds.push(begin.body.requestId);
     const saved = await api()
       .post('/clover-token/submit')
-      .set('Authorization', `Bearer ${APPLE_JANE_ADMIN_ACCESS_TOKEN}`)
+      .set('Authorization', `Bearer ${actorToken}`)
       .send({
         requestId: begin.body.requestId,
         accessToken: 'synthetic-status-proof-token',
@@ -187,7 +229,7 @@ it('accepts bounded native status route and refuses untrusted identity/grants wi
   const grant = async (enabled: boolean, expectedGrantId: string | null) =>
     api()
       .post('/clover-token/background-grant')
-      .set('Authorization', `Bearer ${APPLE_JANE_ADMIN_ACCESS_TOKEN}`)
+      .set('Authorization', `Bearer ${actorToken}`)
       .send({ connectedAccountId: ids[0], enabled, expectedGrantId });
   const granted = await grant(true, null);
   expect(granted.status).toBe(200);
@@ -233,6 +275,13 @@ it('accepts bounded native status route and refuses untrusted identity/grants wi
         })
       ).status,
     ).toBe(201);
+  return { delegated, background, grant, grantId };
+};
+
+it('accepts bounded native status route and refuses untrusted identity/grants without provider egress', async () => {
+  const app = await installCandidate();
+  const { delegated, background, grant, grantId } =
+    await prepareStatusData(app);
   const list = await status(delegated, { kind: 'list' });
   expect(list.status).toBe(200);
   expect(list.body.kind).toBe('available');
@@ -327,6 +376,7 @@ it('denies foreign Workspace identity and Apple selector', async () => {
     .set('Authorization', `Bearer ${APPLE_JANE_ADMIN_ACCESS_TOKEN}`)
     .send({ merchantId: 'ABCDEFGHIJKLM' });
   expect(begin.status).toBe(200);
+  handoffIds.push(begin.body.requestId);
   const saved = await api()
     .post('/clover-token/submit')
     .set('Authorization', `Bearer ${APPLE_JANE_ADMIN_ACCESS_TOKEN}`)
@@ -349,3 +399,51 @@ it('denies foreign Workspace identity and Apple selector', async () => {
     expect(JSON.stringify(result.body)).not.toContain('ABCDEFGHIJKLM');
   }
 });
+
+it('renders installed native settings and refuses revoked status in browser', async () => {
+  const app = await installCandidate();
+  const service =
+    getAppProviderByClassName<
+      import('src/engine/core-modules/auth/token/services/access-token.service').AccessTokenService
+    >('AccessTokenService');
+  const { token: actorToken } = await service.generateAccessToken({
+    userId: '20202020-9e3b-46d4-a556-88b9ddc2b034',
+    workspaceId: workspace,
+    authProvider:
+      'password' as import('src/engine/core-modules/workspace/types/workspace.type').AuthProviderEnum,
+  });
+  const { grantId } = await prepareStatusData(app, actorToken);
+  const { spawn } = await import('child_process');
+  await new Promise<void>((resolve, reject) => {
+    const child = spawn(
+      process.execPath,
+      [process.env.CLOVER_BROWSER_RUNNER!],
+      { stdio: ['pipe', 'pipe', 'pipe'] },
+    );
+    let output = '';
+    child.stdout.on('data', (data) => {
+      output += data.toString();
+    });
+    child.stderr.on('data', (data) => {
+      output += data.toString();
+    });
+    child.once('error', reject);
+    child.once('exit', (code) =>
+      code === 0
+        ? resolve()
+        : reject(
+            new Error(
+              `Browser fixture failed (${code}): ${output.slice(-3000)}`,
+            ),
+          ),
+    );
+    child.stdin.end(
+      JSON.stringify({
+        applicationId: app.id,
+        connectionId: ids[0],
+        grantId,
+        token: actorToken,
+      }),
+    );
+  });
+}, 180000);
