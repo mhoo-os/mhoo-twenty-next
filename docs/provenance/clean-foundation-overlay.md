@@ -381,3 +381,24 @@ The exact `packages/twenty-server/jest-clover-proof.config.ts` and
 Clover App-install/queue proof separately from generic integration discovery.
 The suite's fixed disposable database guard and prerequisites remain intact;
 this test profile creates no production or provider authority.
+
+### MHO-266 public legal route test accounting
+
+ARCHITECTURE IMPACT: NONE. Reuse only the reviewed PR37
+`b199aa05571a05c794d39e1964ce538023b26404` exact `UntestedAppPaths.ts`
+blob `7cff3fb35a91accbef5030132e407be781908de7`. Six exact public legal
+routes are selected by DomainShell before WorkspaceApp; the existing
+DomainShell tests already cover all six and reject a nested rogue legal route.
+They are outside the onboarding/auth navigation matrix. Keep its exhaustive
+count assertion and all test cases unchanged; classify these separately tested
+routes alongside the existing public DPA redirect. The source gate admits only
+`packages/twenty-front/src/testing/constants/UntestedAppPaths.ts`, with positive
+and adjacent suffix, nested and unrelated-constant rejection tests. No broad
+testing-directory allowance, legal text, routing behavior or runtime change.
+
+Existing implementation ledger remains
+`docs/provenance/clover-payment-persistence-source-proof.md`; exact hosted
+failure (352 expected versus292 cases), focused test and source-gate receipts
+remain in the retained Clover `clover-pr32-ci-repair` artifacts. Other passing
+App/native/browser proofs are reused. This accounting fix grants no provider,
+deployment or production authority.

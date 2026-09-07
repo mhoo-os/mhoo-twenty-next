@@ -529,6 +529,7 @@ legal_allowed_paths=(
   packages/twenty-front/src/modules/app/components/DomainShell.tsx
   packages/twenty-front/src/modules/app/components/__tests__/DomainShell.test.tsx
   packages/twenty-shared/src/types/AppPath.ts
+  packages/twenty-front/src/testing/constants/UntestedAppPaths.ts
 )
 
 for index in "${!legal_allowed_paths[@]}"; do
@@ -569,6 +570,9 @@ rogue_legal_paths=(
   packages/twenty-front/src/modules/app/components/__tests__/rogue/DomainShell.test.tsx
   packages/twenty-shared/src/types/rogue/AppPath.ts
   packages/twenty-shared/src/types/AppPath.ts.backup
+  packages/twenty-front/src/testing/constants/UntestedAppPaths.ts.backup
+  nested/packages/twenty-front/src/testing/constants/UntestedAppPaths.ts
+  packages/twenty-front/src/testing/constants/PropertyMockStyles.ts
 )
 
 for index in "${!rogue_legal_paths[@]}"; do
