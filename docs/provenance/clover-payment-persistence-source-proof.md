@@ -179,3 +179,77 @@ manifest target including two new operator-entry negative cases (76 covered
 cases in total). App typecheck, lint and the 15-file App build passed. This is
 source/local proof; the new operator functions have not been installed or invoked
 in a live Workspace.
+
+
+## Bounded shared status UI trial (2026-09-07)
+
+User/voice dispatch through repo head `01a07aa7-944a-70c3-bf77-d51b9fc766f2`
+authorized one reversible source/synthetic trial. Primary MHO-266, prerequisite
+MHO-265; retained worker `01a073d5-22c3-7123-89ad-ebf486cdc93a`. Source base
+`7fb5501bdc108df9ace0c619f7cafe258dde9fcc`; isolated branch
+`codex/clover-two-host-trial`. The retained `codex/hass-native-onboarding`
+checkout and its uncommitted operator/status/identifier work remain untouched.
+This slice reuses its status UX but excludes its unresolved general executor
+call. No Finance, custody, queue, provider or host primitive changes.
+
+Existing queue/grant and planner receipts above were consulted and reused;
+their code has not changed. New proof is needed only for shared React selection,
+display contract decoding, two synthetic adapters and manifest non-discovery.
+Initial targeted typecheck caught use of `.component` instead of the SDK
+validation result's `.config.component`; corrected. Initial harness-script lint
+caught console output; replaced with stdout. These failures are preserved here;
+no unrelated native tests or heavy builds were restarted. Exact timestamps of
+those initial checks were not captured.
+
+The first browser run completed at `2026-09-07T09:11:58.970Z`: ten grouped
+checks across both adapters, desktop/mobile screenshots and shared module hashes.
+Both adapters import the same PaymentStatus component and domain contract.
+The Twenty side uses the actual SDK `defineSettingsFrontComponent` validation
+but renders its component with ordinary React DOM. It is a **synthetic native-
+definition harness**, not Remote DOM, an installed App or native invocation.
+The injected read-only fixtures do not fetch, store, authenticate or dispatch.
+Denied/missing states here prove display behavior, not server authorization.
+
+A later source inspection found that native manifest discovery scans the entire
+App folder. The harness definition was changed to a named export so it cannot
+be discovered as an installable settings component. Next focused validation is
+justified by this changed adapter plus a new test of the actual native discovery
+function; browser recheck confirms the changed entry still renders.
+
+Residual native proof: actual Remote DOM CSS/select/useEffect behavior and
+authenticated installed invocation remain unproved. The general native
+executeOneLogicFunction path requires WORKFLOWS; this trial neither uses that
+path nor broadens permission. Real user/App/grant intersection, foreign/stale
+receipt denial before dispatch, durable recurring progress and full catalog
+coverage still need their separately scoped native proof. No web backend or
+secret store is created, and no deployment/installation/publication is implied.
+
+Final focused trial result: **PASS** at `2026-09-07T09:14:32.275Z`.
+Five focused tests passed, including native discovery exclusion; App typecheck
+and focused lint passed. The browser recheck passed ten grouped assertions,
+with no page errors or external requests. Both shared module hashes are recorded
+in the artifact receipt; runtime identity assertion also compares the imported
+React function. An initial retry command was issued from the wrong directory
+and did not execute; the subsequent App-directory invocation passed.
+
+Safe reproduction references: App-root Vitest target
+`src/operator/status-contract.test.ts`, `tsgo --noEmit -p tsconfig.json`, and
+`oxlint -c .oxlintrc.json src/operator harness`; root browser command
+`node packages/twenty-apps/internal/mhoo-clover/harness/verify.mjs <output-dir>`.
+Final script SHA-256:
+`d2263cfacf07277154ce7a990f6b7954e79b6ee95b327def8f82a8abe7ce5f1f`.
+Protected local artifact directory:
+`/Users/mhoooo/.codex/visualizations/2026/09/05/01a073d5-22c3-7123-89ad-ebf486cdc93a/clover-two-host-trial-final/`.
+Contains `receipt.json`, `metafile.json`, and both hosts' partial, uncertain and
+mobile PNGs. Initial-run artifacts remain in sibling `clover-two-host-trial/`.
+Desktop/mobile screenshots were visually inspected; no horizontal mobile
+clipping was observed. Owned loopback servers closed in script cleanup and no
+listeners remained on 4332/4333. No Docker resources were used.
+
+Next owner is coordinating head `01a07aa7-944a-70c3-bf77-d51b9fc766f2` for
+review of this local source increment. No publication authority is assumed.
+Native installed invocation/sandbox evidence remains with the retained Clover
+worker after separate scoped dispatch. Separate repository ownership remains
+proposed. Source or adapter changes invalidate affected local proof; none of
+this establishes deployed behavior. The final commit and source-gate results
+are supplied in the handoff; existing queue evidence was not rerun.

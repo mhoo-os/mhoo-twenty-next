@@ -1,6 +1,7 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "jsx": "react-jsx",
     "sourceMap": true,
     "declaration": true,
     "outDir": "./dist",
