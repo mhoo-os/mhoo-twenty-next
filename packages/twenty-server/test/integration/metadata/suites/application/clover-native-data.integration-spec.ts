@@ -1,3 +1,6 @@
+import { RestApiClient } from 'twenty-client-sdk/rest';
+import { persistCloverPaymentPage } from '../../../../../../twenty-apps/internal/mhoo-clover/src/logic-functions/persist-clover-payment-page';
+import { readCloverPayments } from '../../../../../../twenty-apps/internal/mhoo-clover/src/logic-functions/clover-payment-read';
 import { type LogicFunctionExecutorService } from 'src/engine/core-modules/logic-function/logic-function-executor/logic-function-executor.service';
 import { getAppProviderByClassName } from 'test/integration/utils/get-app-provider-by-class-name.util';
 import { type TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
@@ -206,6 +209,78 @@ describe('Clover native install and delegated source-record API', () => {
       .set('Authorization', `Bearer ${APPLE_JANE_ADMIN_ACCESS_TOKEN}`)
       .send({ connectionKey: randomUUID() });
     expect(directUserWrite.status).toBe(400);
+  });
+
+  it('persists payment revisions and replay receipts through the actual native API', async () => {
+    const connectionId = randomUUID();
+    const binding = {
+      connectionId,
+      merchantId: 'ABCDEFGHIJKLM',
+      grantId: randomUUID(),
+    };
+    const connection = {
+      id: connectionId,
+      handle: binding.merchantId,
+      providerName: 'clover-manual',
+      accessToken: 'synthetic-provider-value',
+      authFailedAt: null,
+    };
+    const page = await readCloverPayments(
+      {
+        connectionId,
+        fromMs: 1000,
+        toMs: 2000,
+        timeField: 'modifiedTime',
+        offset: 0,
+      },
+      {
+        list: async () => [connection],
+        get: async () => connection,
+        fetch: async () =>
+          Response.json({
+            elements: [
+              {
+                id: 'NOPQRSTUVWXYZ',
+                amount: 100,
+                createdTime: 1100,
+                modifiedTime: 1500,
+                result: 'SUCCESS',
+              },
+            ],
+          }),
+      },
+    );
+    const dependencies = {
+      client: new RestApiClient({
+        baseUrl: `http://localhost:${APP_PORT}`,
+        token: cloverToken,
+      }),
+      authorize: async () => {},
+      now: () => new Date('2026-09-07T00:00:00Z'),
+    };
+    const saved = await persistCloverPaymentPage(page, binding, dependencies);
+    expect(await persistCloverPaymentPage(page, binding, dependencies)).toEqual(
+      saved,
+    );
+    for (const plural of ['cloverPaymentRevisions', 'cloverImportReceipts']) {
+      const records = await client()
+        .get(`/rest/${plural}`)
+        .query({ filter: `connectionId[eq]:${connectionId}`, depth: 0 })
+        .set('Authorization', `Bearer ${cloverToken}`);
+      expect(records.status).toBe(200);
+      expect(records.body.data[plural]).toHaveLength(1);
+    }
+    const reverse = await client()
+      .get(`/rest/cloverConnections/${connectionId}`)
+      .query({ depth: 1 })
+      .set('Authorization', `Bearer ${cloverToken}`);
+    expect(reverse.body.data.cloverConnection.paymentRevisions).toHaveLength(1);
+    expect(reverse.body.data.cloverConnection.importReceipts).toHaveLength(1);
+    const denied = await client()
+      .post('/rest/cloverImportReceipts')
+      .set('Authorization', `Bearer ${consumerToken}`)
+      .send({ pageKey: randomUUID() });
+    expect(denied.status).toBe(400);
   });
 
   it('uses real authenticated intake/custody, denies another App credential access and disconnects natively', async () => {

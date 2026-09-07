@@ -1,10 +1,10 @@
 import {
-  defineObject,
-  MetadataWritability,
-  FieldType,
-  RelationType,
-} from 'twenty-sdk/define';
-import {
+  PAYMENT_REVISION_OBJECT,
+  IMPORT_RECEIPT_OBJECT,
+  CONNECTION_PAYMENTS_FIELD,
+  PAYMENT_CONNECTION_FIELD,
+  CONNECTION_RECEIPTS_FIELD,
+  RECEIPT_CONNECTION_FIELD,
   CONNECTION_OBJECT,
   SYNC_STATE_OBJECT,
   CONNECTION_SYNC_STATES_FIELD,
@@ -12,6 +12,14 @@ import {
   CONNECTION_OBSERVATIONS_FIELD,
   OBSERVATION_CONNECTION_FIELD,
 } from '../contracts/model-identifiers';
+
+import {
+  defineObject,
+  MetadataWritability,
+  FieldType,
+  RelationType,
+} from 'twenty-sdk/define';
+
 export default defineObject({
   universalIdentifier: CONNECTION_OBJECT,
   nameSingular: 'cloverConnection',
@@ -23,6 +31,28 @@ export default defineObject({
   isUICreatable: false,
   isUIEditable: false,
   fields: [
+    {
+      universalIdentifier: CONNECTION_RECEIPTS_FIELD,
+      name: 'importReceipts',
+      label: 'Import receipts',
+      type: FieldType.RELATION,
+      icon: 'IconLink',
+      isNullable: true,
+      relationTargetObjectMetadataUniversalIdentifier: IMPORT_RECEIPT_OBJECT,
+      relationTargetFieldMetadataUniversalIdentifier: RECEIPT_CONNECTION_FIELD,
+      universalSettings: { relationType: RelationType.ONE_TO_MANY },
+    },
+    {
+      universalIdentifier: CONNECTION_PAYMENTS_FIELD,
+      name: 'paymentRevisions',
+      label: 'Payment revisions',
+      type: FieldType.RELATION,
+      icon: 'IconLink',
+      isNullable: true,
+      relationTargetObjectMetadataUniversalIdentifier: PAYMENT_REVISION_OBJECT,
+      relationTargetFieldMetadataUniversalIdentifier: PAYMENT_CONNECTION_FIELD,
+      universalSettings: { relationType: RelationType.ONE_TO_MANY },
+    },
     {
       universalIdentifier: CONNECTION_OBSERVATIONS_FIELD,
       name: 'observations',

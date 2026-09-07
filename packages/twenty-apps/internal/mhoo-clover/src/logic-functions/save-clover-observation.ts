@@ -4,11 +4,14 @@ import { cloverSourceKey } from '../contracts/source-identity';
 
 // Native record ID reuses the account UUID in a different object namespace.
 // Reconnection creates a new lineage; no secret is stored in these records.
-export const saveCloverObservation = async (
+export const ensureCloverConnection = async (
   client: RestApiClient,
-  observation: CloverMerchantObservation,
+  observation: Pick<
+    CloverMerchantObservation,
+    'connectedAccountId' | 'merchantId'
+  >,
 ) => {
-  const { connectedAccountId, ...facts } = observation;
+  const { connectedAccountId } = observation;
   const connection = {
     id: connectedAccountId,
     connectedAccountId,
@@ -49,9 +52,18 @@ export const saveCloverObservation = async (
     bound.connectionKey !== connection.connectionKey
   )
     throw new Error('Connection record binding mismatch');
+  return connectedAccountId;
+};
+
+export const saveCloverObservation = async (
+  client: RestApiClient,
+  observation: CloverMerchantObservation,
+) => {
+  const connectionId = await ensureCloverConnection(client, observation);
+  const { connectedAccountId: _accountId, ...facts } = observation;
   return client.post(
     '/rest/cloverMerchantObservations',
-    { ...facts, connectionId: connectedAccountId },
-    options,
+    { ...facts, connectionId },
+    { signal: AbortSignal.timeout(4000) },
   );
 };

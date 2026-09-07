@@ -99,43 +99,45 @@ export const readCloverPayments = async (
     const data = JSON.parse(new TextDecoder().decode(bytes));
     if (!Array.isArray(data.elements) || data.elements.length > PAGE_SIZE)
       throw new Error('Invalid page');
-    const revisions = data.elements.map((item: Record<string, unknown>) => {
-      if (
-        !item ||
-        typeof item.id !== 'string' ||
-        !/^[A-Z0-9]{13}$/.test(item.id) ||
-        !Number.isSafeInteger(item.amount) ||
-        !Number.isSafeInteger(item.createdTime) ||
-        !Number.isSafeInteger(item.modifiedTime) ||
-        Number(item.createdTime) < 0 ||
-        Number(item.modifiedTime) < 0 ||
-        typeof item.result !== 'string' ||
-        !/^[A-Z_]{1,32}$/.test(item.result) ||
-        (item.voided !== undefined && typeof item.voided !== 'boolean')
-      )
-        throw new Error('Invalid payment');
-      const timestamp = Number(item[input.timeField]);
-      if (timestamp < input.fromMs || timestamp >= input.toMs)
-        throw new Error('Out of range payment');
-      const facts = {
-        connectionId: connection.id,
-        merchantId: connection.handle,
-        paymentId: item.id,
-        amountMinor: Number(item.amount),
-        currency: null,
-        createdTimeMs: Number(item.createdTime),
-        modifiedTimeMs: Number(item.modifiedTime),
-        result: item.result,
-        voided: item.voided ?? null,
-      };
-      const serialized = JSON.stringify(facts);
-      if (serialized.includes(connection.accessToken))
-        throw new Error('Invalid provider projection');
-      return {
-        ...facts,
-        revisionKey: createHash('sha256').update(serialized).digest('hex'),
-      };
-    });
+    const revisions = (data.elements as Record<string, unknown>[]).map(
+      (item) => {
+        if (
+          !item ||
+          typeof item.id !== 'string' ||
+          !/^[A-Z0-9]{13}$/.test(item.id) ||
+          !Number.isSafeInteger(item.amount) ||
+          !Number.isSafeInteger(item.createdTime) ||
+          !Number.isSafeInteger(item.modifiedTime) ||
+          Number(item.createdTime) < 0 ||
+          Number(item.modifiedTime) < 0 ||
+          typeof item.result !== 'string' ||
+          !/^[A-Z_]{1,32}$/.test(item.result) ||
+          (item.voided !== undefined && typeof item.voided !== 'boolean')
+        )
+          throw new Error('Invalid payment');
+        const timestamp = Number(item[input.timeField]);
+        if (timestamp < input.fromMs || timestamp >= input.toMs)
+          throw new Error('Out of range payment');
+        const facts = {
+          connectionId: connection.id,
+          merchantId: connection.handle,
+          paymentId: item.id,
+          amountMinor: Number(item.amount),
+          currency: null,
+          createdTimeMs: Number(item.createdTime),
+          modifiedTimeMs: Number(item.modifiedTime),
+          result: item.result,
+          voided: item.voided ?? null,
+        };
+        const serialized = JSON.stringify(facts);
+        if (serialized.includes(connection.accessToken))
+          throw new Error('Invalid provider projection');
+        return {
+          ...facts,
+          revisionKey: createHash('sha256').update(serialized).digest('hex'),
+        };
+      },
+    );
     return {
       revisions,
       nextOffset:
