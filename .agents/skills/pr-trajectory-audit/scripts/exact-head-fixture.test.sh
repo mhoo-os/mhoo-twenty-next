@@ -82,6 +82,20 @@ grep -Fq "trajectory fixture rejected: $suffix_path" "$temporary_directory/suffi
 }
 
 allowed_paths=(
+  packages/twenty-server/src/database/commands/upgrade-version-command/2-37/2-37-instance-command-slow-1788846876000-ensure-manual-token-workspace-grant.ts
+  packages/twenty-server/src/database/commands/upgrade-version-command/2-37/__tests__/ensure-manual-token-workspace-grant.instance-command.spec.ts
+  packages/twenty-server/src/engine/core-modules/upgrade/decorators/registered-instance-command.decorator.ts
+  packages/twenty-server/src/engine/core-modules/upgrade/services/upgrade-command-registry.service.ts
+  packages/twenty-server/src/engine/core-modules/upgrade/services/upgrade-sequence-reader.service.ts
+  packages/twenty-server/src/engine/core-modules/upgrade/services/upgrade-sequence-runner.service.ts
+  .github/workflows/preview-env-dispatch.yaml
+  packages/twenty-server/src/engine/core-modules/clover-token/clover-token.service.ts
+  packages/twenty-server/src/engine/core-modules/email/email.service.ts
+  packages/twenty-server/src/engine/core-modules/email/utils/inline-email-image.ts
+  packages/twenty-server/src/engine/core-modules/email/utils/inline-product-email-logo.ts
+  packages/twenty-server/src/engine/core-modules/email/__tests__/inline-email-images.spec.ts
+  packages/twenty-server/src/engine/core-modules/email/__tests__/inline-invitation-rendering.spec.ts
+  packages/twenty-server/src/database/scripts/check-db-initialization.ts
   evaluations/finance/mho-254/README.md
   packages/twenty-front/src/locales/ja-JP.po
   packages/twenty-front/src/locales/generated/ja-JP.ts
@@ -95,20 +109,20 @@ allowed_paths=(
 
 for index in "${!allowed_paths[@]}"; do
   path="${allowed_paths[$index]}"
-  blob="$({ git show "HEAD:$path"; printf '\n# exact-root fixture\n'; } | git hash-object -w --stdin)"
+  blob="$({ if git cat-file -e "HEAD:$path" 2>/dev/null; then git show "HEAD:$path"; fi; printf '\n# exact-root fixture\n'; } | git hash-object -w --stdin)"
   fixture_index="$temporary_directory/index"
   GIT_INDEX_FILE="$fixture_index" git read-tree HEAD
-  GIT_INDEX_FILE="$fixture_index" git update-index \
+  GIT_INDEX_FILE="$fixture_index" git update-index --add \
     --cacheinfo 100644 "$blob" "$path"
   tree="$(GIT_INDEX_FILE="$fixture_index" git write-tree)"
   candidate_head="$(
     printf 'test: allow exact-root locale catalog path\n' |
       GIT_AUTHOR_NAME='Trajectory fixture' \
       GIT_AUTHOR_EMAIL='trajectory-fixture@example.invalid' \
-      GIT_AUTHOR_DATE="2000-01-01T00:01:0${index}Z" \
+      GIT_AUTHOR_DATE="2000-01-01T00:01:00Z" \
       GIT_COMMITTER_NAME='Trajectory fixture' \
       GIT_COMMITTER_EMAIL='trajectory-fixture@example.invalid' \
-      GIT_COMMITTER_DATE="2000-01-01T00:01:0${index}Z" \
+      GIT_COMMITTER_DATE="2000-01-01T00:01:00Z" \
       git commit-tree "$tree" -p HEAD
   )"
 
@@ -117,6 +131,20 @@ for index in "${!allowed_paths[@]}"; do
 done
 
 rogue_allowed_paths=(
+  packages/twenty-server/src/database/commands/upgrade-version-command/2-37/2-37-instance-command-slow-1788846876000-ensure-manual-token-workspace-grant.ts.backup
+  packages/twenty-server/src/database/commands/upgrade-version-command/2-37/__tests__/ensure-manual-token-workspace-grant.instance-command.spec.ts.backup
+  packages/twenty-server/src/engine/core-modules/upgrade/decorators/registered-instance-command.decorator.ts.backup
+  packages/twenty-server/src/engine/core-modules/upgrade/services/rogue-upgrade-command-registry.service.ts
+  packages/twenty-server/src/engine/core-modules/upgrade/services/nested/upgrade-sequence-reader.service.ts
+  packages/twenty-server/src/engine/core-modules/upgrade/services/upgrade-sequence-runner.service.ts.backup
+  .github/workflows/preview-env-dispatch.yaml.backup
+  .github/workflows/nested/preview-env-dispatch.yaml
+  packages/twenty-server/src/engine/core-modules/clover-token/credential-export.ts
+  packages/twenty-server/src/engine/core-modules/clover-token/clover-token.service.ts.backup
+  nested/packages/twenty-server/src/engine/core-modules/clover-token/clover-token.service.ts
+  packages/twenty-server/src/engine/core-modules/email/utils/inline-email-image.ts.backup
+  packages/twenty-server/src/engine/core-modules/email/utils/nested/inline-email-image.ts
+  packages/twenty-server/src/database/scripts/check-db-initialization.ts.backup
   evaluations/finance/mho-254-backup/README.md
   packages/twenty-emails/src/locales/ja-JP.po.backup
   packages/twenty-emails/src/locales/rogue/ja-JP.po
@@ -162,6 +190,14 @@ for index in "${!rogue_allowed_paths[@]}"; do
 done
 
 finance_allowed_paths=(
+  docs/provenance/front-component-graphql-edge-auth.md
+  packages/twenty-front-component-renderer/src/types/HostFetchPolicy.ts
+  packages/twenty-front-component-renderer/src/host/fetch/utils/createHostFetchEnforcingPolicy.ts
+  packages/twenty-front-component-renderer/src/host/fetch/utils/buildHostFetchPolicyFromFrontComponentUrls.ts
+  docs/provenance/front-component-cookie-auth.md
+  scripts/provenance/front-component-cookie-browser.cjs
+  packages/twenty-front-component-renderer/src/host/component-source/utils/fetchComponentSourceFromNetwork.ts
+  packages/twenty-front-component-renderer/src/host/component-source/utils/fetchJavaScriptModuleSourceText.ts
   packages/twenty-apps/internal/mhoo-finance/.gitignore
   packages/twenty-apps/internal/mhoo-finance/README.md
   packages/twenty-apps/internal/mhoo-finance/fixtures/mhoo-finance-fixture-pack.json
@@ -193,6 +229,10 @@ for index in "${!finance_allowed_paths[@]}"; do
 done
 
 rogue_finance_paths=(
+  packages/twenty-front-component-renderer/src/host/fetch/utils/createHostFetchEnforcingPolicy.ts.backup
+  packages/twenty-front-component-renderer/src/host/component-source/utils/fetchComponentSourceFromNetwork.ts.backup
+  packages/twenty-front-component-renderer/src/host/fetch/utils/resolveHostFetchRedirectMode.ts
+  nested/docs/provenance/front-component-cookie-auth.md
   packages/twenty-apps/internal/mhoo-finance.backup/README.md
   nested/packages/twenty-apps/internal/mhoo-finance/README.md
   packages/twenty-apps/internal/mhoo-financeish/README.md
@@ -513,6 +553,7 @@ legal_allowed_paths=(
   packages/twenty-front/src/modules/app/components/DomainShell.tsx
   packages/twenty-front/src/modules/app/components/__tests__/DomainShell.test.tsx
   packages/twenty-shared/src/types/AppPath.ts
+  packages/twenty-front/src/testing/constants/UntestedAppPaths.ts
 )
 
 for index in "${!legal_allowed_paths[@]}"; do
@@ -553,6 +594,9 @@ rogue_legal_paths=(
   packages/twenty-front/src/modules/app/components/__tests__/rogue/DomainShell.test.tsx
   packages/twenty-shared/src/types/rogue/AppPath.ts
   packages/twenty-shared/src/types/AppPath.ts.backup
+  packages/twenty-front/src/testing/constants/UntestedAppPaths.ts.backup
+  nested/packages/twenty-front/src/testing/constants/UntestedAppPaths.ts
+  packages/twenty-front/src/testing/constants/PropertyMockStyles.ts
 )
 
 for index in "${!rogue_legal_paths[@]}"; do
@@ -583,6 +627,75 @@ for index in "${!rogue_legal_paths[@]}"; do
     sed -n '1,120p' "$temporary_directory/rogue-legal-$index-output" >&2
     exit 1
   }
+done
+
+# AI editor repair and runner compatibility retain exact, bounded paths.
+repair_paths=(
+  docs/provenance/linear-issue-status.md
+  packages/twenty-apps/public/linear/src/constants/universal-identifiers.ts
+  packages/twenty-apps/public/linear/src/logic-functions/get-linear-issue-status.ts
+  packages/twenty-apps/public/linear/src/logic-functions/handlers/get-linear-issue-status-handler.ts
+  packages/twenty-apps/public/linear/src/logic-functions/__tests__/get-linear-issue-status.test.ts
+  packages/twenty-apps/public/linear/src/logic-functions/utils/call-linear-graphql.ts
+  packages/twenty-apps/public/linear/src/logic-functions/utils/types/linear-graphql-result.type.ts
+  packages/twenty-front/src/testing/constants/UntestedAppPaths.ts
+  .github/workflows/ci-front.yaml
+  docs/provenance/ai-editor-lifecycle.md
+  packages/twenty-front/src/modules/advanced-text-editor/utils/hasEditorExtension.ts
+  packages/twenty-front/src/modules/advanced-text-editor/utils/__tests__/hasEditorExtension.test.ts
+  packages/twenty-front/src/modules/advanced-text-editor/hooks/useTurnIntoBlockOptions.ts
+  packages/twenty-front/src/modules/advanced-text-editor/hooks/__tests__/useTurnIntoBlockOptions.test.tsx
+)
+for path in "${repair_paths[@]}"; do
+  blob="$(printf 'bounded editor fixture\n' | git hash-object -w --stdin)"
+  GIT_INDEX_FILE="$temporary_directory/index" git read-tree HEAD
+  GIT_INDEX_FILE="$temporary_directory/index" git update-index --add --cacheinfo 100644 "$blob" "$path"
+  tree="$(GIT_INDEX_FILE="$temporary_directory/index" git write-tree)"
+  candidate_head="$(
+    printf 'test: exact editor path\n' |
+      GIT_AUTHOR_NAME='Trajectory fixture' \
+      GIT_AUTHOR_EMAIL='trajectory-fixture@example.invalid' \
+      GIT_AUTHOR_DATE='2000-01-01T00:11:00Z' \
+      GIT_COMMITTER_NAME='Trajectory fixture' \
+      GIT_COMMITTER_EMAIL='trajectory-fixture@example.invalid' \
+      GIT_COMMITTER_DATE='2000-01-01T00:11:00Z' \
+      git commit-tree "$tree" -p HEAD
+  )"
+  bash "$fixture" HEAD "$candidate_head" >"$temporary_directory/ai-editor-output"
+done
+for path in \
+  packages/twenty-apps/public/linear/src/roles/default-function.role.ts \
+  packages/twenty-apps/public/linear/src/logic-functions/get-linear-issue-status.ts.backup \
+  packages/twenty-apps/public/linear/src/logic-functions/handlers/nested/get-linear-issue-status-handler.ts \
+  packages/twenty-front/src/modules/advanced-text-editor/utils/hasEditorExtension.ts.backup \
+  packages/twenty-front/src/modules/advanced-text-editor/hooks/nested/useTurnIntoBlockOptions.ts \
+  packages/twenty-front/src/modules/advanced-text-editor/hooks/useTextBubbleState.ts \
+  packages/twenty-front/src/modules/advanced-text-editor/components/AdvancedTextEditor.tsx \
+  .github/workflows/ci-front.yaml.backup \
+  .github/workflows/nested/ci-front.yaml \
+  .github/workflows/ci-front-component-renderer.yaml \
+  packages/twenty-front/src/testing/constants/UntestedAppPaths.ts.backup \
+  packages/twenty-front/src/testing/constants/nested/UntestedAppPaths.ts \
+  packages/twenty-front/src/testing/constants/PropertyMockStyles.ts; do
+  blob="$(printf 'unauthorized editor fixture\n' | git hash-object -w --stdin)"
+  GIT_INDEX_FILE="$temporary_directory/index" git read-tree HEAD
+  GIT_INDEX_FILE="$temporary_directory/index" git update-index --add --cacheinfo 100644 "$blob" "$path"
+  tree="$(GIT_INDEX_FILE="$temporary_directory/index" git write-tree)"
+  candidate_head="$(
+    printf 'test: reject adjacent editor path\n' |
+      GIT_AUTHOR_NAME='Trajectory fixture' \
+      GIT_AUTHOR_EMAIL='trajectory-fixture@example.invalid' \
+      GIT_AUTHOR_DATE='2000-01-01T00:11:00Z' \
+      GIT_COMMITTER_NAME='Trajectory fixture' \
+      GIT_COMMITTER_EMAIL='trajectory-fixture@example.invalid' \
+      GIT_COMMITTER_DATE='2000-01-01T00:11:00Z' \
+      git commit-tree "$tree" -p HEAD
+  )"
+  if bash "$fixture" HEAD "$candidate_head" >"$temporary_directory/ai-editor-output" 2>&1; then
+    printf 'exact-head fixture test failed: unapproved editor path passed: %s\n' "$path" >&2
+    exit 1
+  fi
+  grep -Fq "trajectory fixture rejected: $path" "$temporary_directory/ai-editor-output"
 done
 
 unrelated_head="$(

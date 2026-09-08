@@ -68,6 +68,7 @@ export class EmailAliasManagerService {
       case ConnectedAccountProvider.IMAP_SMTP_CALDAV:
       case ConnectedAccountProvider.OIDC:
       case ConnectedAccountProvider.SAML:
+      case ConnectedAccountProvider.CLOVER:
       case ConnectedAccountProvider.EMAIL_GROUP:
       case ConnectedAccountProvider.APP:
         return [];

@@ -21,7 +21,8 @@
     "typecheck": "twenty dev:build && tsgo --noEmit -p tsconfig.spec.json",
     "test:unit": "vitest run --config vitest.unit.config.ts",
     "test:watch": "vitest --config vitest.unit.config.ts",
-    "benchmark:population": "node --experimental-strip-types scripts/generate-benchmark-population.mjs"
+    "benchmark:population": "node --experimental-strip-types scripts/generate-benchmark-population.mjs",
+    "fixtures:validate-ingestion": "node --experimental-strip-types scripts/validate-ingestion-fixtures.mjs"
   },
   "devDependencies": {
     "@emotion/react": "^11.14.0",

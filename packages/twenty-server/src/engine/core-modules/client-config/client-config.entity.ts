@@ -444,6 +444,9 @@ export class ClientConfig {
   @Field(() => Boolean)
   isMultiWorkspaceEnabled: boolean;
 
+  // REST client-config only; do not expand the GraphQL schema for this flag.
+  isSameOriginWorkspaceEnabled?: boolean;
+
   @Field(() => Boolean)
   isEmailVerificationRequired: boolean;
 

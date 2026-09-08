@@ -202,6 +202,9 @@ export class ClientConfigService {
         sso: [],
       },
       signInPrefilled: this.twentyConfigService.get('SIGN_IN_PREFILLED'),
+      isSameOriginWorkspaceEnabled:
+        this.twentyConfigService.get('IS_MULTIWORKSPACE_ENABLED') &&
+        this.twentyConfigService.get('IS_SAME_ORIGIN_WORKSPACE_ENABLED'),
       isMultiWorkspaceEnabled: this.twentyConfigService.get(
         'IS_MULTIWORKSPACE_ENABLED',
       ),

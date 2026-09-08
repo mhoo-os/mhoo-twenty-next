@@ -1,0 +1,91 @@
+import {
+  defineObject,
+  MetadataWritability,
+  FieldType,
+  RelationType,
+  OnDeleteAction,
+} from 'twenty-sdk/define';
+import {
+  SYNC_STATE_OBJECT,
+  CONNECTION_OBJECT,
+  SYNC_STATE_CONNECTION_FIELD,
+  CONNECTION_SYNC_STATES_FIELD,
+} from '../contracts/model-identifiers';
+export default defineObject({
+  universalIdentifier: SYNC_STATE_OBJECT,
+  nameSingular: 'cloverSyncState',
+  namePlural: 'cloverSyncStates',
+  labelSingular: 'Clover sync state',
+  labelPlural: 'Clover sync states',
+  icon: 'IconPlug',
+  writability: MetadataWritability.APPLICATION,
+  isUICreatable: false,
+  isUIEditable: false,
+  fields: [
+    {
+      universalIdentifier: 'dbe090a6-4d43-46a8-8a0e-971f69a300dd',
+      name: 'syncKey',
+      label: 'syncKey',
+      type: FieldType.TEXT,
+      icon: 'IconInfoCircle',
+    },
+    {
+      universalIdentifier: '663fd033-ab35-4014-b625-6986cb273a5b',
+      name: 'dataset',
+      label: 'dataset',
+      type: FieldType.TEXT,
+      icon: 'IconInfoCircle',
+    },
+    {
+      universalIdentifier: '434ed861-85ec-417e-a415-a3986f6d89a1',
+      name: 'status',
+      label: 'status',
+      type: FieldType.TEXT,
+      icon: 'IconInfoCircle',
+    },
+    {
+      universalIdentifier: '25eda7f1-a48d-4b03-9ab0-cd994f8dded5',
+      name: 'cursor',
+      label: 'cursor',
+      type: FieldType.TEXT,
+      icon: 'IconInfoCircle',
+    },
+    {
+      universalIdentifier: '7009f2a5-21c5-4a9a-b134-c8bd707cb4df',
+      name: 'lastSuccessAt',
+      label: 'lastSuccessAt',
+      type: FieldType.DATE_TIME,
+      icon: 'IconInfoCircle',
+    },
+    {
+      universalIdentifier: 'b8b57abf-0373-493d-9329-15c706a33678',
+      name: 'coverage',
+      label: 'coverage',
+      type: FieldType.TEXT,
+      icon: 'IconInfoCircle',
+    },
+    {
+      universalIdentifier: '997e1883-6650-4bb0-8370-ed88b628d864',
+      name: 'grantRevision',
+      label: 'grantRevision',
+      type: FieldType.NUMBER,
+      icon: 'IconInfoCircle',
+    },
+    {
+      universalIdentifier: SYNC_STATE_CONNECTION_FIELD,
+      name: 'connection',
+      label: 'Connection',
+      type: FieldType.RELATION,
+      icon: 'IconLink',
+      isNullable: true,
+      relationTargetObjectMetadataUniversalIdentifier: CONNECTION_OBJECT,
+      relationTargetFieldMetadataUniversalIdentifier:
+        CONNECTION_SYNC_STATES_FIELD,
+      universalSettings: {
+        relationType: RelationType.MANY_TO_ONE,
+        onDelete: OnDeleteAction.RESTRICT,
+        joinColumnName: 'connectionId',
+      },
+    },
+  ],
+});
