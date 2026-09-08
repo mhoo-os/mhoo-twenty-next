@@ -96,25 +96,27 @@ const buildHarness = (
   const dataSource = { createQueryRunner: jest.fn(() => queryRunner) };
   const migrationService = {
     getLastAttemptedCommandNameOrThrow: jest.fn(async () =>
-      receipts.findLast((receipt) => !receipt.isInitial),
+      [...receipts].reverse().find((receipt) => !receipt.isInitial),
     ),
     getWorkspaceLastAttemptedCommandNameOrThrow: jest.fn(async () =>
       workspace
         ? new Map([
             [
               WORKSPACE_ID,
-              receipts.findLast(
-                (receipt) => receipt.workspaceId === WORKSPACE_ID,
-              )!,
+              [...receipts]
+                .reverse()
+                .find((receipt) => receipt.workspaceId === WORKSPACE_ID)!,
             ],
           ])
         : new Map(),
     ),
     isLastAttemptCompleted: jest.fn(
       async ({ name }: { name: string }) =>
-        receipts.findLast(
-          (receipt) => receipt.name === name && receipt.workspaceId === null,
-        )?.status === 'completed',
+        [...receipts]
+          .reverse()
+          .find(
+            (receipt) => receipt.name === name && receipt.workspaceId === null,
+          )?.status === 'completed',
     ),
     areAllWorkspacesAtCommand: jest.fn(
       async ({
@@ -126,11 +128,13 @@ const buildHarness = (
       }) =>
         workspaceIds.every(
           (workspaceId) =>
-            receipts.findLast(
-              (receipt) =>
-                receipt.name === commandName &&
-                receipt.workspaceId === workspaceId,
-            )?.status === 'completed',
+            [...receipts]
+              .reverse()
+              .find(
+                (receipt) =>
+                  receipt.name === commandName &&
+                  receipt.workspaceId === workspaceId,
+              )?.status === 'completed',
         ),
     ),
     recordUpgradeMigration: jest.fn(
@@ -287,7 +291,7 @@ describe('manual token grant repair after completed existing 2.37 upgrade', () =
         .filter((step) => step.name !== REPAIR_NAME)
         .map((step) => step.name),
     ).toEqual(historicalNames);
-    expect(h.sequence.at(-1)?.name).toBe(REPAIR_NAME);
+    expect(h.sequence[h.sequence.length - 1]?.name).toBe(REPAIR_NAME);
   });
 
   it('reaches the appended repair after the actual old SLOW cursor and records DDL atomically', async () => {
@@ -307,7 +311,7 @@ describe('manual token grant repair after completed existing 2.37 upgrade', () =
       },
     );
     expect(h.events).toEqual(['ddl', 'completed', 'commit']);
-    expect(h.receipts.at(-1)).toMatchObject({
+    expect(h.receipts[h.receipts.length - 1]).toMatchObject({
       name: REPAIR_NAME,
       status: 'completed',
       workspaceId: null,
@@ -361,7 +365,7 @@ describe('manual token grant repair after completed existing 2.37 upgrade', () =
     expect(h.events).toEqual(['rollback', 'failed']);
     expect(h.queryRunner.addColumn).not.toHaveBeenCalled();
     expect(h.queryRunner.commitTransaction).not.toHaveBeenCalled();
-    expect(h.receipts.at(-1)).toMatchObject({
+    expect(h.receipts[h.receipts.length - 1]).toMatchObject({
       name: REPAIR_NAME,
       status: 'failed',
     });
@@ -376,7 +380,7 @@ describe('manual token grant repair after completed existing 2.37 upgrade', () =
     ).rejects.toThrow('DDL unavailable');
     expect(h.events).toEqual(['rollback', 'failed']);
     await h.sequenceRunner.run({ sequence: h.sequence, options: {} });
-    expect(h.receipts.at(-1)).toMatchObject({
+    expect(h.receipts[h.receipts.length - 1]).toMatchObject({
       name: REPAIR_NAME,
       status: 'completed',
     });
@@ -399,12 +403,12 @@ describe('manual token grant repair after completed existing 2.37 upgrade', () =
 
       await h.sequenceRunner.run({ sequence: h.sequence, options: {} });
       expect(h.queryRunner.addColumn).not.toHaveBeenCalled();
-      expect(h.receipts.at(-1)?.name).toBe(WORKSPACE_TAIL);
+      expect(h.receipts[h.receipts.length - 1]?.name).toBe(WORKSPACE_TAIL);
       await h.sequenceRunner.run({ sequence: h.sequence, options: {} });
       for (const provider of h.workspaceProviders)
         expect(provider.instance.runOnWorkspace).not.toHaveBeenCalled();
       expect(h.events).toEqual(['ddl', 'completed', 'commit']);
-      expect(h.receipts.at(-1)).toMatchObject({
+      expect(h.receipts[h.receipts.length - 1]).toMatchObject({
         name: REPAIR_NAME,
         workspaceId: WORKSPACE_ID,
       });
@@ -417,7 +421,9 @@ describe('manual token grant repair after completed existing 2.37 upgrade', () =
 
   it('retries a failed workspace tail and enforces its barrier before repair', async () => {
     const h = buildHarness(undefined, 'failed');
-    const tail = h.workspaceProviders.at(-1)!.instance.runOnWorkspace;
+    const tail =
+      h.workspaceProviders[h.workspaceProviders.length - 1]!.instance
+        .runOnWorkspace;
     tail.mockRejectedValueOnce(new Error('workspace failure'));
     const failed = await h.sequenceRunner.run({
       sequence: h.sequence,
