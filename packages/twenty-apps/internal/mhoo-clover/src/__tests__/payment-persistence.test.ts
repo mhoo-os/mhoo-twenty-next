@@ -208,3 +208,24 @@ describe('durable Clover page acknowledgement', () => {
     expect(store.records.get('cloverImportReceipts')).toHaveLength(1);
   });
 });
+
+it('keeps interactive caller receipts distinct from background grants and deduplicates replay', async () => {
+  const store = native(); const page = await makePage();
+  const before = await persistCloverPaymentPage(page, binding, store);
+  const caller = '44444444-4444-4444-8444-444444444444';
+  const interactive = { ...binding, grantId: null, interactiveUserWorkspaceId: caller };
+  const saved = await persistCloverPaymentPage(page, interactive, store);
+  expect(await persistCloverPaymentPage(page, interactive, store)).toEqual(saved);
+  expect(saved.pageKey).not.toBe(before.pageKey);
+  expect(store.records.get('cloverPaymentRevisions')).toHaveLength(2);
+  const receipts = store.records.get('cloverImportReceipts')!;
+  expect(receipts).toHaveLength(2);
+  expect(receipts[0].grantId).toBe(binding.grantId);
+  expect(receipts[0].authorizationMode).toBeUndefined();
+  expect(receipts[1]).toMatchObject({ grantId: null, authorizationMode: 'interactive-user-v1', initiatingUserWorkspaceId: caller });
+});
+it('rejects an interactive identity paired with a background grant before storage', async () => {
+  const store = native();
+  await expect(persistCloverPaymentPage(await makePage(), { ...binding, interactiveUserWorkspaceId: binding.connectionId }, store)).rejects.toThrow();
+  expect(store.transport).not.toHaveBeenCalled();
+});

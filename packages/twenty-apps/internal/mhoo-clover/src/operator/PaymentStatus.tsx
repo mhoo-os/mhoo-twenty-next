@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { decodeStatus, pageLabels, pageStatus, type Merchant, type StatusReader, type StatusResult } from './status-contract';
 import './payment-status.css';
+import { RecentImport } from './RecentImport';
 
 export function PaymentStatus({ merchants, readStatus }: { merchants: readonly Merchant[]; readStatus: StatusReader }) {
   const [selected, setSelected] = useState('');
@@ -32,6 +33,7 @@ export function PaymentStatus({ merchants, readStatus }: { merchants: readonly M
           </>}
       </div>
     </section>
+    {active && <RecentImport key={active} connectionId={active} onSaved={() => setRequest((n) => n + 1)} />}
     <footer className="mhoo-clover-status__muted">Saved pages describe stored records, not complete provider history. Recurring sync is not enabled.</footer>
   </main>;
 }

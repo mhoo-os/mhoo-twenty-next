@@ -665,3 +665,63 @@ ARCHITECTURE IMPACT: NONE. Exact9413 server integration shard11 job101774993577 
 Head authorized local test-only repair. Reuse existing core-workflows suite's bounded polling pattern (its helper is private and queries a different surface; no suitable exported predicate poll exists). Only failing test wraps its unchanged native GraphQL read and polls until ACTIVE, preserving errors/id/name/publishedVersion/ACTIVE assertions. At most21 reads and20 conditional250ms waits (5s scheduled waiting plus request time; unchanged Jest20s test timeout). Immediate success incurs no wait; errors fail immediately; exhaustion reaches original ACTIVE assertion. No fixed unconditional delay, runtime change, shared abstraction or weakened expectation. Exact test path added to existing source allowlist.
 
 Smallest local verification: retained harness executes the actual extracted test callback with simulated native-response sequences and virtual timers. Original callback fails delayed-status sequence; repaired callback passes immediate/delayed status and still fails never-active after21 reads, GraphQL error immediately, and wrong publishedVersion. This is control-flow proof, not native integration execution. Full server tsgo --noEmit --preserveSymlinks PASS with reused dependencies; default shared-symlink caveat retained. Existing accepted native/browser/App results reused, no services/builds/provider calls/broad tests. Protected clover-pr32-ci-repair contains hosted failure, focused harness, typecheck log and review receipt. Next: head reviews exact localcommit and authorizes publication separately; hosted repaired integration proof remains pending.
+
+## 2026-09-08 first interactive recent-page source
+
+ARCHITECTURE IMPACT: LOCAL. User priority relayed through the native repository
+head authorizes real permitted merchant onboarding and one capped recent import;
+it does not authorize financial provider writes, broad history, a parallel vault,
+policy changes or uncoordinated platform deployment. Up starts at the existing
+Cloudflare guide URL. Token entry remains in native Twenty custody, never chat.
+
+Base: merged PR32 `006a08bf76e638b29e7379a52f32df58970a3a3e`.
+Retained implementation owner: `mhoo-os/mhoo-twenty-next`; worker
+`01a073d5-22c3-7123-89ad-ebf486cdc93a`; coordinating head
+`01a07aa7-944a-70c3-bf77-d51b9fc766f2`.
+
+The App-owned authenticated POST `/clover/recent-page` requires native interactive
+context and an explicit delegated user token. It never falls back to App-only
+identity. Preparation verifies the selected merchant using the existing bounded
+GET and offers a fixed preceding 24-hour window. The user confirms merchant and
+Read-only configuration; provider scope verification remains unknown. Import
+accepts that window for 15 minutes, reads offset zero with a 100-record cap,
+persists one page, and stops even when another page exists. It has no queue,
+cron, generic execution or public tool trigger. No scheduled grant is activated.
+
+Native user + App permission intersection governs provider connection access and
+native storage. Interactive receipts add nullable `authorizationMode` and
+`initiatingUserWorkspaceId` fields and use null `grantId`; old grant-bound receipts
+are not relabeled. Interactive page identities include mode and initiating
+membership. Existing payment revision identity remains unchanged. Receipt read
+requires current connection access before and after the native query and exact
+caller/connection/window/mode binding. A lost response offers receipt checking,
+not automatic token resubmission or import retries. The old background/history
+paths retain their grant checks. Currency and coverage remain unverified.
+
+Validation: 50 focused recent-page/persistence/background-job/history tests passed;
+4 actual route-handler tests passed; 2 additional persistence tests verify distinct
+interactive provenance and reject mixing it with a background grant (8-test
+persistence suite passed). App lint and typecheck passed. Native SDK App build
+passed; no installation, metadata plan/apply or live provider call occurred.
+Initial test discovery from the repository root found no tests; the App-root
+invocation is required. The first test setup incorrectly returned its mock as a
+cleanup callback; fixed to return void before accepting the test result.
+
+Existing protected receipt root remains `clover-pr32-ci-repair` under the retained
+Clover visualization directory. Read-only live observation is with the coordinator
+and Infrastructure: installed source, schema, Workspace and App compatibility must
+be confirmed before App plan/update. The existing guide was observed sample-only
+by the coordinator. The native handoff binds user, membership, Workspace and
+merchant and expires after 10 minutes. Historical deployment records are not
+current host proof. No issue completion, extraction, deployment, invitation or
+message to Up is implied by this source increment.
+
+Independent head review requested reload-persistent interactive receipt visibility.
+The App now lists at most five caller-and-connection-scoped interactive receipts
+from native records on mount and refresh, without an in-browser range or background
+grant. Malformed, foreign-caller, grant-bound or revoked-access results fail closed.
+The actual persistence helper is tested for durable mode/membership/null-grant fields,
+page-key separation, deduplication and unchanged background receipt fields. The
+latest recent helper/route suite passes 17 tests. A build accidentally invoked at
+repository root failed manifest discovery; the App-root build then passed. These
+local command failures are not provider/runtime failures. No live install occurred.
