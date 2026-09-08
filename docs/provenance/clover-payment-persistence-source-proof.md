@@ -725,3 +725,10 @@ page-key separation, deduplication and unchanged background receipt fields. The
 latest recent helper/route suite passes 17 tests. A build accidentally invoked at
 repository root failed manifest discovery; the App-root build then passed. These
 local command failures are not provider/runtime failures. No live install occurred.
+
+Final review preserved the selected thin-host boundary: the existing native
+settings front component injects a recent-page request callback. Shared
+`PaymentStatus`/`RecentImport` React code owns no Twenty client. The import
+control is optional for other hosts; portable status callers remain unchanged.
+Two focused render checks pass with absent/present transport, without a native
+host. Typecheck, lint and the affected App build pass after this correction.

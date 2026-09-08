@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { RestApiClient } from 'twenty-client-sdk/rest';
 
 type Plan = {
   kind: 'ready';
@@ -19,16 +18,16 @@ type SavedPage = {
 type Result =
   | { kind: 'saved'; records: number; moreAvailable: boolean }
   | { kind: 'uncertain' };
-const client = new RestApiClient({ runAs: 'user' });
-const post = (body: unknown) =>
-  client.post<unknown>('/s/clover/recent-page', body);
+export type RecentPageRequest = (body: unknown) => Promise<unknown>;
 
 export function RecentImport({
   connectionId,
   onSaved,
+  request,
 }: {
   connectionId: string;
   onSaved: () => void;
+  request: RecentPageRequest;
 }) {
   const [pages, setPages] = useState<SavedPage[] | null>(null);
   const [receiptRevision, setReceiptRevision] = useState(0);
@@ -38,7 +37,7 @@ export function RecentImport({
     let cancelled = false;
     setPages(null);
     setReceiptUncertain(false);
-    post({ kind: 'receipts', connectionId })
+    request({ kind: 'receipts', connectionId })
       .then((raw) => {
         const value = raw as Record<string, unknown>;
         if (
@@ -82,7 +81,7 @@ export function RecentImport({
     return () => {
       cancelled = true;
     };
-  }, [connectionId, receiptRevision]);
+  }, [connectionId, receiptRevision, request]);
   const [plan, setPlan] = useState<Plan | null>(null);
   const [confirmed, setConfirmed] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -93,7 +92,7 @@ export function RecentImport({
     setPlan(null);
     setConfirmed(false);
     try {
-      const value = (await post({ kind: 'prepare', connectionId })) as Record<
+      const value = (await request({ kind: 'prepare', connectionId })) as Record<
         string,
         unknown
       >;
@@ -128,7 +127,7 @@ export function RecentImport({
     if (!plan || !confirmed || busy) return;
     setBusy(true);
     try {
-      const value = (await post({
+      const value = (await request({
         kind: 'import',
         connectionId,
         fromMs: plan.fromMs,
@@ -161,7 +160,7 @@ export function RecentImport({
     if (!plan || busy) return;
     setBusy(true);
     try {
-      const value = (await post({
+      const value = (await request({
         kind: 'receipt',
         connectionId,
         fromMs: plan.fromMs,
