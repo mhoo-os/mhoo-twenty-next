@@ -34,6 +34,18 @@ export const validatePopulationOptions = (options: PopulationOptions) => {
   }
 };
 
+// The CLI retains all chunk descriptors for its final manifest. Cap that
+// metadata independently of the generator's bounded raw-row working set.
+export const MAX_POPULATION_MANIFEST_CHUNKS = 10_000;
+export const validatePopulationManifestOptions = (options: PopulationOptions) => {
+  validatePopulationOptions(options);
+  const chunks = Math.ceil(options.assumedSixYearRows * 2 / options.chunkSize);
+  if (chunks > MAX_POPULATION_MANIFEST_CHUNKS) {
+    throw new Error('Population manifest exceeds 10000 chunks; increase chunkSize');
+  }
+  return chunks;
+};
+
 /** Offline raw-artifact preparation only. No ingestion, snapshot or coverage
  * state advances here. A consumer must commit a chunk before saving nextEvent.
  * Chunk boundaries and resume positions are bound to these exact options.

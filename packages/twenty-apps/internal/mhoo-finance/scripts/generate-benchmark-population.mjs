@@ -3,7 +3,7 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { performance } from 'node:perf_hooks';
 
-import { generateSyntheticPopulation, validatePopulationOptions } from '../src/benchmarks/synthetic-population.ts';
+import { generateSyntheticPopulation, validatePopulationManifestOptions } from '../src/benchmarks/synthetic-population.ts';
 
 // No source-count discovery or network calls. Every run labels its input as
 // hypothetical, even when a caller supplies a number learned elsewhere.
@@ -12,7 +12,7 @@ if (!assumedRows || !directory || extra.length) {
   throw new Error('Usage: node scripts/generate-benchmark-population.mjs ASSUMED_SIX_YEAR_ROWS OUTPUT_DIRECTORY [CHUNK_SIZE]');
 }
 const options = { assumedSixYearRows: Number(assumedRows), chunkSize: Number(chunkSize) };
-validatePopulationOptions(options);
+validatePopulationManifestOptions(options);
 const output = resolve(directory);
 // Refuse an existing path so prior raw evidence cannot be overwritten.
 mkdirSync(output);
