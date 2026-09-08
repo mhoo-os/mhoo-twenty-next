@@ -1807,6 +1807,7 @@ export interface AppConnection {
     workspaceMemberId?: Scalars['String']
     accessToken: Scalars['String']
     scopes: Scalars['String'][]
+    manualTokenWorkspaceGrantId?: Scalars['String']
     authFailedAt?: Scalars['String']
     __typename: 'AppConnection'
 }
@@ -5313,6 +5314,7 @@ export interface AppConnectionGenqlSelection{
     workspaceMemberId?: boolean | number
     accessToken?: boolean | number
     scopes?: boolean | number
+    manualTokenWorkspaceGrantId?: boolean | number
     authFailedAt?: boolean | number
     __typename?: boolean | number
     __scalar?: boolean | number

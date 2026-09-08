@@ -789,8 +789,9 @@ export class AuthResolver {
     tokenWorkspaceId: string,
   ): Promise<WorkspaceEntity> {
     const workspace =
-      await this.workspaceDomainsService.getWorkspaceByOriginOrDefaultWorkspace(
+      await this.workspaceDomainsService.getWorkspaceForVerifiedLoginToken(
         origin,
+        tokenWorkspaceId,
       );
 
     assertIsDefinedOrThrow(

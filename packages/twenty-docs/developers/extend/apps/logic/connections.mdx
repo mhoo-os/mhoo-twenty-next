@@ -6,7 +6,18 @@ icon: 'plug'
 
 Connections are credentials a user holds for an external service (Linear, GitHub, Slack, ...). Your app declares **how** those credentials are obtained — a **connection provider** — and consumes them at runtime to make authenticated calls to the third-party API.
 
-Today only OAuth 2.0 is supported. Future credential types (personal access tokens, API keys, basic auth) will plug into the same surface — apps already using `defineConnectionProvider({ type: 'oauth', ... })` won't need to migrate.
+App-defined connection providers currently support only OAuth 2.0. Future credential types (personal access tokens, API keys, basic auth) will plug into the same surface — apps already using `defineConnectionProvider({ type: 'oauth', ... })` won't need to migrate.
+
+<Note>
+The Mhoo distribution also has an opt-in native Clover merchant-token intake for
+one administrator-configured Workspace. Its `ConnectedAccountProvider.CLOVER`
+value identifies a native account; it is not a new `defineConnectionProvider`
+type or an App-owned OAuth connection. It does not invoke App connection hooks,
+enable `getConnection` access for an App, or start synchronization. Native Twenty
+checks membership and connection-management permission and encrypts the token
+before saving. A successful merchant lookup does not verify every token scope.
+App authors should continue using the OAuth contract below.
+</Note>
 
 <AccordionGroup>
 

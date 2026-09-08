@@ -266,6 +266,43 @@ or second financial source of truth.
 These paths authorize source-level branding work only. They do not authorize
 runtime deployment, publication, legal approval, or production mutation.
 
+
+Hass native Clover intake source paths authorized by the owner's 2026-09-06
+approval of ADR-0013's live-source amendment in the coordination repository:
+
+- `packages/twenty-front/src/modules/accounts/utils/hasMissingCreateCalendarEventScopes.ts`
+- `packages/twenty-front/src/modules/accounts/utils/hasMissingDraftEmailScopes.ts`
+- `packages/twenty-front/src/modules/settings/accounts/components/SettingsCloverConnection.tsx`
+- `packages/twenty-front/src/modules/settings/accounts/components/__tests__/SettingsCloverConnection.test.tsx`
+- `packages/twenty-front/src/modules/ui/field/display/components/ActorDisplay.tsx`
+- `packages/twenty-front/src/pages/settings/accounts/SettingsAccounts.tsx`
+- `packages/twenty-server/src/engine/core-modules/app-token/app-token.entity.ts`
+- `packages/twenty-server/src/engine/core-modules/auth/services/auth.service.ts`
+- `packages/twenty-server/src/engine/core-modules/clover-token/clover-token.controller.spec.ts`
+- `packages/twenty-server/src/engine/core-modules/clover-token/clover-token.controller.ts`
+- `packages/twenty-server/src/engine/core-modules/clover-token/clover-token.module.ts`
+- `packages/twenty-server/src/engine/core-modules/clover-token/clover-token.postgres.spec.ts`
+- `packages/twenty-server/src/engine/core-modules/clover-token/clover-token.service.spec.ts`
+- `packages/twenty-server/src/engine/core-modules/clover-token/clover-token.service.ts`
+- `packages/twenty-server/src/engine/core-modules/core-engine.module.ts`
+- `packages/twenty-server/src/engine/core-modules/tool/tools/email-tool/utils/get-missing-draft-email-scopes.util.ts`
+- `packages/twenty-server/src/engine/core-modules/twenty-config/config-variables.ts`
+- `packages/twenty-server/src/engine/core-modules/workspace-invitation/services/workspace-invitation.service.ts`
+- `packages/twenty-server/src/instrument.ts`
+- `packages/twenty-server/src/modules/calendar/calendar-event-creation-manager/utils/get-missing-create-event-scopes.util.ts`
+- `packages/twenty-server/src/modules/connected-account/email-alias-manager/services/email-alias-manager.service.ts`
+- `packages/twenty-server/src/modules/connected-account/refresh-tokens-manager/services/connected-account-refresh-tokens.service.ts`
+- `packages/twenty-server/src/modules/messaging/message-outbound-manager/services/messaging-message-outbound.service.ts`
+- `packages/twenty-shared/src/types/ConnectedAccountProvider.ts`
+- `docs/provenance/hass-clover-intake.md`
+- `packages/twenty-docs/developers/extend/apps/logic/connections.mdx`
+
+This bounded overlay extends native Twenty authentication, invitations,
+AppToken request state and ConnectedAccount encryption. It adds no separate
+credential database, identity service, OAuth callback, provider sync, or legacy
+import. The owner requested deployment; source authorization and local checks
+still do not establish runtime readiness. The activation procedure and its
+remaining evidence are recorded in `hass-clover-intake.md`.
 MHO-240 system SMTP acknowledgement correction (source-only):
 
 - `packages/twenty-server/src/engine/core-modules/email/drivers/smtp.driver.ts`
@@ -303,6 +340,96 @@ Only bearer-authenticated POST to the host-configured GraphQL URL may use
 browser same-origin credentials. Other App fetches and redirect restrictions
 retain their previous policy. This source permission is not deployed proof.
 
+## MHO265 / MHO266 phased native source inventory
+
+ADR-0014 in the coordination repository and the owner's phased-source approval
+authorize the standalone `packages/twenty-apps/internal/mhoo-clover/` App subtree
+(MHO266). MHO265 reuses native Connection custody, explicit background grants,
+SDK retrieval and the previously approved opt-in Workspace session path. The
+exact supplemental host and proof paths are below, matching the trajectory gate.
+This is source admission, not live intake, provider access or activation.
+
+- `docs/provenance/clover-background-grant-source-proof.md`
+- `docs/provenance/clover-multimerchant-source-proof.md`
+- `docs/provenance/clover-native-runtime-proof.md`
+- `docs/provenance/clover-payment-persistence-source-proof.md`
+- `docs/provenance/clover-standalone-source-proof.md`
+- `docs/provenance/hass-manual-consumer-source-proof.md`
+- `docs/provenance/same-origin-workspace-source-proof.md`
+- `packages/twenty-front/src/modules/auth/effect-components/SignOutOnOtherTabSignOutEffect.tsx`
+- `packages/twenty-front/src/modules/auth/hooks/useAuth.ts`
+- `packages/twenty-front/src/modules/auth/utils/__tests__/crossTabSignOut.test.ts`
+- `packages/twenty-front/src/modules/auth/utils/crossTabSignOut.ts`
+- `packages/twenty-front/src/modules/client-config/states/isSameOriginWorkspaceEnabledState.ts`
+- `packages/twenty-front/src/modules/domain-manager/hooks/useIsCurrentLocationOnAWorkspace.ts`
+- `packages/twenty-front/src/modules/domain-manager/hooks/useRedirectToWorkspaceDomain.ts`
+- `packages/twenty-sdk/src/sdk/define/connection-providers/__tests__/define-connection-provider.spec.ts`
+- `packages/twenty-sdk/src/sdk/define/connection-providers/define-connection-provider.ts`
+- `packages/twenty-sdk/src/sdk/logic-function/connections/__tests__/get-connection.spec.ts`
+- `packages/twenty-sdk/src/sdk/logic-function/connections/get-connection.ts`
+- `packages/twenty-sdk/src/sdk/logic-function/connections/list-connections.ts`
+- `packages/twenty-sdk/src/sdk/logic-function/utils/post-graphql-request.util.ts`
+- `packages/twenty-server/jest.config.mjs`
+- `packages/twenty-server/src/database/commands/upgrade-version-command/2-37/2-37-instance-command-fast-1788751203788-add-manual-token-workspace-grant.ts`
+- `packages/twenty-server/src/database/commands/upgrade-version-command/instance-commands.constant.ts`
+- `packages/twenty-server/src/engine/core-modules/application/application-manifest/converters/__tests__/from-connection-provider-manifest-to-universal-flat-connection-provider.util.spec.ts`
+- `packages/twenty-server/src/engine/core-modules/application/connection-provider/connections/application-connections.module.ts`
+- `packages/twenty-server/src/engine/core-modules/application/connection-provider/connections/dtos/app-connection.object.ts`
+- `packages/twenty-server/src/engine/core-modules/application/connection-provider/connections/services/application-connections-list.service.ts`
+- `packages/twenty-server/src/engine/core-modules/application/connection-provider/connections/services/manual-token-workspace-grant.util.spec.ts`
+- `packages/twenty-server/src/engine/core-modules/application/connection-provider/connections/services/manual-token-workspace-grant.util.ts`
+- `packages/twenty-server/src/engine/core-modules/application/connection-provider/connections/types/manual-token-workspace-grant.type.ts`
+- `packages/twenty-server/src/engine/core-modules/auth/auth.resolver.ts`
+- `packages/twenty-server/src/engine/core-modules/clover-token/clover-connection.constants.ts`
+- `packages/twenty-server/src/engine/core-modules/clover-token/clover-consumer.spec.ts`
+- `packages/twenty-server/src/engine/core-modules/clover-token/clover-data-contract.spec.ts`
+- `packages/twenty-server/src/engine/core-modules/clover-token/manual-provider-validation.spec.ts`
+- `packages/twenty-server/src/engine/core-modules/domain/workspace-domains/services/workspace-domains.service.ts`
+- `packages/twenty-server/src/engine/core-modules/two-factor-authentication/two-factor-authentication.resolver.spec.ts`
+- `packages/twenty-server/src/engine/core-modules/two-factor-authentication/two-factor-authentication.resolver.ts`
+- `packages/twenty-server/src/engine/metadata-modules/connected-account/connected-account-metadata.service.ts`
+- `packages/twenty-server/src/engine/metadata-modules/connected-account/entities/connected-account.entity.ts`
+- `packages/twenty-server/src/engine/metadata-modules/connected-account/resolvers/connected-account.resolver.ts`
+- `packages/twenty-server/src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-connection-provider-validator.service.ts`
+- `packages/twenty-server/test/integration/graphql/suites/auth/same-origin-workspaces.integration-spec.ts`
+- `packages/twenty-server/test/integration/metadata/suites/application/clover-native-data.integration-spec.ts`
+- `packages/twenty-shared/src/application/appConnectionType.ts`
+- `packages/twenty-shared/src/application/connectionProviderManifestType.ts`
+- `packages/twenty-shared/src/application/connectionProviderType.ts`
+
+MHO266 CI admission also permits the exact `.github/workflows/ci-twenty-apps.yaml`
+file to select the repository lockfile and build the current native SDK/client
+for Clover's source-only checks. Other Apps retain their standalone dependency
+workflow. The App consumes the modified native manual-token/grant contracts,
+which are absent from the published 2.37 SDK. No dependency, trigger, credential
+or deployment permission is added.
+
+The exact `packages/twenty-server/jest-clover-proof.config.ts` and
+`packages/twenty-server/jest-integration.config.ts` files select the dedicated
+Clover App-install/queue proof separately from generic integration discovery.
+The suite's fixed disposable database guard and prerequisites remain intact;
+this test profile creates no production or provider authority.
+
+### MHO-266 public legal route test accounting
+
+ARCHITECTURE IMPACT: NONE. Reuse only the reviewed PR37
+`b199aa05571a05c794d39e1964ce538023b26404` exact `UntestedAppPaths.ts`
+blob `7cff3fb35a91accbef5030132e407be781908de7`. Six exact public legal
+routes are selected by DomainShell before WorkspaceApp; the existing
+DomainShell tests already cover all six and reject a nested rogue legal route.
+They are outside the onboarding/auth navigation matrix. Keep its exhaustive
+count assertion and all test cases unchanged; classify these separately tested
+routes alongside the existing public DPA redirect. The source gate admits only
+`packages/twenty-front/src/testing/constants/UntestedAppPaths.ts`, with positive
+and adjacent suffix, nested and unrelated-constant rejection tests. No broad
+testing-directory allowance, legal text, routing behavior or runtime change.
+
+Existing implementation ledger remains
+`docs/provenance/clover-payment-persistence-source-proof.md`; exact hosted
+failure (352 expected versus292 cases), focused test and source-gate receipts
+remain in the retained Clover `clover-pr32-ci-repair` artifacts. Other passing
+App/native/browser proofs are reused. This accounting fix grants no provider,
+deployment or production authority.
 ## AI editor lifecycle repair
 
 The September 7 owner-authorized, source-only MHO-259 repair permits exactly:

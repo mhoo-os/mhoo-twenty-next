@@ -71,6 +71,26 @@ import {
 export class ConfigVariables {
   @ConfigVariablesMetadata({
     group: ConfigVariablesGroup.ADVANCED_SETTINGS,
+    description:
+      'Native Workspace UUID allowed to accept Clover merchant tokens. Empty disables intake.',
+    type: ConfigVariableType.STRING,
+    isEnvOnly: true,
+  })
+  @IsOptional()
+  CLOVER_TOKEN_WORKSPACE_ID = '';
+
+  @ConfigVariablesMetadata({
+    group: ConfigVariablesGroup.ADVANCED_SETTINGS,
+    description:
+      'Email for the native Clover onboarding invitation. Empty disables invitation preparation. No email is sent by this action.',
+    type: ConfigVariableType.STRING,
+    isEnvOnly: true,
+  })
+  @IsOptional()
+  CLOVER_TOKEN_INVITEE_EMAIL = '';
+
+  @ConfigVariablesMetadata({
+    group: ConfigVariablesGroup.ADVANCED_SETTINGS,
     description: 'Enable or disable password authentication for users',
     type: ConfigVariableType.BOOLEAN,
   })
@@ -1919,6 +1939,15 @@ export class ConfigVariables {
   })
   @IsOptional()
   IS_MULTIWORKSPACE_ENABLED = false;
+
+  @ConfigVariablesMetadata({
+    group: ConfigVariablesGroup.SERVER_CONFIG,
+    description:
+      'Use the canonical frontend origin for native Workspace sessions; requires multi-workspace mode',
+    type: ConfigVariableType.BOOLEAN,
+  })
+  @IsOptional()
+  IS_SAME_ORIGIN_WORKSPACE_ENABLED = false;
 
   @ConfigVariablesMetadata({
     group: ConfigVariablesGroup.ADVANCED_SETTINGS,

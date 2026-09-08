@@ -137,3 +137,20 @@ describe('fromConnectionProviderManifestToUniversalFlatConnectionProvider', () =
     expect(result.oauthConfig?.usePkce).toBe(true);
   });
 });
+
+it('preserves an explicit manual provider without synthesizing OAuth configuration', () => {
+  const result =
+    fromConnectionProviderManifestToUniversalFlatConnectionProvider({
+      connectionProviderManifest: {
+        universalIdentifier: PROVIDER_UID,
+        name: 'clover-manual',
+        displayName: 'Clover',
+        type: 'manualToken',
+      },
+      applicationUniversalIdentifier: APP_UID,
+      now: NOW,
+    });
+  expect(result.type).toBe('manualToken');
+  expect(result.oauthConfig).toBeNull();
+  expect(result.applicationUniversalIdentifier).toBe(APP_UID);
+});

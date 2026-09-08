@@ -115,3 +115,20 @@ describe('defineConnectionProvider', () => {
     },
   );
 });
+
+describe('manualToken provider contract', () => {
+  it('accepts a manual provider without OAuth configuration', () => {
+    const { oauth: _oauth, ...base } = baseValidConfig;
+    expect(
+      defineConnectionProvider({ ...base, type: 'manualToken' }).success,
+    ).toBe(true);
+  });
+  it('rejects a mixed manual and OAuth configuration at runtime', () => {
+    expect(
+      defineConnectionProvider({
+        ...baseValidConfig,
+        type: 'manualToken',
+      } as never).success,
+    ).toBe(false);
+  });
+});

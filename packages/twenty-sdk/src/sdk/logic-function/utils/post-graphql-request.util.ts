@@ -1,5 +1,6 @@
 import {
   DEFAULT_API_URL_NAME,
+  DEFAULT_APP_ACCESS_TOKEN_NAME,
   DEFAULT_APP_APPLICATION_ACCESS_TOKEN_NAME,
 } from 'twenty-shared/application';
 
@@ -9,13 +10,19 @@ export const postGraphqlRequest = async <TVariables, TData>({
   query,
   variables,
   caller,
+  runAs = 'application',
 }: {
   query: string;
   variables: TVariables;
   caller: string;
+  runAs?: 'user' | 'application';
 }): Promise<TData> => {
   const apiUrl = process.env[DEFAULT_API_URL_NAME];
-  const accessToken = getApplicationAccessToken();
+  // Explicit user execution never falls back to the more privileged App token.
+  const accessToken =
+    runAs === 'user'
+      ? process.env[DEFAULT_APP_ACCESS_TOKEN_NAME]
+      : getApplicationAccessToken();
 
   if (!apiUrl || !accessToken) {
     throw new Error(

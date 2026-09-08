@@ -40,6 +40,7 @@ export class MessagingMessageOutboundService {
           sendMessageInput,
           connectedAccount,
         );
+      case ConnectedAccountProvider.CLOVER:
       case ConnectedAccountProvider.EMAIL_GROUP:
         return this.emailGroupMessageOutboundService.sendMessage(
           sendMessageInput,
@@ -79,6 +80,7 @@ export class MessagingMessageOutboundService {
           sendMessageInput,
           connectedAccount,
         );
+      case ConnectedAccountProvider.CLOVER:
       case ConnectedAccountProvider.EMAIL_GROUP:
       case ConnectedAccountProvider.OIDC:
       case ConnectedAccountProvider.SAML:
@@ -118,6 +120,7 @@ export class MessagingMessageOutboundService {
           sendMessageInput,
           connectedAccount,
         );
+      case ConnectedAccountProvider.CLOVER:
       case ConnectedAccountProvider.EMAIL_GROUP:
       case ConnectedAccountProvider.OIDC:
       case ConnectedAccountProvider.SAML:

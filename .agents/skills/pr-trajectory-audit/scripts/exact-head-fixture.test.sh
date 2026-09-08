@@ -82,6 +82,7 @@ grep -Fq "trajectory fixture rejected: $suffix_path" "$temporary_directory/suffi
 }
 
 allowed_paths=(
+  packages/twenty-server/src/engine/core-modules/clover-token/clover-token.service.ts
   packages/twenty-server/src/engine/core-modules/email/email.service.ts
   packages/twenty-server/src/engine/core-modules/email/utils/inline-email-image.ts
   packages/twenty-server/src/engine/core-modules/email/utils/inline-product-email-logo.ts
@@ -123,6 +124,9 @@ for index in "${!allowed_paths[@]}"; do
 done
 
 rogue_allowed_paths=(
+  packages/twenty-server/src/engine/core-modules/clover-token/credential-export.ts
+  packages/twenty-server/src/engine/core-modules/clover-token/clover-token.service.ts.backup
+  nested/packages/twenty-server/src/engine/core-modules/clover-token/clover-token.service.ts
   packages/twenty-server/src/engine/core-modules/email/utils/inline-email-image.ts.backup
   packages/twenty-server/src/engine/core-modules/email/utils/nested/inline-email-image.ts
   packages/twenty-server/src/database/scripts/check-db-initialization.ts.backup
@@ -534,6 +538,7 @@ legal_allowed_paths=(
   packages/twenty-front/src/modules/app/components/DomainShell.tsx
   packages/twenty-front/src/modules/app/components/__tests__/DomainShell.test.tsx
   packages/twenty-shared/src/types/AppPath.ts
+  packages/twenty-front/src/testing/constants/UntestedAppPaths.ts
 )
 
 for index in "${!legal_allowed_paths[@]}"; do
@@ -574,6 +579,9 @@ rogue_legal_paths=(
   packages/twenty-front/src/modules/app/components/__tests__/rogue/DomainShell.test.tsx
   packages/twenty-shared/src/types/rogue/AppPath.ts
   packages/twenty-shared/src/types/AppPath.ts.backup
+  packages/twenty-front/src/testing/constants/UntestedAppPaths.ts.backup
+  nested/packages/twenty-front/src/testing/constants/UntestedAppPaths.ts
+  packages/twenty-front/src/testing/constants/PropertyMockStyles.ts
 )
 
 for index in "${!rogue_legal_paths[@]}"; do
