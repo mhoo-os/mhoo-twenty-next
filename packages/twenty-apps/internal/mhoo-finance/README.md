@@ -48,6 +48,10 @@ authority is allowed.
 
 See [PORTING.md](./PORTING.md) for the exact carry-forward/discard matrix.
 
+See [BENCHMARK.md](./BENCHMARK.md) for bounded six-year synthetic population
+generation. It prepares raw inputs at twice a hypothetical count; actual source
+counts, native performance/recovery evidence and a storage verdict remain open.
+
 ## Shared logical contracts
 
 See [Finance contract v1](src/contracts/README.md) for exact money, dataset
