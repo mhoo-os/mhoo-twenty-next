@@ -59,6 +59,12 @@ MHO-146 Phase A source authorization:
   preserve that CI runner compatibility adjustment. This does not authorize
   another workflow, trigger, deployment, credential, or product path.
 
+- `.github/workflows/ci-front.yaml` is authorized solely for replacing the
+  unavailable `ubuntu-latest-8-cores` label with `ubuntu-latest` in the existing
+  `front-build` and `front-sb-build` jobs. All commands, gates, dependencies,
+  timeouts, heap settings, events and permissions remain unchanged. This adds
+  no deployment, runner purchase or other workflow authority.
+
 These are exact source-custody boundaries. A path that is adjacent, nested
 under another root, has a suffix or lookalike name, or belongs to another App
 or workflow remains rejected by the trajectory fixture.
@@ -297,6 +303,28 @@ credential database, identity service, OAuth callback, provider sync, or legacy
 import. The owner requested deployment; source authorization and local checks
 still do not establish runtime readiness. The activation procedure and its
 remaining evidence are recorded in `hass-clover-intake.md`.
+MHO-240 system SMTP acknowledgement correction (source-only):
+
+- `packages/twenty-server/src/engine/core-modules/email/drivers/smtp.driver.ts`
+- `packages/twenty-server/src/engine/core-modules/email/drivers/smtp.driver.spec.ts`
+
+These exact paths permit awaiting SMTP acknowledgement and propagating rejection,
+with mock-only regression tests. Existing EmailService retryLimit3 (four total
+BullMQ attempts) is unchanged; no new retry loop or exactly-once guarantee is
+introduced. A connection failure after provider acceptance may still be ambiguous;
+manual retries require provider/inbox reconciliation. This source correction does
+not authorize SMTP configuration, credentials, sends, or deployment.
+
+MHO-255 image identity and fail-closed startup paths:
+
+- `packages/twenty-docker/twenty/Dockerfile`
+- `packages/twenty-docker/twenty/entrypoint.sh`
+- `packages/twenty-docker/twenty/test_entrypoint.py`
+- `packages/twenty-server/src/database/scripts/` (initialization validation and setup failure propagation)
+- `deploy/twenty-next/mho255-*` (disposable synthetic PG16 acceptance only)
+
+The Dockerfile custody hash follows the reviewed distribution Dockerfile; the upstream commit/tree and lockfile provenance remain unchanged. Runtime semantic version and OCI source revision are independent build inputs. No serving-host build, production promotion, or database repair is introduced.
+
 ## GraphQL edge authentication follow-up
 
 The owner-authorized saved-sample integration requires native Core API reads
@@ -402,3 +430,75 @@ failure (352 expected versus292 cases), focused test and source-gate receipts
 remain in the retained Clover `clover-pr32-ci-repair` artifacts. Other passing
 App/native/browser proofs are reused. This accounting fix grants no provider,
 deployment or production authority.
+## AI editor lifecycle repair
+
+The September 7 owner-authorized, source-only MHO-259 repair permits exactly:
+
+- `packages/twenty-front/src/modules/advanced-text-editor/utils/hasEditorExtension.ts`
+- `packages/twenty-front/src/modules/advanced-text-editor/utils/__tests__/hasEditorExtension.test.ts`
+- `packages/twenty-front/src/modules/advanced-text-editor/hooks/useTurnIntoBlockOptions.ts`
+- `packages/twenty-front/src/modules/advanced-text-editor/hooks/__tests__/useTurnIntoBlockOptions.test.tsx`
+- `docs/provenance/ai-editor-lifecycle.md`
+
+Scope is the confirmed AI instructions formatting-selector crash when a
+previous editor has been destroyed. The shared helper safely rejects missing
+or destroyed editors; the selector uses the current editor instance and emits
+no options while it is unavailable. This authorizes no editor redesign,
+dependency update, manifest/CORS change, Workspace mutation or deployment.
+
+PR37 CI test-maintenance scope additionally permits exactly
+`packages/twenty-front/src/testing/constants/UntestedAppPaths.ts` to classify
+six public Legal App routes outside the authenticated navigation test matrix.
+`DomainShell.test.tsx` already verifies these exact public routes bypass
+WorkspaceApp. The exhaustive count assertion and production navigation behavior
+remain unchanged; no adjacent test constants or hook implementation are included.
+
+## Inherited upstream external-effect guards
+
+ARCHITECTURE IMPACT: LOCAL
+
+A normal main merge must not implicitly execute inherited upstream operations.
+The source owner is `twentyhq/twenty`, pinned in `.twenty-source`; existing
+workflows explicitly target `twentyhq/twenty-infra`, `twentyhq/twenty-factory`,
+`twenty.api.crowdin.com` and `engineering.twenty.com`. The following exact
+workflow jobs now require `github.repository == 'twentyhq/twenty'` before
+performing those operations, retaining their existing conditions:
+
+| Workflow | Guarded job/step | Existing effect |
+| --- | --- | --- |
+| cd-deploy-main.yaml | deploy-main | twenty-infra deployment dispatch |
+| app-prod-parity-e2e-dispatch.yaml | dispatch | twenty-factory prod-parity dispatch and status |
+| i18n-push.yaml | extract_translations | translation branch/PR, Twenty Crowdin and infra automerge |
+| docs-i18n-push.yaml | push_docs | upstream documentation translation upload |
+| website-i18n-push.yaml | extract_website_translations | upstream website translation upload |
+| visual-regression-dispatch.yaml | dispatch-pixel-diff | twenty-factory visual comparison dispatch |
+| post-ci-comments.yaml | dispatch-breaking-changes | twenty-factory breaking-changes comment dispatch |
+| docs-i18n-pull.yaml | Eight Crowdin/writeback/infra steps only | upstream translation mutation, PR/branch push and automerge dispatch |
+| ci-e2e-main.yaml | notify-main-ci-failure; QA Scout prepare/run/comment | upstream engineering notification and cloud-agent/context publication |
+
+Each path is under `.github/workflows/` and is enumerated in the exact-head
+fixture. This is a source execution guard, not deletion, account-level workflow
+disabling, token rotation or a replacement integration. Local E2E/build/test jobs,
+runner-local postcard installation and manual clean-foundation image semantics
+are unchanged. QA preparation, the agent run and comment publication have direct
+guards; downstream receipt-only steps retain their existing output conditions.
+
+Source base: `6a1dec473a3d6c303697bca044e3e7d3681e7b72`. Retained Finance/shared-AI
+executor prepares this isolated prerequisite for PR37; coordinating repo head
+`01a07aa7-944a-70c3-bf77-d51b9fc766f2` owns independent review and publication
+sequencing. Local validation compares parsed YAML to the exact base, allowing
+only repository guards while preserving original predicates and all other
+workflow structure; checks fork/upstream outcomes and rejects missing/OR-bypass
+guards. Detailed inputs/results live in the protected upstream-workflow-guards
+receipt folder. No existing source tests are rerun without changed inputs.
+
+A push from the eventual merged revision reads its guarded workflows. Before
+that merge, `workflow_run` callbacks use the existing default branch: publishing
+this guard PR can still invoke the old post-CI dispatcher. Therefore this local
+candidate does not itself prove safe pre-merge publication. The head must resolve
+that concrete sequencing condition before publication, without relying on absent
+secrets or implying production authorization. No publish/merge/deploy occurred in
+this preparation. Re-evaluate if workflow source, default branch or event policy
+changes; local validation is not a live GitHub execution claim.
+
+Follow-up inventory found docs-i18n-pull also runs on schedules and PR paths. Its local generation/check steps remain intact; only the eight external mutation/writeback steps gain owner guards. Observed PR run34165536337 completed without invoking its non-PR Crowdin steps; this does not establish safety of scheduled runs.

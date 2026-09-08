@@ -1,3 +1,83 @@
+# mhoo-twenty-next contributor entrypoint
+
+This is the clean Twenty v2.37.0 distribution and the accepted native Finance
+source repository. Start with [AGENTS.md](AGENTS.md) before running commands.
+The upstream product examples below describe capabilities, not permission to
+publish, install an App, access provider data, or operate a deployment.
+
+## Ownership and source
+
+- [ADR-0009, accepted Finance boundary](https://github.com/mhoo-os/mhoo/blob/abdc2be8a2adb6d979905db8bcf6a3ae6c41225c/ADR/0009-finance-six-year-forensic-review.md)
+  assigns `@mhoo/finance` to this repository, at
+  [packages/twenty-apps/internal/mhoo-finance](packages/twenty-apps/internal/mhoo-finance).
+- That decision amends Finance only. [ADR-0008](https://github.com/mhoo-os/mhoo/blob/abdc2be8a2adb6d979905db8bcf6a3ae6c41225c/ADR/0008-twenty-framework-platform.md)
+  retains its general App and `@mhoo/core` boundary; this README does not move
+  those responsibilities here. The separate `core` repository preserves legacy
+  evidence. Architecture decisions belong in `mhoo`; operations belong in
+  `infrastructure`.
+- [.twenty-source](.twenty-source) pins upstream identity. Preserve upstream
+  ancestry and the [enumerated overlay](docs/provenance/clean-foundation-overlay.md).
+  Never merge, cherry-pick, or import legacy `mhoo-twenty` commits.
+- The [central generated context](https://github.com/mhoo-os/mhoo/blob/abdc2be8a2adb6d979905db8bcf6a3ae6c41225c/docs/architecture/REPOSITORY_CONTEXT.json)
+  is owned by `mhoo`. Its catalog has no dedicated entry for this repository at
+  the linked revision; use accepted ADR-0009 for Finance, and escalate catalog
+  drift to that owner instead of broadening ownership locally.
+
+## Commands: choose only the relevant check
+
+Use Node matching root `package.json` (`^24.5.0`) and pinned Yarn 4.13.0.
+Dependency setup is `yarn install --immutable` at the repository root. Finance
+has its own package manifest and lockfile; install there separately when needed.
+Commands below are source-defined examples, not checks run by this README.
+
+| Purpose | Command from repository root |
+| --- | --- |
+| Source custody | `bash scripts/provenance/verify-source.sh HEAD` |
+| Exact committed diff | `bash .agents/skills/pr-trajectory-audit/scripts/exact-head-fixture.sh <base-sha> <head-sha>` |
+| Focused frontend test | `yarn nx run twenty-front:test --runTestsByPath <test-path> --runInBand` |
+| Focused server test | `yarn nx run twenty-server:test:ci --runTestsByPath <test-path>` |
+| Changed project types/build | `yarn nx run <project>:typecheck` / `yarn nx run <project>:build` |
+| Finance unit checks | `yarn --cwd packages/twenty-apps/internal/mhoo-finance test:unit` |
+| Finance lint/types | `yarn --cwd packages/twenty-apps/internal/mhoo-finance lint` / `yarn --cwd packages/twenty-apps/internal/mhoo-finance typecheck` |
+
+Replace placeholders with actual project names and test paths. Host projects
+include `twenty-front`, `twenty-server`, and `twenty-emails`; Finance uses its
+package scripts. See [nx.json](nx.json), each project's `project.json`, and the
+[Finance scripts](packages/twenty-apps/internal/mhoo-finance/package.json).
+Nx checks can build dependencies; Finance typecheck runs `twenty dev:build`.
+Do not repeat full builds or unchanged passing tests to refresh a status.
+Local `yarn start` launches server, frontend and worker: use only with an
+approved development environment, never as an onboarding probe.
+
+## Existing work and evidence
+
+Snapshot supplied by the coordinator on 2026-09-07; refresh exact heads and
+existing issue/run-ledger receipts before acting. These are distinct lanes,
+not instructions to resume them:
+
+- [MHO-259](https://linear.app/mhoo/issue/MHO-259), [PR37](https://github.com/mhoo-os/mhoo-twenty-next/pull/37):
+  shared AI/editor source complete at `b199aa05571a05c794d39e1964ce538023b26404`;
+  hosted CI receipt records 69 successful / 42 skipped checks, none failed or
+  pending. Open draft; no merge or deployment approval. Reuse the MHO-259 run ledger.
+- [MHO-240](https://linear.app/mhoo/issue/MHO-240), [PR28](https://github.com/mhoo-os/mhoo-twenty-next/pull/28):
+  combined-release hold. Its later frontend route-count failure is already
+  corrected in PR37's separate source lane; do not duplicate that repair or
+  call PR28 fully green from its older receipt.
+- [MHO-265](https://linear.app/mhoo/issue/MHO-265) /
+  [MHO-266](https://linear.app/mhoo/issue/MHO-266), [PR32](https://github.com/mhoo-os/mhoo-twenty-next/pull/32):
+  existing bounded Clover source lane; retain its owner and grant/lifecycle
+  boundaries. No provider credentials or production activation follow from setup.
+- [MHO-146](https://linear.app/mhoo/issue/MHO-146), [PR36](https://github.com/mhoo-os/mhoo-twenty-next/pull/36):
+  installed Finance receipt is separate from source readiness. Coordinator
+  reports zero post-apply diff and 20 saved facts preserved; restricted-user
+  denial remains unproved. Do not redo accepted journeys or seed cleanup.
+
+Issue status, source checks, review, installation and runtime/recovery acceptance
+must retain separate evidence. Follow the existing coordinator's scoped handoff;
+a new repository head or project label does not transfer worker custody.
+
+---
+
 <p align="center">
   <a href="https://github.com/mhoo-os/mhoo-twenty-next">
     <img src="./packages/twenty-front/public/images/mhoo/mhoo-snout-transparent-1024.png" width="100px" alt="Mhoo pig snout mark" />

@@ -23,7 +23,7 @@ DOCUMENTS = (
 
 
 def typescript_string(value: str) -> str:
-    """Serialize with the repository formatter's preferred quote style."""
+    """Use the repository's single-quote style without changing decoded bytes."""
     encoded = json.dumps(value, ensure_ascii=False)
     if value.count("'") > value.count('"'):
         return encoded
