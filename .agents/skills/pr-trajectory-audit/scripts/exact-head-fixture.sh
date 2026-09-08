@@ -31,8 +31,10 @@ ai_editor_allowed='^(docs/provenance/ai-editor-lifecycle\.md|packages/twenty-fro
 
 upstream_dispatch_allowed='^\.github/workflows/(cd-deploy-main|app-prod-parity-e2e-dispatch|i18n-push|docs-i18n-push|website-i18n-push|docs-i18n-pull|visual-regression-dispatch|post-ci-comments|ci-e2e-main)\.yaml$'
 
+linear_status_allowed='^(docs/provenance/linear\-issue\-status\.md|packages/twenty\-apps/public/linear/src/constants/universal\-identifiers\.ts|packages/twenty\-apps/public/linear/src/logic\-functions/get\-linear\-issue\-status\.ts|packages/twenty\-apps/public/linear/src/logic\-functions/handlers/get\-linear\-issue\-status\-handler\.ts|packages/twenty\-apps/public/linear/src/logic\-functions/__tests__/get\-linear\-issue\-status\.test\.ts|packages/twenty\-apps/public/linear/src/logic\-functions/utils/call\-linear\-graphql\.ts|packages/twenty\-apps/public/linear/src/logic\-functions/utils/types/linear\-graphql\-result\.type\.ts)$'
+
 git diff --name-only "$base" "$head" | while IFS= read -r path; do
-  [[ "$path" =~ $allowed || "$path" =~ $email_allowed || "$path" =~ $distribution_allowed || "$path" =~ $scanner_allowed || "$path" =~ $legal_allowed || "$path" =~ $evaluation_allowed || "$path" =~ $loader_allowed || "$path" =~ $graphql_allowed || "$path" =~ $clover_native_allowed || "$path" =~ $clover_allowed || "$path" =~ $startup_allowed || "$path" =~ $ai_editor_allowed || "$path" =~ $upstream_dispatch_allowed ]] || { printf 'trajectory fixture rejected: %s\n' "$path" >&2; exit 1; }
+  [[ "$path" =~ $allowed || "$path" =~ $email_allowed || "$path" =~ $distribution_allowed || "$path" =~ $scanner_allowed || "$path" =~ $legal_allowed || "$path" =~ $evaluation_allowed || "$path" =~ $loader_allowed || "$path" =~ $graphql_allowed || "$path" =~ $clover_native_allowed || "$path" =~ $clover_allowed || "$path" =~ $startup_allowed || "$path" =~ $ai_editor_allowed || "$path" =~ $upstream_dispatch_allowed || "$path" =~ $linear_status_allowed ]] || { printf 'trajectory fixture rejected: %s\n' "$path" >&2; exit 1; }
 done
 
 assert_manual_only_workflow() {
