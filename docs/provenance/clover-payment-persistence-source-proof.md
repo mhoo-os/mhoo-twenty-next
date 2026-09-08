@@ -732,3 +732,74 @@ settings front component injects a recent-page request callback. Shared
 control is optional for other hosts; portable status callers remain unchanged.
 Two focused render checks pass with absent/present transport, without a native
 host. Typecheck, lint and the affected App build pass after this correction.
+
+
+## Existing 2.37 upgrade catch-up — 2026-09-08
+
+The actual old 2.37 pair trial reached healthy application startup but lacked
+`core.connectedAccount.manualTokenWorkspaceGrant`. Receipt
+`mho246-pair-e8bb10abbe10a244.json` has SHA256
+`3acb3f7c40b03aa25d7f5648365a4b0af9033ec90e93813c842449500ae9c379`.
+The retained read-only production cursor projection
+`infrastructure-mho246-release/outputs/mho246-upgrade-cursor-readback-20260908.json`
+(SHA256 `216af3bf6643d275420e1d297e6701f1da3506386c6230ddb277544e4e7c81e6`)
+confirms completed global `BackfillMissingPageLayoutWidgetPositionsSlowInstanceCommand`
+1787838153752, and an initial completed workspace tail
+`RestoreSettingsNavigationCommandMenuItemLabelsCommand` 1787840804000.
+The original grant FAST command sorts before that completed SLOW cursor and is
+therefore skipped; adding another ordinary SLOW would also be skipped by a
+later noninitial workspace tail.
+
+The coordinator authorized this isolated source repair on exact base
+`eca4feb8515c18c8e0d5d3752c5ea3f3497b8a43`. New
+`EnsureManualTokenWorkspaceGrantSlowInstanceCommand` 1788846876000 is a native
+slow instance command with an explicit after-workspace phase. The optional
+metadata passes through the existing registry and reader; every historical
+command retains its name, relative order and default metadata. No prior command,
+cursor, receipt or version is rewritten. Schema DDL and completion use the
+existing native instance transaction. Compatible nullable scalar jsonb is left
+untouched; incompatible type, nullability, default, array or generated shape
+fails closed. The catch-up down method does not drop existing grants.
+
+A failed native instance attempt records a current-command workspace cursor.
+For this opt-in phase only, retry accepts the exact current attempt cursor after
+`areAllWorkspacesAtCommand` confirms retained completed preceding workspace-tail
+receipts. This additional proof matters because direct instance invocation can
+write an attempt without passing the sequence barrier. Missing, failed or
+unrelated predecessor state remains rejected. Existing workspace segments are
+not replayed to reach the repair.
+
+Focused source regression uses the actual registered instance commands and all
+three actual 2.37 workspace command classes with the native sequence, instance
+and workspace runners. Twenty tests pass, including the actual initial-tail
+shape, a later completed workspace tail, interruption, failed workspace/instance
+retry, exact current completed/failed attempts, non-opt-in rejection, existing
+column compatibility, incompatible shape rejection and completion idempotency.
+The database/ledger transports are in-memory test doubles; this is source proof,
+not a PostgreSQL upgrade receipt. The corrected actual-old-image pair trial and
+real existing-grant preservation remain Infra release gates.
+
+Focused oxlint passes all seven changed TypeScript files with zero warnings or
+errors. Existing compatible dependencies and the identical oxlint-rules source
+tree (`a1d77ffa20da4c49ff65e9e38fffa5640e4cdb97`) were reused through local
+symlinks, without rebuilding other checkouts. Initial lint could not find the
+local built plugin until that existing runtime was linked. An admission selftest
+invocation was invalidated by editing its running script, and a subsequent
+local harness edit omitted --add in unrelated negative cases; those edits were
+restored before accepting the final selftest. Neither was an application failure.
+The expanded regression first exposed the retry-barrier defect above; it passed
+after the persisted-predecessor check was added.
+
+The coordinator's separate preview-dispatch containment is included: the job
+and token/dispatch steps require the upstream repository. The retained
+`preview-dispatch-containment-20260908.json` records parsed YAML and 150 truth-table
+cases (fork always false; upstream behavior unchanged), with final workflow
+SHA256 `b034ed6006a70eea85d0dad1c6c47252c8425965a8ebec64a98c7b09b247bc3c`.
+The coordinator disabled only that workflow before publication and owns restoring
+it after guarded source reaches main. Exact migration, helper and workflow
+admissions have adjacent-path rejection fixtures; no directory-wide upgrade
+engine admission was added. Source receipts are retained in
+`clover-intake-install/clover-existing-237-migration/` beside the installation
+handoff. Independent committed-head provenance/trajectory review and required CI
+remain separate from these local source checks. No image build, installation,
+live upgrade, credential mutation, provider call, or deployment occurred here.

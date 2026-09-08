@@ -372,6 +372,12 @@ This is source admission, not live intake, provider access or activation.
 - `packages/twenty-server/jest.config.mjs`
 - `packages/twenty-server/src/database/commands/upgrade-version-command/2-37/2-37-instance-command-fast-1788751203788-add-manual-token-workspace-grant.ts`
 - `packages/twenty-server/src/database/commands/upgrade-version-command/instance-commands.constant.ts`
+- `packages/twenty-server/src/database/commands/upgrade-version-command/2-37/2-37-instance-command-slow-1788846876000-ensure-manual-token-workspace-grant.ts`
+- `packages/twenty-server/src/database/commands/upgrade-version-command/2-37/__tests__/ensure-manual-token-workspace-grant.instance-command.spec.ts`
+- `packages/twenty-server/src/engine/core-modules/upgrade/decorators/registered-instance-command.decorator.ts`
+- `packages/twenty-server/src/engine/core-modules/upgrade/services/upgrade-command-registry.service.ts`
+- `packages/twenty-server/src/engine/core-modules/upgrade/services/upgrade-sequence-reader.service.ts`
+- `packages/twenty-server/src/engine/core-modules/upgrade/services/upgrade-sequence-runner.service.ts`
 - `packages/twenty-server/src/engine/core-modules/application/application-manifest/converters/__tests__/from-connection-provider-manifest-to-universal-flat-connection-provider.util.spec.ts`
 - `packages/twenty-server/src/engine/core-modules/application/connection-provider/connections/application-connections.module.ts`
 - `packages/twenty-server/src/engine/core-modules/application/connection-provider/connections/dtos/app-connection.object.ts`
@@ -474,6 +480,7 @@ performing those operations, retaining their existing conditions:
 | visual-regression-dispatch.yaml | dispatch-pixel-diff | twenty-factory visual comparison dispatch |
 | post-ci-comments.yaml | dispatch-breaking-changes | twenty-factory breaking-changes comment dispatch |
 | docs-i18n-pull.yaml | Eight Crowdin/writeback/infra steps only | upstream translation mutation, PR/branch push and automerge dispatch |
+| preview-env-dispatch.yaml | repository and token/dispatch step guards | restrict upstream preview repository dispatch to TwentyHQ custody |
 | ci-e2e-main.yaml | notify-main-ci-failure; QA Scout prepare/run/comment | upstream engineering notification and cloud-agent/context publication |
 
 Each path is under `.github/workflows/` and is enumerated in the exact-head
@@ -510,3 +517,10 @@ The exact-file allowance covers its identifier constant, tool/handler/mock test,
 shared GraphQL helper/result metadata and `linear-issue-status.md` receipt only.
 No App role, provider grant, manifest/version or runtime install change is included.
 See [the source and installed-mapping limits](linear-issue-status.md).
+
+The existing-2.37 manual-token grant repair adds one opt-in slow instance step
+after the version's workspace tail. Only the exact registration, reader, runner,
+and regression paths above are admitted. Historical command names, order and
+receipts remain unchanged; retries require completed prior workspace-tail
+receipts. This corrects discovery for already completed 2.37 ledgers and does
+not admit cursor resets, replay-all, or deployment.
