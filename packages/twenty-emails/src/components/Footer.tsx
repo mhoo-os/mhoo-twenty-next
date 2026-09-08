@@ -13,11 +13,19 @@ const footerContainerStyle = {
 type FooterProps = {
   i18n: I18n;
   brand: ResolvedBrand;
+  compact?: boolean;
 };
 
-export const Footer = ({ i18n, brand }: FooterProps) => {
-  const links =
-    brand.preset === 'twenty'
+export const Footer = ({ i18n, brand, compact = false }: FooterProps) => {
+  const links = compact
+    ? [
+        {
+          href: brand.urls.supportUrl,
+          value: i18n._('Support'),
+          ariaLabel: i18n._('Contact product support'),
+        },
+      ]
+    : brand.preset === 'twenty'
       ? [
           {
             href: brand.urls.websiteUrl,
@@ -88,7 +96,9 @@ export const Footer = ({ i18n, brand }: FooterProps) => {
       label: i18n._('DPA Status'),
       ariaLabel: i18n._('Read the DPA availability notice'),
     },
-  ].filter(({ document }) => isApprovedBrandDocument(document));
+  ]
+    .slice(0, compact ? 2 : undefined)
+    .filter(({ document }) => isApprovedBrandDocument(document));
   const hasLegalEntity =
     brand.legal.legalEntityStatus === 'approved' &&
     brand.legal.legalEntity.trim().length > 0;
@@ -104,7 +114,16 @@ export const Footer = ({ i18n, brand }: FooterProps) => {
   return (
     <Container style={footerContainerStyle}>
       <Row>
-        {links.map((link) => (
+        {[
+          ...links,
+          ...(compact
+            ? legalLinks.map(({ document, label, ariaLabel }) => ({
+                href: document.url as string,
+                value: label,
+                ariaLabel,
+              }))
+            : []),
+        ].map((link) => (
           <Column key={link.value}>
             <ShadowText>
               <Link
@@ -116,7 +135,7 @@ export const Footer = ({ i18n, brand }: FooterProps) => {
           </Column>
         ))}
       </Row>
-      {legalLinks.length > 0 ? (
+      {!compact && legalLinks.length > 0 ? (
         <Row>
           {legalLinks.map(({ document, label, ariaLabel }) => (
             <Column key={label}>
@@ -131,17 +150,34 @@ export const Footer = ({ i18n, brand }: FooterProps) => {
           ))}
         </Row>
       ) : null}
-      {hasLegalEntity ? (
-        <ShadowText>{brand.legal.legalEntity}</ShadowText>
-      ) : null}
-      {hasAttribution ? (
+      {compact ? (
         <ShadowText>
-          <Link
-            href={brand.attribution.url as string}
-            value={brand.attribution.label}
-          />
+          <>
+            {hasLegalEntity ? brand.legal.legalEntity : null}
+            {hasLegalEntity && hasAttribution ? ' · ' : null}
+            {hasAttribution ? (
+              <Link
+                href={brand.attribution.url as string}
+                value={brand.attribution.label}
+              />
+            ) : null}
+          </>
         </ShadowText>
-      ) : null}
+      ) : (
+        <>
+          {hasLegalEntity ? (
+            <ShadowText>{brand.legal.legalEntity}</ShadowText>
+          ) : null}
+          {hasAttribution ? (
+            <ShadowText>
+              <Link
+                href={brand.attribution.url as string}
+                value={brand.attribution.label}
+              />
+            </ShadowText>
+          ) : null}
+        </>
+      )}
       {previewNotice ? <ShadowText>{previewNotice}</ShadowText> : null}
     </Container>
   );

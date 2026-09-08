@@ -82,6 +82,11 @@ grep -Fq "trajectory fixture rejected: $suffix_path" "$temporary_directory/suffi
 }
 
 allowed_paths=(
+  packages/twenty-server/src/engine/core-modules/email/email.service.ts
+  packages/twenty-server/src/engine/core-modules/email/utils/inline-email-image.ts
+  packages/twenty-server/src/engine/core-modules/email/utils/inline-product-email-logo.ts
+  packages/twenty-server/src/engine/core-modules/email/__tests__/inline-email-images.spec.ts
+  packages/twenty-server/src/engine/core-modules/email/__tests__/inline-invitation-rendering.spec.ts
   packages/twenty-server/src/database/scripts/check-db-initialization.ts
   evaluations/finance/mho-254/README.md
   packages/twenty-front/src/locales/ja-JP.po
@@ -106,10 +111,10 @@ for index in "${!allowed_paths[@]}"; do
     printf 'test: allow exact-root locale catalog path\n' |
       GIT_AUTHOR_NAME='Trajectory fixture' \
       GIT_AUTHOR_EMAIL='trajectory-fixture@example.invalid' \
-      GIT_AUTHOR_DATE="2000-01-01T00:01:0${index}Z" \
+      GIT_AUTHOR_DATE="2000-01-01T00:01:00Z" \
       GIT_COMMITTER_NAME='Trajectory fixture' \
       GIT_COMMITTER_EMAIL='trajectory-fixture@example.invalid' \
-      GIT_COMMITTER_DATE="2000-01-01T00:01:0${index}Z" \
+      GIT_COMMITTER_DATE="2000-01-01T00:01:00Z" \
       git commit-tree "$tree" -p HEAD
   )"
 
@@ -118,6 +123,8 @@ for index in "${!allowed_paths[@]}"; do
 done
 
 rogue_allowed_paths=(
+  packages/twenty-server/src/engine/core-modules/email/utils/inline-email-image.ts.backup
+  packages/twenty-server/src/engine/core-modules/email/utils/nested/inline-email-image.ts
   packages/twenty-server/src/database/scripts/check-db-initialization.ts.backup
   evaluations/finance/mho-254-backup/README.md
   packages/twenty-emails/src/locales/ja-JP.po.backup
