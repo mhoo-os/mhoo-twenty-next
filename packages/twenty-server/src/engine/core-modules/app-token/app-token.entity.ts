@@ -27,6 +27,7 @@ export enum AppTokenType {
   EmailVerificationToken = 'EMAIL_VERIFICATION_TOKEN',
   EnterpriseValidityToken = 'ENTERPRISE_VALIDITY_TOKEN',
   SSOExchangeToken = 'SSO_EXCHANGE_TOKEN',
+  CloverTokenHandoff = 'CLOVER_TOKEN_HANDOFF',
 }
 
 @Entity({ name: 'appToken', schema: 'core' })
@@ -94,5 +95,10 @@ export class AppTokenEntity {
     codeChallenge?: string;
     scope?: string;
     authProvider?: AuthProviderEnum;
+    cloverHandoff?: {
+      merchantId: string;
+      userWorkspaceId: string;
+      connectedAccountId?: string;
+    };
   } | null;
 }

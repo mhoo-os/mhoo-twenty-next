@@ -36,6 +36,9 @@ export type AppConnection = {
   // OAuth scopes actually granted by the upstream provider on the most recent
   // token issuance (may be a subset of what the app requested).
   scopes: string[];
+  // Active explicit native grant revision for manual-token background execution.
+  // Null for interactive calls; never an OAuth scope or an access grant by itself.
+  manualTokenWorkspaceGrantId?: string | null;
   // Set when the most recent refresh attempt failed permanently
   // (4xx invalid_grant); the user must reconnect from the app's settings tab.
   // Apps should surface this so users know to take action.

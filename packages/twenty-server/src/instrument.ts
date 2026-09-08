@@ -60,7 +60,15 @@ if (process.env.EXCEPTION_HANDLER_DRIVER === ExceptionHandlerDriver.SENTRY) {
     }).filter((integration) => integration.name !== 'Modules'),
     integrations: [
       Sentry.redisIntegration(),
-      Sentry.httpIntegration(),
+      Sentry.httpIntegration({
+        // Credentials use a dedicated REST path, never GraphQL documents.
+        // Suppress collection before Sentry receives the request body.
+        ignoreIncomingRequestBody: (url) =>
+          /\/clover-token(?:\/|\?|$)/i.test(url),
+        ignoreIncomingRequests: (url) => /\/clover-token(?:\/|\?|$)/i.test(url),
+        ignoreOutgoingRequests: (url) =>
+          /^https:\/\/api\.clover\.com\/v3\/merchants\//i.test(url),
+      }),
       Sentry.expressIntegration(),
       Sentry.graphqlIntegration(),
       Sentry.postgresIntegration(),
@@ -93,6 +101,13 @@ if (process.env.EXCEPTION_HANDLER_DRIVER === ExceptionHandlerDriver.SENTRY) {
     }),
     maxValueLength: 8192,
     sendDefaultPii: true,
+    beforeSend: (event) => {
+      if (/\/clover-token(?:\/|\?|$)/i.test(event.request?.url ?? '')) {
+        // Also covers exceptions raised by middleware before our filter runs.
+        return null;
+      }
+      return event;
+    },
     debug: process.env.NODE_ENV === NodeEnvironment.DEVELOPMENT,
     beforeSendSpan: (span) => {
       const twentyContext = Sentry.getIsolationScope().getScopeData().contexts

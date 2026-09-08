@@ -1,4 +1,6 @@
-import { UseGuards, UseInterceptors } from '@nestjs/common';
+import { PermissionFlagType } from 'twenty-shared/constants';
+import { PermissionsService } from 'src/engine/metadata-modules/permissions/permissions.service';
+import { ForbiddenException, UseGuards, UseInterceptors } from '@nestjs/common';
 import { Args, Mutation, Query } from '@nestjs/graphql';
 
 import { MetadataResolver } from 'src/engine/api/graphql/graphql-config/decorators/metadata-resolver.decorator';
@@ -20,6 +22,7 @@ import { buildPublicConnectedAccount } from 'src/engine/metadata-modules/connect
 export class ConnectedAccountResolver {
   constructor(
     private readonly connectedAccountMetadataService: ConnectedAccountMetadataService,
+    private readonly permissions: PermissionsService,
   ) {}
 
   @Query(() => [ConnectedAccountPublicDTO])
@@ -44,11 +47,24 @@ export class ConnectedAccountResolver {
     @AuthWorkspace() workspace: WorkspaceEntity,
     @AuthUserWorkspaceId() userWorkspaceId: string,
   ): Promise<ConnectedAccountPublicDTO> {
-    await this.connectedAccountMetadataService.verifyOwnership({
+    const account = await this.connectedAccountMetadataService.verifyOwnership({
       id,
       userWorkspaceId,
       workspaceId: workspace.id,
     });
+
+    if (
+      account.connectionProvider?.type === 'manualToken' &&
+      !(await this.permissions.userHasWorkspaceSettingPermission({
+        workspaceId: workspace.id,
+        userWorkspaceId,
+        setting: PermissionFlagType.CONNECTED_ACCOUNTS,
+      }))
+    ) {
+      throw new ForbiddenException(
+        'You need permission to manage connections in this Workspace.',
+      );
+    }
 
     const deleted = await this.connectedAccountMetadataService.delete({
       id,

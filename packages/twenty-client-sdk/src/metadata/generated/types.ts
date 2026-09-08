@@ -4260,6 +4260,9 @@ export default {
             "scopes": [
                 1
             ],
+            "manualTokenWorkspaceGrantId": [
+                1
+            ],
             "authFailedAt": [
                 1
             ],

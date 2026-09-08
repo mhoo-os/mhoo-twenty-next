@@ -6,9 +6,12 @@ export const SignOutOnOtherTabSignOutEffect = () => {
   const { clearSession } = useAuth();
 
   useEffect(() => {
-    const unsubscribe = subscribeToSignOutFromOtherTabs(() => {
-      clearSession();
-    });
+    const unsubscribe = subscribeToSignOutFromOtherTabs(
+      () => {
+        clearSession();
+      },
+      () => window.location.replace('/'),
+    );
 
     return unsubscribe;
   }, [clearSession]);

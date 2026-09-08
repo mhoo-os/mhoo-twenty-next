@@ -27,6 +27,7 @@ export const getMissingCreateEventScopes = (connectedAccount: {
     }
     // Non-OAuth providers do not rely on OAuth scopes to create events.
     case ConnectedAccountProvider.IMAP_SMTP_CALDAV:
+    case ConnectedAccountProvider.CLOVER:
     case ConnectedAccountProvider.EMAIL_GROUP:
     case ConnectedAccountProvider.APP:
     case ConnectedAccountProvider.OIDC:

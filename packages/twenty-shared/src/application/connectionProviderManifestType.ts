@@ -4,8 +4,9 @@ import { type SyncableEntityOptions } from '@/application/syncableEntityOptionsT
 export type ConnectionProviderManifest = SyncableEntityOptions & {
   name: string;
   displayName: string;
-  type: 'oauth';
-  oauth: OAuthConnectionProviderConfig;
   onConnectLogicFunction?: SyncableEntityOptions;
   onDisconnectLogicFunction?: SyncableEntityOptions;
-};
+} & (
+    | { type: 'oauth'; oauth: OAuthConnectionProviderConfig }
+    | { type: 'manualToken'; oauth?: never }
+  );

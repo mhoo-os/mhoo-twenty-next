@@ -32,7 +32,10 @@ import { currentWorkspaceState } from '@/auth/states/currentWorkspaceState';
 import { returnToPathState } from '@/auth/states/returnToPathState';
 import { tokenPairState } from '@/auth/states/tokenPairState';
 import { clearSessionLocalStorageKeys } from '@/auth/utils/clearSessionLocalStorageKeys';
-import { broadcastSignOutToOtherTabs } from '@/auth/utils/crossTabSignOut';
+import {
+  broadcastWorkspaceChangeToOtherTabs,
+  broadcastSignOutToOtherTabs,
+} from '@/auth/utils/crossTabSignOut';
 import { isValidReturnToPath } from '@/auth/utils/isValidReturnToPath';
 import { isNonEmptyString } from '@sniptt/guards';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
@@ -51,6 +54,7 @@ import {
   getFirstAvailableWorkspaces,
 } from '@/auth/utils/availableWorkspacesUtils';
 import { isEmailVerificationRequiredState } from '@/client-config/states/isEmailVerificationRequiredState';
+import { isSameOriginWorkspaceEnabledState } from '@/client-config/states/isSameOriginWorkspaceEnabledState';
 import { isMultiWorkspaceEnabledState } from '@/client-config/states/isMultiWorkspaceEnabledState';
 import { useLastAuthenticatedWorkspaceDomain } from '@/domain-manager/hooks/useLastAuthenticatedWorkspaceDomain';
 import { useOrigin } from '@/domain-manager/hooks/useOrigin';
@@ -76,6 +80,9 @@ export const useAuth = () => {
   const { origin } = useOrigin();
   const isMultiWorkspaceEnabled = useAtomStateValue(
     isMultiWorkspaceEnabledState,
+  );
+  const isSameOriginWorkspaceEnabled = useAtomStateValue(
+    isSameOriginWorkspaceEnabledState,
   );
   const isEmailVerificationRequired = useAtomStateValue(
     isEmailVerificationRequiredState,
@@ -293,8 +300,25 @@ export const useAuth = () => {
 
   const handleLoadWorkspaceAfterAuthentication = useCallback(
     async (authTokens: AuthTokenPair) => {
-      handleSetAuthTokens(authTokens);
       setIsAppEffectRedirectEnabled(false);
+      handleSetAuthTokens(authTokens);
+      if (isSameOriginWorkspaceEnabled) {
+        // Some identity atoms persist across reloads. Clear old context while
+        // retaining the freshly issued native tokens.
+        store.set(currentUserState.atom, null);
+        store.set(currentWorkspaceState.atom, null);
+        store.set(currentWorkspaceMemberState.atom, null);
+        store.set(currentUserWorkspaceState.atom, null);
+        clearSessionLocalStorageKeys();
+        sessionStorage.clear();
+        try {
+          await apolloClient.clearStore();
+        } finally {
+          broadcastWorkspaceChangeToOtherTabs();
+          window.location.replace('/');
+        }
+        return;
+      }
 
       try {
         await loadCurrentUser();
@@ -302,7 +326,14 @@ export const useAuth = () => {
         setIsAppEffectRedirectEnabled(true);
       }
     },
-    [loadCurrentUser, handleSetAuthTokens, setIsAppEffectRedirectEnabled],
+    [
+      loadCurrentUser,
+      handleSetAuthTokens,
+      setIsAppEffectRedirectEnabled,
+      isSameOriginWorkspaceEnabled,
+      apolloClient,
+      store,
+    ],
   );
 
   const handleGetAuthTokensFromLoginToken = useCallback(
