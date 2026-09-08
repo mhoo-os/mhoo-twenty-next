@@ -141,9 +141,10 @@ export class UpgradeSequenceRunnerService {
         const previousStep = cursor > 0 ? sequence[cursor - 1] : undefined;
 
         if (previousStep?.kind === 'workspace') {
-          this.enforceWorkspacesCompletedPreviousWorkspaceSegment({
+          await this.enforceWorkspacesCompletedPreviousWorkspaceSegment({
             sequence,
             previousWorkspaceStep: previousStep,
+            instanceStep: step,
             workspaceCursors,
           });
         }
@@ -445,15 +446,18 @@ export class UpgradeSequenceRunnerService {
     return workspaceIds;
   }
 
-  private enforceWorkspacesCompletedPreviousWorkspaceSegment({
+  private async enforceWorkspacesCompletedPreviousWorkspaceSegment({
     sequence,
     previousWorkspaceStep,
+    instanceStep,
     workspaceCursors,
   }: {
     sequence: UpgradeStep[];
     previousWorkspaceStep: WorkspaceUpgradeStep;
+    instanceStep: InstanceUpgradeStep;
     workspaceCursors: Map<string, WorkspaceLastAttemptedCommand>;
-  }): void {
+  }): Promise<void> {
+    const retryWorkspaceIds: string[] = [];
     const barrierCursor =
       this.upgradeSequenceReaderService.locateStepInSequenceOrThrow({
         sequence,
@@ -471,6 +475,16 @@ export class UpgradeSequenceRunnerService {
         cursorPosition === barrierCursor &&
         workspaceCursor.status === 'completed';
 
+      if (
+        !isAtBarrierAndCompleted &&
+        instanceStep.kind === 'slow-instance' &&
+        instanceStep.afterWorkspaceCommands &&
+        workspaceCursor.name === instanceStep.name
+      ) {
+        retryWorkspaceIds.push(workspaceId);
+        continue;
+      }
+
       if (!isAtBarrierAndCompleted) {
         throw new Error(
           `Cannot run instance step: workspace ${workspaceId} ` +
@@ -478,6 +492,21 @@ export class UpgradeSequenceRunnerService {
             `(cursor: "${workspaceCursor.name}", status: "${workspaceCursor.status}")`,
         );
       }
+    }
+
+    // A native instance failure advances workspace attempt cursors. A direct
+    // instance invocation can do the same without passing this barrier, so its
+    // receipt alone is insufficient: retain proof of the completed prior tail.
+    if (
+      retryWorkspaceIds.length > 0 &&
+      !(await this.upgradeMigrationService.areAllWorkspacesAtCommand({
+        commandName: previousWorkspaceStep.name,
+        workspaceIds: retryWorkspaceIds,
+      }))
+    ) {
+      throw new Error(
+        `Cannot retry instance step "${instanceStep.name}": workspaces have not completed "${previousWorkspaceStep.name}"`,
+      );
     }
   }
 }

@@ -82,6 +82,13 @@ grep -Fq "trajectory fixture rejected: $suffix_path" "$temporary_directory/suffi
 }
 
 allowed_paths=(
+  packages/twenty-server/src/database/commands/upgrade-version-command/2-37/2-37-instance-command-slow-1788846876000-ensure-manual-token-workspace-grant.ts
+  packages/twenty-server/src/database/commands/upgrade-version-command/2-37/__tests__/ensure-manual-token-workspace-grant.instance-command.spec.ts
+  packages/twenty-server/src/engine/core-modules/upgrade/decorators/registered-instance-command.decorator.ts
+  packages/twenty-server/src/engine/core-modules/upgrade/services/upgrade-command-registry.service.ts
+  packages/twenty-server/src/engine/core-modules/upgrade/services/upgrade-sequence-reader.service.ts
+  packages/twenty-server/src/engine/core-modules/upgrade/services/upgrade-sequence-runner.service.ts
+  .github/workflows/preview-env-dispatch.yaml
   packages/twenty-server/src/engine/core-modules/clover-token/clover-token.service.ts
   packages/twenty-server/src/engine/core-modules/email/email.service.ts
   packages/twenty-server/src/engine/core-modules/email/utils/inline-email-image.ts
@@ -102,10 +109,10 @@ allowed_paths=(
 
 for index in "${!allowed_paths[@]}"; do
   path="${allowed_paths[$index]}"
-  blob="$({ git show "HEAD:$path"; printf '\n# exact-root fixture\n'; } | git hash-object -w --stdin)"
+  blob="$({ if git cat-file -e "HEAD:$path" 2>/dev/null; then git show "HEAD:$path"; fi; printf '\n# exact-root fixture\n'; } | git hash-object -w --stdin)"
   fixture_index="$temporary_directory/index"
   GIT_INDEX_FILE="$fixture_index" git read-tree HEAD
-  GIT_INDEX_FILE="$fixture_index" git update-index \
+  GIT_INDEX_FILE="$fixture_index" git update-index --add \
     --cacheinfo 100644 "$blob" "$path"
   tree="$(GIT_INDEX_FILE="$fixture_index" git write-tree)"
   candidate_head="$(
@@ -124,6 +131,14 @@ for index in "${!allowed_paths[@]}"; do
 done
 
 rogue_allowed_paths=(
+  packages/twenty-server/src/database/commands/upgrade-version-command/2-37/2-37-instance-command-slow-1788846876000-ensure-manual-token-workspace-grant.ts.backup
+  packages/twenty-server/src/database/commands/upgrade-version-command/2-37/__tests__/ensure-manual-token-workspace-grant.instance-command.spec.ts.backup
+  packages/twenty-server/src/engine/core-modules/upgrade/decorators/registered-instance-command.decorator.ts.backup
+  packages/twenty-server/src/engine/core-modules/upgrade/services/rogue-upgrade-command-registry.service.ts
+  packages/twenty-server/src/engine/core-modules/upgrade/services/nested/upgrade-sequence-reader.service.ts
+  packages/twenty-server/src/engine/core-modules/upgrade/services/upgrade-sequence-runner.service.ts.backup
+  .github/workflows/preview-env-dispatch.yaml.backup
+  .github/workflows/nested/preview-env-dispatch.yaml
   packages/twenty-server/src/engine/core-modules/clover-token/credential-export.ts
   packages/twenty-server/src/engine/core-modules/clover-token/clover-token.service.ts.backup
   nested/packages/twenty-server/src/engine/core-modules/clover-token/clover-token.service.ts

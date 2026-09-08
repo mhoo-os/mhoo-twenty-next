@@ -48,11 +48,21 @@ export class UpgradeSequenceReaderService {
       }
 
       for (const command of bundle.slowInstanceCommands) {
-        sequence.push({ kind: 'slow-instance', ...command });
+        if (!command.afterWorkspaceCommands) {
+          sequence.push({ kind: 'slow-instance', ...command });
+        }
       }
 
       for (const command of bundle.workspaceCommands) {
         sequence.push({ kind: 'workspace', ...command });
+      }
+
+      // A patch to an already released version must also be reachable from its
+      // completed workspace tail. Historical commands keep their original order.
+      for (const command of bundle.slowInstanceCommands) {
+        if (command.afterWorkspaceCommands) {
+          sequence.push({ kind: 'slow-instance', ...command });
+        }
       }
     }
 

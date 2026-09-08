@@ -162,6 +162,7 @@ import { AddUsageLimitFastInstanceCommand } from 'src/database/commands/upgrade-
 import { MakeUserEmailCaseInsensitiveFastInstanceCommand } from 'src/database/commands/upgrade-version-command/2-37/2-37-instance-command-fast-1787836741000-make-user-email-case-insensitive';
 import { BackfillMissingPageLayoutWidgetPositionsSlowInstanceCommand } from 'src/database/commands/upgrade-version-command/2-37/2-37-instance-command-slow-1787838153752-backfill-missing-page-layout-widget-positions';
 import { AddManualTokenWorkspaceGrantFastInstanceCommand } from 'src/database/commands/upgrade-version-command/2-37/2-37-instance-command-fast-1788751203788-add-manual-token-workspace-grant';
+import { EnsureManualTokenWorkspaceGrantSlowInstanceCommand } from 'src/database/commands/upgrade-version-command/2-37/2-37-instance-command-slow-1788846876000-ensure-manual-token-workspace-grant';
 
 export const INSTANCE_COMMANDS = [
   AddViewFieldGroupIdIndexOnViewFieldFastInstanceCommand,
@@ -326,4 +327,5 @@ export const INSTANCE_COMMANDS = [
   MakeUserEmailCaseInsensitiveFastInstanceCommand,
   BackfillMissingPageLayoutWidgetPositionsSlowInstanceCommand,
   AddManualTokenWorkspaceGrantFastInstanceCommand,
+  EnsureManualTokenWorkspaceGrantSlowInstanceCommand,
 ];
