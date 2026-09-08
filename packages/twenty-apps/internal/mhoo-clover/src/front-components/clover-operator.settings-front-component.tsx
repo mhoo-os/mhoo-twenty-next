@@ -7,6 +7,7 @@ import { listStatusMerchants, readNativeStatus } from '../operator/native-status
 import type { MerchantListResult } from '../operator/status-route-contract';
 // Explicit delegated client; REST is bundled by the native component builder.
 const client = new RestApiClient({ runAs: 'user' });
+const requestRecentPage = (body: unknown) => client.post<unknown>('/s/clover/recent-page', body);
 const readStatus = (id: string) => readNativeStatus(id, client);
 export function CloverOperatorSettings() {
   const [result, setResult] = useState<MerchantListResult | null>(null);
@@ -17,7 +18,7 @@ export function CloverOperatorSettings() {
     listStatusMerchants(client).then((value) => { if (!cancelled) setResult(value); }).catch(() => { if (!cancelled) setResult({ kind: 'uncertain' }); });
     return () => { cancelled = true; };
   }, [revision]);
-  if (result?.kind === 'available') return <PaymentStatus merchants={result.merchants} readStatus={readStatus} />;
+  if (result?.kind === 'available') return <PaymentStatus merchants={result.merchants} readStatus={readStatus} requestRecentPage={requestRecentPage} />;
   return <section className="mhoo-clover-status" role="status"><h1>Clover history</h1><p>{!result ? 'Loading connections…' : result.kind === 'denied' ? 'Access denied. Ask your Workspace administrator to review your permissions.' : 'Connections could not be confirmed. Try again.'}</p><button disabled={!result} onClick={() => setRevision((n) => n + 1)}>Refresh connections</button></section>;
 }
 export default defineSettingsFrontComponent({ universalIdentifier: OPERATOR_SETTINGS_COMPONENT, name: 'Clover payment status', component: CloverOperatorSettings });

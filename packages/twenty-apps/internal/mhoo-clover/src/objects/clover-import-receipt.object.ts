@@ -23,6 +23,22 @@ export default defineObject({
   isUIEditable: false,
   fields: [
     {
+      universalIdentifier: 'b601a08b-f3b9-4bdb-ac10-231f099ae788',
+      name: 'authorizationMode',
+      label: 'Authorization mode',
+      type: FieldType.TEXT,
+      icon: 'IconUserCheck',
+      isNullable: true,
+    },
+    {
+      universalIdentifier: '32445bba-7b66-46a0-b587-caf10a770a38',
+      name: 'initiatingUserWorkspaceId',
+      label: 'Initiating membership',
+      type: FieldType.UUID,
+      icon: 'IconUserCheck',
+      isNullable: true,
+    },
+    {
       universalIdentifier: '1b5dc9e9-2030-45c5-ae08-76976e53953b',
       name: 'pageKey',
       label: 'pageKey',

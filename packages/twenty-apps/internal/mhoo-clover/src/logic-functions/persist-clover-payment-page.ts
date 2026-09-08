@@ -90,7 +90,12 @@ const ensureRecords = async (
 // Partial revision writes are safe to replay; failure never produces a page receipt.
 export const persistCloverPaymentPage = async (
   page: Page,
-  binding: { connectionId: string; merchantId: string; grantId: string | null },
+  binding: {
+    connectionId: string;
+    merchantId: string;
+    grantId: string | null;
+    interactiveUserWorkspaceId?: string;
+  },
   dependencies: {
     client: RestApiClient;
     authorize: () => Promise<void>;
@@ -98,6 +103,14 @@ export const persistCloverPaymentPage = async (
   },
 ) => {
   try {
+    if (
+      binding.interactiveUserWorkspaceId &&
+      (binding.grantId !== null ||
+        !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+          binding.interactiveUserWorkspaceId,
+        ))
+    )
+      throw new Error('Invalid interactive receipt identity');
     if (
       page.revisions.length > 100 ||
       new Set(page.revisions.map((r) => r.revisionKey)).size !==
@@ -152,6 +165,9 @@ export const persistCloverPaymentPage = async (
       'clover-payments-page-v1',
       requestKey,
       binding.grantId,
+      ...(binding.interactiveUserWorkspaceId
+        ? ['interactive-user-v1', binding.interactiveUserWorkspaceId]
+        : []),
       revisionKeys,
     ]);
     const [receiptId] = await ensureRecords(
@@ -164,6 +180,12 @@ export const persistCloverPaymentPage = async (
           connectionId: binding.connectionId,
           dataset: 'payments',
           grantId: binding.grantId,
+          ...(binding.interactiveUserWorkspaceId
+            ? {
+                authorizationMode: 'interactive-user-v1',
+                initiatingUserWorkspaceId: binding.interactiveUserWorkspaceId,
+              }
+            : {}),
           ...page.range,
           nextOffset: page.nextOffset,
           rowCount: revisionKeys.length,
