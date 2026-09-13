@@ -1,5 +1,76 @@
 # Professional investigation method acceptance map
 
+## Installed-target discovery — 2026-09-14 05:18 Bangkok
+
+Installation remains **NOT APPLIED**; real Follow-ups functional acceptance is
+**NOT PROVEN**. Sole retained runtime lead is
+`01a09cd2-9ab9-76a3-97d4-37d2300a65a8`, same `finance-native-review-ui` and
+MHO-7/MHO-135/MHO-146. Both handoff acknowledgments were received; Delivery Room
+ownership transferred with revision 14 → 15, preserving previous source leads.
+Accepted implementation remains `f87cfc5296bcb036f79eaac6581b77cab9d6d0c1`;
+`7fb2950bc6f24d719a68375f7b861b41da225d5c` adds handoff documentation only.
+No unchanged test/build suites were repeated. Source custody was checked once
+against the accepted implementation and passed.
+
+Fresh observations (not inferred from prior installation receipts):
+
+- Existing browser session at `https://hass-kitchen.mhoo.app` displays Hass
+  Kitchen and native profile Tanyawit Nilnavarat. Members lists two existing
+  accounts; no second session or allowed/denied role execution was established.
+  Guide owner supplied retained Workspace key `ws_be7c8bf326d474ab745cfbd1`;
+  that key is not independently verified as the native Twenty UUID.
+- Native Installed Apps shows Mhoo Finance, Local, version 0.1.0, application
+  ID `31a2ddce-fc04-4278-b3a9-1b2080dc830f`, six objects, two fields, one logic
+  function and one front component. Its Permissions panel displays no
+  object-level permissions and disabled/off global settings/actions. This is a
+  UI observation of the older installation, not a tested effective-role receipt
+  or proof of its exact source/build checksum.
+- Existing CLI `production` pointed at `https://hass.mhoo.app`, which failed
+  both browser and OS DNS. Coordinator supplied the working current host.
+  Using exported SDK ConfigService, only that remote's apiUrl was corrected to
+  `https://hass-kitchen.mhoo.app`; the default remote and credentials were
+  retained. Previous URL is recorded here for configuration rollback. No
+  browser sessions or tokens were extracted or copied.
+- Pinned CLI `twenty -r production remote:status` on the corrected target
+  reports OAuth invalid. `twenty -r production plan` exits 1 at server/auth
+  preflight: `Authentication failed. Run yarn twenty remote:add to authenticate.`
+  It never reaches manifest build or a metadata change plan.
+- Supported SDK `authLoginOAuth` against the correct host returns
+  `OAUTH_NOT_SUPPORTED`: server does not expose a CLI client ID. Read-only
+  discovery confirms HTTP 200, issuer and authorize/token endpoints on
+  `hass-kitchen.mhoo.app`, and absent `cli_client_id`. This attempt stopped
+  before a browser grant or token write. No API key was created as a workaround.
+- Existing local remote `http://localhost:2020` cannot connect; no disposable
+  Workspace was verified or created. No dev watcher was started.
+
+Smallest remaining decisions and prerequisites:
+
+1. Runtime custodian must establish a compatible existing CLI authentication
+   route/registration and the installed Finance rollback artifact. Neither is
+   known by the guide owner. A new API key or OAuth grant needs exact authority;
+   routine browser sign-in alone cannot repair the missing CLI client discovery.
+2. Obtain the actual CLI metadata plan before apply. Accepted candidate's
+   default App role denies native Task writes and lacks People/Note reads, so
+   an existing user writer alone cannot be assumed sufficient. A proposed
+   change must explicitly scope Task writes to Finance rows and required fields,
+   plus bounded People/Note reads, preserve caller-role intersection, and retain
+   the shipped reviewer read-only policy. No role change is authorized here.
+3. Immutable per-event actor history remains unimplemented/unproved in the
+   Follow-ups Task JSON path. A successful install would not close this gate.
+   Real Files, Remote DOM, persistence/reload, scope and allowed/denied identity
+   receipts remain outstanding.
+
+Clover guide/runtime owner `01a09b1b-2239-7c80-b4e0-6e014cef51a5` confirmed no
+concurrent sync/deploy and was notified that Finance has no active apply window.
+Future shared-host mutations must serialize with that owner and recovery custody.
+Coordinator was notified of the actual CLI boundary and permission finding.
+Routing class: consequential authorization/runtime integration; Astra high is
+the reference's review candidate, while actual inherited setting is not
+independently observed here. No model interruption or cost claim was made.
+No App apply/install, grant, customer import, provider/mailbox access, send,
+host rollout, push or merge occurred. Linear milestone reconciliation remains
+with the coordinator; no Linear connector is available in this task.
+
 ## Installation lead handoff — 2026-09-14
 
 Runtime owner is now `01a09cd2-9ab9-76a3-97d4-37d2300a65a8`, with actual incoming
