@@ -1,11 +1,5 @@
-import {
-  ApolloClient,
-  ApolloLink,
-  HttpLink,
-  InMemoryCache,
-} from '@apollo/client';
+import { ApolloClient, HttpLink, InMemoryCache } from '@apollo/client';
 
-import { loggerLink } from '@/apollo/utils/loggerLink';
 import {
   type AuthTokenPair,
   RenewTokenDocument,
@@ -14,10 +8,6 @@ import {
 } from '~/generated-metadata/graphql';
 import { isUndefinedOrNull } from '~/utils/isUndefinedOrNull';
 
-const isDebugMode = process.env.IS_DEBUG_MODE === 'true';
-
-const logger = loggerLink(() => 'Twenty-Refresh');
-
 const renewTokenMutation = async (
   uri: string | undefined,
   refreshToken: string,
@@ -25,7 +15,8 @@ const renewTokenMutation = async (
   const httpLink = new HttpLink({ uri, credentials: 'include' });
 
   const client = new ApolloClient({
-    link: ApolloLink.from([...(isDebugMode ? [logger] : []), httpLink]),
+    // Renewal carries refresh and access credentials, including in debug mode.
+    link: httpLink,
     cache: new InMemoryCache({}),
   });
 

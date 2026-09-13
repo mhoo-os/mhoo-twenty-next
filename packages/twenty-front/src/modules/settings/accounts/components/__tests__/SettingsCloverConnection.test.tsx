@@ -8,14 +8,30 @@ import {
 import { type ReactNode, type ComponentProps } from 'react';
 
 import { SettingsCloverConnection } from '@/settings/accounts/components/SettingsCloverConnection';
+import {
+  currentUserState,
+  type CurrentUser,
+} from '@/auth/states/currentUserState';
+import {
+  currentWorkspaceState,
+  type CurrentWorkspace,
+} from '@/auth/states/currentWorkspaceState';
+import {
+  jotaiStore,
+  resetJotaiStore,
+} from '@/ui/utilities/state/jotai/jotaiStore';
 
 let mockWorkspace = { id: 'hass', displayName: 'Hass Kitchen' };
+const mockNativeToken = `e30.${btoa(JSON.stringify({ type: 'ACCESS', workspaceId: 'hass', sub: 'owner', userWorkspaceId: 'membership' }))}.synthetic`;
 jest.mock('@/ui/utilities/state/jotai/hooks/useAtomStateValue', () => ({
   useAtomStateValue: () => mockWorkspace,
 }));
 jest.mock('@/apollo/utils/getTokenPair', () => ({
   getTokenPair: () => ({
-    accessOrWorkspaceAgnosticToken: { token: 'synthetic-native-session' },
+    accessOrWorkspaceAgnosticToken: {
+      token: mockNativeToken,
+      expiresAt: new Date(Date.now() + 3_600_000).toISOString(),
+    },
   }),
 }));
 jest.mock('@linaria/react', () => ({ styled: { div: () => 'div' } }));
@@ -56,6 +72,11 @@ const mockFetch = jest.fn();
 
 describe('Clover native form', () => {
   beforeEach(() => {
+    resetJotaiStore();
+    jotaiStore.set(currentWorkspaceState.atom, {
+      id: 'hass',
+    } as CurrentWorkspace);
+    jotaiStore.set(currentUserState.atom, { id: 'owner' } as CurrentUser);
     mockWorkspace = { id: 'hass', displayName: 'Hass Kitchen' };
     mockFetch.mockReset().mockImplementation(async (url: string) =>
       reply(
@@ -168,9 +189,7 @@ describe('Clover native form', () => {
     const [, request] = mockFetch.mock.calls.at(-1)!;
     expect(request.cache).toBe('no-store');
     expect(request.credentials).toBe('same-origin');
-    expect(request.headers.Authorization).toBe(
-      'Bearer synthetic-native-session',
-    );
+    expect(request.headers.Authorization).toBe(`Bearer ${mockNativeToken}`);
     expect(request.redirect).toBe('error');
     await act(async () => complete(reply(receipt)));
     expect(

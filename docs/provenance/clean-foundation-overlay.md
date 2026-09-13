@@ -577,3 +577,32 @@ on PR45, but Google continuation returned without the creation action and did
 not expose the form. Dropped action is confirmed; the cause of any remaining
 token-redemption failure is not established. These regressions do not prove
 actual Hass provisioning, authorize a new deployment, or permit provider access.
+
+## Clover native session bearer renewal
+
+The September 13 owner/coordinator-authorized MHO-265/MHO-266 repair starts from
+`e46797ae55c9126a44d82f5bd19052d19ba102eb`. The native cookie session can remain
+valid while the dormant access token used by the Clover form has expired. The
+already-enumerated `SettingsCloverConnection.tsx` now renews only an expired
+matching native ACCESS pair through the existing renewal operation. It checks
+the current user, Workspace, membership and pair snapshot before dispatch; it
+never retries a Clover submission or requests additional permissions.
+
+This increment admits only these additional exact files:
+
+- `packages/twenty-front/src/modules/auth/services/AuthService.ts`
+- `packages/twenty-front/src/modules/auth/services/__tests__/AuthService.test.ts`
+- `packages/twenty-front/src/modules/settings/accounts/components/__tests__/cloverRequest.test.ts`
+
+The renewal client no longer attaches the debug logger because its inputs and
+outputs contain authentication credentials. Existing native renewal, controller
+Bearer requirements, CSRF checks, Workspace/member permissions and installed
+App/provider checks retain authority. No authentication subtree is admitted.
+
+Synthetic tests exercise the actual renewal HTTP client and Clover transport,
+including stale credentials, identity changes, cancellation and no submission
+replay. They do not prove the live cause of a particular 403 or token intake.
+An in-flight native renewal may set a cookie before a concurrent session switch
+is detected; this repair prevents subsequent client persistence and Clover
+dispatch, and does not claim to change that server cookie race. No provider
+read, permission expansion, deployment or production acceptance is implied.
