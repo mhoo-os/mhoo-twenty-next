@@ -2,6 +2,16 @@
 
 ## Temporary API-key fallback inspection — 2026-09-14
 
+Subsequent exact approval: coordinator asked the user to approve a temporary
+Admin key for Finance installation, revoked immediately afterward, after Oracle
+maintenance; user replied `Approve`. One key is now authorized with the shortest
+native 15-day expiration cap, immediate revocation on completion or abandonment,
+and no use beyond this Finance installation. No key has yet been created.
+Mutations remain held for Oracle owner's explicit safe-window acknowledgment.
+A local non-secret helper uses hidden terminal input and SDK authLogin to a
+separate `finance-install-20260914` remote; it logs only fixed result messages.
+The existing production/default remotes will not receive this temporary key.
+
 Coordinator relayed explicit user approval to obtain a narrowly scoped temporary
 Workspace API key for Hass Finance installation/testing, preferably existing,
 with minimum scope/expiry and revocation after use. No App role expansion or
