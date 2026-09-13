@@ -274,6 +274,7 @@ export type AppConnection = {
   authFailedAt?: Maybe<Scalars['String']['output']>;
   handle: Scalars['String']['output'];
   id: Scalars['ID']['output'];
+  manualTokenWorkspaceGrantId?: Maybe<Scalars['String']['output']>;
   name: Scalars['String']['output'];
   providerName: Scalars['String']['output'];
   scopes: Array<Scalars['String']['output']>;

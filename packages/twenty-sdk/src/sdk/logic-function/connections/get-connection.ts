@@ -15,11 +15,15 @@ const GET_APP_CONNECTION_QUERY = `
       accessToken
       scopes
       authFailedAt
+      manualTokenWorkspaceGrantId
     }
   }
 `;
 
-export const getConnection = async (id: string): Promise<AppConnection> => {
+export const getConnection = async (
+  id: string,
+  options: { runAs?: 'user' | 'application' } = {},
+): Promise<AppConnection> => {
   const { appConnection } = await postGraphqlRequest<
     { id: string },
     { appConnection: AppConnection }
@@ -27,6 +31,7 @@ export const getConnection = async (id: string): Promise<AppConnection> => {
     query: GET_APP_CONNECTION_QUERY,
     variables: { id },
     caller: 'getConnection',
+    runAs: options.runAs,
   });
 
   if (appConnection.authFailedAt !== null) {

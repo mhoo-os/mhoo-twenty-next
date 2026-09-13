@@ -10,6 +10,7 @@ export type RegisteredInstanceCommandMetadata = {
   version: TwentyAllVersion;
   timestamp: number;
   type: InstanceCommandType;
+  afterWorkspaceCommands?: true;
 };
 
 const REGISTERED_INSTANCE_COMMAND_KEY = 'REGISTERED_INSTANCE_COMMAND';
@@ -21,13 +22,20 @@ export const RegisteredInstanceCommand =
   (
     version: TwentyAllVersion,
     timestamp: number,
-    options?: { type: 'slow' },
+    options?: { type: 'slow'; afterWorkspaceCommands?: true },
   ): ClassDecorator =>
   (target) => {
     Injectable()(target);
     Reflect.defineMetadata(
       REGISTERED_INSTANCE_COMMAND_KEY,
-      { version, timestamp, type: options?.type ?? 'fast' },
+      {
+        version,
+        timestamp,
+        type: options?.type ?? 'fast',
+        ...(options?.afterWorkspaceCommands
+          ? { afterWorkspaceCommands: true }
+          : {}),
+      },
       target,
     );
   };

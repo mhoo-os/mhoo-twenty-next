@@ -1,3 +1,5 @@
+import { currentWorkspaceState } from '@/auth/states/currentWorkspaceState';
+import { isSameOriginWorkspaceEnabledState } from '@/client-config/states/isSameOriginWorkspaceEnabledState';
 import { isMultiWorkspaceEnabledState } from '@/client-config/states/isMultiWorkspaceEnabledState';
 import { useReadDefaultDomainFromConfiguration } from '@/domain-manager/hooks/useReadDefaultDomainFromConfiguration';
 import { domainConfigurationState } from '@/domain-manager/states/domainConfigurationState';
@@ -10,6 +12,10 @@ export const useIsCurrentLocationOnAWorkspace = () => {
   const isMultiWorkspaceEnabled = useAtomStateValue(
     isMultiWorkspaceEnabledState,
   );
+  const isSameOriginWorkspaceEnabled = useAtomStateValue(
+    isSameOriginWorkspaceEnabledState,
+  );
+  const currentWorkspace = useAtomStateValue(currentWorkspaceState);
   const domainConfiguration = useAtomStateValue(domainConfigurationState);
 
   if (
@@ -20,9 +26,10 @@ export const useIsCurrentLocationOnAWorkspace = () => {
     throw new Error('frontDomain and defaultSubdomain are required');
   }
 
-  const isOnAWorkspace = !isMultiWorkspaceEnabled
-    ? true
-    : window.location.hostname !== defaultDomain;
+  // UI routing follows resolved native session state, never a URL selector.
+  const isOnAWorkspace = isSameOriginWorkspaceEnabled
+    ? isDefined(currentWorkspace)
+    : !isMultiWorkspaceEnabled || window.location.hostname !== defaultDomain;
 
   return {
     isOnAWorkspace,

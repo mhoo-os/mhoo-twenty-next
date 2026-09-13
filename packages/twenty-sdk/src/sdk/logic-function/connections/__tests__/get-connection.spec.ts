@@ -9,6 +9,7 @@ import {
 } from 'vitest';
 
 import { AppConnectionAuthFailedError } from '@/sdk/logic-function/connections/errors/app-connection-auth-failed.error';
+import { listConnections } from '@/sdk/logic-function/connections/list-connections';
 import { getConnection } from '@/sdk/logic-function/connections/get-connection';
 import { type AppConnection } from '@/sdk/logic-function/connections/types/app-connection.type';
 
@@ -40,6 +41,7 @@ describe('getConnection', () => {
   afterEach(() => {
     delete process.env.TWENTY_API_URL;
     delete process.env.TWENTY_APP_ACCESS_TOKEN;
+    delete process.env.TWENTY_APP_APPLICATION_ACCESS_TOKEN;
     fetchSpy.mockRestore();
   });
 
@@ -110,6 +112,41 @@ describe('getConnection', () => {
       /requires the app runtime env vars/,
     );
 
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+  it('uses delegated user credentials for explicit user list/get even when App credentials exist', async () => {
+    process.env.TWENTY_APP_APPLICATION_ACCESS_TOKEN = 'synthetic-app-only';
+    fetchSpy.mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          data: {
+            appConnection: buildConnection(),
+            appConnections: [buildConnection()],
+          },
+        }),
+      ),
+    );
+    await getConnection('c-1', { runAs: 'user' });
+    fetchSpy.mockResolvedValue(
+      new Response(
+        JSON.stringify({ data: { appConnections: [buildConnection()] } }),
+      ),
+    );
+    await listConnections({}, { runAs: 'user' });
+    for (const [, init] of fetchSpy.mock.calls)
+      expect(init?.headers).toMatchObject({
+        Authorization: 'Bearer app-token',
+      });
+  });
+  it('never falls back to App credentials when explicit user credentials are absent', async () => {
+    process.env.TWENTY_APP_APPLICATION_ACCESS_TOKEN = 'synthetic-app-only';
+    delete process.env.TWENTY_APP_ACCESS_TOKEN;
+    await expect(getConnection('c-1', { runAs: 'user' })).rejects.toThrow(
+      'requires',
+    );
+    await expect(listConnections({}, { runAs: 'user' })).rejects.toThrow(
+      'requires',
+    );
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 });

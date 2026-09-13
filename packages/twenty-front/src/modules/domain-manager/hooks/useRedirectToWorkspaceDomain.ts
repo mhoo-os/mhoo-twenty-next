@@ -1,3 +1,4 @@
+import { isSameOriginWorkspaceEnabledState } from '@/client-config/states/isSameOriginWorkspaceEnabledState';
 import { isMultiWorkspaceEnabledState } from '@/client-config/states/isMultiWorkspaceEnabledState';
 import { useBuildSearchParamsFromUrlSyncedStates } from '@/domain-manager/hooks/useBuildSearchParamsFromUrlSyncedStates';
 import { useBuildWorkspaceUrl } from '@/domain-manager/hooks/useBuildWorkspaceUrl';
@@ -7,6 +8,9 @@ import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomState
 export const useRedirectToWorkspaceDomain = () => {
   const isMultiWorkspaceEnabled = useAtomStateValue(
     isMultiWorkspaceEnabledState,
+  );
+  const isSameOriginWorkspaceEnabled = useAtomStateValue(
+    isSameOriginWorkspaceEnabledState,
   );
   const { buildWorkspaceUrl } = useBuildWorkspaceUrl();
   const { redirect } = useRedirect();
@@ -21,6 +25,14 @@ export const useRedirectToWorkspaceDomain = () => {
     target?: string,
   ) => {
     if (!isMultiWorkspaceEnabled) return;
+    if (
+      isSameOriginWorkspaceEnabled &&
+      new URL(baseUrl).origin !== window.location.origin
+    ) {
+      throw new Error(
+        'Workspace navigation must stay on the canonical origin.',
+      );
+    }
     redirect(
       buildWorkspaceUrl(baseUrl, pathname, {
         ...searchParams,

@@ -5,7 +5,7 @@ import { type ConnectionProviderManifest } from 'twenty-shared/application';
 import { isDefined } from 'twenty-shared/utils';
 
 const PROVIDER_NAME_PATTERN = /^[a-z][a-z0-9-]*$/;
-const SUPPORTED_TYPES = ['oauth'] as const;
+const SUPPORTED_TYPES = ['oauth', 'manualToken'] as const;
 
 type ConnectionProviderLifecycleHookKey = Extract<
   keyof ConnectionProviderManifest,
@@ -58,6 +58,10 @@ export const defineConnectionProvider: DefineEntity<
     errors.push(
       `Connection provider type "${config.type}" is not supported. Supported types: ${SUPPORTED_TYPES.join(', ')}.`,
     );
+  }
+
+  if (config.type === 'manualToken' && isDefined(config.oauth)) {
+    errors.push('Manual token providers must not declare OAuth configuration.');
   }
 
   if (config.type === 'oauth') {

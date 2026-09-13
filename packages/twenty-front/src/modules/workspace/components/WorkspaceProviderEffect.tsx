@@ -1,3 +1,4 @@
+import { isAppEffectRedirectEnabledState } from '@/app/states/isAppEffectRedirectEnabledState';
 import { isMultiWorkspaceEnabledState } from '@/client-config/states/isMultiWorkspaceEnabledState';
 import { useReadWorkspaceUrlFromCurrentLocation } from '@/domain-manager/hooks/useReadWorkspaceUrlFromCurrentLocation';
 import { useRedirectToWorkspaceDomain } from '@/domain-manager/hooks/useRedirectToWorkspaceDomain';
@@ -9,6 +10,7 @@ import { useInitializeQueryParamState } from '@/app/hooks/useInitializeQueryPara
 import { useGetPublicWorkspaceDataByDomain } from '@/domain-manager/hooks/useGetPublicWorkspaceDataByDomain';
 import { useIsCurrentLocationOnDefaultDomain } from '@/domain-manager/hooks/useIsCurrentLocationOnDefaultDomain';
 import { isDefined } from 'twenty-shared/utils';
+import { AppPath } from 'twenty-shared/types';
 import { type WorkspaceUrls } from '~/generated-metadata/graphql';
 import { getWorkspaceUrl } from '~/utils/getWorkspaceUrl';
 
@@ -29,6 +31,10 @@ export const WorkspaceProviderEffect = () => {
 
   const isMultiWorkspaceEnabled = useAtomStateValue(
     isMultiWorkspaceEnabledState,
+  );
+
+  const isAppEffectRedirectEnabled = useAtomStateValue(
+    isAppEffectRedirectEnabledState,
   );
 
   const { initializeQueryParamState } = useInitializeQueryParamState();
@@ -67,6 +73,15 @@ export const WorkspaceProviderEffect = () => {
     if (
       isMultiWorkspaceEnabled &&
       isDefaultDomain &&
+      isAppEffectRedirectEnabled &&
+      !new URLSearchParams(window.location.hash.substring(1)).has(
+        'ssoExchangeToken',
+      ) &&
+      !(
+        window.location.pathname === AppPath.SignInUp &&
+        new URLSearchParams(window.location.search).get('action') ===
+          'create-new-workspace'
+      ) &&
       isDefined(lastAuthenticatedWorkspaceDomain) &&
       'workspaceUrl' in lastAuthenticatedWorkspaceDomain &&
       isDefined(lastAuthenticatedWorkspaceDomain?.workspaceUrl)
@@ -81,6 +96,7 @@ export const WorkspaceProviderEffect = () => {
   }, [
     isMultiWorkspaceEnabled,
     isDefaultDomain,
+    isAppEffectRedirectEnabled,
     lastAuthenticatedWorkspaceDomain,
     redirectToWorkspaceDomain,
     initializeQueryParamState,

@@ -10,8 +10,20 @@ permissions:
 jobs:
   publish-linux-amd64:
     runs-on: ubuntu-latest
+    timeout-minutes: 90
+    outputs:
+      digest: ${{ steps.build.outputs.digest }}
+      app_version: ${{ steps.version.outputs.app_version }}
     steps:
       - uses: actions/checkout@v4
+      - name: Derive runtime version from governed upstream metadata
+        id: version
+        shell: bash
+        run: |
+          version=$(sed -n 's/^TWENTY_VERSION=v//p' .twenty-source)
+          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || exit 1
+          [[ "$GITHUB_SHA" =~ ^[0-9a-f]{40}$ ]] || exit 1
+          echo "app_version=${version}+${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
@@ -19,6 +31,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - uses: docker/build-push-action@v6
+        id: build
         with:
           context: .
           file: packages/twenty-docker/twenty/Dockerfile
@@ -26,15 +39,46 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: ghcr.io/mhoo-os/mhoo-twenty-next:${{ github.sha }}
-          build-args: APP_VERSION=${{ github.sha }}
+          build-args: |
+            APP_VERSION=${{ steps.version.outputs.app_version }}
+            SOURCE_REVISION=${{ github.sha }}
           labels: |
             org.opencontainers.image.title=Mhoo built on Twenty
             org.opencontainers.image.vendor=Mhoo
             org.opencontainers.image.source=https://github.com/mhoo-os/mhoo-twenty-next
             org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.version=${{ steps.version.outputs.app_version }}
             org.opencontainers.image.description=Mhoo distribution image built from the governed Twenty v2.37.0 foundation.
             org.opencontainers.image.upstream.source=https://github.com/twentyhq/twenty
             org.opencontainers.image.upstream.version=v2.37.0
             org.opencontainers.image.upstream.revision=6da524b8903ec16a3eeea4b2e4a5fb63dbfc1c58
             org.opencontainers.image.upstream.tree=3ce4ef3eac3604ee52b6b8ee0f1a4766d7f533ca
             org.opencontainers.image.licenses=AGPL-3.0
+
+  verify-pg16-startup:
+    needs: publish-linux-amd64
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Verify immutable candidate on disposable PostgreSQL 16
+        env:
+          TWENTY_IMAGE: ghcr.io/mhoo-os/mhoo-twenty-next@${{ needs.publish-linux-amd64.outputs.digest }}
+          EXPECTED_SOURCE_SHA: ${{ github.sha }}
+          EXPECTED_APP_VERSION: ${{ needs.publish-linux-amd64.outputs.app_version }}
+        run: bash deploy/twenty-next/mho255-verify.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mho255-startup-${{ github.sha }}
+          path: work/mho255-evidence/
+          if-no-files-found: error
+          retention-days: 14

@@ -1,3 +1,4 @@
+import { type ManualTokenWorkspaceGrant } from 'src/engine/core-modules/application/connection-provider/connections/types/manual-token-workspace-grant.type';
 import {
   Check,
   Column,
@@ -109,6 +110,10 @@ export class ConnectedAccountEntity extends WorkspaceRelatedEntity {
 
   @Column({ type: 'varchar', nullable: true })
   name: string | null;
+
+  // Absent by default. Workspace visibility alone never enables manual-token jobs.
+  @Column({ type: 'jsonb', nullable: true })
+  manualTokenWorkspaceGrant: ManualTokenWorkspaceGrant | null;
 
   @Column({ type: 'varchar', nullable: false, default: 'user' })
   visibility: ConnectedAccountVisibility;

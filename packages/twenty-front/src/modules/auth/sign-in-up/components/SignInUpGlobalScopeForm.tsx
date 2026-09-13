@@ -5,6 +5,7 @@ import { useQuery } from '@apollo/client/react';
 import { styled } from '@linaria/react';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { FormProvider } from 'react-hook-form';
+import { useSearchParams } from 'react-router-dom';
 import { ClickToActionLink, UndecoratedLink } from 'twenty-ui/navigation';
 
 import { StyledOnboardingContentContainer } from '@/auth/components/StyledOnboardingContentContainer';
@@ -138,6 +139,11 @@ export const SignInUpGlobalScopeForm = () => {
   const { form } = useSignInUpForm();
   const { handleResetPassword } = useHandleResetPassword();
   const returnToPath = useAtomStateValue(returnToPathState);
+  const [searchParams] = useSearchParams();
+  const socialSSOAction =
+    searchParams.get('action') === 'create-new-workspace'
+      ? 'create-new-workspace'
+      : 'list-available-workspaces';
 
   useQuery(GetWorkspaceCreationDefaultsDocument, {
     skip: signInUpStep !== SignInUpStep.WorkspaceSelection,
@@ -244,16 +250,10 @@ export const SignInUpGlobalScopeForm = () => {
       {signInUpStep !== SignInUpStep.WorkspaceSelection && (
         <StyledOnboardingContentContainer>
           {authProviders.google && (
-            <SignInUpWithGoogle
-              action="list-available-workspaces"
-              isGlobalScope
-            />
+            <SignInUpWithGoogle action={socialSSOAction} isGlobalScope />
           )}
           {authProviders.microsoft && (
-            <SignInUpWithMicrosoft
-              action="list-available-workspaces"
-              isGlobalScope
-            />
+            <SignInUpWithMicrosoft action={socialSSOAction} isGlobalScope />
           )}
           {(authProviders.google || authProviders.microsoft) && (
             <HorizontalSeparator

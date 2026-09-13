@@ -6,16 +6,19 @@ export const callLinearGraphQL = async <TData>({
   accessToken,
   query,
   variables,
+  signal,
 }: {
   accessToken: string;
   query: string;
   variables?: Record<string, unknown>;
+  signal?: AbortSignal;
 }): Promise<LinearGraphQLResult<TData>> => {
   let response: Response;
 
   try {
     response = await fetch(LINEAR_GRAPHQL_ENDPOINT, {
       method: 'POST',
+      ...(signal ? { signal, redirect: 'error' as const } : {}),
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`,
@@ -36,6 +39,7 @@ export const callLinearGraphQL = async <TData>({
     const text = await response.text().catch(() => '');
 
     return {
+      httpStatus: response.status,
       errors: [
         {
           message: `Linear API responded with ${response.status}: ${text.slice(0, 500)}`,

@@ -33,6 +33,7 @@ export type RegisteredSlowInstanceCommand = {
   command: SlowInstanceCommand;
   version: TwentyAllVersion;
   timestamp: number;
+  afterWorkspaceCommands?: true;
 };
 
 export type RegisteredWorkspaceCommand = {
@@ -109,6 +110,9 @@ export class UpgradeCommandRegistryService implements OnModuleInit {
           bundle.slowInstanceCommands.push({
             ...entry,
             command: instance as SlowInstanceCommand,
+            ...(instanceCommandMetadata.afterWorkspaceCommands
+              ? { afterWorkspaceCommands: true }
+              : {}),
           });
         } else {
           bundle.fastInstanceCommands.push({

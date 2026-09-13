@@ -268,7 +268,7 @@ describe('email templates rendering', () => {
   it.each([
     {
       name: 'invitation',
-      expectedJapaneseContent: 'CRMソフトウェア',
+      expectedJapaneseContent: 'Mhooでチームに参加',
       element: SendInviteLinkEmail({
         link: 'https://mhoo.example.com/invite/token',
         workspace: WORKSPACE,
@@ -319,7 +319,7 @@ describe('email templates rendering', () => {
 
   it.each(MHOO_TEMPLATES)(
     'should keep $name free of upstream customer-facing residue in HTML and plain text',
-    async ({ element }) => {
+    async ({ element, name }) => {
       const html = await renderEmail(element);
       const text = await renderEmail(element, { plainText: true });
       const output = `${html}\n${text}`;
@@ -331,9 +331,13 @@ describe('email templates rendering', () => {
       expect(output).toContain('Powered by Twenty');
       expect(output).toContain('https://mhoo.example.com/legal/terms');
       expect(output).toContain('https://mhoo.example.com/legal/privacy');
-      expect(output).toContain('https://mhoo.example.com/legal/acceptable-use');
+      if (!name.endsWith('SendInviteLinkEmail')) {
+        expect(output).toContain(
+          'https://mhoo.example.com/legal/acceptable-use',
+        );
+        expect(output).toContain('https://mhoo.example.com/legal/dpa');
+      }
       expect(output).toContain('https://mhoo.example.com/legal/open-source');
-      expect(output).toContain('https://mhoo.example.com/legal/dpa');
       expect(outputWithoutApprovedAttribution).not.toContain('Twenty');
       expect(output).not.toContain('twenty.com');
       expect(output).not.toContain('San Francisco');

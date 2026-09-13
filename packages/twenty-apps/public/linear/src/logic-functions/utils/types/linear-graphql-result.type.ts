@@ -1,4 +1,8 @@
 export type LinearGraphQLResult<TData> = {
   data?: TData;
-  errors?: Array<{ message: string }>;
+  httpStatus?: number;
+  errors?: Array<{
+    message: string;
+    extensions?: { code?: string; type?: string };
+  }>;
 };

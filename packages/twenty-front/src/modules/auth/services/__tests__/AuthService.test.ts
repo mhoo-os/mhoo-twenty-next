@@ -2,6 +2,11 @@ import { enableFetchMocks } from 'jest-fetch-mock';
 import { act } from 'react';
 
 import { renewToken } from '@/auth/services/AuthService';
+import { loggerLink } from '@/apollo/utils/loggerLink';
+
+jest.mock('@/apollo/utils/loggerLink', () => ({
+  loggerLink: jest.fn(),
+}));
 
 enableFetchMocks();
 
@@ -48,5 +53,6 @@ describe('AuthService', () => {
       expect.any(String),
       expect.objectContaining({ credentials: 'include' }),
     );
+    expect(loggerLink).not.toHaveBeenCalled();
   });
 });

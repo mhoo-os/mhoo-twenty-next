@@ -9,7 +9,7 @@ import application from 'src/application.config';
 import financeFixtureReaderRole from 'src/roles/finance-fixture-reader.role';
 
 describe('@mhoo/finance fixture manifest contracts', () => {
-  it('declares no provider variables or credential boundary', () => {
+  it('declares no secret App variables', () => {
     expect(application.success).toBe(true);
     expect(application.config?.serverVariables).toBeUndefined();
   });

@@ -170,3 +170,58 @@ checks cannot establish installed Workspace RLS, actual reviewer permissions,
 provider consent, durable cache behavior, live evidence custody or a storage SLO.
 MHO-135 retains its procedure/case/privacy/runtime gates; MHO-124 owns scale and
 recovery proof. A later production adapter must supply those proofs before use.
+
+## Saved-question adapter — MHO-135, September 9 source increment
+
+`investigation/saved-question-reader.ts` adds a bounded async read adapter for
+observed bank outflows and unresolved-evidence counts. It rebuilds and compares
+the published logical snapshot using this contract, excludes duplicate artifact
+acquisitions from chart arithmetic, and uses exact money strings. The whole
+selected population drives the chart; rows are stable identity-sorted pages of
+at most 50. Excluded counts stay inside selected accounts/dates. Freeform
+manifest limitations and descriptions are not forwarded to avoid exposing
+unrelated account text. Static scope/completeness limitations are always shown.
+
+Every chart, page and trace resolves current permission; the adapter has no
+response cache. Workspace, engagement, allowed snapshot, account set and explicit
+field projection must match. The chosen question requires its own summary or
+unresolved action; a trace additionally requires trace permission. Cursor query
+identity includes subject/permission revision, scope, snapshot/publication,
+question, month and limit; a cursor is navigation, never authorization. Current
+publication and permission are checked again after I/O. Missing/stale/unverified
+snapshots return no rows or totals. Derived partial CSV exports cannot become an
+eligible baseline. Inputs above 10,000 observations withhold rather than truncate;
+this bound is not the six-year storage or latency acceptance verdict.
+
+A trace reads only the referenced artifact through the authorized port and
+compares exact bytes to its manifest digest. It returns the receipt, digest and
+recorded row locator, not raw source bytes or a newly parsed/verified excerpt.
+Parser-to-row provenance and statement completeness remain separate evidence.
+
+`investigation/saved-question-session.ts` is a UI-side sequencing adapter: question
+submission, chart-month selection and selected row each call the reader anew.
+It clears prior results before loading and ignores late responses after reset or
+supersession. Reset must be called by the host on Workspace/identity changes;
+this is presentation isolation and never substitutes for server authorization.
+Focused tests drive this session through the actual read adapter using synthetic
+stand-ins for the native dependencies, including in-flight revocation.
+
+**Not yet wired or shipped to the Workspace:** no logic function, MCP tool,
+front-component entry, object, role, grant or metadata is registered by this
+increment. The current saved-sample component and c1ab/534982 synthetic question
+UI remain unchanged. Required next integration is an authenticated native host
+client binding this session to the reader, a Twenty person/App permission resolver
+including field/account visibility, durable authorized snapshot publication and
+current-revision checks, and the authorized artifact read port. MHO-128/135 own
+the missing persistence/runtime proof. The installed CSV samples currently lack
+that verified publication; never wrap the synthetic fixture factory or invent a
+snapshot/authority to make them render financial totals. Actual installed
+allowed/denied roles and Workspace switching remain acceptance gates after
+separately authorized installation. Production freeze stays intact.
+
+Owning repository: mhoo-twenty-next. Retained worker
+01a075f0-61f8-7f12-a4bc-392bc251a108; successor native head
+01a07f5b-736e-7512-952e-f6f5e7a1ea7e. MHO-146/258 stay completed dependencies.
+Source base 902537a8162988528409cc917afa17a9884aff36. Reuse PR36 installed evidence,
+c1ab question UI and 534982 native local proof; these files do not invalidate
+those unchanged journeys or establish new installed behavior.

@@ -86,6 +86,7 @@ export class ConnectedAccountMetadataService {
   }): Promise<ConnectedAccountEntity> {
     const connectedAccount = await this.repository.findOne({
       where: { id, workspaceId },
+      relations: { connectionProvider: true },
     });
 
     if (!connectedAccount) {

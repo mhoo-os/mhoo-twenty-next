@@ -1,0 +1,31 @@
+// Stable native metadata identifiers.
+export const CONNECTION_OBJECT = 'd09743d0-e528-4e45-9676-f20028113874';
+export const SYNC_STATE_OBJECT = '36ec4174-1583-4ef7-b5f4-a8473bc29484';
+export const CONNECTION_SYNC_STATES_FIELD =
+  'fd1ccf5e-ab4f-4157-be63-bcecb21bab86';
+export const SYNC_STATE_CONNECTION_FIELD =
+  '77fb63b6-dc9d-4ac8-b6a2-801dae02e020';
+export const CONNECTION_KEY_FIELD = '7ad7a97f-6041-4a1f-94e5-b7e98ecae77b';
+export const SYNC_KEY_FIELD = 'dbe090a6-4d43-46a8-8a0e-971f69a300dd';
+export const CONNECTION_OBSERVATIONS_FIELD =
+  '135c0ee0-6625-4e26-b9cf-8cada630529f';
+export const OBSERVATION_CONNECTION_FIELD =
+  'ff6e47d6-91c8-4094-91a6-ce059131c27b';
+export const PAYMENT_REVISION_OBJECT = '22db3881-1f63-4fa1-be63-73c6adb93fd1';
+export const IMPORT_RECEIPT_OBJECT = 'b123bd5c-07a0-4fab-b43b-9d5abb82a4a6';
+export const PAYMENT_REVISION_KEY_FIELD =
+  'bce870fe-d90d-458f-b33b-195e5856216f';
+export const IMPORT_RECEIPT_KEY_FIELD = '1b5dc9e9-2030-45c5-ae08-76976e53953b';
+export const CONNECTION_PAYMENTS_FIELD = 'c95b9d5c-74df-4fcf-841e-1288cbe844ab';
+export const PAYMENT_CONNECTION_FIELD = '5c7542cb-84b2-4cc9-9ea2-8bcaa24ed08b';
+export const CONNECTION_RECEIPTS_FIELD = '5a5c3525-7559-4753-bbd6-b406e98a8b35';
+export const RECEIPT_CONNECTION_FIELD = '16624be7-da3b-4360-9f15-128d13a9670c';
+
+export const PAYMENT_IMPORT_FUNCTION = '1dbeb77b-d08e-4c36-90d8-e3012d14630b';
+
+export const PAYMENT_HISTORY_FUNCTION = '714efb8a-d57d-42a3-a9b9-da8f4ed7c5d3';
+
+export const PAYMENT_RECOVERY_FUNCTION = '7d3dc80c-3359-474f-aa12-0384f30075c6';
+
+export const OPERATOR_STATUS_FUNCTION = '946b7c50-19a5-4374-b317-7298bf127864';
+export const OPERATOR_SETTINGS_COMPONENT = '640b038f-291f-463c-ac23-5f6299ae0fad';

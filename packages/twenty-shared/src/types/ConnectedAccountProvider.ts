@@ -1,4 +1,5 @@
 export enum ConnectedAccountProvider {
+  CLOVER = 'clover',
   GOOGLE = 'google',
   MICROSOFT = 'microsoft',
   IMAP_SMTP_CALDAV = 'imap_smtp_caldav',

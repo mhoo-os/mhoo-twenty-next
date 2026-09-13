@@ -47,6 +47,18 @@ export class FlatConnectionProviderValidatorService {
       });
     }
 
+    if (
+      !['oauth', 'manualToken'].includes(flatConnectionProvider.type) ||
+      (flatConnectionProvider.type === 'manualToken' &&
+        isDefined(flatConnectionProvider.oauthConfig))
+    ) {
+      validationResult.errors.push({
+        code: ConnectionProviderExceptionCode.INVALID_CONNECTION_PROVIDER_INPUT,
+        message: 'Invalid connection provider kind or configuration',
+        userFriendlyMessage: msg`Invalid connection provider kind or configuration`,
+      });
+    }
+
     if (flatConnectionProvider.type === 'oauth') {
       const oauthConfig = flatConnectionProvider.oauthConfig;
 
@@ -139,6 +151,7 @@ export class FlatConnectionProviderValidatorService {
 
   public validateFlatConnectionProviderUpdate({
     universalIdentifier,
+    flatEntityUpdate,
     optimisticFlatEntityMapsAndRelatedFlatEntityMaps: {
       flatConnectionProviderMaps: optimisticFlatConnectionProviderMaps,
     },
@@ -168,6 +181,19 @@ export class FlatConnectionProviderValidatorService {
       return validationResult;
     }
 
+    if (
+      (isDefined(flatEntityUpdate.type) &&
+        flatEntityUpdate.type !== fromFlatConnectionProvider.type) ||
+      (fromFlatConnectionProvider.type === 'manualToken' &&
+        isDefined(flatEntityUpdate.oauthConfig))
+    ) {
+      validationResult.errors.push({
+        code: ConnectionProviderExceptionCode.INVALID_CONNECTION_PROVIDER_INPUT,
+        message:
+          'Provider kind is immutable; disconnect and recreate the provider',
+        userFriendlyMessage: msg`Provider kind is immutable; disconnect and recreate the provider`,
+      });
+    }
     return validationResult;
   }
 }

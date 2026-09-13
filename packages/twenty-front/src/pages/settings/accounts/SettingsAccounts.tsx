@@ -1,6 +1,7 @@
 import { SettingsAccountsBlocklistSection } from '@/settings/accounts/components/SettingsAccountsBlocklistSection';
 import { SettingsAccountsConnectedAccountsListCard } from '@/settings/accounts/components/SettingsAccountsConnectedAccountsListCard';
 import { SettingsAccountsSettingsSection } from '@/settings/accounts/components/SettingsAccountsSettingsSection';
+import { SettingsCloverConnection } from '@/settings/accounts/components/SettingsCloverConnection';
 import { useMyConnectedAccounts } from '@/settings/accounts/hooks/useMyConnectedAccounts';
 import { SettingsPageContainer } from '@/settings/components/SettingsPageContainer';
 import { SettingsSectionSkeletonLoader } from '@/settings/components/SettingsSectionSkeletonLoader';
@@ -28,6 +29,7 @@ export const SettingsAccounts = () => {
       ]}
     >
       <SettingsPageContainer>
+        <SettingsCloverConnection />
         {loading ? (
           <SettingsSectionSkeletonLoader />
         ) : (

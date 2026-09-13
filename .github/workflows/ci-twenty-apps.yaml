@@ -55,21 +55,41 @@ jobs:
         with:
           node-version-file: '.nvmrc'
           cache: yarn
-          cache-dependency-path: ${{ matrix.app.path }}/yarn.lock
+          cache-dependency-path: ${{ matrix.app.name == 'mhoo-clover' && 'yarn.lock' || format('{0}/yarn.lock', matrix.app.path) }}
 
       - name: Install dependencies
+        if: matrix.app.name != 'mhoo-clover'
         run: yarn install --immutable
 
       - name: Lint
+        if: matrix.app.name != 'mhoo-clover'
         run: yarn lint
 
       - name: Typecheck
-        if: matrix.app.hasTypecheck
+        if: matrix.app.hasTypecheck && matrix.app.name != 'mhoo-clover'
         run: yarn typecheck
 
       - name: Unit tests
-        if: matrix.app.hasUnit
+        if: matrix.app.hasUnit && matrix.app.name != 'mhoo-clover'
         run: yarn test:unit
+
+      # This App exercises native manual-token/grant additions in this fork.
+      # Published 2.37 SDK packages do not contain that contract.
+      - name: Validate Clover against repository SDK
+        if: matrix.app.name == 'mhoo-clover'
+        working-directory: .
+        env:
+          NX_DAEMON: 'false'
+          NX_NO_CLOUD: 'true'
+        run: |
+          yarn install --immutable
+          yarn nx build twenty-client-sdk
+          yarn nx build twenty-sdk
+          cd packages/twenty-apps/internal/mhoo-clover
+          ../../../../node_modules/.bin/oxlint -c .oxlintrc.json .
+          ../../../../node_modules/.bin/tsgo --noEmit -p tsconfig.json
+          ../../../../node_modules/.bin/vitest run --config vitest.unit.config.ts
+          node ../../../twenty-sdk/dist/cli.cjs dev:build
 
   integration:
     needs: discover

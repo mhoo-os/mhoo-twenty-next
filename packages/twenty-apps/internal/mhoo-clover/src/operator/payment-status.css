@@ -1,0 +1,16 @@
+ .mhoo-clover-status { color:#163b2d; background:#fff; font-family:Arial,sans-serif; max-width:900px; margin:0 auto; padding:48px 24px; display:grid; gap:24px; }
+.mhoo-clover-status__header h1 { font-size:clamp(36px,6vw,60px); line-height:1.04; letter-spacing:-2px; font-weight:750; margin:20px 0; }
+.mhoo-clover-status__header p { font-size:18px; line-height:1.6; color:#526b60; }
+.mhoo-clover-status__eyebrow { color:#287a48; font-weight:700; font-size:12px; letter-spacing:2px; }
+.mhoo-clover-status__panel { border:1px solid #dce8df; border-radius:18px; padding:26px; }
+.mhoo-clover-status label { display:block; font-weight:700; margin-bottom:12px; }
+.mhoo-clover-status select { padding:14px; width:100%; border:1px solid #afc4b5; border-radius:8px; color:#163b2d; background:#fff; font:inherit; }
+.mhoo-clover-status__muted { color:#5a6c61; font-size:13px; line-height:1.7; }
+.mhoo-clover-status__row { display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+.mhoo-clover-status h2 { font-size:20px; margin:0; }
+.mhoo-clover-status button { border:1px solid #bad4bf; border-radius:8px; background:#eef7ee; padding:11px 15px; color:#245d37; font:inherit; font-size:13px; font-weight:700; cursor:pointer; }
+.mhoo-clover-status button:disabled { opacity:.5; cursor:default; }
+.mhoo-clover-status__page { display:flex; flex-wrap:wrap; gap:16px; align-items:center; justify-content:space-between; padding:22px 0; border-bottom:1px solid #e8eeea; }
+.mhoo-clover-status__page:last-child { border:0; }
+.mhoo-clover-status__number { margin-right:18px; color:#7a9182; font-size:13px; }
+.mhoo-clover-status__badge { border-radius:6px; padding:8px 10px; font-size:12px; font-weight:700; background:#f0f6ef; color:#365f3d; }
