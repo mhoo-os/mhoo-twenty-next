@@ -37,11 +37,13 @@ importer/reviewer segregation. Source reference/hash provenance and user asserti
 stay distinct. Same-millisecond edits outside financeRevision remain a concurrency
 limit. Runtime authorization is not inferred from the SDK runAs option.
 
-Verification: 50 focused tests across workflow, existing Task adapter, read adapter
+Verification: 51 focused tests across workflow, existing Task adapter, read adapter
 and follow-up contract; changed-file lint, test-project typecheck and native App
 build. Baseline 271-test/build/UI receipts are reused for unchanged behavior.
 Independent source review accepted the corrected workflow: exact evidence identity,
 full-list review, uncertain creation custody, stored approval and visible failures.
+Final review caught and fixed a static-sample Reload action that could invoke the
+Workspace reader; both the control and handler now preserve sample isolation.
 The previously suspected second-create defect was withdrawn after verifying the
 create form unmounts; explicit reset is retained defensively.
 

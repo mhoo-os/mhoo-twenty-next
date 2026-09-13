@@ -19,7 +19,7 @@ await build({
       const key='finance-follow-up-local-synthetic-v1';
       const host=createFollowUpTestHost({tasks:JSON.parse(localStorage.getItem(key)||'{}'),saved:tasks=>localStorage.setItem(key,JSON.stringify(tasks))});
       const services={read:host.read,client:host.client};
-      createRoot(document.getElementById('root')).render(<><aside style={{padding:12}}>Local synthetic workflow · no live Workspace, files or mailbox. Person: {FIXTURE_IDS.person} · Reply note: {FIXTURE_IDS.note}<button onClick={()=>{host.control.denied=!host.control.denied;document.getElementById('denial').textContent=host.control.denied?'Denial on':'Denial off';}}>Toggle denial</button><span id="denial">Denial off</span><button onClick={()=>{localStorage.removeItem(key);location.reload();}}>Reset synthetic Tasks</button></aside><FinanceWorkspace initialView="followups" services={services}/></>);`,
+      createRoot(document.getElementById('root')).render(<><aside style={{padding:12}}>Local synthetic workflow · no live Workspace, files or mailbox. Person: {FIXTURE_IDS.person} · Reply note: {FIXTURE_IDS.note}<button onClick={()=>{host.control.denied=!host.control.denied;document.getElementById('denial').textContent=host.control.denied?'Denial on':'Denial off';}}>Toggle denial</button><span id="denial">Denial off</span><button onClick={()=>{localStorage.removeItem(key);location.reload();}}>Reset synthetic Tasks</button></aside>{new URLSearchParams(location.search).has('static')?<FinanceWorkspace initialView="followups" dataSource="synthetic"/>:<FinanceWorkspace initialView="followups" services={services}/>}</>);`,
     resolveDir: root,
     loader: 'tsx',
   },

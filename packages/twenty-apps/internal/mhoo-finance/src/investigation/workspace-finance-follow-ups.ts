@@ -202,6 +202,8 @@ export const approveWorkspaceFinanceDraft = async (
   client = new RestApiClient({ runAs: 'user' }),
 ) => {
   if (!UUID.test(input.taskId)) throw new Error('Invalid native Task identity');
+  if (input.financeState === 'RESOLVED')
+    throw new Error('Reopen the follow-up before approving its request');
   if (input.from !== 'AWAITING_APPROVAL') {
     throw new Error('Finance email draft is not awaiting approval');
   }

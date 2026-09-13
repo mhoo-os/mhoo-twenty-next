@@ -290,4 +290,25 @@ describe('native Follow-ups persisted workflow', () => {
       ),
     ).rejects.toThrow('Reopen');
   });
+  it('requires reopening before approving a pending draft on a resolved Task', async () => {
+    const host = createFollowUpTestHost();
+    await prepare(host);
+    host.tasks[ids.task].financeFollowUpState = 'RESOLVED';
+    const task = (await host.read()).followUps[0];
+    await expect(
+      approveWorkspaceFinanceDraft(
+        {
+          taskId: task.id,
+          from: 'AWAITING_APPROVAL',
+          financeState: task.state,
+          expectedUpdatedAt: task.updatedAt,
+          expectedRevision: task.revision,
+          draftEmail: task.draftEmail!,
+          people: task.people,
+          at: task.updatedAt,
+        },
+        host.client,
+      ),
+    ).rejects.toThrow('Reopen');
+  });
 });

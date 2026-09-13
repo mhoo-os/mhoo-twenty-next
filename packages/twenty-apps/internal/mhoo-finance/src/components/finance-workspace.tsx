@@ -1558,6 +1558,7 @@ const WorkspaceFinanceScreen = ({
   };
 
   const reloadFollowUp = async (id: string) => {
+    if (isSynthetic) return;
     const updated = await (services?.read ?? readWorkspaceFinance)();
     const task = updated.followUps.find((row) => row.id === id);
     if (!task)
@@ -2263,7 +2264,7 @@ const WorkspaceFinanceScreen = ({
             <button
               type="button"
               className="fw-button"
-              disabled={followUpMutation === 'saving'}
+              disabled={isSynthetic || followUpMutation === 'saving'}
               onClick={() => {
                 setFollowUpMutation('saving');
                 void reloadFollowUp(selectedFollowUp.id)
@@ -2538,6 +2539,7 @@ const WorkspaceFinanceScreen = ({
                           type="button"
                           className="fw-button"
                           disabled={
+                            selectedFollowUp.state === 'RESOLVED' ||
                             isSynthetic ||
                             followUpMutation === 'saving' ||
                             !hasExactSelectedRecipients(
