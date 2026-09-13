@@ -4,6 +4,8 @@ import { parseFinanceCompletenessReceipt } from '../investigation/completeness-r
 
 const receipt = (patch: Record<string, unknown> = {}) => ({
   version: 'finance-completeness/v1',
+  receiptId: 'completeness-receipt-april-2025',
+  populationKey: 'operating-statements',
   population: 'Operating statement · April 2025',
   entityScope: 'synthetic-hass-kitchen',
   accountScope: 'operating-demo',
@@ -107,6 +109,20 @@ describe('professional source-completeness receipt', () => {
           id: 'trust-me',
           result: 'PASS',
           detail: 'No recognized completeness procedure was performed.',
+        },
+      ],
+    },
+    {
+      tests: [
+        {
+          id: 'page-continuity',
+          result: 'PASS',
+          detail: 'Pages 1-6 present.',
+        },
+        {
+          id: 'trust-me-too',
+          result: 'PASS',
+          detail: 'Unknown procedure cannot be smuggled beside a valid one.',
         },
       ],
     },

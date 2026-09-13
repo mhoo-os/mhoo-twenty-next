@@ -202,6 +202,7 @@ export const readWorkspaceFinance = async (
           financeEvidenceReferences: true,
           financeDraftEmail: true,
           financeEmailApproval: true,
+          financeScope: true,
           financeCorrelationKey: true,
           financeProvenanceHistory: true,
           financeRevision: true,
@@ -251,6 +252,7 @@ export const readWorkspaceFinance = async (
     statementControls: node.statementControls ?? null,
   }));
   const followUps = (result.tasks?.edges ?? []).flatMap(({ node }) => {
+    if (node.financeScope !== 'MHOO_FINANCE_V1') return [];
     const rawState = optionalString(node.financeFollowUpState);
     const rawSubjects = optionalString(node.financeSubjectReferences);
     const rawPeople = optionalString(node.financePeopleContext);

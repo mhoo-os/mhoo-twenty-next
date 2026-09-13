@@ -214,85 +214,178 @@ export const evaluateMatchGroup = (
 };
 
 type OptionalAmount = string | null;
+export type CloverFundingBridgeInput = Readonly<{
+  currency: string;
+  merchantReference: string | null;
+  businessDate: string | null;
+  timezone: string | null;
+  batchReference: string | null;
+  batchMembership: 'EXPLICIT' | 'INFERRED' | null;
+  saleBaseMinor: OptionalAmount;
+  taxMinor: OptionalAmount;
+  tipMinor: OptionalAmount;
+  chargeMinor: OptionalAmount;
+  refundMinor: OptionalAmount;
+  adjustmentMinor: OptionalAmount;
+  grossSalesMinor: OptionalAmount;
+  totalTenderMinor: OptionalAmount;
+  cardTenderMinor: OptionalAmount;
+  cashTenderMinor: OptionalAmount;
+  feeMinor: OptionalAmount;
+  reserveMinor: OptionalAmount;
+  fundingAdjustmentMinor: OptionalAmount;
+  payoutMinor: OptionalAmount;
+  bankDepositMinor: OptionalAmount;
+}>;
+
 export const evaluateCloverFundingBridge = (
-  input: Readonly<{
-    currency: string;
-    batchReference: string | null;
-    saleBaseMinor: OptionalAmount;
-    taxMinor: OptionalAmount;
-    tipMinor: OptionalAmount;
-    chargeMinor: OptionalAmount;
-    refundMinor: OptionalAmount;
-    adjustmentMinor: OptionalAmount;
-    grossSalesMinor: OptionalAmount;
-    tenderMinor: OptionalAmount;
-    feeMinor: OptionalAmount;
-    reserveMinor: OptionalAmount;
-    payoutMinor: OptionalAmount;
-    bankDepositMinor: OptionalAmount;
-  }>,
+  input: CloverFundingBridgeInput,
 ) => {
   const unit = currency(input.currency);
+  for (const [label, value] of [
+    ['merchantReference', input.merchantReference],
+    ['batchReference', input.batchReference],
+  ] as const) {
+    if (value !== null && !nonEmpty(value))
+      throw new Error(`Invalid Clover ${label}`);
+  }
+  if (input.businessDate !== null && !exactDate(input.businessDate))
+    throw new Error('Invalid Clover business date');
+  if (
+    input.batchMembership !== null &&
+    input.batchMembership !== 'EXPLICIT' &&
+    input.batchMembership !== 'INFERRED'
+  )
+    throw new Error('Invalid Clover batch membership');
+  if (input.timezone !== null) {
+    try {
+      new Intl.DateTimeFormat('en-US', { timeZone: input.timezone }).format();
+    } catch {
+      throw new Error('Invalid Clover timezone');
+    }
+  }
+
+  const signedAmountKeys = new Set([
+    'adjustmentMinor',
+    'fundingAdjustmentMinor',
+  ]);
+  const amounts = new Map<string, bigint | null>();
+  for (const [key, value] of Object.entries(input)) {
+    if (!key.endsWith('Minor')) continue;
+    if (value === null) {
+      amounts.set(key, null);
+      continue;
+    }
+    const parsed = minor(value);
+    if (!signedAmountKeys.has(key) && parsed < 0n)
+      throw new Error('Clover bridge components must be non-negative');
+    amounts.set(key, parsed);
+  }
+  const get = (key: string) => amounts.get(key) ?? null;
   const missing = Object.entries(input)
     .filter(([key, value]) => key !== 'currency' && value === null)
     .map(([key]) => key);
-  if (missing.length)
-    return Object.freeze({
-      status: 'PARTIAL' as const,
-      gaps: Object.freeze(missing),
-    });
-  if (!nonEmpty(input.batchReference as string))
-    throw new Error('Clover batch reference required');
-  const amount = (value: OptionalAmount) => minor(value as string);
-  const saleBase = amount(input.saleBaseMinor);
-  const tax = amount(input.taxMinor);
-  const tip = amount(input.tipMinor);
-  const charges = amount(input.chargeMinor);
-  const refunds = amount(input.refundMinor);
-  const adjustments = amount(input.adjustmentMinor);
-  const gross = amount(input.grossSalesMinor);
-  const tender = amount(input.tenderMinor);
-  const fees = amount(input.feeMinor);
-  const reserves = amount(input.reserveMinor);
-  const payout = amount(input.payoutMinor);
-  const bank = amount(input.bankDepositMinor);
-  if (
-    [
-      saleBase,
-      tax,
-      tip,
-      charges,
-      refunds,
-      gross,
-      tender,
-      fees,
-      reserves,
-      payout,
-      bank,
-    ].some((value) => value < 0n)
-  )
-    throw new Error('Clover bridge components must be non-negative');
-  const expectedGross = minor(
-    (saleBase + tax + tip + charges - refunds + adjustments).toString(),
-  );
-  const expectedPayout = minor((tender - fees - reserves).toString());
+  const allKnown = (keys: readonly string[]) =>
+    keys.every((key) => get(key) !== null);
+
+  const expectedGross = allKnown([
+    'saleBaseMinor',
+    'taxMinor',
+    'tipMinor',
+    'chargeMinor',
+    'refundMinor',
+    'adjustmentMinor',
+  ])
+    ? minor(
+        (
+          (get('saleBaseMinor') as bigint) +
+          (get('taxMinor') as bigint) +
+          (get('tipMinor') as bigint) +
+          (get('chargeMinor') as bigint) -
+          (get('refundMinor') as bigint) +
+          (get('adjustmentMinor') as bigint)
+        ).toString(),
+      )
+    : null;
+  const tenderBreakdown = allKnown(['cardTenderMinor', 'cashTenderMinor'])
+    ? minor(
+        (
+          (get('cardTenderMinor') as bigint) +
+          (get('cashTenderMinor') as bigint)
+        ).toString(),
+      )
+    : null;
+  const expectedPayout = allKnown([
+    'cardTenderMinor',
+    'feeMinor',
+    'reserveMinor',
+    'fundingAdjustmentMinor',
+  ])
+    ? minor(
+        (
+          (get('cardTenderMinor') as bigint) -
+          (get('feeMinor') as bigint) -
+          (get('reserveMinor') as bigint) +
+          (get('fundingAdjustmentMinor') as bigint)
+        ).toString(),
+      )
+    : null;
   const contradictions = [
-    ...(expectedGross === gross ? [] : ['SALE_COMPONENT_MISMATCH']),
-    ...(gross === tender ? [] : ['GROSS_TENDER_MISMATCH']),
-    ...(expectedPayout === payout ? [] : ['PAYOUT_COMPONENT_MISMATCH']),
-    ...(payout === bank ? [] : ['PAYOUT_BANK_MISMATCH']),
+    ...(expectedGross === null ||
+    get('grossSalesMinor') === null ||
+    expectedGross === get('grossSalesMinor')
+      ? []
+      : ['SALE_COMPONENT_MISMATCH']),
+    ...(tenderBreakdown === null ||
+    get('totalTenderMinor') === null ||
+    tenderBreakdown === get('totalTenderMinor')
+      ? []
+      : ['TENDER_COMPONENT_MISMATCH']),
+    ...(get('grossSalesMinor') === null ||
+    get('totalTenderMinor') === null ||
+    get('grossSalesMinor') === get('totalTenderMinor')
+      ? []
+      : ['GROSS_TENDER_MISMATCH']),
+    ...(expectedPayout === null ||
+    get('payoutMinor') === null ||
+    expectedPayout === get('payoutMinor')
+      ? []
+      : ['PAYOUT_COMPONENT_MISMATCH']),
+    ...(get('payoutMinor') === null ||
+    get('bankDepositMinor') === null ||
+    get('payoutMinor') === get('bankDepositMinor')
+      ? []
+      : ['PAYOUT_BANK_MISMATCH']),
   ];
+  const residual =
+    get('payoutMinor') !== null && get('bankDepositMinor') !== null
+      ? minor(
+          (
+            (get('payoutMinor') as bigint) - (get('bankDepositMinor') as bigint)
+          ).toString(),
+        )
+      : null;
+
   return Object.freeze({
     status: contradictions.length
       ? ('CONTRADICTED' as const)
-      : ('RECONCILED' as const),
+      : missing.length
+        ? ('PARTIAL' as const)
+        : input.batchMembership === 'INFERRED'
+          ? ('REVIEW_REQUIRED' as const)
+          : ('ARITHMETICALLY_BALANCED' as const),
     currency: unit,
+    merchantReference: input.merchantReference,
+    businessDate: input.businessDate,
+    timezone: input.timezone,
     batchReference: input.batchReference,
-    expectedGrossMinor: expectedGross.toString(),
-    expectedPayoutMinor: expectedPayout.toString(),
-    residualMinor: minor((payout - bank).toString()).toString(),
+    batchMembership: input.batchMembership,
+    expectedGrossMinor: expectedGross?.toString() ?? null,
+    expectedPayoutMinor: expectedPayout?.toString() ?? null,
+    residualMinor: residual?.toString() ?? null,
     contradictions: Object.freeze(contradictions),
-    gaps: Object.freeze([] as string[]),
+    gaps: Object.freeze(missing),
+    autoReconciled: false as const,
   });
 };
 
@@ -311,6 +404,7 @@ export const reduceBankLifecycle = (events: readonly BankLifecycleEvent[]) => {
     string,
     { counted: boolean; state: BankLifecycleEvent['state'] }
   >();
+  const successorBySourceRecordId = new Map<string, string>();
   for (const event of ordered) {
     if (!nonEmpty(event.sourceRecordId))
       throw new Error('Source record ID required');
@@ -344,9 +438,15 @@ export const reduceBankLifecycle = (events: readonly BankLifecycleEvent[]) => {
           (replaced.state === 'POSTED' || replaced.state === 'REMOVED'));
       if (!validReplacement)
         throw new Error('Invalid provider replacement transition');
+      if (successorBySourceRecordId.has(event.replacesSourceRecordId))
+        throw new Error('Provider record already has a successor');
+      successorBySourceRecordId.set(
+        event.replacesSourceRecordId,
+        event.sourceRecordId,
+      );
       current.set(event.replacesSourceRecordId, {
         counted: false,
-        state: replaced.state,
+        state: 'SUPERSEDED',
       });
     }
     current.set(event.sourceRecordId, {
@@ -358,7 +458,7 @@ export const reduceBankLifecycle = (events: readonly BankLifecycleEvent[]) => {
     countedSourceRecordIds: Object.freeze(
       [...current].filter(([, record]) => record.counted).map(([id]) => id),
     ),
-    history: Object.freeze(ordered),
+    history: Object.freeze(ordered.map((event) => Object.freeze({ ...event }))),
     preservesAllSourceRecords: true as const,
   });
 };
@@ -369,18 +469,60 @@ export type MonthCoverage = Readonly<{
   receiptJson: string | null;
 }>;
 
+export type PeriodCompletenessScope = Readonly<{
+  entityScope: string;
+  accountScope: string;
+  populationKey: string;
+  periodStart: string;
+  periodEnd: string;
+  timezone: string;
+  basis: string;
+}>;
+
+const monthEnd = (month: string) => {
+  const [year, monthNumber] = month.split('-').map(Number);
+  const day = new Date(Date.UTC(year, monthNumber, 0)).getUTCDate();
+  return `${month}-${String(day).padStart(2, '0')}`;
+};
+
+const inclusiveMonths = (start: string, end: string) => {
+  const [startYear, startMonth] = start.split('-').map(Number);
+  const [endYear, endMonth] = end.split('-').map(Number);
+  const startIndex = startYear * 12 + startMonth - 1;
+  const endIndex = endYear * 12 + endMonth - 1;
+  if (endIndex < startIndex || endIndex - startIndex > 600)
+    throw new Error('Invalid completeness period');
+  return Array.from({ length: endIndex - startIndex + 1 }, (_, offset) => {
+    const index = startIndex + offset;
+    return `${Math.floor(index / 12)}-${String((index % 12) + 1).padStart(2, '0')}`;
+  });
+};
+
 export const evaluatePeriodCompleteness = (
-  expectedMonths: readonly string[],
+  scope: PeriodCompletenessScope,
   receipts: readonly MonthCoverage[],
 ) => {
   const validMonth = (value: string) => /^\d{4}-(?:0[1-9]|1[0-2])$/.test(value);
   if (
-    !expectedMonths.length ||
-    new Set(expectedMonths).size !== expectedMonths.length ||
-    expectedMonths.some((month) => !validMonth(month)) ||
+    !nonEmpty(scope.entityScope) ||
+    !nonEmpty(scope.accountScope) ||
+    !nonEmpty(scope.populationKey) ||
+    !validMonth(scope.periodStart) ||
+    !validMonth(scope.periodEnd) ||
+    !nonEmpty(scope.timezone) ||
+    !nonEmpty(scope.basis)
+  )
+    throw new Error('Invalid completeness scope');
+  try {
+    new Intl.DateTimeFormat('en-US', { timeZone: scope.timezone }).format();
+  } catch {
+    throw new Error('Invalid completeness timezone');
+  }
+  const expectedMonths = inclusiveMonths(scope.periodStart, scope.periodEnd);
+  if (
     new Set(receipts.map((receipt) => receipt.month)).size !== receipts.length
   )
-    throw new Error('Expected months must be unique');
+    throw new Error('Receipt months must be unique');
   const verifiedReceipts = receipts.map((receipt) => {
     if (!expectedMonths.includes(receipt.month) || !validMonth(receipt.month))
       throw new Error('Receipt month is outside the expected period');
@@ -396,8 +538,13 @@ export const evaluatePeriodCompleteness = (
     const parsed = parseFinanceCompletenessReceipt(receipt.receiptJson);
     if (
       !parsed ||
-      parsed.periodStart.slice(0, 7) !== receipt.month ||
-      parsed.periodEnd.slice(0, 7) !== receipt.month ||
+      parsed.periodStart !== `${receipt.month}-01` ||
+      parsed.periodEnd !== monthEnd(receipt.month) ||
+      parsed.entityScope !== scope.entityScope ||
+      parsed.accountScope !== scope.accountScope ||
+      parsed.populationKey !== scope.populationKey ||
+      parsed.timezone !== scope.timezone ||
+      parsed.basis !== scope.basis ||
       (receipt.state === 'PROVEN_COMPLETE'
         ? parsed.coverageState !== 'PROVEN_COMPLETE'
         : parsed.coverageState === 'PROVEN_COMPLETE' ||
@@ -407,7 +554,8 @@ export const evaluatePeriodCompleteness = (
     return Object.freeze({
       month: receipt.month,
       state: receipt.state,
-      receiptReference: parsed.authorityReceiptId,
+      receiptReference: parsed.receiptId,
+      authorityReceiptReference: parsed.authorityReceiptId,
     });
   });
   const byMonth = new Map(

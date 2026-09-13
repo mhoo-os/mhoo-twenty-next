@@ -69,9 +69,9 @@ export default defineRole({
       universalIdentifier: '717ef529-7642-46ab-872e-bd1337cf326b',
       objectUniversalIdentifier:
         STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.task.universalIdentifier,
-      fieldUniversalIdentifier: '33e50c7f-1214-45c0-a776-da19f30e01fb',
-      operand: RowLevelPermissionPredicateOperand.CONTAINS,
-      value: 'mhoo-finance:',
+      fieldUniversalIdentifier: '297123dd-275d-4f12-9cf4-92e47fcb2c94',
+      operand: RowLevelPermissionPredicateOperand.IS,
+      value: 'MHOO_FINANCE_V1',
     },
   ],
   permissionFlagUniversalIdentifiers: [],

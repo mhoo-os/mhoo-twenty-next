@@ -13,6 +13,8 @@ const validatedCompletenessReceipt: unique symbol = Symbol(
 export type FinanceCompletenessReceipt = Readonly<{
   [validatedCompletenessReceipt]: true;
   version: 'finance-completeness/v1';
+  receiptId: string;
+  populationKey: string;
   population: string;
   entityScope: string;
   accountScope: string;
@@ -110,6 +112,8 @@ export const parseFinanceCompletenessReceipt = (
     const tests = row.tests;
     if (
       row.version !== 'finance-completeness/v1' ||
+      !nonEmpty(row.receiptId) ||
+      !nonEmpty(row.populationKey) ||
       !nonEmpty(row.population) ||
       !nonEmpty(row.entityScope) ||
       !nonEmpty(row.accountScope) ||
@@ -168,6 +172,12 @@ export const parseFinanceCompletenessReceipt = (
             ) && (test as Record<string, unknown>).result === 'PASS',
         ) ||
         tests.some(
+          (test) =>
+            !COMPLETENESS_PROCEDURES.has(
+              (test as Record<string, unknown>).id as string,
+            ),
+        ) ||
+        tests.some(
           (test) => (test as Record<string, unknown>).result !== 'PASS',
         ))
     ) {
@@ -176,6 +186,8 @@ export const parseFinanceCompletenessReceipt = (
 
     return Object.freeze({
       version: 'finance-completeness/v1',
+      receiptId: row.receiptId,
+      populationKey: row.populationKey,
       population: row.population,
       entityScope: row.entityScope,
       accountScope: row.accountScope,

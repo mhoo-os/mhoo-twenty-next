@@ -1358,13 +1358,15 @@ const WorkspaceFinanceScreen = ({
   );
   const aggregateAvailable = aggregateCurrency.kind === 'available';
   const aggregateUnavailableReason =
-    aggregateCurrency.kind === 'truncated'
-      ? 'Result limit reached · totals and chart withheld'
-      : aggregateCurrency.kind === 'mixed'
-        ? 'Mixed currencies · totals and chart withheld'
-        : aggregateCurrency.kind === 'currency-unavailable'
-          ? 'Currency unavailable · totals and chart withheld'
-          : 'Money exceeds the exact supported range · totals and chart withheld';
+    aggregateCurrency.kind === 'available'
+      ? null
+      : aggregateCurrency.kind === 'truncated'
+        ? 'Result limit reached · totals and chart withheld'
+        : aggregateCurrency.kind === 'mixed'
+          ? 'Mixed currencies · totals and chart withheld'
+          : aggregateCurrency.kind === 'currency-unavailable'
+            ? 'Currency unavailable · totals and chart withheld'
+            : 'Money exceeds the exact supported range · totals and chart withheld';
   const aggregateMoney = (value: string | bigint) =>
     aggregateCurrency.kind === 'available'
       ? formatMoney({

@@ -13,19 +13,31 @@ import {
 
 const RUN = 'b976fbe8-7d49-4d87-bdf2-5245192149e0';
 const TASK = '20202020-0001-4e7c-8001-123456789def';
+const PERIOD_SCOPE = {
+  entityScope: 'synthetic-hass-kitchen',
+  accountScope: 'operating-demo',
+  populationKey: 'operating-statements',
+  periodStart: '2025-01',
+  periodEnd: '2025-03',
+  timezone: 'America/New_York',
+  basis: 'CASH',
+} as const;
 const completenessReceipt = (
   month: string,
   coverageState: 'PROVEN_COMPLETE' | 'PARTIAL',
+  patch: Record<string, unknown> = {},
 ) =>
   JSON.stringify({
     version: 'finance-completeness/v1',
+    receiptId: `completeness-${month}`,
+    populationKey: PERIOD_SCOPE.populationKey,
     population: `Operating statement · ${month}`,
-    entityScope: 'synthetic-hass-kitchen',
-    accountScope: 'operating-demo',
+    entityScope: PERIOD_SCOPE.entityScope,
+    accountScope: PERIOD_SCOPE.accountScope,
     periodStart: `${month}-01`,
-    periodEnd: `${month}-28`,
-    timezone: 'America/New_York',
-    basis: 'CASH',
+    periodEnd: `${month}-${month === '2025-02' ? '28' : '31'}`,
+    timezone: PERIOD_SCOPE.timezone,
+    basis: PERIOD_SCOPE.basis,
     acquisitionMethod: 'AUTHORIZED_UPLOAD',
     acquiredAt: '2026-09-14T02:00:00.000Z',
     authorityReceiptId: `receipt-${month}`,
@@ -51,7 +63,33 @@ const completenessReceipt = (
     coverageState,
     reviewerReference: 'synthetic-reviewer',
     reviewedAt: '2026-09-14T02:05:00.000Z',
+    ...patch,
   });
+
+const cloverBridge = (patch: Record<string, unknown> = {}) => ({
+  currency: 'USD',
+  merchantReference: 'merchant-1',
+  businessDate: '2026-09-13',
+  timezone: 'America/New_York',
+  batchReference: 'batch-7',
+  batchMembership: 'EXPLICIT' as const,
+  saleBaseMinor: '85000',
+  taxMinor: '7000',
+  tipMinor: '8000',
+  chargeMinor: '2000',
+  refundMinor: '3000',
+  adjustmentMinor: '1000',
+  grossSalesMinor: '100000',
+  totalTenderMinor: '100000',
+  cardTenderMinor: '100000',
+  cashTenderMinor: '0',
+  feeMinor: '2500',
+  reserveMinor: '5000',
+  fundingAdjustmentMinor: '0',
+  payoutMinor: '92500',
+  bankDepositMinor: '92500',
+  ...patch,
+});
 
 describe('professional investigation domain', () => {
   it('freezes an exact InvestigationRun envelope and rejects impossible scope', () => {
@@ -171,74 +209,83 @@ describe('professional investigation domain', () => {
   it('bridges Clover sale components, tender, funding batch and bank exactly', () => {
     expect(
       evaluateCloverFundingBridge({
-        currency: 'USD',
-        batchReference: 'batch-7',
-        saleBaseMinor: '85000',
-        taxMinor: '7000',
-        tipMinor: '8000',
-        chargeMinor: '2000',
-        refundMinor: '3000',
-        adjustmentMinor: '1000',
-        grossSalesMinor: '100000',
-        tenderMinor: '100000',
-        feeMinor: '2500',
-        reserveMinor: '5000',
-        payoutMinor: '92500',
-        bankDepositMinor: '92500',
+        ...cloverBridge(),
       }),
     ).toMatchObject({
-      status: 'RECONCILED',
+      status: 'ARITHMETICALLY_BALANCED',
       batchReference: 'batch-7',
       expectedGrossMinor: '100000',
       expectedPayoutMinor: '92500',
       residualMinor: '0',
+      autoReconciled: false,
     });
   });
 
   it('reports missing Clover components instead of inventing a balancing amount', () => {
     expect(
       evaluateCloverFundingBridge({
-        currency: 'USD',
-        batchReference: 'batch-7',
-        saleBaseMinor: '85000',
-        taxMinor: '7000',
-        tipMinor: '8000',
-        chargeMinor: '2000',
-        refundMinor: '3000',
-        adjustmentMinor: '1000',
-        grossSalesMinor: '100000',
-        tenderMinor: '100000',
+        ...cloverBridge(),
         feeMinor: null,
         reserveMinor: null,
-        payoutMinor: '92500',
-        bankDepositMinor: '92500',
       }),
-    ).toEqual({ status: 'PARTIAL', gaps: ['feeMinor', 'reserveMinor'] });
+    ).toMatchObject({ status: 'PARTIAL', gaps: ['feeMinor', 'reserveMinor'] });
   });
 
   it('does not hide a contradictory Clover sale component inside gross sales', () => {
     expect(
       evaluateCloverFundingBridge({
-        currency: 'USD',
-        batchReference: 'batch-7',
-        saleBaseMinor: '85000',
-        taxMinor: '7000',
-        tipMinor: '8000',
-        chargeMinor: '2000',
-        refundMinor: '3000',
+        ...cloverBridge(),
         adjustmentMinor: '999',
-        grossSalesMinor: '100000',
-        tenderMinor: '100000',
-        feeMinor: '2500',
-        reserveMinor: '5000',
-        payoutMinor: '92500',
-        bankDepositMinor: '92500',
       }),
     ).toMatchObject({
       status: 'CONTRADICTED',
       expectedGrossMinor: '99999',
       contradictions: ['SALE_COMPONENT_MISMATCH'],
     });
+  });
+
+  it('never includes cash tender in expected card funding', () => {
+    expect(
+      evaluateCloverFundingBridge({
+        ...cloverBridge(),
+        cardTenderMinor: '80000',
+        cashTenderMinor: '20000',
+      }),
+    ).toMatchObject({
+      status: 'CONTRADICTED',
+      expectedPayoutMinor: '72500',
+      contradictions: ['PAYOUT_COMPONENT_MISMATCH'],
+    });
+  });
+
+  it('validates known Clover values and preserves contradictions alongside gaps', () => {
+    expect(() =>
+      evaluateCloverFundingBridge({
+        ...cloverBridge(),
+        saleBaseMinor: 'not-money',
+        feeMinor: null,
+      }),
+    ).toThrow('Minor units must be canonical integer text');
+    expect(
+      evaluateCloverFundingBridge({
+        ...cloverBridge(),
+        adjustmentMinor: '999',
+        feeMinor: null,
+      }),
+    ).toMatchObject({
+      status: 'CONTRADICTED',
+      gaps: ['feeMinor'],
+      contradictions: ['SALE_COMPONENT_MISMATCH'],
+    });
+  });
+
+  it('keeps an inferred Clover batch in review even when arithmetic balances', () => {
+    expect(
+      evaluateCloverFundingBridge({
+        ...cloverBridge(),
+        batchMembership: 'INFERRED',
+      }),
+    ).toMatchObject({ status: 'REVIEW_REQUIRED', autoReconciled: false });
   });
 
   it('retains pending and removed rows while counting only the supported replacement', () => {
@@ -311,22 +358,56 @@ describe('professional investigation domain', () => {
     expect(() => reduceBankLifecycle(events)).toThrow();
   });
 
+  it('rejects forked bank successors and seals copied history', () => {
+    const first = {
+      sequence: 1,
+      sourceRecordId: 'pending-1',
+      state: 'PENDING' as const,
+      replacesSourceRecordId: null,
+    };
+    const result = reduceBankLifecycle([
+      first,
+      {
+        sequence: 2,
+        sourceRecordId: 'posted-a',
+        state: 'POSTED',
+        replacesSourceRecordId: 'pending-1',
+      },
+    ]);
+    expect(Object.isFrozen(result.history[0])).toBe(true);
+    expect(result.history[0]).not.toBe(first);
+    expect(() =>
+      reduceBankLifecycle([
+        first,
+        {
+          sequence: 2,
+          sourceRecordId: 'posted-a',
+          state: 'POSTED',
+          replacesSourceRecordId: 'pending-1',
+        },
+        {
+          sequence: 3,
+          sourceRecordId: 'posted-b',
+          state: 'POSTED',
+          replacesSourceRecordId: 'pending-1',
+        },
+      ]),
+    ).toThrow();
+  });
+
   it('makes every expected month and gap visible without treating missing as zero', () => {
-    const result = evaluatePeriodCompleteness(
-      ['2025-01', '2025-02', '2025-03'],
-      [
-        {
-          month: '2025-01',
-          state: 'PROVEN_COMPLETE',
-          receiptJson: completenessReceipt('2025-01', 'PROVEN_COMPLETE'),
-        },
-        {
-          month: '2025-03',
-          state: 'PARTIAL',
-          receiptJson: completenessReceipt('2025-03', 'PARTIAL'),
-        },
-      ],
-    );
+    const result = evaluatePeriodCompleteness(PERIOD_SCOPE, [
+      {
+        month: '2025-01',
+        state: 'PROVEN_COMPLETE',
+        receiptJson: completenessReceipt('2025-01', 'PROVEN_COMPLETE'),
+      },
+      {
+        month: '2025-03',
+        state: 'PARTIAL',
+        receiptJson: completenessReceipt('2025-03', 'PARTIAL'),
+      },
+    ]);
     expect(result).toMatchObject({
       status: 'INCOMPLETE',
       gaps: ['2025-02', '2025-03'],
@@ -341,17 +422,59 @@ describe('professional investigation domain', () => {
 
   it('rejects a month-completeness label backed by the wrong period', () => {
     expect(() =>
-      evaluatePeriodCompleteness(
-        ['2025-01'],
-        [
-          {
-            month: '2025-01',
-            state: 'PROVEN_COMPLETE',
-            receiptJson: completenessReceipt('2025-02', 'PROVEN_COMPLETE'),
-          },
-        ],
-      ),
+      evaluatePeriodCompleteness({ ...PERIOD_SCOPE, periodEnd: '2025-01' }, [
+        {
+          month: '2025-01',
+          state: 'PROVEN_COMPLETE',
+          receiptJson: completenessReceipt('2025-02', 'PROVEN_COMPLETE'),
+        },
+      ]),
     ).toThrow('Month coverage requires a scope-matched receipt');
+  });
+
+  it('rejects partial-month and cross-series completeness receipts', () => {
+    const scope = { ...PERIOD_SCOPE, periodEnd: '2025-01' };
+    expect(() =>
+      evaluatePeriodCompleteness(scope, [
+        {
+          month: '2025-01',
+          state: 'PROVEN_COMPLETE',
+          receiptJson: completenessReceipt('2025-01', 'PROVEN_COMPLETE', {
+            periodEnd: '2025-01-28',
+          }),
+        },
+      ]),
+    ).toThrow('Month coverage requires a scope-matched receipt');
+    expect(() =>
+      evaluatePeriodCompleteness(scope, [
+        {
+          month: '2025-01',
+          state: 'PROVEN_COMPLETE',
+          receiptJson: completenessReceipt('2025-01', 'PROVEN_COMPLETE', {
+            accountScope: 'reserve-demo',
+          }),
+        },
+      ]),
+    ).toThrow('Month coverage requires a scope-matched receipt');
+  });
+
+  it('uses the actual leap-year month end for a complete February', () => {
+    const scope = {
+      ...PERIOD_SCOPE,
+      periodStart: '2024-02',
+      periodEnd: '2024-02',
+    };
+    expect(
+      evaluatePeriodCompleteness(scope, [
+        {
+          month: '2024-02',
+          state: 'PROVEN_COMPLETE',
+          receiptJson: completenessReceipt('2024-02', 'PROVEN_COMPLETE', {
+            periodEnd: '2024-02-29',
+          }),
+        },
+      ]),
+    ).toMatchObject({ status: 'PROVEN_COMPLETE', gaps: [] });
   });
 
   it('creates a native-Task follow-up history with evidence, approve-not-send and reply correlation', () => {

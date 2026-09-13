@@ -92,6 +92,7 @@ describe('current Workspace Finance data adapter', () => {
               financeEvidenceReferences: '[]',
               financeDraftEmail: null,
               financeEmailApproval: null,
+              financeScope: 'MHOO_FINANCE_V1',
               financeCorrelationKey: 'finance:fact-1',
               financeProvenanceHistory: '[]',
             },

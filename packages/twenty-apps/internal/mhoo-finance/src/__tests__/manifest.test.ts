@@ -76,8 +76,8 @@ describe('@mhoo/finance fixture manifest contracts', () => {
         expect.objectContaining({
           objectUniversalIdentifier:
             STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.task.universalIdentifier,
-          fieldUniversalIdentifier: '33e50c7f-1214-45c0-a776-da19f30e01fb',
-          value: 'mhoo-finance:',
+          fieldUniversalIdentifier: '297123dd-275d-4f12-9cf4-92e47fcb2c94',
+          value: 'MHOO_FINANCE_V1',
         }),
       ]),
     );
@@ -112,8 +112,8 @@ describe('@mhoo/finance fixture manifest contracts', () => {
         expect.objectContaining({
           objectUniversalIdentifier:
             STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.task.universalIdentifier,
-          fieldUniversalIdentifier: '33e50c7f-1214-45c0-a776-da19f30e01fb',
-          value: 'mhoo-finance:',
+          fieldUniversalIdentifier: '297123dd-275d-4f12-9cf4-92e47fcb2c94',
+          value: 'MHOO_FINANCE_V1',
         }),
       ]),
     );
