@@ -1,5 +1,30 @@
 # Professional investigation method acceptance map
 
+## Approved key custody pending local paste — 2026-09-14 05:48 Bangkok
+
+Oracle owner explicitly released the Finance App-only maintenance hold after
+server replacement verification. Guide host-deployment lane was notified that
+the Finance key/plan window is active; this lead performs no host operations.
+
+One explicitly approved temporary Hass Kitchen key was created through native
+Workspace settings: `ffff4b79-2677-4a0f-9f52-03a3fb070d6d`, display name
+`Finance install temporary 2026-09-14`, Admin role, minimum native 15-day expiry.
+Key-page observations suppressed all key values; only safe controls/record ID
+were read. Native Copy succeeded. No value appears in source, logs or messages.
+
+Computer-use rejected native Terminal control "for safety reasons". No alternate
+automation bypass was attempted. The user must paste the key into the prepared
+hidden-input Codex terminal session `97517` and press Return, never into chat.
+The supported SDK helper will save/verify a separate `finance-install-20260914`
+remote. Browser tab `4` and terminal panels are queued on this installation task;
+the generated-key browser tab is retained for the user handoff. No CLI plan/apply
+has run with this key yet. Coordinator received the exact manual custody step.
+
+**Cleanup pending:** this key is currently active and must be revoked, with
+verification, immediately after use or if this installation attempt is abandoned.
+Do not create a second key. App-role expansion remains unauthorized. Earlier
+"no key created" entries are historical observations superseded by this receipt.
+
 ## Temporary API-key fallback inspection — 2026-09-14
 
 Subsequent exact approval: coordinator asked the user to approve a temporary
