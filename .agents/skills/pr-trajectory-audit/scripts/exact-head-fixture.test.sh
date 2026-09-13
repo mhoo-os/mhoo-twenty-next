@@ -631,6 +631,10 @@ done
 
 # AI editor repair and runner compatibility retain exact, bounded paths.
 repair_paths=(
+  packages/twenty-front/src/modules/domain-manager/hooks/useRedirect.ts
+  packages/twenty-front/src/modules/domain-manager/hooks/__tests__/useRedirect.test.tsx
+  packages/twenty-front/src/modules/workspace/components/WorkspaceProviderEffect.tsx
+  packages/twenty-front/src/modules/workspace/components/__tests__/WorkspaceProviderEffect.selfRedirect.test.tsx
   docs/provenance/linear-issue-status.md
   packages/twenty-apps/public/linear/src/constants/universal-identifiers.ts
   packages/twenty-apps/public/linear/src/logic-functions/get-linear-issue-status.ts
@@ -664,6 +668,12 @@ for path in "${repair_paths[@]}"; do
   bash "$fixture" HEAD "$candidate_head" >"$temporary_directory/ai-editor-output"
 done
 for path in \
+  packages/twenty-front/src/modules/domain-manager/hooks/useRedirect.ts.backup \
+  packages/twenty-front/src/modules/domain-manager/hooks/nested/useRedirect.ts \
+  packages/twenty-front/src/modules/domain-manager/hooks/useRedirectToDefaultDomain.ts \
+  packages/twenty-front/src/modules/workspace/components/WorkspaceProviderEffect.tsx.backup \
+  packages/twenty-front/src/modules/workspace/components/nested/WorkspaceProviderEffect.tsx \
+  packages/twenty-front/src/modules/workspace/components/WorkspaceProvider.tsx \
   packages/twenty-apps/public/linear/src/roles/default-function.role.ts \
   packages/twenty-apps/public/linear/src/logic-functions/get-linear-issue-status.ts.backup \
   packages/twenty-apps/public/linear/src/logic-functions/handlers/nested/get-linear-issue-status-handler.ts \
