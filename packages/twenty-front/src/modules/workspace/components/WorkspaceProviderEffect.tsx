@@ -1,3 +1,4 @@
+import { isAppEffectRedirectEnabledState } from '@/app/states/isAppEffectRedirectEnabledState';
 import { isMultiWorkspaceEnabledState } from '@/client-config/states/isMultiWorkspaceEnabledState';
 import { useReadWorkspaceUrlFromCurrentLocation } from '@/domain-manager/hooks/useReadWorkspaceUrlFromCurrentLocation';
 import { useRedirectToWorkspaceDomain } from '@/domain-manager/hooks/useRedirectToWorkspaceDomain';
@@ -30,6 +31,10 @@ export const WorkspaceProviderEffect = () => {
 
   const isMultiWorkspaceEnabled = useAtomStateValue(
     isMultiWorkspaceEnabledState,
+  );
+
+  const isAppEffectRedirectEnabled = useAtomStateValue(
+    isAppEffectRedirectEnabledState,
   );
 
   const { initializeQueryParamState } = useInitializeQueryParamState();
@@ -68,6 +73,10 @@ export const WorkspaceProviderEffect = () => {
     if (
       isMultiWorkspaceEnabled &&
       isDefaultDomain &&
+      isAppEffectRedirectEnabled &&
+      !new URLSearchParams(window.location.hash.substring(1)).has(
+        'ssoExchangeToken',
+      ) &&
       !(
         window.location.pathname === AppPath.SignInUp &&
         new URLSearchParams(window.location.search).get('action') ===
@@ -87,6 +96,7 @@ export const WorkspaceProviderEffect = () => {
   }, [
     isMultiWorkspaceEnabled,
     isDefaultDomain,
+    isAppEffectRedirectEnabled,
     lastAuthenticatedWorkspaceDomain,
     redirectToWorkspaceDomain,
     initializeQueryParamState,
