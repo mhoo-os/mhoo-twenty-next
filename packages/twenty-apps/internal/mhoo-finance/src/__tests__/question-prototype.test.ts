@@ -5,12 +5,14 @@ import {
   DEMO_QUESTIONS,
   DEMO_RECONCILIATION_ITEMS,
   DEMO_SOURCE_LANES,
+  demoReviewContextKey,
   demoTrace,
   initialDemoScope,
   initialDemoState,
   reduceDemo,
   resolveDemoQuestion,
   selectedDemoTotal,
+  visibleDemoAttentionItems,
   visibleDemoRows,
 } from '../investigation/question-prototype';
 
@@ -42,10 +44,50 @@ describe('synthetic question-to-evidence exploration', () => {
       'contradictory-sources',
       'human-review',
     ]);
-    expect(DEMO_ATTENTION_ITEMS.every((item) => item.count === 1)).toBe(true);
+    expect(DEMO_ATTENTION_ITEMS.every((item) => item.contributingRowId)).toBe(
+      true,
+    );
     expect(
       DEMO_ATTENTION_ITEMS.some((item) => item.status === 'HUMAN_REVIEW'),
     ).toBe(true);
+  });
+
+  it('fails the attention queue closed and scopes every item to a visible contributor', () => {
+    const normal = resolveDemoQuestion(
+      initialDemoScope,
+      DEMO_QUESTIONS[0],
+      'normal',
+    );
+    const denied = resolveDemoQuestion(
+      initialDemoScope,
+      DEMO_QUESTIONS[0],
+      'denied',
+    );
+    const v2 = resolveDemoQuestion(
+      { ...initialDemoScope, snapshot: 'demo-v2' },
+      DEMO_QUESTIONS[0],
+      'normal',
+    );
+    expect(visibleDemoAttentionItems(null, [])).toEqual([]);
+    expect(visibleDemoAttentionItems(denied, denied.rows)).toEqual([]);
+    expect(
+      visibleDemoAttentionItems(normal, normal.rows).map((item) => item.id),
+    ).toEqual([
+      'missing-evidence',
+      'unmatched-money',
+      'contradictory-sources',
+      'human-review',
+    ]);
+    expect(
+      visibleDemoAttentionItems(v2, v2.rows).map((item) => item.id),
+    ).not.toContain('missing-evidence');
+    expect(visibleDemoAttentionItems(normal, [normal.rows[0]])).toEqual([]);
+  });
+
+  it('separates review decisions for two attention reasons on the same row', () => {
+    expect(demoReviewContextKey('missing-evidence', 'd6', 'demo-v1')).not.toBe(
+      demoReviewContextKey('unmatched-money', 'd6', 'demo-v1'),
+    );
   });
 
   it('keeps source periods, bases and provenance separate', () => {
@@ -131,7 +173,7 @@ describe('synthetic question-to-evidence exploration', () => {
     expect(demoTrace(state)).toMatchObject({
       locator: 'CSV row 5',
       snapshot: 'demo-v1',
-      raw: 'd4,operating,2025-02-05,Demo produce supplier,56000,USD,SYNTHETIC_EXCLUDED',
+      raw: 'd4,operating,2025-02-05,Demo Clover settlement candidate,56000,USD,SYNTHETIC_EXCLUDED',
     });
     expect(reduceDemo(state, { type: 'row', id: 'd1' })).toBe(state);
     state = reduceDemo(state, { type: 'month', month: '2025-01' });

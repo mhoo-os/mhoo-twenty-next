@@ -15,6 +15,10 @@ const frontComponentSource = readFileSync(
   ),
   'utf8',
 );
+const questionComponentSource = readFileSync(
+  new URL('../components/finance-question-prototype.tsx', import.meta.url),
+  'utf8',
+);
 
 describe('workspace preparation', () => {
   it('registers the review surface used by the Overview page layout', () => {
@@ -24,6 +28,8 @@ describe('workspace preparation', () => {
     expect(frontComponentSource).toContain(
       'component: FinanceWorkspacePreparation',
     );
+    expect(questionComponentSource).toContain('visibleDemoAttentionItems');
+    expect(questionComponentSource).not.toContain('Accept demo match');
     const widget = dashboard.config?.tabs
       ?.flatMap((tab) => tab.widgets ?? [])
       .find((candidate) => candidate.type === 'FRONT_COMPONENT');

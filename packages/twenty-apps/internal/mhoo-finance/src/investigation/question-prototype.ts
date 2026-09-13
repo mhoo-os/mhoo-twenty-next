@@ -90,43 +90,45 @@ export type DemoReconciliationItem = {
 export type DemoAttentionItem = {
   id: string;
   label: string;
-  count: number;
   status: 'NEEDS_EVIDENCE' | 'UNCLASSIFIED' | 'PARTIAL_MATCH' | 'HUMAN_REVIEW';
   explanation: string;
+  contributingRowId: string;
+  requiresMissingSource?: boolean;
 };
 
 export const DEMO_ATTENTION_ITEMS: readonly DemoAttentionItem[] = [
   {
     id: 'missing-evidence',
     label: 'Missing evidence',
-    count: 1,
     status: 'NEEDS_EVIDENCE',
     explanation:
       'One contributing transaction has a locator but no source excerpt.',
+    contributingRowId: 'd6',
+    requiresMissingSource: true,
   },
   {
     id: 'unmatched-money',
     label: 'Unmatched money',
-    count: 1,
     status: 'UNCLASSIFIED',
     explanation:
       'One movement stays unclassified until both sides or a source are reviewed.',
+    contributingRowId: 'd6',
   },
   {
     id: 'contradictory-sources',
     label: 'Contradictory sources',
-    count: 1,
     status: 'PARTIAL_MATCH',
     explanation:
-      'Gross Clover activity and a net bank deposit must not be forced to agree.',
+      'A Clover settlement candidate and net bank deposit must not be forced to agree.',
+    contributingRowId: 'd4',
   },
   {
     id: 'human-review',
     label: 'Human review',
-    count: 1,
     status: 'HUMAN_REVIEW',
     explanation:
       'An invoice and bank-payment candidate need an explicit reviewer decision.',
+    contributingRowId: 'd5',
   },
 ];
 
@@ -196,8 +198,24 @@ const ROWS: readonly DemoRow[] = [
   ['d1', 'operating', '2025-01-08', 'Demo produce supplier', '42000', 2, true],
   ['d2', 'operating', '2025-01-17', 'Demo equipment service', '18000', 3, true],
   ['d3', 'reserve', '2025-01-21', 'Demo maintenance', '15000', 4, true],
-  ['d4', 'operating', '2025-02-05', 'Demo produce supplier', '56000', 5, true],
-  ['d5', 'operating', '2025-02-12', 'Demo equipment service', '28000', 6, true],
+  [
+    'd4',
+    'operating',
+    '2025-02-05',
+    'Demo Clover settlement candidate',
+    '56000',
+    5,
+    true,
+  ],
+  [
+    'd5',
+    'operating',
+    '2025-02-12',
+    'Demo vendor payment candidate',
+    '28000',
+    6,
+    true,
+  ],
   [
     'd6',
     'operating',
@@ -274,6 +292,26 @@ export type DemoResult = {
   }[];
   scenario: DemoScenario;
 };
+
+export const visibleDemoAttentionItems = (
+  result: DemoResult | null,
+  visibleRows: readonly DemoRow[],
+): readonly DemoAttentionItem[] => {
+  if (!result || result.status !== 'ready') return [];
+  const rowsById = new Map(visibleRows.map((row) => [row.id, row]));
+  return DEMO_ATTENTION_ITEMS.filter((item) => {
+    const row = rowsById.get(item.contributingRowId);
+    return Boolean(
+      row && (!item.requiresMissingSource || row.sourceAvailable === false),
+    );
+  });
+};
+
+export const demoReviewContextKey = (
+  attentionId: string | null,
+  rowId: string | null,
+  snapshot: string | null,
+): string => JSON.stringify([attentionId ?? 'direct', rowId, snapshot]);
 
 const total = (rows: readonly DemoRow[]) =>
   sumMoney(

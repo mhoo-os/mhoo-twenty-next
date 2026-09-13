@@ -3,17 +3,18 @@ import { useEffect, useReducer, useRef, useState } from 'react';
 import { Button } from 'twenty-ui/input';
 
 import {
-  DEMO_ATTENTION_ITEMS,
   DEMO_FORECAST_ASSUMPTIONS,
   DEMO_QUESTIONS,
   DEMO_RECONCILIATION_ITEMS,
   DEMO_SOURCE_LANES,
   demoMoney,
+  demoReviewContextKey,
   demoTrace,
   initialDemoState,
   reduceDemo,
   resolveDemoQuestion,
   selectedDemoTotal,
+  visibleDemoAttentionItems,
   visibleDemoRows,
   type DemoScenario,
   type DemoScope,
@@ -67,6 +68,8 @@ const Shell = styled.section({
     margin: '18px 0 24px',
   },
   '& .mhoo-fq-story-link': {
+    display: 'block',
+    boxSizing: 'border-box',
     color: '#34482c',
     background: '#fff',
     border: '1px solid #d8ded2',
@@ -167,6 +170,19 @@ const Shell = styled.section({
     fontWeight: 600,
     lineHeight: 1,
     margin: '12px 0 8px',
+  },
+  '& .mhoo-fq-attention-item .mhoo-fq-story-link': {
+    width: '100%',
+    marginTop: '12px',
+    padding: '10px 12px',
+    overflowWrap: 'anywhere',
+  },
+  '& .mhoo-fq-source .mhoo-fq-definition-list': {
+    gridTemplateColumns: '1fr',
+    gap: '2px',
+  },
+  '& .mhoo-fq-source .mhoo-fq-definition-list dd': {
+    marginBottom: '8px',
   },
   '& .mhoo-fq-review-item': {
     display: 'grid',
@@ -350,8 +366,14 @@ export const FinanceQuestionPrototype = ({
   const [state, dispatch] = useReducer(reduceDemo, initialDemoState);
   const [questionDraft, setQuestionDraft] = useState<string>(DEMO_QUESTIONS[0]);
   const [reviewDecision, setReviewDecision] = useState<
-    'UNREVIEWED' | 'ACCEPTED' | 'REJECTED' | 'NEEDS_EVIDENCE'
+    | 'UNREVIEWED'
+    | 'EVIDENCE_REQUEST_DRAFTED'
+    | 'KEPT_UNCLASSIFIED'
+    | 'REJECTED_CANDIDATE'
   >('UNREVIEWED');
+  const [selectedAttentionId, setSelectedAttentionId] = useState<string | null>(
+    null,
+  );
   const sequence = useRef(0);
   const timers = useRef<Array<ReturnType<typeof setTimeout>>>([]);
   const request = (
@@ -390,6 +412,15 @@ export const FinanceQuestionPrototype = ({
   const rows = visibleDemoRows(state);
   const trace = demoTrace(state);
   const result = state.result;
+  const attentionItems = visibleDemoAttentionItems(result, rows);
+  const selectedAttention = attentionItems.find(
+    (item) => item.id === selectedAttentionId,
+  );
+  const reviewContextKey = demoReviewContextKey(
+    selectedAttentionId,
+    trace?.row.id ?? null,
+    trace?.snapshot ?? null,
+  );
   const coverage = state.question === DEMO_QUESTIONS[1];
   const maximum = Math.max(
     1,
@@ -400,7 +431,15 @@ export const FinanceQuestionPrototype = ({
 
   useEffect(() => {
     setReviewDecision('UNREVIEWED');
-  }, [trace?.row.id, trace?.snapshot]);
+  }, [reviewContextKey]);
+
+  useEffect(() => {
+    if (
+      selectedAttentionId &&
+      !attentionItems.some((item) => item.id === selectedAttentionId)
+    )
+      setSelectedAttentionId(null);
+  }, [attentionItems, selectedAttentionId]);
 
   return (
     <Shell aria-label="Finance question prototype">
@@ -446,26 +485,50 @@ export const FinanceQuestionPrototype = ({
         aria-label="Needs attention"
       >
         <div className="mhoo-fq-eyebrow">Needs attention / review queue</div>
-        <h2 className="mhoo-fq-heading">Four items need a human decision</h2>
+        <h2 className="mhoo-fq-heading">
+          {state.loading
+            ? 'Loading this review queue…'
+            : result?.status === 'ready'
+              ? attentionItems.length === 0
+                ? 'No modeled attention items in this selection'
+                : `${attentionItems.length} ${attentionItems.length === 1 ? 'item needs' : 'items need'} a human decision`
+              : 'No review queue returned'}
+        </h2>
         <p className="mhoo-fq-muted">
           These are fixture counts, not alerts or findings. Coverage gaps appear
           before totals so missing evidence cannot look like certainty.
         </p>
-        <div className="mhoo-fq-attention-grid">
-          {DEMO_ATTENTION_ITEMS.map((item) => (
-            <article className="mhoo-fq-attention-item" key={item.id}>
-              <span className="mhoo-fq-status" data-tone="review">
-                {item.status.replace('_', ' ')}
-              </span>
-              <div className="mhoo-fq-attention-count">{item.count}</div>
-              <strong>{item.label}</strong>
-              <p className="mhoo-fq-muted">{item.explanation}</p>
-              <a className="mhoo-fq-story-link" href="#finance-review">
-                Inspect contributing records →
-              </a>
-            </article>
-          ))}
-        </div>
+        {attentionItems.length > 0 ? (
+          <div className="mhoo-fq-attention-grid">
+            {attentionItems.map((item) => (
+              <article className="mhoo-fq-attention-item" key={item.id}>
+                <span className="mhoo-fq-status" data-tone="review">
+                  {item.status.replace('_', ' ')}
+                </span>
+                <div className="mhoo-fq-attention-count">1</div>
+                <strong>{item.label}</strong>
+                <p className="mhoo-fq-muted">{item.explanation}</p>
+                <a
+                  className="mhoo-fq-story-link"
+                  href="#finance-evidence"
+                  onClick={() => {
+                    setReviewDecision('UNREVIEWED');
+                    setSelectedAttentionId(item.id);
+                    dispatch({ type: 'row', id: item.contributingRowId });
+                  }}
+                >
+                  Inspect {item.label.toLowerCase()} contributor →
+                </a>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <div role="status" className="mhoo-fq-notice">
+            {state.loading
+              ? 'Previous queue cleared while this scope loads.'
+              : 'No attention items are available for this response. This does not prove that real activity is complete or reconciled.'}
+          </div>
+        )}
       </section>
       <section
         id="finance-history"
@@ -687,9 +750,10 @@ export const FinanceQuestionPrototype = ({
                   key={group.month}
                   aria-label={'Select ' + group.label}
                   aria-pressed={state.selectedMonth === group.month}
-                  onClick={() =>
-                    dispatch({ type: 'month', month: group.month })
-                  }
+                  onClick={() => {
+                    setSelectedAttentionId(null);
+                    dispatch({ type: 'month', month: group.month });
+                  }}
                 >
                   <span className="mhoo-fq-bar-label">
                     <strong>{group.label}</strong>
@@ -723,7 +787,10 @@ export const FinanceQuestionPrototype = ({
                 <button
                   type="button"
                   className="mhoo-fq-button"
-                  onClick={() => dispatch({ type: 'month', month: null })}
+                  onClick={() => {
+                    setSelectedAttentionId(null);
+                    dispatch({ type: 'month', month: null });
+                  }}
                 >
                   Clear period selection
                 </button>
@@ -742,7 +809,11 @@ export const FinanceQuestionPrototype = ({
                     className="mhoo-fq-row"
                     key={row.id}
                     aria-pressed={state.selectedRow === row.id}
-                    onClick={() => dispatch({ type: 'row', id: row.id })}
+                    onClick={() => {
+                      setReviewDecision('UNREVIEWED');
+                      setSelectedAttentionId(null);
+                      dispatch({ type: 'row', id: row.id });
+                    }}
                   >
                     <span>
                       <strong>{row.description}</strong>
@@ -817,32 +888,41 @@ export const FinanceQuestionPrototype = ({
         </h2>
         {trace ? (
           <>
-            <p className="mhoo-fq-muted">
-              Demo record {trace.row.id} · current local decision{' '}
-              <strong>{reviewDecision.replace('_', ' ')}</strong>. This choice
-              exists only in this browser preview and does not write to Twenty.
+            <p className="mhoo-fq-muted" role="status" aria-live="polite">
+              {selectedAttention
+                ? `Reviewing ${selectedAttention.label.toLowerCase()} · `
+                : 'Direct transaction review · '}
+              demo record {trace.row.id} · current local decision{' '}
+              <strong>{reviewDecision.replaceAll('_', ' ')}</strong>. This
+              choice exists only in this browser preview and does not write to
+              Twenty.
             </p>
             <div className="mhoo-fq-suggestions">
               <button
                 type="button"
                 className="mhoo-fq-button"
-                onClick={() => setReviewDecision('ACCEPTED')}
+                aria-pressed={reviewDecision === 'KEPT_UNCLASSIFIED'}
+                onClick={() => setReviewDecision('KEPT_UNCLASSIFIED')}
               >
-                Accept demo match
+                Keep demo record unclassified
               </button>
+              {trace.raw && selectedAttention?.status === 'PARTIAL_MATCH' ? (
+                <button
+                  type="button"
+                  className="mhoo-fq-button"
+                  aria-pressed={reviewDecision === 'REJECTED_CANDIDATE'}
+                  onClick={() => setReviewDecision('REJECTED_CANDIDATE')}
+                >
+                  Reject demo candidate link
+                </button>
+              ) : null}
               <button
                 type="button"
                 className="mhoo-fq-button"
-                onClick={() => setReviewDecision('REJECTED')}
+                aria-pressed={reviewDecision === 'EVIDENCE_REQUEST_DRAFTED'}
+                onClick={() => setReviewDecision('EVIDENCE_REQUEST_DRAFTED')}
               >
-                Reject demo match
-              </button>
-              <button
-                type="button"
-                className="mhoo-fq-button"
-                onClick={() => setReviewDecision('NEEDS_EVIDENCE')}
-              >
-                Mark demo: needs evidence
+                Draft demo evidence request
               </button>
             </div>
             <p className="mhoo-fq-muted">
