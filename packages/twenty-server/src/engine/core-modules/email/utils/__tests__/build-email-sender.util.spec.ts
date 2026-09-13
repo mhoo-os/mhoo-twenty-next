@@ -14,7 +14,7 @@ describe('buildEmailSender', () => {
         brand: mhooBrand,
         address: 'no-reply@example.com',
       }),
-    ).toBe('Mhoo <no-reply@example.com>');
+    ).toBe('MHOO <no-reply@example.com>');
   });
 
   it('scopes a human sender through the resolved product', () => {
@@ -24,7 +24,7 @@ describe('buildEmailSender', () => {
         address: 'no-reply@example.com',
         senderName: 'Jane Doe',
       }),
-    ).toBe('Jane Doe (via Mhoo) <no-reply@example.com>');
+    ).toBe('Jane Doe (via MHOO) <no-reply@example.com>');
   });
 
   it('removes header line breaks before formatting the envelope', () => {
@@ -35,7 +35,7 @@ describe('buildEmailSender', () => {
         senderName: 'Jane\nDoe',
       }),
     ).toBe(
-      'Jane Doe (via Mhoo) <no-reply@example.com Bcc: attacker@example.com>',
+      'Jane Doe (via MHOO) <no-reply@example.com Bcc: attacker@example.com>',
     );
   });
 });

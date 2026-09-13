@@ -103,6 +103,7 @@ RUN chmod +x /app/entrypoint.sh
 WORKDIR /app/packages/twenty-server
 
 ARG APP_VERSION
+ARG SOURCE_REVISION
 ENV APP_VERSION=$APP_VERSION
 ENV NODE_ENV=production
 
@@ -133,7 +134,8 @@ COPY --chown=1000 --from=twenty-server-build /app/packages/twenty-client-sdk/dis
 LABEL org.opencontainers.image.title="Mhoo built on Twenty"
 LABEL org.opencontainers.image.vendor="Mhoo"
 LABEL org.opencontainers.image.source="https://github.com/mhoo-os/mhoo-twenty-next"
-LABEL org.opencontainers.image.revision="$APP_VERSION"
+LABEL org.opencontainers.image.revision="$SOURCE_REVISION"
+LABEL org.opencontainers.image.version="$APP_VERSION"
 LABEL org.opencontainers.image.description="Mhoo distribution server image built on Twenty (no frontend)."
 LABEL org.opencontainers.image.upstream.source="https://github.com/twentyhq/twenty"
 LABEL org.opencontainers.image.upstream.version="v2.37.0"
@@ -285,6 +287,7 @@ RUN mkdir -p /data/postgres /data/redis /app/packages/twenty-server/.local-stora
  && chown 1000:1000 /data/redis /app/packages/twenty-server/.local-storage
 
 ARG APP_VERSION=0.0.0
+ARG SOURCE_REVISION
 
 ENV S6_KEEP_ENV=1
 ENV PG_DATABASE_URL=postgres://twenty:twenty@localhost:5432/default \
@@ -309,7 +312,8 @@ VOLUME ["/data/postgres", "/app/packages/twenty-server/.local-storage"]
 LABEL org.opencontainers.image.title="Mhoo built on Twenty"
 LABEL org.opencontainers.image.vendor="Mhoo"
 LABEL org.opencontainers.image.source="https://github.com/mhoo-os/mhoo-twenty-next"
-LABEL org.opencontainers.image.revision="$APP_VERSION"
+LABEL org.opencontainers.image.revision="$SOURCE_REVISION"
+LABEL org.opencontainers.image.version="$APP_VERSION"
 LABEL org.opencontainers.image.description="All-in-one Mhoo distribution image for local development and SDK usage, built on Twenty. Includes PostgreSQL, Redis, server, and worker."
 LABEL org.opencontainers.image.upstream.source="https://github.com/twentyhq/twenty"
 LABEL org.opencontainers.image.upstream.version="v2.37.0"

@@ -2,12 +2,21 @@
 
 from __future__ import annotations
 
+import ast
+import hashlib
 import json
+import re
 import shutil
 import tempfile
 import unittest
 from pathlib import Path
 
+from scripts.legal.generate_mhoo_legal_sources import (
+    DOCUMENTS,
+    OUTPUT_PATH,
+    render_generated_module,
+    typescript_string,
+)
 from scripts.legal.verify_mhoo_legal_packet import (
     MANIFEST_NAME,
     PACKET_DIRECTORY,
@@ -17,6 +26,25 @@ from scripts.legal.verify_mhoo_legal_packet import (
 
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
+
+
+class GenerateMhooLegalSourcesTest(unittest.TestCase):
+    def test_generated_strings_preserve_every_approved_source_byte(self) -> None:
+        generated = render_generated_module(REPOSITORY_ROOT)
+        sources = re.findall(r"    source:\n      (.*),\n", generated)
+        self.assertEqual(len(sources), len(DOCUMENTS))
+        for literal, (_, filename) in zip(sources, DOCUMENTS):
+            expected = (REPOSITORY_ROOT / PACKET_DIRECTORY / filename).read_bytes()
+            self.assertEqual(ast.literal_eval(literal).encode("utf-8"), expected)
+            self.assertIn(hashlib.sha256(expected).hexdigest(), generated)
+        self.assertEqual(
+            generated, (REPOSITORY_ROOT / OUTPUT_PATH).read_text(encoding="utf-8")
+        )
+
+    def test_string_escaping_roundtrips_quotes_backslashes_and_unicode(self) -> None:
+        for value in ["plain", "it's", 'say "hello"', "'\"\\\n\t", "Mhoo’s ไทย"]:
+            with self.subTest(value=value):
+                self.assertEqual(ast.literal_eval(typescript_string(value)), value)
 
 
 class VerifyMhooLegalPacketTest(unittest.TestCase):

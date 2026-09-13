@@ -408,11 +408,12 @@ describe('If/Else Workflow (e2e)', () => {
 
   describe('Workflow structure', () => {
     it('should verify If/Else workflow exists and is active', async () => {
-      const response = await client
-        .post('/graphql')
-        .set('Authorization', `Bearer ${APPLE_JANE_ADMIN_ACCESS_TOKEN}`)
-        .send({
-          query: `
+      const findWorkflow = () =>
+        client
+          .post('/graphql')
+          .set('Authorization', `Bearer ${APPLE_JANE_ADMIN_ACCESS_TOKEN}`)
+          .send({
+            query: `
             query FindWorkflow($id: UUID!) {
               workflow(filter: { id: { eq: $id } }) {
                 id
@@ -422,8 +423,23 @@ describe('If/Else Workflow (e2e)', () => {
               }
             }
           `,
-          variables: { id: createdWorkflowId },
-        });
+            variables: { id: createdWorkflowId },
+          });
+
+      // Workflow statuses are derived by an async queue job after activation.
+      // Match the bounded polling used by the core-workflows integration suite.
+      let response = await findWorkflow();
+
+      for (let attempt = 0; attempt < 20; attempt++) {
+        expect(response.body.errors).toBeUndefined();
+
+        if (response.body.data.workflow.statuses.includes('ACTIVE')) {
+          break;
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, 250));
+        response = await findWorkflow();
+      }
 
       expect(response.body.errors).toBeUndefined();
       expect(response.body.data.workflow.id).toBe(createdWorkflowId);

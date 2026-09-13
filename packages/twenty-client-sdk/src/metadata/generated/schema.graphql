@@ -2157,6 +2157,7 @@ type AppConnection {
   workspaceMemberId: String
   accessToken: String!
   scopes: [String!]!
+  manualTokenWorkspaceGrantId: String
   authFailedAt: String
 }
 
