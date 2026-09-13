@@ -39,7 +39,10 @@ import {
   timelineMonthSpan,
 } from '../investigation/timeline-domain';
 import { SYNTHETIC_WORKSPACE_FINANCE_DATA } from '../investigation/synthetic-workspace-data';
-import { workspaceAggregateCurrency } from '../investigation/workspace-aggregate';
+import {
+  netMovementMinor,
+  workspaceAggregateCurrency,
+} from '../investigation/workspace-aggregate';
 
 export type FinanceView =
   | 'overview'
@@ -1362,11 +1365,11 @@ const WorkspaceFinanceScreen = ({
         : aggregateCurrency.kind === 'currency-unavailable'
           ? 'Currency unavailable · totals and chart withheld'
           : 'Money exceeds the exact supported range · totals and chart withheld';
-  const aggregateMoney = (value: string) =>
+  const aggregateMoney = (value: string | bigint) =>
     aggregateCurrency.kind === 'available'
       ? formatMoney({
           currency: aggregateCurrency.currency,
-          minor: value,
+          minor: minor(value.toString()).toString(),
         })
       : '—';
   const selectedAccountLabel =
@@ -1832,7 +1835,9 @@ const WorkspaceFinanceScreen = ({
               <div>
                 <span className="fw-label">Net movement</span>
                 <div className="fw-value">
-                  {aggregateMoney(moneyInMinor - moneyOutMinor)}
+                  {aggregateMoney(
+                    netMovementMinor(moneyInMinor, moneyOutMinor),
+                  )}
                 </div>
               </div>
             </div>

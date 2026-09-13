@@ -1,6 +1,9 @@
 import { currency, minor, type Currency } from '../contracts/money';
 import type { WorkspaceFinanceFact } from './workspace-finance-data';
 
+export const netMovementMinor = (inflow: string, outflow: string): string =>
+  minor((minor(inflow) - minor(outflow)).toString()).toString();
+
 export const workspaceAggregateCurrency = (
   facts: readonly WorkspaceFinanceFact[],
   truncated: boolean,
@@ -13,10 +16,7 @@ export const workspaceAggregateCurrency = (
     }
   | {
       kind:
-        | 'truncated'
-        | 'mixed'
-        | 'currency-unavailable'
-        | 'money-unavailable';
+        'truncated' | 'mixed' | 'currency-unavailable' | 'money-unavailable';
     }
 > => {
   if (truncated) return { kind: 'truncated' };

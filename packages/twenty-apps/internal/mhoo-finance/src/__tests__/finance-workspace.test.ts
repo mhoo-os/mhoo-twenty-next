@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import { workspaceAggregateCurrency } from '../investigation/workspace-aggregate';
+import {
+  netMovementMinor,
+  workspaceAggregateCurrency,
+} from '../investigation/workspace-aggregate';
 import type { WorkspaceFinanceFact } from '../investigation/workspace-finance-data';
 
 import {
@@ -72,6 +75,12 @@ describe('Finance workspace cash-direction timeline', () => {
         false,
       ),
     ).toEqual({ kind: 'money-unavailable' });
+  });
+
+  it('keeps net movement as canonical minor-unit text', () => {
+    expect(netMovementMinor('612500', '562500')).toBe('50000');
+    expect(netMovementMinor('12500', '12500')).toBe('0');
+    expect(netMovementMinor('0', '12500')).toBe('-12500');
   });
   it('keeps Jan-Jun all-account totals exact and includes one unknown direction', () => {
     const rows = financeTimelineRows(
