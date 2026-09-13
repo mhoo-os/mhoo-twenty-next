@@ -100,6 +100,40 @@ describe('append-only Workspace investigation events', () => {
     expect(post).not.toHaveBeenCalled();
   });
 
+  it('returns an exact stored event on idempotent replay without another write', async () => {
+    const stored = {
+      id: EVENT,
+      eventKey: EVENT,
+      aggregateKind: 'INVESTIGATION_RUN',
+      aggregateReference: RUN,
+      sequence: 1,
+      eventType: 'RUN_OPENED',
+      eventPayload: JSON.stringify({ ruleSetVersion: 'v1', scopeHash: `sha256:${'a'.repeat(64)}` }),
+      previousEventReference: 'ROOT',
+      actorWorkspaceMemberId: MEMBER,
+      occurredAt: '2026-09-14T04:00:00.000Z',
+      nativeTaskReference: 'NONE',
+    };
+    const get = vi.fn().mockResolvedValue({ data: { financeInvestigationEvents: [stored] } });
+    const post = vi.fn();
+    await expect(
+      appendInvestigationEvent(
+        {
+          eventId: EVENT,
+          aggregateKind: 'INVESTIGATION_RUN',
+          aggregateReference: RUN,
+          expectedSequence: 0,
+          previousEventReference: null,
+          eventType: 'RUN_OPENED',
+          payload: { scopeHash: `sha256:${'a'.repeat(64)}`, ruleSetVersion: 'v1' },
+        },
+        { workspaceMemberId: MEMBER, now: () => new Date('2026-09-14T05:00:00.000Z') },
+        { get, post } as unknown as RestApiClient,
+      ),
+    ).resolves.toMatchObject({ id: EVENT, occurredAt: '2026-09-14T04:00:00.000Z' });
+    expect(post).not.toHaveBeenCalled();
+  });
+
   it('rejects an event kind on the wrong aggregate and malformed contradiction money', async () => {
     const client = { get: vi.fn(), post: vi.fn() } as unknown as RestApiClient;
     await expect(

@@ -183,12 +183,7 @@ export const appendInvestigationEvent = async (
     },
   });
   const latest = latestResponse.data.financeInvestigationEvents?.[0] ?? null;
-  if (
-    (latest && !isStoredEvent(latest)) ||
-    (latest?.sequence ?? 0) !== input.expectedSequence ||
-    (latest?.id ?? null) !== input.previousEventReference
-  ) throw new Error('Finance event stream changed since it was read');
-  const event: StoredEvent = {
+  const intendedBusinessFields = {
     id: input.eventId,
     eventKey: input.eventId,
     aggregateKind: input.aggregateKind,
@@ -198,8 +193,25 @@ export const appendInvestigationEvent = async (
     eventPayload,
     previousEventReference: input.previousEventReference ?? 'ROOT',
     actorWorkspaceMemberId: context.workspaceMemberId,
-    occurredAt: context.now().toISOString(),
     nativeTaskReference: input.nativeTaskReference ?? 'NONE',
+  } as const;
+  if (latest?.id === input.eventId) {
+    if (
+      !isStoredEvent(latest) ||
+      Object.entries(intendedBusinessFields).some(
+        ([key, value]) => latest[key as keyof StoredEvent] !== value,
+      )
+    ) throw new Error('Finance investigation event replay mismatch');
+    return Object.freeze({ ...latest });
+  }
+  if (
+    (latest && !isStoredEvent(latest)) ||
+    (latest?.sequence ?? 0) !== input.expectedSequence ||
+    (latest?.id ?? null) !== input.previousEventReference
+  ) throw new Error('Finance event stream changed since it was read');
+  const event: StoredEvent = {
+    ...intendedBusinessFields,
+    occurredAt: context.now().toISOString(),
   };
   try {
     await client.post('/rest/financeInvestigationEvents', event);

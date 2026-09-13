@@ -220,6 +220,8 @@ export const evaluateCloverFundingBridge = (input: Readonly<{
   const reserves = amount(input.reserveMinor);
   const payout = amount(input.payoutMinor);
   const bank = amount(input.bankDepositMinor);
+  if ([gross, tender, fees, reserves, payout, bank].some((value) => value < 0n))
+    throw new Error('Clover bridge components must be non-negative');
   const expectedPayout = minor((tender - fees - reserves).toString());
   const contradictions = [
     ...(gross === tender ? [] : ['GROSS_TENDER_MISMATCH']),
@@ -252,6 +254,8 @@ export const reduceBankLifecycle = (events: readonly BankLifecycleEvent[]) => {
   const current = new Map<string, boolean>();
   for (const event of ordered) {
     if (!nonEmpty(event.sourceRecordId)) throw new Error('Source record ID required');
+    if (event.state === 'REPLACED' && !event.replacesSourceRecordId)
+      throw new Error('Replacement source record required');
     if (event.replacesSourceRecordId) current.set(event.replacesSourceRecordId, false);
     current.set(event.sourceRecordId, event.state === 'POSTED' || event.state === 'REPLACED');
     if (event.state === 'REMOVED' || event.state === 'SUPERSEDED')
@@ -276,7 +280,18 @@ export const evaluatePeriodCompleteness = (
   expectedMonths: readonly string[],
   receipts: readonly MonthCoverage[],
 ) => {
-  if (!expectedMonths.length || new Set(expectedMonths).size !== expectedMonths.length)
+  const validMonth = (value: string) => /^\d{4}-(?:0[1-9]|1[0-2])$/.test(value);
+  if (!expectedMonths.length || new Set(expectedMonths).size !== expectedMonths.length ||
+      expectedMonths.some((month) => !validMonth(month)) ||
+      new Set(receipts.map((receipt) => receipt.month)).size !== receipts.length ||
+      receipts.some(
+        (receipt) =>
+          !expectedMonths.includes(receipt.month) ||
+          !validMonth(receipt.month) ||
+          (receipt.state === 'PROVEN_COMPLETE'
+            ? !receipt.receiptReference?.trim()
+            : receipt.state === 'MISSING' && receipt.receiptReference !== null),
+      ))
     throw new Error('Expected months must be unique');
   const byMonth = new Map(receipts.map((receipt) => [receipt.month, receipt]));
   const months = expectedMonths.map(
