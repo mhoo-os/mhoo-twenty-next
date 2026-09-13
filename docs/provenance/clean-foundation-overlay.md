@@ -550,3 +550,30 @@ to the same full default-domain welcome URL. These source tests prove the
 navigation contract only: rendered creation form, native creation authorization
 and actual Hass provisioning require separate runtime acceptance. This admission
 does not authorize deployment, schema changes, provider access or token intake.
+
+## Native social SSO creation intent
+
+The September 13 owner/coordinator-authorized follow-up to PR45 preserves
+explicit `action=create-new-workspace` through the existing Google/Microsoft
+buttons and the native global SSO return URL. The production files were already
+enumerated; this bounded increment adds only the two exact regression paths:
+
+- `packages/twenty-front/src/modules/auth/sign-in-up/components/SignInUpGlobalScopeForm.tsx`
+- `packages/twenty-front/src/modules/auth/sign-in-up/components/__tests__/SignInUpGlobalScopeForm.test.tsx`
+- `packages/twenty-server/src/engine/core-modules/auth/services/auth.service.ts`
+- `packages/twenty-server/src/engine/core-modules/auth/services/auth-social-sso-creation-intent.spec.ts`
+
+All other entry actions retain list behavior. The global return adds the action
+only for explicit creation, retains the exchange token in the fragment, and
+keeps Workspace-scoped SSO on its existing authorization path. Native creation
+defaults and server-admin enforcement are unchanged. No adjacent auth service
+or component directory is admitted.
+
+Base is deployed PR45 `133e67af8997c6300f9aaed517d463d13d3e4999`. A focused
+regression calls the actual AuthService and native domain URL builder: explicit
+creation failed for both Google and Microsoft before the fix, while list/join
+returns and the Workspace authorization branch passed. Live welcome is stable
+on PR45, but Google continuation returned without the creation action and did
+not expose the form. Dropped action is confirmed; the cause of any remaining
+token-redemption failure is not established. These regressions do not prove
+actual Hass provisioning, authorize a new deployment, or permit provider access.

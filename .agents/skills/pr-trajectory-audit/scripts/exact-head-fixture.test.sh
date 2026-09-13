@@ -631,6 +631,10 @@ done
 
 # AI editor repair and runner compatibility retain exact, bounded paths.
 repair_paths=(
+  packages/twenty-front/src/modules/auth/sign-in-up/components/SignInUpGlobalScopeForm.tsx
+  packages/twenty-front/src/modules/auth/sign-in-up/components/__tests__/SignInUpGlobalScopeForm.test.tsx
+  packages/twenty-server/src/engine/core-modules/auth/services/auth.service.ts
+  packages/twenty-server/src/engine/core-modules/auth/services/auth-social-sso-creation-intent.spec.ts
   packages/twenty-front/src/modules/domain-manager/hooks/useRedirect.ts
   packages/twenty-front/src/modules/domain-manager/hooks/__tests__/useRedirect.test.tsx
   packages/twenty-front/src/modules/workspace/components/WorkspaceProviderEffect.tsx
@@ -668,6 +672,11 @@ for path in "${repair_paths[@]}"; do
   bash "$fixture" HEAD "$candidate_head" >"$temporary_directory/ai-editor-output"
 done
 for path in \
+  packages/twenty-front/src/modules/auth/sign-in-up/components/__tests__/SignInUpGlobalScopeForm.test.tsx.backup \
+  packages/twenty-front/src/modules/auth/sign-in-up/components/__tests__/nested/SignInUpGlobalScopeForm.test.tsx \
+  packages/twenty-server/src/engine/core-modules/auth/services/auth-social-sso-creation-intent.spec.ts.backup \
+  packages/twenty-server/src/engine/core-modules/auth/services/nested/auth-social-sso-creation-intent.spec.ts \
+  packages/twenty-server/src/engine/core-modules/auth/services/adjacent-auth.service.ts \
   packages/twenty-front/src/modules/domain-manager/hooks/useRedirect.ts.backup \
   packages/twenty-front/src/modules/domain-manager/hooks/nested/useRedirect.ts \
   packages/twenty-front/src/modules/domain-manager/hooks/useRedirectToDefaultDomain.ts \

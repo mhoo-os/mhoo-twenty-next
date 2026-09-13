@@ -37,8 +37,11 @@ linear_status_allowed='^(docs/provenance/linear\-issue\-status\.md|packages/twen
 # Owner-authorized native default-domain repair: exact four files only.
 native_default_domain_allowed='^(packages/twenty-front/src/modules/domain-manager/hooks/useRedirect\.ts|packages/twenty-front/src/modules/domain-manager/hooks/__tests__/useRedirect\.test\.tsx|packages/twenty-front/src/modules/workspace/components/WorkspaceProviderEffect\.tsx|packages/twenty-front/src/modules/workspace/components/__tests__/WorkspaceProviderEffect\.selfRedirect\.test\.tsx)$'
 
+# Exact regression paths for the owner-authorized native SSO creation intent repair.
+native_sso_intent_allowed='^(packages/twenty-front/src/modules/auth/sign-in-up/components/__tests__/SignInUpGlobalScopeForm\.test\.tsx|packages/twenty-server/src/engine/core-modules/auth/services/auth-social-sso-creation-intent\.spec\.ts)$'
+
 git diff --name-only "$base" "$head" | while IFS= read -r path; do
-  [[ "$path" =~ $allowed || "$path" =~ $email_allowed || "$path" =~ $distribution_allowed || "$path" =~ $scanner_allowed || "$path" =~ $legal_allowed || "$path" =~ $evaluation_allowed || "$path" =~ $loader_allowed || "$path" =~ $graphql_allowed || "$path" =~ $clover_native_allowed || "$path" =~ $clover_upgrade_allowed || "$path" =~ $clover_allowed || "$path" =~ $startup_allowed || "$path" =~ $ai_editor_allowed || "$path" =~ $upstream_dispatch_allowed || "$path" =~ $linear_status_allowed || "$path" =~ $native_default_domain_allowed ]] || { printf 'trajectory fixture rejected: %s\n' "$path" >&2; exit 1; }
+  [[ "$path" =~ $allowed || "$path" =~ $email_allowed || "$path" =~ $distribution_allowed || "$path" =~ $scanner_allowed || "$path" =~ $legal_allowed || "$path" =~ $evaluation_allowed || "$path" =~ $loader_allowed || "$path" =~ $graphql_allowed || "$path" =~ $clover_native_allowed || "$path" =~ $clover_upgrade_allowed || "$path" =~ $clover_allowed || "$path" =~ $startup_allowed || "$path" =~ $ai_editor_allowed || "$path" =~ $upstream_dispatch_allowed || "$path" =~ $linear_status_allowed || "$path" =~ $native_default_domain_allowed || "$path" =~ $native_sso_intent_allowed ]] || { printf 'trajectory fixture rejected: %s\n' "$path" >&2; exit 1; }
 done
 
 assert_manual_only_workflow() {
