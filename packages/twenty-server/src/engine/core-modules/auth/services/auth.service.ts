@@ -987,6 +987,7 @@ export class AuthService {
       workspaceInviteHash,
       workspaceId,
       billingCheckoutSessionState,
+      action,
       locale,
       returnToPath,
     }: MicrosoftRequest['user'] | GoogleRequest['user'],
@@ -1027,6 +1028,7 @@ export class AuthService {
       const url = this.domainServerConfigService.buildBaseUrl({
         pathname: AppPath.SignInUp,
         searchParams: {
+          ...(action === 'create-new-workspace' ? { action } : {}),
           ...(isNonEmptyString(returnToPath) && returnToPath.startsWith('/')
             ? { returnToPath }
             : {}),
