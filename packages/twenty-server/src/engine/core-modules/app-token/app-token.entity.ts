@@ -99,6 +99,7 @@ export class AppTokenEntity {
       merchantId: string;
       userWorkspaceId: string;
       connectedAccountId?: string;
+      reconnectConnectedAccountId?: string;
     };
   } | null;
 }

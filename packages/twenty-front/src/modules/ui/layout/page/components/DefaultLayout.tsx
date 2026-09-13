@@ -5,6 +5,7 @@ import { FileUploadProvider } from '@/file-upload/components/FileUploadProvider'
 import { InformationBannerIsImpersonating } from '@/information-banner/components/impersonate/InformationBannerIsImpersonating';
 import { KeyboardShortcutMenu } from '@/keyboard-shortcut-menu/components/KeyboardShortcutMenu';
 import { LayoutCustomizationBar } from '@/layout-customization/components/LayoutCustomizationBar';
+import { CloverSetupPrompt } from '@/settings/accounts/components/CloverSetupPrompt';
 import { AppNavigationDrawer } from '@/navigation/components/AppNavigationDrawer';
 import { MobileNavigationBar } from '@/navigation/components/MobileNavigationBar';
 import { PageDragDropProvider } from '@/navigation-menu-item/display/dnd/providers/PageDragDropProvider';
@@ -82,6 +83,7 @@ export const DefaultLayout = () => {
         <StyledLayout>
           <AppErrorBoundary FallbackComponent={AppFullScreenErrorFallback}>
             <InformationBannerIsImpersonating />
+            <CloverSetupPrompt />
             <LayoutCustomizationBar />
             <StyledPageContainer>
               <PageDragDropProvider>
