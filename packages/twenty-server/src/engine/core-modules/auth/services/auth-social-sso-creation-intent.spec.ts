@@ -48,7 +48,7 @@ const setup = () => {
 };
 
 describe('social SSO workspace creation intent', () => {
-  it.each([AuthProviderEnum.Google, AuthProviderEnum.Microsoft])(
+  it.each([AuthProviderEnum.Google, AuthProviderEnum.Microsoft] as const)(
     'preserves explicit creation intent in the native %s return URL',
     async (provider) => {
       const { service, generateSSOExchangeToken, signUpWithoutWorkspace } =
