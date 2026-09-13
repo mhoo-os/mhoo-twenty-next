@@ -5,6 +5,8 @@ import {
   hasExactSelectedRecipients,
   isFinanceFollowUpTransitionAllowed,
   parseFinanceProvenance,
+  parseFinanceDraftEmail,
+  parseFinancePeople,
   type FinanceDraftEmail,
   type FinanceFollowUpState,
   type FinanceFollowUpPerson,
@@ -13,9 +15,11 @@ import {
 const UUID =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-type NativeTaskReceipt = Readonly<{
+export type NativeTaskReceipt = Readonly<{
   id?: unknown;
   financeScope?: unknown;
+  financeDraftEmail?: unknown;
+  financePeopleContext?: unknown;
   status?: unknown;
   financeFollowUpState?: unknown;
   financeEmailApproval?: unknown;
@@ -29,7 +33,7 @@ const FINANCE_SCOPE = 'MHOO_FINANCE_V1';
 
 // This is an additional row bound, never a grant. Twenty still authorizes the
 // caller through the native REST route. No application-identity fallback.
-const mutationFilter = (
+export const mutationFilter = (
   input: Readonly<{
     taskId: string;
     expectedRevision: number;
@@ -73,7 +77,7 @@ const validatedProvenance = (value: string | null) => {
   return parsed;
 };
 
-const readTaskReceipt = async (
+export const readTaskReceipt = async (
   taskId: string,
   client: RestApiClient,
 ): Promise<NativeTaskReceipt> => {
@@ -83,7 +87,7 @@ const readTaskReceipt = async (
   return response.data.task ?? {};
 };
 
-const assertFreshTask = (
+export const assertFreshTask = (
   receipt: NativeTaskReceipt,
   input: Readonly<{
     taskId: string;
@@ -108,7 +112,7 @@ const assertFreshTask = (
   }
 };
 
-const appendProvenance = (
+export const appendProvenance = (
   current: unknown,
   event: Readonly<Record<string, string>>,
 ) => {
@@ -215,11 +219,29 @@ export const approveWorkspaceFinanceDraft = async (
   if (before.financeEmailApproval !== input.from) {
     throw new Error('Finance email approval changed since it was read');
   }
+  const storedDraft =
+    typeof before.financeDraftEmail === 'string'
+      ? parseFinanceDraftEmail(before.financeDraftEmail)
+      : null;
+  const storedPeople =
+    typeof before.financePeopleContext === 'string'
+      ? parseFinancePeople(before.financePeopleContext)
+      : [];
+  if (
+    !storedDraft ||
+    JSON.stringify(storedDraft) !== JSON.stringify(input.draftEmail) ||
+    !hasExactSelectedRecipients(storedDraft, storedPeople)
+  ) {
+    throw new Error(
+      'Stored Finance draft or recipients changed; reload before approval',
+    );
+  }
   const operationId = input.operationId ?? crypto.randomUUID();
   if (!UUID.test(operationId))
     throw new Error('Invalid Finance operation identity');
   const expected = {
     financeEmailApproval: 'APPROVED_NOT_SENT',
+    financeDraftEmail: JSON.stringify(storedDraft),
     financeProvenanceHistory: appendProvenance(
       before.financeProvenanceHistory,
       {
@@ -239,6 +261,7 @@ export const approveWorkspaceFinanceDraft = async (
   if (
     receipt.id !== input.taskId ||
     receipt.financeScope !== FINANCE_SCOPE ||
+    receipt.financeDraftEmail !== expected.financeDraftEmail ||
     receipt.financeEmailApproval !== expected.financeEmailApproval ||
     receipt.financeProvenanceHistory !== expected.financeProvenanceHistory ||
     receipt.financeRevision !== expected.financeRevision ||

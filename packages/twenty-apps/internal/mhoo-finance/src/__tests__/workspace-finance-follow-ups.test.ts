@@ -42,6 +42,8 @@ describe('user-scoped native Task Finance mutations', () => {
             financeRevision: 0,
             financeFollowUpState: 'READY_FOR_REVIEW',
             financeEmailApproval: 'AWAITING_APPROVAL',
+            financeDraftEmail: JSON.stringify(draftEmail),
+            financePeopleContext: JSON.stringify(people),
           },
         },
       });
@@ -248,6 +250,8 @@ describe('user-scoped native Task Finance mutations', () => {
             updatedAt,
             financeFollowUpState: 'WAITING_FOR_REPLY',
             financeEmailApproval: 'AWAITING_APPROVAL',
+            financeDraftEmail: JSON.stringify(draftEmail),
+            financePeopleContext: JSON.stringify(people),
             financeRevision: 0,
             financeProvenanceHistory: null,
           },

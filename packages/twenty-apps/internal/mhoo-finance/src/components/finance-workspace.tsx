@@ -1,4 +1,6 @@
 import styled from '@emotion/styled';
+import type { RestApiClient } from 'twenty-client-sdk/rest';
+import { FinanceFollowUpActions } from './finance-follow-up-actions';
 import { useEffect, useRef, useState } from 'react';
 
 import { currency, formatMoney, minor } from '../contracts/money';
@@ -61,9 +63,8 @@ const PAGE_TITLES: Readonly<Record<FinanceView, string>> = {
   sources: 'Add a source',
 };
 
-// The source defines CAS/event contracts, but the current install candidate
-// intentionally grants reviewers no write authority. Enable only after an
-// installed, row-bounded mutation receipt is independently accepted.
+// Financial link-decision writes remain disabled. Native Task follow-ups use
+// their separate caller-scoped REST workflow and do not enable this route.
 const WORKSPACE_REVIEW_MUTATIONS_ENABLED = false;
 
 type BrushKind = 'move' | 'start' | 'end';
@@ -809,6 +810,25 @@ const Workspace = styled.section({
     paddingTop: '15px',
     borderTop: '1px solid var(--fw-line)',
   },
+  '& .fw-workflow-actions form': {
+    display: 'grid',
+    gap: '12px',
+    maxWidth: '700px',
+    marginBottom: '24px',
+  },
+  '& .fw-workflow-actions label': { display: 'grid', gap: '6px' },
+  '& .fw-workflow-actions input, & .fw-workflow-actions textarea, & .fw-workflow-actions select':
+    {
+      boxSizing: 'border-box',
+      maxWidth: '100%',
+      padding: '10px',
+      border: '1px solid var(--fw-line)',
+      borderRadius: '6px',
+      background: 'var(--fw-surface)',
+      color: 'var(--fw-text)',
+      font: 'inherit',
+    },
+  '& .fw-workflow-actions textarea': { minHeight: '110px' },
   '& .fw-followup-list': {
     display: 'grid',
     marginTop: '8px',
@@ -1145,9 +1165,14 @@ const parseStatementControls = (value: string | null) => {
 const WorkspaceFinanceScreen = ({
   initialView,
   dataOverride,
+  services,
 }: {
   initialView: Exclude<FinanceView, 'sources'>;
   dataOverride?: WorkspaceFinanceData;
+  services?: {
+    read: () => Promise<WorkspaceFinanceData>;
+    client: RestApiClient;
+  };
 }) => {
   const [loadState, setLoadState] = useState<WorkspaceLoadState>(
     dataOverride
@@ -1209,7 +1234,7 @@ const WorkspaceFinanceScreen = ({
       };
     }
     setLoadState({ kind: 'loading' });
-    readWorkspaceFinance()
+    (services?.read ?? readWorkspaceFinance)()
       .then((data) => {
         if (cancelled) return;
         setLoadState({ kind: 'ready', data });
@@ -1225,7 +1250,7 @@ const WorkspaceFinanceScreen = ({
     return () => {
       cancelled = true;
     };
-  }, [dataOverride, refresh]);
+  }, [dataOverride, refresh, services]);
 
   useEffect(() => {
     let cancelled = false;
@@ -1532,28 +1557,36 @@ const WorkspaceFinanceScreen = ({
     }
   };
 
+  const reloadFollowUp = async (id: string) => {
+    const updated = await (services?.read ?? readWorkspaceFinance)();
+    const task = updated.followUps.find((row) => row.id === id);
+    if (!task)
+      throw new Error(
+        'Saved Task is not visible after reload. Check permissions before retrying.',
+      );
+    setLoadState({ kind: 'ready', data: updated });
+    setSelectedFollowUp(task);
+    setView('followups');
+  };
+
   const transitionFollowUp = async (to: FinanceFollowUpState) => {
-    if (
-      !WORKSPACE_REVIEW_MUTATIONS_ENABLED ||
-      !selectedFollowUp ||
-      isSynthetic ||
-      followUpMutation === 'saving'
-    )
+    if (!selectedFollowUp || isSynthetic || followUpMutation === 'saving')
       return;
     setFollowUpMutation('saving');
     try {
-      await updateWorkspaceFinanceFollowUpState({
-        taskId: selectedFollowUp.id,
-        from: selectedFollowUp.state,
-        to,
-        expectedUpdatedAt: selectedFollowUp.updatedAt,
-        expectedRevision: selectedFollowUp.revision,
-        at: new Date().toISOString(),
-      });
-      setSelectedFollowUp(null);
-      setFollowUpDetailSection('summary');
+      await updateWorkspaceFinanceFollowUpState(
+        {
+          taskId: selectedFollowUp.id,
+          from: selectedFollowUp.state,
+          to,
+          expectedUpdatedAt: selectedFollowUp.updatedAt,
+          expectedRevision: selectedFollowUp.revision,
+          at: new Date().toISOString(),
+        },
+        services?.client,
+      );
+      await reloadFollowUp(selectedFollowUp.id);
       setFollowUpMutation('idle');
-      setRefresh((value) => value + 1);
     } catch (error) {
       setFollowUpMutation(financeFollowUpMutationFailure(error));
     }
@@ -1562,27 +1595,27 @@ const WorkspaceFinanceScreen = ({
   const approveFollowUpDraft = async () => {
     if (
       !selectedFollowUp?.draftEmail ||
-      !WORKSPACE_REVIEW_MUTATIONS_ENABLED ||
       isSynthetic ||
       followUpMutation === 'saving'
     )
       return;
     setFollowUpMutation('saving');
     try {
-      await approveWorkspaceFinanceDraft({
-        taskId: selectedFollowUp.id,
-        from: 'AWAITING_APPROVAL',
-        financeState: selectedFollowUp.state,
-        expectedUpdatedAt: selectedFollowUp.updatedAt,
-        expectedRevision: selectedFollowUp.revision,
-        draftEmail: selectedFollowUp.draftEmail,
-        people: selectedFollowUp.people,
-        at: new Date().toISOString(),
-      });
-      setSelectedFollowUp(null);
-      setFollowUpDetailSection('summary');
+      await approveWorkspaceFinanceDraft(
+        {
+          taskId: selectedFollowUp.id,
+          from: 'AWAITING_APPROVAL',
+          financeState: selectedFollowUp.state,
+          expectedUpdatedAt: selectedFollowUp.updatedAt,
+          expectedRevision: selectedFollowUp.revision,
+          draftEmail: selectedFollowUp.draftEmail,
+          people: selectedFollowUp.people,
+          at: new Date().toISOString(),
+        },
+        services?.client,
+      );
+      await reloadFollowUp(selectedFollowUp.id);
       setFollowUpMutation('idle');
-      setRefresh((value) => value + 1);
     } catch (error) {
       setFollowUpMutation(financeFollowUpMutationFailure(error));
     }
@@ -2128,12 +2161,13 @@ const WorkspaceFinanceScreen = ({
               Finance follow-ups are native Twenty Tasks with bounded Finance
               context. A reply or checked task is not proof of reconciliation.
             </p>
-            {!WORKSPACE_REVIEW_MUTATIONS_ENABLED ? (
-              <p className="fw-warning" role="status">
-                Review actions are read-only until installed, row-bounded
-                mutation authority is accepted.
-              </p>
-            ) : null}
+            <FinanceFollowUpActions
+              section="create"
+              data={data}
+              disabled={isSynthetic}
+              client={services?.client}
+              onSaved={reloadFollowUp}
+            />
             <div className="fw-followup-list" aria-label="Finance follow-ups">
               {data.followUps.map((followUp) => (
                 <button
@@ -2226,6 +2260,28 @@ const WorkspaceFinanceScreen = ({
               ))}
             </div>
 
+            <button
+              type="button"
+              className="fw-button"
+              disabled={followUpMutation === 'saving'}
+              onClick={() => {
+                setFollowUpMutation('saving');
+                void reloadFollowUp(selectedFollowUp.id)
+                  .then(() => setFollowUpMutation('idle'))
+                  .catch((error) =>
+                    setFollowUpMutation(financeFollowUpMutationFailure(error)),
+                  );
+              }}
+            >
+              Reload Task
+            </button>
+            {followUpMutation === 'denied' || followUpMutation === 'failed' ? (
+              <p role="alert" className="fw-warning">
+                {followUpMutation === 'denied'
+                  ? 'Twenty denied this action. Your permissions were not changed.'
+                  : 'The write could not be verified. Reload the Task before retrying.'}
+              </p>
+            ) : null}
             {followUpDetailSection === 'summary' ? (
               <section className="fw-detail-section" aria-label="Summary">
                 <h3>Question scope</h3>
@@ -2266,11 +2322,7 @@ const WorkspaceFinanceScreen = ({
                       <button
                         type="button"
                         className="fw-button"
-                        disabled={
-                          !WORKSPACE_REVIEW_MUTATIONS_ENABLED ||
-                          isSynthetic ||
-                          followUpMutation === 'saving'
-                        }
+                        disabled={isSynthetic || followUpMutation === 'saving'}
                         onClick={() =>
                           void transitionFollowUp('WAITING_FOR_REPLY')
                         }
@@ -2280,11 +2332,7 @@ const WorkspaceFinanceScreen = ({
                       <button
                         type="button"
                         className="fw-button"
-                        disabled={
-                          !WORKSPACE_REVIEW_MUTATIONS_ENABLED ||
-                          isSynthetic ||
-                          followUpMutation === 'saving'
-                        }
+                        disabled={isSynthetic || followUpMutation === 'saving'}
                         onClick={() =>
                           void transitionFollowUp('READY_FOR_REVIEW')
                         }
@@ -2297,11 +2345,7 @@ const WorkspaceFinanceScreen = ({
                       <button
                         type="button"
                         className="fw-button"
-                        disabled={
-                          !WORKSPACE_REVIEW_MUTATIONS_ENABLED ||
-                          isSynthetic ||
-                          followUpMutation === 'saving'
-                        }
+                        disabled={isSynthetic || followUpMutation === 'saving'}
                         onClick={() =>
                           void transitionFollowUp('READY_FOR_REVIEW')
                         }
@@ -2311,11 +2355,7 @@ const WorkspaceFinanceScreen = ({
                       <button
                         type="button"
                         className="fw-button"
-                        disabled={
-                          !WORKSPACE_REVIEW_MUTATIONS_ENABLED ||
-                          isSynthetic ||
-                          followUpMutation === 'saving'
-                        }
+                        disabled={isSynthetic || followUpMutation === 'saving'}
                         onClick={() => void transitionFollowUp('TO_DO')}
                       >
                         Return to do
@@ -2326,11 +2366,7 @@ const WorkspaceFinanceScreen = ({
                       <button
                         type="button"
                         className="fw-button"
-                        disabled={
-                          !WORKSPACE_REVIEW_MUTATIONS_ENABLED ||
-                          isSynthetic ||
-                          followUpMutation === 'saving'
-                        }
+                        disabled={isSynthetic || followUpMutation === 'saving'}
                         onClick={() =>
                           void transitionFollowUp('WAITING_FOR_REPLY')
                         }
@@ -2340,11 +2376,7 @@ const WorkspaceFinanceScreen = ({
                       <button
                         type="button"
                         className="fw-button"
-                        disabled={
-                          !WORKSPACE_REVIEW_MUTATIONS_ENABLED ||
-                          isSynthetic ||
-                          followUpMutation === 'saving'
-                        }
+                        disabled={isSynthetic || followUpMutation === 'saving'}
                         onClick={() => void transitionFollowUp('RESOLVED')}
                       >
                         Resolve after review
@@ -2354,11 +2386,7 @@ const WorkspaceFinanceScreen = ({
                     <button
                       type="button"
                       className="fw-button"
-                      disabled={
-                        !WORKSPACE_REVIEW_MUTATIONS_ENABLED ||
-                        isSynthetic ||
-                        followUpMutation === 'saving'
-                      }
+                      disabled={isSynthetic || followUpMutation === 'saving'}
                       onClick={() =>
                         void transitionFollowUp('READY_FOR_REVIEW')
                       }
@@ -2367,14 +2395,9 @@ const WorkspaceFinanceScreen = ({
                     </button>
                   )}
                 </div>
-                {!WORKSPACE_REVIEW_MUTATIONS_ENABLED ? (
+                {isSynthetic ? (
                   <p className="fw-local" role="status">
-                    Task actions remain read-only in this install candidate.
-                  </p>
-                ) : isSynthetic ? (
-                  <p className="fw-local">
-                    Synthetic adapter is read-only; no mock state transition is
-                    shown.
+                    This static sample is read-only.
                   </p>
                 ) : followUpMutation === 'denied' ? (
                   <p className="fw-local" role="status">
@@ -2391,6 +2414,15 @@ const WorkspaceFinanceScreen = ({
 
             {followUpDetailSection === 'people' ? (
               <section className="fw-detail-section" aria-label="People">
+                <FinanceFollowUpActions
+                  key={`${selectedFollowUp.id}:people:${selectedFollowUp.revision}`}
+                  section="people"
+                  task={selectedFollowUp}
+                  data={data}
+                  disabled={isSynthetic}
+                  client={services?.client}
+                  onSaved={reloadFollowUp}
+                />
                 <p className="fw-page-note">
                   People are shown only when requested. Being listed here does
                   not grant Workspace membership or Finance-record access.
@@ -2416,6 +2448,15 @@ const WorkspaceFinanceScreen = ({
 
             {followUpDetailSection === 'evidence' ? (
               <section className="fw-detail-section" aria-label="Evidence">
+                <FinanceFollowUpActions
+                  key={`${selectedFollowUp.id}:evidence:${selectedFollowUp.revision}`}
+                  section="evidence"
+                  task={selectedFollowUp}
+                  data={data}
+                  disabled={isSynthetic}
+                  client={services?.client}
+                  onSaved={reloadFollowUp}
+                />
                 <p className="fw-page-note">
                   Replies and attachments stay attributed to their source.
                   Ambiguous correlation requires review and private replies are
@@ -2445,10 +2486,20 @@ const WorkspaceFinanceScreen = ({
 
             {followUpDetailSection === 'email' ? (
               <section className="fw-detail-section" aria-label="Email">
+                <FinanceFollowUpActions
+                  key={`${selectedFollowUp.id}:email:${selectedFollowUp.revision}`}
+                  section="email"
+                  task={selectedFollowUp}
+                  data={data}
+                  disabled={isSynthetic}
+                  client={services?.client}
+                  onSaved={reloadFollowUp}
+                />
                 <p className="fw-page-note">
-                  A draft must show its authorized mailbox, selected recipients,
-                  exact body and attachments before approval. This build does
-                  not send email or request new mailbox scopes.
+                  A draft must show its intended sender, selected recipients,
+                  exact body and attachments before approval. The sender label
+                  is planned, not a verified mailbox. This build does not send
+                  email or request new mailbox scopes.
                 </p>
                 {selectedFollowUp.draftEmail ? (
                   <div className="fw-email-preview">
@@ -2488,7 +2539,6 @@ const WorkspaceFinanceScreen = ({
                           className="fw-button"
                           disabled={
                             isSynthetic ||
-                            !WORKSPACE_REVIEW_MUTATIONS_ENABLED ||
                             followUpMutation === 'saving' ||
                             !hasExactSelectedRecipients(
                               selectedFollowUp.draftEmail,
@@ -2509,8 +2559,8 @@ const WorkspaceFinanceScreen = ({
                   </div>
                 ) : (
                   <div className="fw-empty">
-                    No validated email draft is available. Composition and send
-                    remain unsupported in this increment.
+                    No saved draft yet. Compose a request above, then review its
+                    reloaded preview.
                   </div>
                 )}
                 <p className="fw-local">
@@ -2736,10 +2786,15 @@ const WorkspaceFinanceScreen = ({
 export const FinanceWorkspace = ({
   initialView = 'overview',
   dataSource = 'workspace',
+  services,
 }: {
   onExit?: () => void;
   initialView?: Exclude<FinanceView, 'sources'>;
   dataSource?: 'workspace' | 'synthetic';
+  services?: {
+    read: () => Promise<WorkspaceFinanceData>;
+    client: RestApiClient;
+  };
 }) =>
   dataSource === 'synthetic' ? (
     <WorkspaceFinanceScreen
@@ -2747,5 +2802,5 @@ export const FinanceWorkspace = ({
       initialView={initialView}
     />
   ) : (
-    <WorkspaceFinanceScreen initialView={initialView} />
+    <WorkspaceFinanceScreen initialView={initialView} services={services} />
   );

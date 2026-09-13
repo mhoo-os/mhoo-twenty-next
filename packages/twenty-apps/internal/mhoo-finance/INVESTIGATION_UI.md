@@ -179,3 +179,14 @@ references must be present before `APPROVED_NOT_SENT` can be recorded. No send,
 invite, upload, mailbox-scope or automatic reply-correlation action exists in
 this source candidate. Ambiguous correlation stays review-only and private
 replies are not automatically exposed to other participants.
+
+
+## Follow-ups workflow continuation — 2026-09-14
+
+The functioning source workflow supersedes earlier disabled native Task actions.
+See the current section of `PROFESSIONAL_METHOD_ACCEPTANCE.md` for exact source
+behavior, synthetic browser evidence and remaining installed gates. Forms now
+create Tasks, choose People, submit explanations, attach retained references,
+save and approve exact drafts without sending, and explicitly link/review a reply
+Note. Native role manifests remain unchanged. This is not immutable event-store,
+provider ingestion, uploaded-file custody or installed Workspace proof.

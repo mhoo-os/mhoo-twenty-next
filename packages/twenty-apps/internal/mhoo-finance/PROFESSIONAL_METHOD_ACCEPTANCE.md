@@ -1,5 +1,72 @@
 # Professional investigation method acceptance map
 
+## Current source workflow — 2026-09-14 continuation
+
+ARCHITECTURE IMPACT: LOCAL. This section supersedes earlier read-only UI status
+for native Task Follow-ups only. User explicitly resumed the functioning source
+workflow from `5b58e0ee5889e201398d5bb30557b7e9e33b1ca7`; same owner, worktree,
+branch, MHO-7/MHO-135/MHO-146 and Delivery Room `finance-native-review-ui`.
+
+Implemented and wired to the actual Finance UI:
+
+- Create one native Task from a readable active transaction and a neutral question.
+  The caller's existing native Task permission is required. An uncertain creation
+  retains its UUID and exact request; receipt verification precedes success.
+- Choose a readable existing Person (bounded first 50), record their role and
+  explicit recipient selection without invitation or a grant.
+- Submit an explicitly unverified explanation shared with Task readers, or attach
+  a retained SourceArtifact reference after checking readable ID, hash and status.
+  These are reference attachments, not new uploaded bytes or original Files proof.
+- Persist exact sender label, recipients, subject, body and source-reference
+  attachments; reset approval on edits; approve only the reloaded stored draft.
+  `APPROVED_NOT_SENT` has no mailbox or send effect. Sender label is not mailbox
+  authorization. Recipients do not acquire source access from a draft reference.
+- Manually propose a readable native Note as a reply reference, confirming the
+  exact Task key and explicit sharing. Note content is not copied; mailbox origin
+  remains unverified. Accept only the selected evidence kind/reference pair.
+- Review/resolve/reopen native Task state with no reconciliation effect. Resolved
+  Tasks must reopen before changing evidence or a request. Reload and denial/error
+  controls are visible; failed writes are not optimistically displayed as saved.
+
+All writes use native caller-scoped REST permissions; role manifests, application
+writer and public event routes are unchanged. Generic Task permissions remain the
+host authority. Client validation is not an independent security boundary or an
+immutable ledger. Native Task createdBy/updatedBy describe host record activity;
+Task JSON history does not prove durable per-event actor/time immutability or
+importer/reviewer segregation. Source reference/hash provenance and user assertions
+stay distinct. Same-millisecond edits outside financeRevision remain a concurrency
+limit. Runtime authorization is not inferred from the SDK runAs option.
+
+Verification: 50 focused tests across workflow, existing Task adapter, read adapter
+and follow-up contract; changed-file lint, test-project typecheck and native App
+build. Baseline 271-test/build/UI receipts are reused for unchanged behavior.
+Independent source review accepted the corrected workflow: exact evidence identity,
+full-list review, uncertain creation custody, stored approval and visible failures.
+The previously suspected second-create defect was withdrawn after verifying the
+create form unmounts; explicit reset is retained defensively.
+
+Local browser proof uses `node scripts/preview-follow-up-workflow.mjs`, loopback
+port 4347. It renders the real UI and actual REST adapters against the explicit
+synthetic transport under `src/__tests__/fixtures/follow-up-test-host.ts`; local
+browser storage retains only synthetic Tasks across reload. Verified creation,
+Person choice, explanation, hash-backed attachment, exact multiline draft,
+approved-not-sent persistence after reload, explicit reply linking, denied review
+with unchanged evidence, successful review, resolution and a second distinct Task.
+Desktop light and 390px dark forms were inspected; document width equals 390px.
+This preview is not a Twenty installation or a hosted authorization receipt.
+
+Exact remaining runtime gate: separately authorized disposable-Workspace install
+and allowed/denied identities across Task, Person, SourceArtifact and Note access;
+real REST create/update/readback, scope switching, persistence after reload and
+concurrency, native Files availability, Remote DOM form behavior and dark theme.
+The shipped Finance reviewer remains read-only: it should deny these writes until
+a separately authorized native role policy permits them. No new grant is made by
+this source increment. Immutable investigation-event persistence and per-event
+host actor custody remain separate unimplemented acceptance requirements.
+Provider ingestion, mailbox reply ingestion, sending, live customer PDFs, grants,
+install/deployment/merge/push remain outside this assignment. No external gate is
+reported as passed. Coordinator owns those decisions; no duplicate lead exists.
+
 ## Bounded lead handoff — 2026-09-14
 
 Delivery Room `finance-native-review-ui`, primary MHO-7, related MHO-135/MHO-146.
