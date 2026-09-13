@@ -456,16 +456,15 @@ const FinanceFixturePreview = () => {
 };
 
 export const FinanceWorkspacePreparation = () => {
-  const [showExample, setShowExample] = useState(false);
-  const [showQuestionDemo, setShowQuestionDemo] = useState(false);
-  if (showQuestionDemo)
-    return <FinanceQuestionPrototype onExit={() => setShowQuestionDemo(false)} />;
-  if (showExample)
+  const [mode, setMode] = useState<'review' | 'setup' | 'fixture'>('review');
+  if (mode === 'review')
+    return <FinanceQuestionPrototype onExit={() => setMode('setup')} />;
+  if (mode === 'fixture')
     return (
       <>
         <Button
           title="Back to workspace preparation"
-          onClick={() => setShowExample(false)}
+          onClick={() => setMode('setup')}
         />
         <FinanceFixturePreview />
       </>
@@ -522,11 +521,11 @@ export const FinanceWorkspacePreparation = () => {
         />
         <Button
           title="Open synthetic example"
-          onClick={() => setShowExample(true)}
+          onClick={() => setMode('fixture')}
         />
         <Button
-          title="Explore the question-to-evidence demo"
-          onClick={() => setShowQuestionDemo(true)}
+          title="Open the Finance review reference"
+          onClick={() => setMode('review')}
         />
       </Section>
     </StyledDashboard>
@@ -538,6 +537,6 @@ export default defineFrontComponent({
     FINANCE_AUDIT_DASHBOARD_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER,
   name: 'finance-audit-dashboard',
   description:
-    'Empty-first Finance preparation with an explicit synthetic review example.',
+    'Synthetic Finance review reference with explicit setup and fixture views.',
   component: FinanceWorkspacePreparation,
 });

@@ -4,6 +4,31 @@ ARCHITECTURE IMPACT: LOCAL
 
 ## Hass product walkthrough — 2026-09-13 local source
 
+### Registered Finance review reference — 2026-09-14
+
+The Overview page layout's existing registered front-component now opens on the
+synthetic review reference instead of hiding it behind workspace preparation.
+The first screen presents bounded needs-attention queues, then preserves the
+existing exact chart-to-transaction-to-source trail and adds an explicit local
+review decision beside the selected evidence. Setup and the older fixture
+dashboard remain reachable from the reference; no competing Finance UI was
+introduced.
+
+The local preview script now imports `FinanceWorkspacePreparation` from the
+registered `finance-audit-dashboard.front-component.tsx` entry rather than
+rendering `FinanceQuestionPrototype` directly. This proves that the same source
+entry builds and is viewable as ordinary React. It still does not prove Twenty
+Remote DOM execution, installation, Workspace navigation, role enforcement,
+live records, provider access, persistence or deployment. Review decisions are
+browser-local simulation only and make no Twenty write.
+
+The queue and decision shape follows the bounded public-pattern review for this
+increment: show missing evidence, unmatched money, contradictory sources and
+human review before totals; reveal exact contributing records and source
+locators; keep uncertainty visible; require a separate production-grade review
+receipt before any decision could persist. No vendor risk score, autonomous
+finding, journal automation, message send or provider behavior is copied.
+
 The retained local `FinanceQuestionPrototype` now tells one coherent story:
 historical source inventory, present question-to-evidence review, reconciliation
 of duplicates/transfers/refunds/fees/settlements/invoice candidates, and future

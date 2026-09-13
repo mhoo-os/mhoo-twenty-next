@@ -43,7 +43,8 @@ export const DEMO_SOURCE_LANES: readonly DemoSourceLane[] = [
     basis: 'Filed basis shown; reporting basis remains separate',
     status: 'PARTIAL',
     provenance: 'invented-return-2024.pdf · demo checksum',
-    limitation: 'A filed return is a historical source, not proof of current-year activity.',
+    limitation:
+      'A filed return is a historical source, not proof of current-year activity.',
   },
   {
     id: 'bank',
@@ -52,7 +53,8 @@ export const DEMO_SOURCE_LANES: readonly DemoSourceLane[] = [
     basis: 'Transaction date; statement controls unavailable',
     status: 'REVIEWABLE',
     provenance: 'demo-v1-invented-transactions.csv · rows 2–8',
-    limitation: 'Plaid-style rows do not prove statement completeness or account ownership.',
+    limitation:
+      'Plaid-style rows do not prove statement completeness or account ownership.',
   },
   {
     id: 'clover',
@@ -61,7 +63,8 @@ export const DEMO_SOURCE_LANES: readonly DemoSourceLane[] = [
     basis: 'Sale date kept separate from bank settlement date',
     status: 'NOT_CONNECTED',
     provenance: 'illustrative settlement packet only',
-    limitation: 'No live merchant, token, import, payout coverage or connection is represented.',
+    limitation:
+      'No live merchant, token, import, payout coverage or connection is represented.',
   },
   {
     id: 'email',
@@ -70,7 +73,8 @@ export const DEMO_SOURCE_LANES: readonly DemoSourceLane[] = [
     basis: 'Document and message dates; payment date remains separate',
     status: 'PARTIAL',
     provenance: 'invented invoice excerpt · no mailbox custody',
-    limitation: 'CRM email sync is not a complete invoice, vendor or payment-evidence archive.',
+    limitation:
+      'CRM email sync is not a complete invoice, vendor or payment-evidence archive.',
   },
 ];
 
@@ -83,46 +87,108 @@ export type DemoReconciliationItem = {
   uncertainty: string;
 };
 
+export type DemoAttentionItem = {
+  id: string;
+  label: string;
+  count: number;
+  status: 'NEEDS_EVIDENCE' | 'UNCLASSIFIED' | 'PARTIAL_MATCH' | 'HUMAN_REVIEW';
+  explanation: string;
+};
+
+export const DEMO_ATTENTION_ITEMS: readonly DemoAttentionItem[] = [
+  {
+    id: 'missing-evidence',
+    label: 'Missing evidence',
+    count: 1,
+    status: 'NEEDS_EVIDENCE',
+    explanation:
+      'One contributing transaction has a locator but no source excerpt.',
+  },
+  {
+    id: 'unmatched-money',
+    label: 'Unmatched money',
+    count: 1,
+    status: 'UNCLASSIFIED',
+    explanation:
+      'One movement stays unclassified until both sides or a source are reviewed.',
+  },
+  {
+    id: 'contradictory-sources',
+    label: 'Contradictory sources',
+    count: 1,
+    status: 'PARTIAL_MATCH',
+    explanation:
+      'Gross Clover activity and a net bank deposit must not be forced to agree.',
+  },
+  {
+    id: 'human-review',
+    label: 'Human review',
+    count: 1,
+    status: 'HUMAN_REVIEW',
+    explanation:
+      'An invoice and bank-payment candidate need an explicit reviewer decision.',
+  },
+];
+
 export const DEMO_RECONCILIATION_ITEMS: readonly DemoReconciliationItem[] = [
   {
     id: 'duplicate-export',
     title: 'Repeated bank / Plaid export',
     status: 'MATCHED',
-    treatment: 'Suppress the repeated acquisition; keep both import receipts and one eligible fact.',
+    treatment:
+      'Suppress the repeated acquisition; keep both import receipts and one eligible fact.',
     evidence: 'Stable source identity plus matching content and row keys.',
-    uncertainty: 'A similar description or amount alone never proves a duplicate.',
+    uncertainty:
+      'A similar description or amount alone never proves a duplicate.',
   },
   {
     id: 'internal-transfer',
     title: 'Operating → reserve transfer',
     status: 'MATCHED',
-    treatment: 'Pair both sides and exclude the internal movement from revenue and expense.',
-    evidence: 'Opposite signed entries, compatible dates, currency and owned-account scope.',
-    uncertainty: 'One visible side remains an unclassified movement, not an expense.',
+    treatment:
+      'Pair both sides and exclude the internal movement from revenue and expense.',
+    evidence:
+      'Opposite signed entries, compatible dates, currency and owned-account scope.',
+    uncertainty:
+      'One visible side remains an unclassified movement, not an expense.',
   },
   {
     id: 'clover-settlement',
     title: 'Clover settlement → bank deposit',
     status: 'PARTIAL',
-    treatment: 'Bridge gross sales, refunds and processor fees before comparing the net deposit.',
-    evidence: 'Illustrative settlement components and one bank deposit candidate.',
-    uncertainty: 'Do not force gross sales to equal a net deposit or collapse fees and refunds.',
+    treatment:
+      'Bridge gross sales, refunds and processor fees before comparing the net deposit.',
+    evidence:
+      'Illustrative settlement components and one bank deposit candidate.',
+    uncertainty:
+      'Do not force gross sales to equal a net deposit or collapse fees and refunds.',
   },
   {
     id: 'invoice-payment',
     title: 'Vendor invoice → bank payment',
     status: 'HUMAN_REVIEW',
-    treatment: 'Show ranked candidates with reasons; a reviewer accepts, rejects or requests evidence.',
+    treatment:
+      'Show ranked candidates with reasons; a reviewer accepts, rejects or requests evidence.',
     evidence: 'Vendor, amount and date proximity from invented excerpts.',
-    uncertainty: 'Email presence is supporting evidence, not payment proof or a complete mailbox search.',
+    uncertainty:
+      'Email presence is supporting evidence, not payment proof or a complete mailbox search.',
   },
 ];
 
 export const DEMO_FORECAST_ASSUMPTIONS = [
-  ['Actuals baseline', 'Requires reviewed, sufficiently covered source periods'],
-  ['Revenue pattern', 'Use approved historical sales definition; do not substitute bank deposits'],
+  [
+    'Actuals baseline',
+    'Requires reviewed, sufficiently covered source periods',
+  ],
+  [
+    'Revenue pattern',
+    'Use approved historical sales definition; do not substitute bank deposits',
+  ],
   ['Cost pattern', 'Keep fixed, variable, refund and fee behavior explicit'],
-  ['Scenario changes', 'Human-entered assumptions with author, as-of date and version'],
+  [
+    'Scenario changes',
+    'Human-entered assumptions with author, as-of date and version',
+  ],
 ] as const;
 
 // Fixed invented data only. No client records, provider identifiers or Files.

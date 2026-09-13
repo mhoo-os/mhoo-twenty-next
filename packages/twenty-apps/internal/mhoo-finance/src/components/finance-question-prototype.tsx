@@ -3,6 +3,7 @@ import { useEffect, useReducer, useRef, useState } from 'react';
 import { Button } from 'twenty-ui/input';
 
 import {
+  DEMO_ATTENTION_ITEMS,
   DEMO_FORECAST_ASSUMPTIONS,
   DEMO_QUESTIONS,
   DEMO_RECONCILIATION_ITEMS,
@@ -61,7 +62,7 @@ const Shell = styled.section({
   },
   '& .mhoo-fq-story-nav': {
     display: 'grid',
-    gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+    gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
     gap: '10px',
     margin: '18px 0 24px',
   },
@@ -148,6 +149,24 @@ const Shell = styled.section({
     display: 'grid',
     gap: '10px',
     marginTop: '16px',
+  },
+  '& .mhoo-fq-attention-grid': {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 220px), 1fr))',
+    gap: '10px',
+    marginTop: '16px',
+  },
+  '& .mhoo-fq-attention-item': {
+    border: '1px solid #e1e5dc',
+    borderRadius: '12px',
+    padding: '16px',
+    background: '#fbfcf9',
+  },
+  '& .mhoo-fq-attention-count': {
+    fontSize: '25px',
+    fontWeight: 600,
+    lineHeight: 1,
+    margin: '12px 0 8px',
   },
   '& .mhoo-fq-review-item': {
     display: 'grid',
@@ -330,6 +349,9 @@ export const FinanceQuestionPrototype = ({
 }) => {
   const [state, dispatch] = useReducer(reduceDemo, initialDemoState);
   const [questionDraft, setQuestionDraft] = useState<string>(DEMO_QUESTIONS[0]);
+  const [reviewDecision, setReviewDecision] = useState<
+    'UNREVIEWED' | 'ACCEPTED' | 'REJECTED' | 'NEEDS_EVIDENCE'
+  >('UNREVIEWED');
   const sequence = useRef(0);
   const timers = useRef<Array<ReturnType<typeof setTimeout>>>([]);
   const request = (
@@ -376,6 +398,10 @@ export const FinanceQuestionPrototype = ({
     ) ?? []),
   );
 
+  useEffect(() => {
+    setReviewDecision('UNREVIEWED');
+  }, [trace?.row.id, trace?.snapshot]);
+
   return (
     <Shell aria-label="Finance question prototype">
       <header className="mhoo-fq-header">
@@ -397,30 +423,65 @@ export const FinanceQuestionPrototype = ({
         below is a demonstration.
       </div>
       <nav className="mhoo-fq-story-nav" aria-label="Finance walkthrough">
-        <a className="mhoo-fq-story-link" href="#finance-history">
-          <strong>1 · History</strong>
-          Collect source evidence without forcing it to agree.
+        <a className="mhoo-fq-story-link" href="#finance-attention">
+          <strong>1 · Needs attention</strong>
+          Start with the gaps that need a decision.
         </a>
         <a className="mhoo-fq-story-link" href="#finance-review">
-          <strong>2 · Review</strong>
-          Ask, inspect, reconcile and record uncertainty.
+          <strong>2 · Transactions</strong>
+          Inspect exactly which records contribute.
         </a>
-        <a className="mhoo-fq-story-link" href="#finance-planning">
-          <strong>3 · Planning</strong>
-          Build scenarios only from explicit assumptions.
+        <a className="mhoo-fq-story-link" href="#finance-evidence">
+          <strong>3 · Evidence</strong>
+          Follow a record to its original source locator.
+        </a>
+        <a className="mhoo-fq-story-link" href="#finance-next-action">
+          <strong>4 · Next action</strong>
+          Record a review decision without hiding uncertainty.
         </a>
       </nav>
+      <section
+        id="finance-attention"
+        className="mhoo-fq-card"
+        aria-label="Needs attention"
+      >
+        <div className="mhoo-fq-eyebrow">Needs attention / review queue</div>
+        <h2 className="mhoo-fq-heading">Four items need a human decision</h2>
+        <p className="mhoo-fq-muted">
+          These are fixture counts, not alerts or findings. Coverage gaps appear
+          before totals so missing evidence cannot look like certainty.
+        </p>
+        <div className="mhoo-fq-attention-grid">
+          {DEMO_ATTENTION_ITEMS.map((item) => (
+            <article className="mhoo-fq-attention-item" key={item.id}>
+              <span className="mhoo-fq-status" data-tone="review">
+                {item.status.replace('_', ' ')}
+              </span>
+              <div className="mhoo-fq-attention-count">{item.count}</div>
+              <strong>{item.label}</strong>
+              <p className="mhoo-fq-muted">{item.explanation}</p>
+              <a className="mhoo-fq-story-link" href="#finance-review">
+                Inspect contributing records →
+              </a>
+            </article>
+          ))}
+        </div>
+      </section>
       <section
         id="finance-history"
         className="mhoo-fq-card"
         aria-label="Historical evidence sources"
       >
-        <div className="mhoo-fq-eyebrow">History / what do we actually have?</div>
-        <h2 className="mhoo-fq-heading">One review, several independent sources</h2>
+        <div className="mhoo-fq-eyebrow">
+          History / what do we actually have?
+        </div>
+        <h2 className="mhoo-fq-heading">
+          One review, several independent sources
+        </h2>
         <p className="mhoo-fq-muted">
           Each source keeps its own period, basis and provenance. A tax return,
-          bank row, Clover sale and emailed invoice can support one another; none
-          is silently rewritten to make the others match.
+          bank row, Clover sale and emailed invoice can support one another;
+          none is silently rewritten to make the others match.
         </p>
         <div className="mhoo-fq-source-grid">
           {DEMO_SOURCE_LANES.map((source) => (
@@ -702,6 +763,7 @@ export const FinanceQuestionPrototype = ({
         </section>
       </div>
       <section
+        id="finance-evidence"
         className="mhoo-fq-card mhoo-fq-records"
         aria-label="Selected source evidence"
       >
@@ -745,10 +807,64 @@ export const FinanceQuestionPrototype = ({
         )}
       </section>
       <section
+        id="finance-next-action"
+        className="mhoo-fq-card mhoo-fq-records"
+        aria-label="Reviewed next action"
+      >
+        <div className="mhoo-fq-eyebrow">05 / reviewed next action</div>
+        <h2 className="mhoo-fq-heading">
+          Keep the decision beside its evidence
+        </h2>
+        {trace ? (
+          <>
+            <p className="mhoo-fq-muted">
+              Demo record {trace.row.id} · current local decision{' '}
+              <strong>{reviewDecision.replace('_', ' ')}</strong>. This choice
+              exists only in this browser preview and does not write to Twenty.
+            </p>
+            <div className="mhoo-fq-suggestions">
+              <button
+                type="button"
+                className="mhoo-fq-button"
+                onClick={() => setReviewDecision('ACCEPTED')}
+              >
+                Accept demo match
+              </button>
+              <button
+                type="button"
+                className="mhoo-fq-button"
+                onClick={() => setReviewDecision('REJECTED')}
+              >
+                Reject demo match
+              </button>
+              <button
+                type="button"
+                className="mhoo-fq-button"
+                onClick={() => setReviewDecision('NEEDS_EVIDENCE')}
+              >
+                Mark demo: needs evidence
+              </button>
+            </div>
+            <p className="mhoo-fq-muted">
+              Production acceptance still requires reviewer identity, rationale,
+              retained evidence and permission-checked persistence.
+            </p>
+          </>
+        ) : (
+          <p className="mhoo-fq-muted">
+            Select a contributing transaction and inspect its source before
+            recording a demo decision.
+          </p>
+        )}
+      </section>
+      <section
+        id="finance-reconciliation"
         className="mhoo-fq-card mhoo-fq-records"
         aria-label="Reconciliation review"
       >
-        <div className="mhoo-fq-eyebrow">Review / how disagreements are handled</div>
+        <div className="mhoo-fq-eyebrow">
+          Review / how disagreements are handled
+        </div>
         <h2 className="mhoo-fq-heading">Keep the difference visible</h2>
         <p className="mhoo-fq-muted">
           Deterministic rules propose treatment. Evidence and uncertainty travel
@@ -789,12 +905,15 @@ export const FinanceQuestionPrototype = ({
         className="mhoo-fq-card mhoo-fq-records"
         aria-label="Future planning assumptions"
       >
-        <div className="mhoo-fq-eyebrow">Planning / what could happen next?</div>
+        <div className="mhoo-fq-eyebrow">
+          Planning / what could happen next?
+        </div>
         <h2 className="mhoo-fq-heading">Scenario before forecast</h2>
         <p className="mhoo-fq-muted">
           This walkthrough does not calculate a forecast. The planned product
           first records the reviewed actuals baseline and every human-authored
-          assumption; then it can compare scenarios without presenting a promise.
+          assumption; then it can compare scenarios without presenting a
+          promise.
         </p>
         <div className="mhoo-fq-source-grid">
           {DEMO_FORECAST_ASSUMPTIONS.map(([label, value]) => (

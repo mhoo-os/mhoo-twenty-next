@@ -1,4 +1,4 @@
-// Local-only preview of the actual React component. No Workspace/API adapter.
+// Local-only preview of the registered Twenty front-component source. No Workspace/API adapter.
 import { build } from 'esbuild';
 import { createServer } from 'node:http';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
@@ -11,7 +11,7 @@ await mkdir(output, { recursive: true });
 await build({
   stdin: {
     contents:
-      "import React from 'react'; import {createRoot} from 'react-dom/client'; import {FinanceQuestionPrototype} from './src/components/finance-question-prototype'; createRoot(document.getElementById('root')).render(<FinanceQuestionPrototype />);",
+      "import React from 'react'; import {createRoot} from 'react-dom/client'; import {FinanceWorkspacePreparation} from './src/front-components/finance-audit-dashboard.front-component'; createRoot(document.getElementById('root')).render(<FinanceWorkspacePreparation />);",
     resolveDir: root,
     loader: 'tsx',
   },
@@ -20,13 +20,16 @@ await build({
   platform: 'browser',
   format: 'esm',
   jsx: 'automatic',
+  alias: { src: resolve(root, 'src') },
   define: { 'process.env.NODE_ENV': '"development"' },
 });
 await writeFile(
   resolve(output, 'index.html'),
-  '<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>mhoo Finance · synthetic question prototype</title></head><body style="margin:0;padding:24px;background:#eef0e9"><div id="root"></div><script type="module" src="/app.js"></script></body></html>',
+  '<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>mhoo Finance · registered front-component reference</title></head><body style="margin:0;padding:24px;background:#eef0e9"><div id="root"></div><script type="module" src="/app.js"></script></body></html>',
 );
-process.stdout.write('Built actual FinanceQuestionPrototype at ' + output + '\n');
+process.stdout.write(
+  'Built registered Finance front-component source at ' + output + '\n',
+);
 if (!process.argv.includes('--build-only')) {
   const routes = {
     '/': ['index.html', 'text/html'],
@@ -53,7 +56,7 @@ if (!process.argv.includes('--build-only')) {
   });
   server.listen(4331, '127.0.0.1', () =>
     process.stdout.write(
-      'Finance-only synthetic preview http://127.0.0.1:4331 · PID ' +
+      'Registered Finance front-component source preview http://127.0.0.1:4331 · PID ' +
         process.pid +
         '\n',
     ),

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  DEMO_ATTENTION_ITEMS,
   DEMO_FORECAST_ASSUMPTIONS,
   DEMO_QUESTIONS,
   DEMO_RECONCILIATION_ITEMS,
@@ -34,6 +35,19 @@ const ready = () =>
   );
 
 describe('synthetic question-to-evidence exploration', () => {
+  it('starts with bounded attention queues instead of unsupported risk scores', () => {
+    expect(DEMO_ATTENTION_ITEMS.map((item) => item.id)).toEqual([
+      'missing-evidence',
+      'unmatched-money',
+      'contradictory-sources',
+      'human-review',
+    ]);
+    expect(DEMO_ATTENTION_ITEMS.every((item) => item.count === 1)).toBe(true);
+    expect(
+      DEMO_ATTENTION_ITEMS.some((item) => item.status === 'HUMAN_REVIEW'),
+    ).toBe(true);
+  });
+
   it('keeps source periods, bases and provenance separate', () => {
     expect(DEMO_SOURCE_LANES.map((source) => source.id)).toEqual([
       'tax',
@@ -46,12 +60,12 @@ describe('synthetic question-to-evidence exploration', () => {
         (source) => source.period && source.basis && source.provenance,
       ),
     ).toBe(true);
-    expect(DEMO_SOURCE_LANES.find((source) => source.id === 'clover')).toMatchObject(
-      { status: 'NOT_CONNECTED' },
-    );
-    expect(DEMO_SOURCE_LANES.find((source) => source.id === 'email')?.limitation).toContain(
-      'not a complete',
-    );
+    expect(
+      DEMO_SOURCE_LANES.find((source) => source.id === 'clover'),
+    ).toMatchObject({ status: 'NOT_CONNECTED' });
+    expect(
+      DEMO_SOURCE_LANES.find((source) => source.id === 'email')?.limitation,
+    ).toContain('not a complete');
   });
 
   it('keeps duplicates, transfers, settlements and uncertain invoices explicit', () => {

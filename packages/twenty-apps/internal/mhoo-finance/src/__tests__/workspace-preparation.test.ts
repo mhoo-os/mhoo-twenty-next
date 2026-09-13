@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+
 import { describe, expect, it } from 'vitest';
 import account from '../objects/financial-account.object';
 import fact from '../objects/finance-fact.object';
@@ -6,13 +8,47 @@ import dashboard from '../page-layouts/finance-audit-dashboard.page-layout';
 import transactions from '../views/finance-facts.view';
 import * as I from '../constants/universal-identifiers';
 
+const frontComponentSource = readFileSync(
+  new URL(
+    '../front-components/finance-audit-dashboard.front-component.tsx',
+    import.meta.url,
+  ),
+  'utf8',
+);
+
 describe('workspace preparation', () => {
+  it('registers the review surface used by the Overview page layout', () => {
+    expect(frontComponentSource).toContain(
+      "useState<'review' | 'setup' | 'fixture'>('review')",
+    );
+    expect(frontComponentSource).toContain(
+      'component: FinanceWorkspacePreparation',
+    );
+    const widget = dashboard.config?.tabs
+      ?.flatMap((tab) => tab.widgets ?? [])
+      .find((candidate) => candidate.type === 'FRONT_COMPONENT');
+    expect(widget?.configuration).toMatchObject({
+      frontComponentUniversalIdentifier:
+        I.FINANCE_AUDIT_DASHBOARD_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER,
+    });
+  });
+
   it('declares both account/fact relation directions and account navigation', () => {
     expect(account.success).toBe(true);
     expect(fact.success).toBe(true);
     expect(navigation.success).toBe(true);
-    expect(account.config?.fields?.find(f => f.name === 'facts')).toMatchObject({ relationTargetFieldMetadataUniversalIdentifier: I.FINANCE_FACT_ACCOUNT_FIELD_UNIVERSAL_IDENTIFIER });
-    expect(fact.config?.fields?.find(f => f.name === 'financialAccount')).toMatchObject({ relationTargetFieldMetadataUniversalIdentifier: I.FINANCIAL_ACCOUNT_FACTS_FIELD_UNIVERSAL_IDENTIFIER });
+    expect(
+      account.config?.fields?.find((f) => f.name === 'facts'),
+    ).toMatchObject({
+      relationTargetFieldMetadataUniversalIdentifier:
+        I.FINANCE_FACT_ACCOUNT_FIELD_UNIVERSAL_IDENTIFIER,
+    });
+    expect(
+      fact.config?.fields?.find((f) => f.name === 'financialAccount'),
+    ).toMatchObject({
+      relationTargetFieldMetadataUniversalIdentifier:
+        I.FINANCIAL_ACCOUNT_FACTS_FIELD_UNIVERSAL_IDENTIFIER,
+    });
   });
 });
 
@@ -20,11 +56,28 @@ describe('workspace preparation', () => {
 describe('preparation dashboard financial limits', () => {
   it('uses record counts only until a qualified snapshot metric is connected', () => {
     const tabs = dashboard.config?.tabs ?? [];
-    const graphs = tabs.flatMap(tab => tab.widgets ?? []).filter(widget => widget.type === 'GRAPH');
+    const graphs = tabs
+      .flatMap((tab) => tab.widgets ?? [])
+      .filter((widget) => widget.type === 'GRAPH');
     expect(graphs).toHaveLength(4);
-    for (const widget of graphs) expect(widget.configuration).toMatchObject({ aggregateOperation: 'COUNT' });
-    expect(graphs.find(widget => widget.title === 'Unclassified records (count)')?.configuration).toMatchObject({
-      filter: { recordFilters: [{ fieldMetadataUniversalIdentifier: I.FINANCE_FACT_CLASSIFICATION_FIELD_UNIVERSAL_IDENTIFIER, operand: 'IS', value: '["UNCLASSIFIED"]' }] },
+    for (const widget of graphs)
+      expect(widget.configuration).toMatchObject({
+        aggregateOperation: 'COUNT',
+      });
+    expect(
+      graphs.find((widget) => widget.title === 'Unclassified records (count)')
+        ?.configuration,
+    ).toMatchObject({
+      filter: {
+        recordFilters: [
+          {
+            fieldMetadataUniversalIdentifier:
+              I.FINANCE_FACT_CLASSIFICATION_FIELD_UNIVERSAL_IDENTIFIER,
+            operand: 'IS',
+            value: '["UNCLASSIFIED"]',
+          },
+        ],
+      },
     });
   });
 });
@@ -33,9 +86,15 @@ describe('preparation dashboard financial limits', () => {
 describe('native transaction view contract', () => {
   it('keeps the object label identifier visible at the lowest position', () => {
     const fields = transactions.config?.fields ?? [];
-    const label = fields.find(field => field.fieldMetadataUniversalIdentifier === fact.config?.labelIdentifierFieldMetadataUniversalIdentifier);
+    const label = fields.find(
+      (field) =>
+        field.fieldMetadataUniversalIdentifier ===
+        fact.config?.labelIdentifierFieldMetadataUniversalIdentifier,
+    );
     expect(label).toBeDefined();
     expect(label?.isVisible).toBe(true);
-    expect(label?.position).toBe(Math.min(...fields.map(field => field.position)));
+    expect(label?.position).toBe(
+      Math.min(...fields.map((field) => field.position)),
+    );
   });
 });
