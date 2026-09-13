@@ -1,5 +1,30 @@
 # Professional investigation method acceptance map
 
+## Temporary API-key fallback inspection — 2026-09-14
+
+Coordinator relayed explicit user approval to obtain a narrowly scoped temporary
+Workspace API key for Hass Finance installation/testing, preferably existing,
+with minimum scope/expiry and revocation after use. No App role expansion or
+Oracle/server work was authorized to this lead. Oracle maintenance belongs only
+to `01a09b1a-36a5-7390-9821-1451d907d312`; this lead has performed or delegated
+no host operations and requested a safe timing acknowledgment before mutations.
+
+Fresh native UI at Hass Kitchen Settings → MCP & APIs → API lists no existing
+keys. The new-key form exposes only `Admin` and `WhatsApp function role` as
+assignable roles; expiration options start at `15 days` and default to `Never`.
+The form was inspected and cancelled unsaved. No key, grant, role, token export,
+plan/apply or customer/provider operation occurred.
+
+The coordinator received the concrete mismatch: there is no available narrow
+Finance installer key. A temporary Admin-scoped key with immediate revocation
+and a 15-day expiry cap needs explicit scope approval; an Applications-only
+installer role would instead require separately authorized role creation and
+verification that it supports the exact CLI operations. Neither choice was
+silently selected. Oracle's maintenance completion is a separate timing gate.
+Candidate App Task/People/Note permission and rollback prerequisites remain
+unchanged. This note supersedes the earlier blanket no-new-key authority only
+for the approved narrow temporary fallback; no credential has yet been created.
+
 ## Installed-target discovery — 2026-09-14 05:18 Bangkok
 
 Installation remains **NOT APPLIED**; real Follow-ups functional acceptance is
