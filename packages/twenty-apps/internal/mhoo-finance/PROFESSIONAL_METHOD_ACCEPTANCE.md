@@ -1,5 +1,65 @@
 # Professional investigation method acceptance map
 
+## Bounded lead handoff — 2026-09-14
+
+Delivery Room `finance-native-review-ui`, primary MHO-7, related MHO-135/MHO-146.
+New retained lead: `01a09cb1-b6c6-73b3-84c2-a167ea0c0ceb`; coordinator:
+`01a09c1e-fcec-7721-bafe-fd0ec677127c`. Previous lead
+`01a09b96-78c7-7362-a9b2-c8142cdf1261` remains in job history and is not archived
+because its other Clover ownership has not been checked.
+
+Implementation remains in `mhoo-os/mhoo-twenty-next`, fresh worktree
+`/Users/mhoooo/.codex/worktrees/90cd/mhoo-twenty-next`, branch
+`codex/finance-follow-up-mutation`, based directly on accepted commit
+`86ee71aaa38d7b64fc1d361150c58cc69ca28c1c`, tree
+`7c2797a58a9d3f13ab700bb1e5b8bf8c827543a0`. Instructions read through
+`AGENTS.md` → `CLAUDE.md` at that commit, plus delivery-flow. This file and
+`INVESTIGATION_UI.md` retain the acceptance/run ledger. No PR or push in this handoff.
+The product destination remains `finance-investigation-workspace`; migration is
+not part of this increment.
+
+Accepted baseline receipts retained from the previous lead: 271 tests,
+lint/typecheck/build/custody and three independent contract, permission/provenance,
+and desktop/mobile reviews. They are inherited source evidence, not rerun or
+installed proof. No workers or operations have been dispatched by the new lead.
+Job lead association transferred with revision check 10 → 11.
+
+Authorized next step: inspect Twenty's existing user-scoped, row-bounded route
+and implement the smallest source-only follow-up mutation improvement with
+changed-input tests. Installed authorization is still unproved; native Task
+creation, evidence attachments, persisted approved-not-sent drafts, reply
+correlation and provider ingestion remain open. The coordinator owns future
+authority decisions. No live grants, 42 Hass PDF imports, provider connections,
+email sending, install, deployment, merge or blind push. Preserve the read-only
+UI until its actual mutation prerequisites are satisfied.
+
+### First follow-up increment: exact native Task write bounds
+
+The existing `workspace-finance-follow-ups.ts` adapter now rejects a Task outside
+the exact `MHOO_FINANCE_V1` scope before either state or approval writes and in
+the final receipt. Native PATCH filters bind ID, scope, revision and `updatedAt`
+together. Invalid/overflowing revisions and noncanonical freshness timestamps
+are rejected before requests; native denials propagate without a retry under a
+different identity. This closes an adapter gap for callers who already possess
+native Task write permission; it grants none.
+
+Inspected host path: `RestApiCoreController` uses JWT, Workspace and custom
+permission guards; `RestApiUpdateManyHandler` carries the parsed filter and auth
+context into `CommonUpdateManyQueryRunnerService`; the common base runner builds
+the filtered mutation with native row-level permissions. The SDK's `runAs: user`
+selects its normal token channel (with the SDK's existing API-key fallback when
+that token is absent); no application writer or public Finance route is enabled.
+Do not infer an installed end-user identity receipt from that SDK option.
+
+Changed-input validation: 20 focused adapter tests pass, plus two-file lint and
+App test-project typecheck. Dependencies are reused through an ignored local
+node_modules symlink to the previous accepted worktree; tests execute this
+worktree's source. Unchanged 271-test baseline, build and UI reviews are retained.
+No UI changed. Task creation, attachments, exact draft-content persistence and
+immutable actor attribution still need a separately reviewed implementation;
+the legacy approval adapter is not acceptance of those features. Hosted route,
+role and concurrency proof remain open.
+
 ARCHITECTURE IMPACT: LOCAL
 
 This checkpoint maps the professional-method research into the transitional

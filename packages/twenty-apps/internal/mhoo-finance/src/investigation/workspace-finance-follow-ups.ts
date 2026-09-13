@@ -15,6 +15,7 @@ const UUID =
 
 type NativeTaskReceipt = Readonly<{
   id?: unknown;
+  financeScope?: unknown;
   status?: unknown;
   financeFollowUpState?: unknown;
   financeEmailApproval?: unknown;
@@ -23,6 +24,36 @@ type NativeTaskReceipt = Readonly<{
   financeRevision?: unknown;
   financeLastOperationId?: unknown;
 }>;
+
+const FINANCE_SCOPE = 'MHOO_FINANCE_V1';
+
+// This is an additional row bound, never a grant. Twenty still authorizes the
+// caller through the native REST route. No application-identity fallback.
+const mutationFilter = (
+  input: Readonly<{
+    taskId: string;
+    expectedRevision: number;
+    expectedUpdatedAt: string;
+  }>,
+) => {
+  if (
+    !Number.isSafeInteger(input.expectedRevision) ||
+    input.expectedRevision < 0 ||
+    input.expectedRevision >= Number.MAX_SAFE_INTEGER
+  ) {
+    throw new Error('Invalid Finance revision');
+  }
+  if (
+    !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(
+      input.expectedUpdatedAt,
+    ) ||
+    !Number.isFinite(Date.parse(input.expectedUpdatedAt)) ||
+    new Date(input.expectedUpdatedAt).toISOString() !== input.expectedUpdatedAt
+  ) {
+    throw new Error('Invalid Finance freshness timestamp');
+  }
+  return `and(id[eq]:${input.taskId},financeScope[eq]:${FINANCE_SCOPE},financeRevision[eq]:${input.expectedRevision},updatedAt[eq]:${input.expectedUpdatedAt})`;
+};
 
 const validatedProvenance = (value: string | null) => {
   if (!value) return [];
@@ -61,6 +92,9 @@ const assertFreshTask = (
     from: FinanceFollowUpState;
   }>,
 ) => {
+  if (receipt.financeScope !== FINANCE_SCOPE) {
+    throw new Error('Task is outside the Finance scope');
+  }
   if (!input.expectedUpdatedAt) {
     throw new Error('Finance follow-up freshness receipt is unavailable');
   }
@@ -108,10 +142,12 @@ export const updateWorkspaceFinanceFollowUpState = async (
   if (!isFinanceFollowUpTransitionAllowed(input.from, input.to)) {
     throw new Error('Invalid Finance follow-up transition');
   }
+  const filter = mutationFilter(input);
   const before = await readTaskReceipt(input.taskId, client);
   assertFreshTask(before, input);
   const operationId = input.operationId ?? crypto.randomUUID();
-  if (!UUID.test(operationId)) throw new Error('Invalid Finance operation identity');
+  if (!UUID.test(operationId))
+    throw new Error('Invalid Finance operation identity');
   const expected = {
     financeFollowUpState: input.to,
     status: financeNativeTaskStatus(input.to),
@@ -129,17 +165,18 @@ export const updateWorkspaceFinanceFollowUpState = async (
   } as const;
   await client.patch('/rest/tasks', expected, {
     query: {
-      filter: `and(id[eq]:${input.taskId},financeRevision[eq]:${input.expectedRevision})`,
+      filter,
     },
   });
   const receipt = await readTaskReceipt(input.taskId, client);
   if (
     receipt.id !== input.taskId ||
+    receipt.financeScope !== FINANCE_SCOPE ||
     receipt.financeFollowUpState !== expected.financeFollowUpState ||
     receipt.status !== expected.status ||
-    receipt.financeProvenanceHistory !== expected.financeProvenanceHistory
-    || receipt.financeRevision !== expected.financeRevision
-    || receipt.financeLastOperationId !== operationId
+    receipt.financeProvenanceHistory !== expected.financeProvenanceHistory ||
+    receipt.financeRevision !== expected.financeRevision ||
+    receipt.financeLastOperationId !== operationId
   ) {
     throw new Error('Finance follow-up state receipt mismatch');
   }
@@ -167,6 +204,7 @@ export const approveWorkspaceFinanceDraft = async (
   if (!hasExactSelectedRecipients(input.draftEmail, input.people)) {
     throw new Error('Finance email draft has no valid selected recipients');
   }
+  const filter = mutationFilter(input);
   const before = await readTaskReceipt(input.taskId, client);
   assertFreshTask(before, {
     taskId: input.taskId,
@@ -178,7 +216,8 @@ export const approveWorkspaceFinanceDraft = async (
     throw new Error('Finance email approval changed since it was read');
   }
   const operationId = input.operationId ?? crypto.randomUUID();
-  if (!UUID.test(operationId)) throw new Error('Invalid Finance operation identity');
+  if (!UUID.test(operationId))
+    throw new Error('Invalid Finance operation identity');
   const expected = {
     financeEmailApproval: 'APPROVED_NOT_SENT',
     financeProvenanceHistory: appendProvenance(
@@ -193,16 +232,17 @@ export const approveWorkspaceFinanceDraft = async (
   } as const;
   await client.patch('/rest/tasks', expected, {
     query: {
-      filter: `and(id[eq]:${input.taskId},financeRevision[eq]:${input.expectedRevision})`,
+      filter,
     },
   });
   const receipt = await readTaskReceipt(input.taskId, client);
   if (
     receipt.id !== input.taskId ||
+    receipt.financeScope !== FINANCE_SCOPE ||
     receipt.financeEmailApproval !== expected.financeEmailApproval ||
-    receipt.financeProvenanceHistory !== expected.financeProvenanceHistory
-    || receipt.financeRevision !== expected.financeRevision
-    || receipt.financeLastOperationId !== operationId
+    receipt.financeProvenanceHistory !== expected.financeProvenanceHistory ||
+    receipt.financeRevision !== expected.financeRevision ||
+    receipt.financeLastOperationId !== operationId
   ) {
     throw new Error('Finance email approval receipt mismatch');
   }
