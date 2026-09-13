@@ -9,6 +9,7 @@ import { useInitializeQueryParamState } from '@/app/hooks/useInitializeQueryPara
 import { useGetPublicWorkspaceDataByDomain } from '@/domain-manager/hooks/useGetPublicWorkspaceDataByDomain';
 import { useIsCurrentLocationOnDefaultDomain } from '@/domain-manager/hooks/useIsCurrentLocationOnDefaultDomain';
 import { isDefined } from 'twenty-shared/utils';
+import { AppPath } from 'twenty-shared/types';
 import { type WorkspaceUrls } from '~/generated-metadata/graphql';
 import { getWorkspaceUrl } from '~/utils/getWorkspaceUrl';
 
@@ -67,6 +68,11 @@ export const WorkspaceProviderEffect = () => {
     if (
       isMultiWorkspaceEnabled &&
       isDefaultDomain &&
+      !(
+        window.location.pathname === AppPath.SignInUp &&
+        new URLSearchParams(window.location.search).get('action') ===
+          'create-new-workspace'
+      ) &&
       isDefined(lastAuthenticatedWorkspaceDomain) &&
       'workspaceUrl' in lastAuthenticatedWorkspaceDomain &&
       isDefined(lastAuthenticatedWorkspaceDomain?.workspaceUrl)
