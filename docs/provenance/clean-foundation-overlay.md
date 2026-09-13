@@ -524,3 +524,29 @@ and regression paths above are admitted. Historical command names, order and
 receipts remain unchanged; retries require completed prior workspace-tail
 receipts. This corrects discovery for already completed 2.37 ledgers and does
 not admit cursor resets, replay-all, or deployment.
+
+## Native default-domain navigation repair
+
+The September 13 owner/coordinator-authorized native subdomain onboarding repair
+admits only these four additional paths:
+
+- `packages/twenty-front/src/modules/domain-manager/hooks/useRedirect.ts`
+- `packages/twenty-front/src/modules/domain-manager/hooks/__tests__/useRedirect.test.tsx`
+- `packages/twenty-front/src/modules/workspace/components/WorkspaceProviderEffect.tsx`
+- `packages/twenty-front/src/modules/workspace/components/__tests__/WorkspaceProviderEffect.selfRedirect.test.tsx`
+
+The shared redirect suppresses exact current-document navigation for the default
+or explicit `_self` target. Other destinations and window targets retain their
+behavior. Remembered Workspace restoration yields only to explicit
+`action=create-new-workspace` on the native sign-in/up route. Native Workspace
+authorization, creation defaults, configuration, credentials and provisioning
+remain unchanged. No adjacent hook/component directory is admitted.
+
+Source base is `902537a8162988528409cc917afa17a9884aff36`. The two production
+files and two tests had 12 passing focused tests, scoped lint and an independent
+working-diff review with no actionable findings; exact committed-head checks
+remain separate. Browser evidence identified repeated script-initiated navigation
+to the same full default-domain welcome URL. These source tests prove the
+navigation contract only: rendered creation form, native creation authorization
+and actual Hass provisioning require separate runtime acceptance. This admission
+does not authorize deployment, schema changes, provider access or token intake.
