@@ -1,5 +1,61 @@
 # Professional investigation method acceptance map
 
+## Installation lead handoff — 2026-09-14
+
+Runtime owner is now `01a09cd2-9ab9-76a3-97d4-37d2300a65a8`, with actual incoming
+acknowledgment and outgoing custody acknowledgment on this date. Coordinator
+remains `01a09c1e-fcec-7721-bafe-fd0ec677127c`; same Delivery Room job and issues.
+Outgoing source lead `01a09cb1-b6c6-73b3-84c2-a167ea0c0ceb` owns no runtime edits,
+CLI watcher, apply, install, role change or live Workspace operation. The only
+retained process is synthetic loopback preview PID 97526, port 4347.
+
+User now authorizes installation/testing and explicitly prefers Twenty CLI sync.
+This supersedes the earlier no-install hold for this bounded gate only. Prefer
+an existing disposable/test Workspace before Hass; do not create one silently.
+Inspect configured remote, installed App/host compatibility and effective roles;
+preserve installed working revision and a verified rollback path. Use the pinned
+CLI's `yarn twenty plan` then reviewed `yarn twenty apply` for shared Hass;
+`yarn twenty dev` is appropriate only with one sync owner on a verified test
+Workspace. No `--force`, new grants, customer PDF imports, provider/mailbox reads,
+email sends, unrelated host changes, auto merge or blind push. Dev sync does not
+run install hooks; inspect whether a separate governed hook path is needed.
+
+Accepted source: `f87cfc5296bcb036f79eaac6581b77cab9d6d0c1`, tree
+`2be1697914916a4a6dddbadef8ceedb37ceee812`, branch
+`codex/finance-follow-up-mutation`, worktree `/Users/mhoooo/.codex/worktrees/90cd/mhoo-twenty-next`.
+App root `packages/twenty-apps/internal/mhoo-finance`, `@mhoo/finance` 0.1.0,
+application UID `ad100496-8c49-4453-9814-886ac4064d4c`. Both installed SDK/client
+package metadata are 2.37.0; manifest requires server 2.37.0. Source provenance
+pins upstream `6da524b8903ec16a3eeea4b2e4a5fb63dbfc1c58` via `.twenty-source`.
+Reuse 51 focused test receipts, build/typecheck/lint, custody/trajectory, exact-head
+independent review, desktop/mobile and complete local synthetic workflow proof.
+
+Existing built output is `.twenty/output` (local build, not installed):
+- manifest SHA-256 `efca5a8fbff7e48f2fd5e984d9cfa9710ce5f046decfda2021bdeae5f2642edc`;
+- package.json SHA-256 `ba2f6eddf71f741ccb5719d47cd91162baea29ba9fbaf3c877076b2693a66460`;
+- source yarn.lock SHA-256 `214db49994e0accaa49d2ed2567a39ad243af7a21d45ece63b6b32c6e555fdad`.
+These hashes identify this retained build; inspect/review the actual CLI plan and
+build input at the installation owner's checkout before synchronization.
+
+Concrete authority gate found in the generated manifest: default App role
+`a4c0b84d-a3cb-4cff-b1db-b555545e91f0` denies updates to native Task
+`20202020-1ba1-48ba-bc83-ef7e5990ed10`, and has no People/Notes read entries.
+The v2.37 authorization reference says the user token is user-role intersected
+with App-role. Thus an existing user writer alone may not suffice. Verify actual
+installed ceiling and metadata writability. If confirmed, present the smallest
+scoped App Task-write/People-and-Note-read decision; do not grant admin rights or
+change any role silently. The earlier suggestion that an existing writer alone
+might suffice was unproved and is superseded by this explicit ceiling finding.
+
+Current Hass host digest, installed App revision, CLI target, test Workspace,
+allowed/denied identities and rollback artifact are **not verified here**. The
+fresh installation lead owns that live discovery; no old receipt substitutes for
+it. Governance read: lifecycle, workspace-operations and authorization SKILL.md
+plus focused v2.37 references under the coordinating mhoo repository; auth-approval
+and delivery-flow were also read. Work class is consequential authorization/runtime
+validation; routing trial suggests Astra high review. Actual incoming model/effort
+is coordinator-owned and unknown here; no override was made during active work.
+
 ## Current source workflow — 2026-09-14 continuation
 
 ARCHITECTURE IMPACT: LOCAL. This section supersedes earlier read-only UI status
