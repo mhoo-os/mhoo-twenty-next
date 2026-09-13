@@ -1,5 +1,32 @@
 # Professional investigation method acceptance map
 
+## Installation attempt cancelled; credential cleanup verified — 2026-09-14
+
+Guide owner requested cancellation in favor of the automatic popup deployment;
+Oracle owner also requested closure for the authorized recovery capture window.
+Finance serialization hold is explicitly released, with all further App actions
+held until recovery releases its window.
+
+- Temporary key `ffff4b79-2677-4a0f-9f52-03a3fb070d6d` was revoked using the
+  native key Delete confirmation. The post-action Hass API-key inventory is
+  empty. The browser clipboard was cleared and generated-key tab closed.
+- Hidden-input helper session `97517` was interrupted while still waiting in
+  getpass, before any submitted input or SDK authLogin call; it exited with code
+  1. Sanitized local configuration inspection confirms temporary CLI remote
+  `finance-install-20260914` does not exist. No key was stored in CLI config.
+- No CLI plan/apply/sync or watcher was started with that key. No Finance host
+  operation was started or delegated. No installation, role change, customer
+  import, provider/mailbox operation or send occurred. Accepted implementation
+  `f87cfc5296bcb036f79eaac6581b77cab9d6d0c1` remains unchanged.
+- Oracle owner, guide owner and coordinator received exact closed/revoked
+  handback. The earlier manual-paste request is cancelled. No further token
+  input should be supplied. Earlier active-key notes are historical and are
+  superseded by this cleanup receipt.
+
+Runtime acceptance remains incomplete, with the same App-role, rollback,
+immutable event actor, Files, Remote DOM and identity/persistence gates. Resume
+only in a later serialized window; do not silently create a replacement key.
+
 ## Approved key custody pending local paste — 2026-09-14 05:48 Bangkok
 
 Oracle owner explicitly released the Finance App-only maintenance hold after
