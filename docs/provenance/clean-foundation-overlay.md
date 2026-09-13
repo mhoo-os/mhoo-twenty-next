@@ -273,7 +273,11 @@ approval of ADR-0013's live-source amendment in the coordination repository:
 - `packages/twenty-front/src/modules/accounts/utils/hasMissingCreateCalendarEventScopes.ts`
 - `packages/twenty-front/src/modules/accounts/utils/hasMissingDraftEmailScopes.ts`
 - `packages/twenty-front/src/modules/settings/accounts/components/SettingsCloverConnection.tsx`
+- `packages/twenty-front/src/modules/settings/accounts/components/CloverSetupPrompt.tsx`
+- `packages/twenty-front/src/modules/settings/accounts/components/__stories__/CloverSetupPrompt.stories.tsx`
+- `packages/twenty-front/src/modules/settings/accounts/components/__tests__/CloverSetupPrompt.test.tsx`
 - `packages/twenty-front/src/modules/settings/accounts/components/__tests__/SettingsCloverConnection.test.tsx`
+- `packages/twenty-front/src/modules/ui/layout/page/components/DefaultLayout.tsx`
 - `packages/twenty-front/src/modules/ui/field/display/components/ActorDisplay.tsx`
 - `packages/twenty-front/src/pages/settings/accounts/SettingsAccounts.tsx`
 - `packages/twenty-server/src/engine/core-modules/app-token/app-token.entity.ts`
@@ -303,6 +307,14 @@ credential database, identity service, OAuth callback, provider sync, or legacy
 import. The owner requested deployment; source authorization and local checks
 still do not establish runtime readiness. The activation procedure and its
 remaining evidence are recorded in `hass-clover-intake.md`.
+
+The owner's 2026-09-14 private-pilot follow-up authorizes the four exact prompt
+paths above and the `DefaultLayout.tsx` mount. The prompt may rely only on the
+authenticated, permission-checked Clover status endpoint; unknown, failed, and
+unauthorized reads stay silent. Its action opens the existing secure Clover
+screen, and its per-member dismissal stores no token or provider data. This is
+source admission only and does not authorize a Workspace installation,
+deployment, credential entry, or role change.
 MHO-240 system SMTP acknowledgement correction (source-only):
 
 - `packages/twenty-server/src/engine/core-modules/email/drivers/smtp.driver.ts`

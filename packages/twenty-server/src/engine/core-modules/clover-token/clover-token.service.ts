@@ -79,14 +79,36 @@ export class CloverTokenService {
           handle: true,
           name: true,
           updatedAt: true,
+          authFailedAt: true,
+          archivedAt: true,
+          provider: true,
+          applicationId: true,
+          connectionProviderId: true,
           manualTokenWorkspaceGrant: true,
         },
         order: { id: 'ASC' },
       });
-    const receipts = accounts.map((account) => this.receipt(account));
+    const activeAccounts = accounts.filter(
+      (account) => !account.authFailedAt && !account.archivedAt,
+    );
+    const reconnectableAccounts = accounts.filter(
+      (account) =>
+        account.provider === ConnectedAccountProvider.APP &&
+        account.applicationId === binding.applicationId &&
+        account.connectionProviderId === binding.id &&
+        account.authFailedAt &&
+        !account.archivedAt,
+    );
+    const receipts = activeAccounts.map((account) => this.receipt(account));
     // Legacy singular clients get no ambiguous first merchant.
     return {
       enabled: true,
+      connectionState:
+        receipts.length > 0
+          ? ('connected' as const)
+          : reconnectableAccounts.length > 0
+            ? ('reconnectRequired' as const)
+            : ('needsSetup' as const),
       receipt: receipts.length === 1 ? receipts[0] : null,
       receipts,
     };
@@ -101,7 +123,17 @@ export class CloverTokenService {
 
     return this.dataSource.transaction(async (manager) => {
       await this.authorize(actor, manager, true);
-      if (await this.findAccount(manager, actor.workspaceId, merchantId)) {
+      const existing = await this.findAccount(
+        manager,
+        actor.workspaceId,
+        merchantId,
+      );
+      if (
+        existing &&
+        (existing.provider !== ConnectedAccountProvider.APP ||
+          !existing.authFailedAt ||
+          existing.archivedAt)
+      ) {
         throw new ConflictException(
           'This merchant already has a Clover connection in this Workspace.',
         );
@@ -137,6 +169,7 @@ export class CloverTokenService {
             cloverHandoff: {
               merchantId,
               userWorkspaceId: actor.userWorkspaceId,
+              ...(existing ? { reconnectConnectedAccountId: existing.id } : {}),
             },
           },
         }),
@@ -209,11 +242,25 @@ export class CloverTokenService {
       if (request.revokedAt || request.expiresAt.getTime() <= Date.now()) {
         throw new ConflictException('This handoff expired. Start again.');
       }
-      if (
-        await this.findAccount(manager, actor.workspaceId, handoff.merchantId)
-      ) {
+      const existing = await this.findAccount(
+        manager,
+        actor.workspaceId,
+        handoff.merchantId,
+      );
+      if (existing && existing.id !== handoff.reconnectConnectedAccountId) {
         throw new ConflictException(
           'This merchant already has a Clover connection in this Workspace.',
+        );
+      }
+      if (
+        handoff.reconnectConnectedAccountId &&
+        (!existing ||
+          existing.provider !== ConnectedAccountProvider.APP ||
+          !existing.authFailedAt ||
+          existing.archivedAt)
+      ) {
+        throw new ConflictException(
+          'This Clover connection changed. Refresh before trying again.',
         );
       }
 
@@ -227,22 +274,33 @@ export class CloverTokenService {
         workspaceId: actor.workspaceId,
       });
       const accounts = manager.getRepository(ConnectedAccountEntity);
-      const account = await accounts.save(
-        accounts.create({
-          workspaceId: actor.workspaceId,
-          userWorkspaceId: actor.userWorkspaceId,
-          provider: ConnectedAccountProvider.APP,
-          applicationId: binding.applicationId,
-          connectionProviderId: binding.id,
-          handle: handoff.merchantId,
-          name: merchantName,
-          visibility: 'workspace',
+      let account: ConnectedAccountEntity;
+      if (existing) {
+        account = await accounts.save({
+          ...existing,
           accessToken: encrypted,
-          refreshToken: null,
-          // A merchant's confirmation is not proof of provider scopes.
-          scopes: null,
-        }),
-      );
+          authFailedAt: null,
+          name: merchantName,
+          lastCredentialsRefreshedAt: new Date(),
+        });
+      } else {
+        account = await accounts.save(
+          accounts.create({
+            workspaceId: actor.workspaceId,
+            userWorkspaceId: actor.userWorkspaceId,
+            provider: ConnectedAccountProvider.APP,
+            applicationId: binding.applicationId,
+            connectionProviderId: binding.id,
+            handle: handoff.merchantId,
+            name: merchantName,
+            visibility: 'workspace',
+            accessToken: encrypted,
+            refreshToken: null,
+            // A merchant's confirmation is not proof of provider scopes.
+            scopes: null,
+          }),
+        );
+      }
 
       request.revokedAt = new Date();
       request.context = {
@@ -427,6 +485,11 @@ export class CloverTokenService {
         handle: true,
         name: true,
         updatedAt: true,
+        authFailedAt: true,
+        archivedAt: true,
+        provider: true,
+        applicationId: true,
+        connectionProviderId: true,
         manualTokenWorkspaceGrant: true,
       },
     });

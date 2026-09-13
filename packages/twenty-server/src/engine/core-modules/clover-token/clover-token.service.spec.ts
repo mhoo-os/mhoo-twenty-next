@@ -3,6 +3,7 @@ import { ConnectionProviderEntity } from 'src/engine/core-modules/application/co
 import { randomUUID } from 'crypto';
 
 import { WorkspaceActivationStatus } from 'twenty-shared/workspace';
+import { ConnectedAccountProvider } from 'twenty-shared/types';
 import { type DataSource } from 'typeorm';
 
 import {
@@ -175,6 +176,53 @@ describe('native Clover token handoff', () => {
     await expect(service.begin(actor, 'OTHER12345678')).rejects.toThrow(
       'already has',
     );
+  });
+
+  it('classifies a failed credential as reconnectable instead of connected', async () => {
+    account = {
+      id: randomUUID(),
+      handle: merchantId,
+      name: 'Synthetic Hass',
+      updatedAt: new Date(),
+      authFailedAt: new Date(),
+      archivedAt: null,
+      provider: ConnectedAccountProvider.APP,
+      applicationId: 'synthetic-app',
+      connectionProviderId: 'synthetic-provider',
+    } as ConnectedAccountEntity;
+    await expect(service.status(actor)).resolves.toMatchObject({
+      enabled: true,
+      connectionState: 'reconnectRequired',
+      receipt: null,
+      receipts: [],
+    });
+  });
+
+  it('atomically replaces a failed credential through the same secure form', async () => {
+    const connectedAccountId = randomUUID();
+    account = {
+      id: connectedAccountId,
+      handle: merchantId,
+      name: 'Synthetic Hass',
+      updatedAt: new Date(),
+      authFailedAt: new Date(),
+      archivedAt: null,
+      provider: ConnectedAccountProvider.APP,
+      applicationId: 'synthetic-app',
+      connectionProviderId: 'synthetic-provider',
+    } as ConnectedAccountEntity;
+
+    await service.begin(actor, merchantId);
+    handoff = requestSave.mock.calls[requestSave.mock.calls.length - 1][0];
+    expect(handoff.context?.cloverHandoff).toMatchObject({
+      merchantId,
+      reconnectConnectedAccountId: connectedAccountId,
+    });
+
+    const result = await service.submit(actor, input());
+    expect(result.connectedAccountId).toBe(connectedAccountId);
+    expect(account?.authFailedAt).toBeNull();
+    expect(account?.accessToken).toMatch(/^enc:v2:/);
   });
 
   it('requires explicit grant revision and revokes without changing custody', async () => {

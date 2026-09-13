@@ -17,8 +17,14 @@ type Receipt = {
   backgroundSyncGrantId?: string | null;
   backgroundSyncEnabled?: boolean;
 };
-type Status = {
+export type CloverConnectionState =
+  | 'connected'
+  | 'needsSetup'
+  | 'reconnectRequired';
+
+export type CloverStatus = {
   enabled: boolean;
+  connectionState?: CloverConnectionState;
   receipt: Receipt | null;
   receipts?: Receipt[];
   canPrepareInvitation?: boolean;
@@ -110,7 +116,7 @@ export async function cloverRequest<T>(
 }
 
 const CloverForm = ({ workspaceName }: { workspaceName: string }) => {
-  const [status, setStatus] = useState<Status | null>(null);
+  const [status, setStatus] = useState<CloverStatus | null>(null);
   const [handoff, setHandoff] = useState<Handoff | null>(null);
   const [merchantId, setMerchantId] = useState('');
   const [confirmed, setConfirmed] = useState(false);
@@ -130,7 +136,7 @@ const CloverForm = ({ workspaceName }: { workspaceName: string }) => {
   useEffect(() => {
     const controller = new AbortController();
     abort.current = controller;
-    void cloverRequest<Status>('status', undefined, controller.signal)
+    void cloverRequest<CloverStatus>('status', undefined, controller.signal)
       .then(setStatus)
       .catch(() => {
         if (!controller.signal.aborted)
@@ -225,7 +231,7 @@ const CloverForm = ({ workspaceName }: { workspaceName: string }) => {
                       },
                       abort.current.signal,
                     );
-                    const latest = await cloverRequest<Status>(
+                    const latest = await cloverRequest<CloverStatus>(
                       'status',
                       undefined,
                       abort.current.signal,
@@ -345,7 +351,7 @@ const CloverForm = ({ workspaceName }: { workspaceName: string }) => {
                       // A lost response may follow a committed save. Check the native
                       // receipt without resending or retaining the credential.
                       try {
-                        const latest = await cloverRequest<Status>(
+                        const latest = await cloverRequest<CloverStatus>(
                           'status',
                           undefined,
                           abort.current.signal,
