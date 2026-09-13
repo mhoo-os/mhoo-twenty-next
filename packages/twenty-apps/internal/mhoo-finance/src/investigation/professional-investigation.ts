@@ -1,4 +1,5 @@
 import { currency, minor, sumMoney, type Currency } from '../contracts/money';
+import { parseFinanceCompletenessReceipt } from './completeness-receipt';
 import {
   hasExactSelectedRecipients,
   isFinanceFollowUpTransitionAllowed,
@@ -159,19 +160,33 @@ export const evaluateMatchGroup = (
   const sources = members.filter((member) => member.side === 'SOURCE');
   const targets = members.filter((member) => member.side === 'TARGET');
   const cardinalityValid =
-    (type === 'EXACT_ONE_TO_ONE' && sources.length === 1 && targets.length === 1) ||
-    (type === 'SPLIT_ONE_TO_MANY' && sources.length === 1 && targets.length > 1) ||
-    (type === 'BATCH_MANY_TO_ONE' && sources.length > 1 && targets.length === 1) ||
+    (type === 'EXACT_ONE_TO_ONE' &&
+      sources.length === 1 &&
+      targets.length === 1) ||
+    (type === 'SPLIT_ONE_TO_MANY' &&
+      sources.length === 1 &&
+      targets.length > 1) ||
+    (type === 'BATCH_MANY_TO_ONE' &&
+      sources.length > 1 &&
+      targets.length === 1) ||
     (type === 'MANY_TO_MANY' && sources.length > 1 && targets.length > 1);
   if (!cardinalityValid) throw new Error('MatchGroup cardinality mismatch');
-  if (new Set(members.map((member) => member.factReference)).size !== members.length)
+  if (
+    new Set(members.map((member) => member.factReference)).size !==
+    members.length
+  )
     throw new Error('Duplicate MatchGroup member');
-  const currencies = new Set(members.map((member) => currency(member.currency)));
+  const currencies = new Set(
+    members.map((member) => currency(member.currency)),
+  );
   if (currencies.size !== 1) throw new Error('Mixed currency MatchGroup');
   const unit = [...currencies][0] as Currency;
   const total = (rows: readonly MatchGroupMember[]) =>
     sumMoney(
-      rows.map((row) => ({ currency: unit, minor: minor(row.amountMinor).toString() })),
+      rows.map((row) => ({
+        currency: unit,
+        minor: minor(row.amountMinor).toString(),
+      })),
       unit,
     ).minor;
   const sourceMinor = total(sources);
@@ -191,39 +206,78 @@ export const evaluateMatchGroup = (
     residualMinor,
     status: exact ? ('EXACT' as const) : ('REVIEW_REQUIRED' as const),
     autoLinkEligible:
-      exact && references.size === 1 &&
+      exact &&
+      references.size === 1 &&
       members.every((member) => member.explicitReference !== null),
     preservesOriginals: true as const,
   });
 };
 
 type OptionalAmount = string | null;
-export const evaluateCloverFundingBridge = (input: Readonly<{
-  currency: string;
-  grossSalesMinor: OptionalAmount;
-  tenderMinor: OptionalAmount;
-  feeMinor: OptionalAmount;
-  reserveMinor: OptionalAmount;
-  payoutMinor: OptionalAmount;
-  bankDepositMinor: OptionalAmount;
-}>) => {
+export const evaluateCloverFundingBridge = (
+  input: Readonly<{
+    currency: string;
+    batchReference: string | null;
+    saleBaseMinor: OptionalAmount;
+    taxMinor: OptionalAmount;
+    tipMinor: OptionalAmount;
+    chargeMinor: OptionalAmount;
+    refundMinor: OptionalAmount;
+    adjustmentMinor: OptionalAmount;
+    grossSalesMinor: OptionalAmount;
+    tenderMinor: OptionalAmount;
+    feeMinor: OptionalAmount;
+    reserveMinor: OptionalAmount;
+    payoutMinor: OptionalAmount;
+    bankDepositMinor: OptionalAmount;
+  }>,
+) => {
   const unit = currency(input.currency);
   const missing = Object.entries(input)
     .filter(([key, value]) => key !== 'currency' && value === null)
     .map(([key]) => key);
   if (missing.length)
-    return Object.freeze({ status: 'PARTIAL' as const, gaps: Object.freeze(missing) });
+    return Object.freeze({
+      status: 'PARTIAL' as const,
+      gaps: Object.freeze(missing),
+    });
+  if (!nonEmpty(input.batchReference as string))
+    throw new Error('Clover batch reference required');
   const amount = (value: OptionalAmount) => minor(value as string);
+  const saleBase = amount(input.saleBaseMinor);
+  const tax = amount(input.taxMinor);
+  const tip = amount(input.tipMinor);
+  const charges = amount(input.chargeMinor);
+  const refunds = amount(input.refundMinor);
+  const adjustments = amount(input.adjustmentMinor);
   const gross = amount(input.grossSalesMinor);
   const tender = amount(input.tenderMinor);
   const fees = amount(input.feeMinor);
   const reserves = amount(input.reserveMinor);
   const payout = amount(input.payoutMinor);
   const bank = amount(input.bankDepositMinor);
-  if ([gross, tender, fees, reserves, payout, bank].some((value) => value < 0n))
+  if (
+    [
+      saleBase,
+      tax,
+      tip,
+      charges,
+      refunds,
+      gross,
+      tender,
+      fees,
+      reserves,
+      payout,
+      bank,
+    ].some((value) => value < 0n)
+  )
     throw new Error('Clover bridge components must be non-negative');
+  const expectedGross = minor(
+    (saleBase + tax + tip + charges - refunds + adjustments).toString(),
+  );
   const expectedPayout = minor((tender - fees - reserves).toString());
   const contradictions = [
+    ...(expectedGross === gross ? [] : ['SALE_COMPONENT_MISMATCH']),
     ...(gross === tender ? [] : ['GROSS_TENDER_MISMATCH']),
     ...(expectedPayout === payout ? [] : ['PAYOUT_COMPONENT_MISMATCH']),
     ...(payout === bank ? [] : ['PAYOUT_BANK_MISMATCH']),
@@ -233,6 +287,8 @@ export const evaluateCloverFundingBridge = (input: Readonly<{
       ? ('CONTRADICTED' as const)
       : ('RECONCILED' as const),
     currency: unit,
+    batchReference: input.batchReference,
+    expectedGrossMinor: expectedGross.toString(),
     expectedPayoutMinor: expectedPayout.toString(),
     residualMinor: minor((payout - bank).toString()).toString(),
     contradictions: Object.freeze(contradictions),
@@ -251,19 +307,56 @@ export const reduceBankLifecycle = (events: readonly BankLifecycleEvent[]) => {
   const ordered = [...events].sort((a, b) => a.sequence - b.sequence);
   if (ordered.some((event, index) => event.sequence !== index + 1))
     throw new Error('Invalid provider lifecycle sequence');
-  const current = new Map<string, boolean>();
+  const current = new Map<
+    string,
+    { counted: boolean; state: BankLifecycleEvent['state'] }
+  >();
   for (const event of ordered) {
-    if (!nonEmpty(event.sourceRecordId)) throw new Error('Source record ID required');
+    if (!nonEmpty(event.sourceRecordId))
+      throw new Error('Source record ID required');
+    if (event.replacesSourceRecordId === event.sourceRecordId)
+      throw new Error('Bank record cannot replace itself');
+    const previous = current.get(event.sourceRecordId);
+    if (previous) {
+      const validTransition =
+        (previous.state === 'PENDING' && event.state === 'POSTED') ||
+        ((previous.state === 'POSTED' || previous.state === 'REPLACED') &&
+          (event.state === 'REMOVED' || event.state === 'SUPERSEDED'));
+      if (!validTransition)
+        throw new Error('Invalid provider lifecycle transition');
+      if (event.replacesSourceRecordId)
+        throw new Error(
+          'Existing record transition cannot replace another row',
+        );
+    } else if (event.state === 'REMOVED' || event.state === 'SUPERSEDED') {
+      throw new Error('Provider lifecycle transition requires an existing row');
+    }
+
     if (event.state === 'REPLACED' && !event.replacesSourceRecordId)
       throw new Error('Replacement source record required');
-    if (event.replacesSourceRecordId) current.set(event.replacesSourceRecordId, false);
-    current.set(event.sourceRecordId, event.state === 'POSTED' || event.state === 'REPLACED');
-    if (event.state === 'REMOVED' || event.state === 'SUPERSEDED')
-      current.set(event.sourceRecordId, false);
+    if (event.replacesSourceRecordId) {
+      const replaced = current.get(event.replacesSourceRecordId);
+      if (!replaced)
+        throw new Error('Replacement target must exist in lifecycle history');
+      const validReplacement =
+        (event.state === 'POSTED' && replaced.state === 'PENDING') ||
+        (event.state === 'REPLACED' &&
+          (replaced.state === 'POSTED' || replaced.state === 'REMOVED'));
+      if (!validReplacement)
+        throw new Error('Invalid provider replacement transition');
+      current.set(event.replacesSourceRecordId, {
+        counted: false,
+        state: replaced.state,
+      });
+    }
+    current.set(event.sourceRecordId, {
+      counted: event.state === 'POSTED' || event.state === 'REPLACED',
+      state: event.state,
+    });
   }
   return Object.freeze({
     countedSourceRecordIds: Object.freeze(
-      [...current].filter(([, counted]) => counted).map(([id]) => id),
+      [...current].filter(([, record]) => record.counted).map(([id]) => id),
     ),
     history: Object.freeze(ordered),
     preservesAllSourceRecords: true as const,
@@ -273,7 +366,7 @@ export const reduceBankLifecycle = (events: readonly BankLifecycleEvent[]) => {
 export type MonthCoverage = Readonly<{
   month: string;
   state: 'PROVEN_COMPLETE' | 'PARTIAL' | 'MISSING';
-  receiptReference: string | null;
+  receiptJson: string | null;
 }>;
 
 export const evaluatePeriodCompleteness = (
@@ -281,26 +374,58 @@ export const evaluatePeriodCompleteness = (
   receipts: readonly MonthCoverage[],
 ) => {
   const validMonth = (value: string) => /^\d{4}-(?:0[1-9]|1[0-2])$/.test(value);
-  if (!expectedMonths.length || new Set(expectedMonths).size !== expectedMonths.length ||
-      expectedMonths.some((month) => !validMonth(month)) ||
-      new Set(receipts.map((receipt) => receipt.month)).size !== receipts.length ||
-      receipts.some(
-        (receipt) =>
-          !expectedMonths.includes(receipt.month) ||
-          !validMonth(receipt.month) ||
-          (receipt.state === 'PROVEN_COMPLETE'
-            ? !receipt.receiptReference?.trim()
-            : receipt.state === 'MISSING' && receipt.receiptReference !== null),
-      ))
+  if (
+    !expectedMonths.length ||
+    new Set(expectedMonths).size !== expectedMonths.length ||
+    expectedMonths.some((month) => !validMonth(month)) ||
+    new Set(receipts.map((receipt) => receipt.month)).size !== receipts.length
+  )
     throw new Error('Expected months must be unique');
-  const byMonth = new Map(receipts.map((receipt) => [receipt.month, receipt]));
+  const verifiedReceipts = receipts.map((receipt) => {
+    if (!expectedMonths.includes(receipt.month) || !validMonth(receipt.month))
+      throw new Error('Receipt month is outside the expected period');
+    if (receipt.state === 'MISSING') {
+      if (receipt.receiptJson !== null)
+        throw new Error('Missing month cannot carry a completeness receipt');
+      return Object.freeze({
+        month: receipt.month,
+        state: receipt.state,
+        receiptReference: null,
+      });
+    }
+    const parsed = parseFinanceCompletenessReceipt(receipt.receiptJson);
+    if (
+      !parsed ||
+      parsed.periodStart.slice(0, 7) !== receipt.month ||
+      parsed.periodEnd.slice(0, 7) !== receipt.month ||
+      (receipt.state === 'PROVEN_COMPLETE'
+        ? parsed.coverageState !== 'PROVEN_COMPLETE'
+        : parsed.coverageState === 'PROVEN_COMPLETE' ||
+          parsed.coverageState === 'MISSING')
+    )
+      throw new Error('Month coverage requires a scope-matched receipt');
+    return Object.freeze({
+      month: receipt.month,
+      state: receipt.state,
+      receiptReference: parsed.authorityReceiptId,
+    });
+  });
+  const byMonth = new Map(
+    verifiedReceipts.map((receipt) => [receipt.month, receipt]),
+  );
   const months = expectedMonths.map(
-    (month): MonthCoverage =>
-      byMonth.get(month) ?? { month, state: 'MISSING', receiptReference: null },
+    (month) =>
+      byMonth.get(month) ?? {
+        month,
+        state: 'MISSING' as const,
+        receiptReference: null,
+      },
   );
   const gaps = months.filter((month) => month.state !== 'PROVEN_COMPLETE');
   return Object.freeze({
-    status: gaps.length ? ('INCOMPLETE' as const) : ('PROVEN_COMPLETE' as const),
+    status: gaps.length
+      ? ('INCOMPLETE' as const)
+      : ('PROVEN_COMPLETE' as const),
     months: Object.freeze(months),
     gaps: Object.freeze(gaps.map((month) => month.month)),
     missingIsZeroActivity: false as const,
@@ -356,7 +481,8 @@ export const reduceFinanceFollowUpEvents = (
       state = event.to;
     }
     if (event.type === 'EVIDENCE_ATTACHED') {
-      if (!event.evidenceReference?.trim()) throw new Error('Evidence required');
+      if (!event.evidenceReference?.trim())
+        throw new Error('Evidence required');
       evidence.push(event.evidenceReference);
     }
     if (event.type === 'DRAFT_PREPARED') {
@@ -370,10 +496,7 @@ export const reduceFinanceFollowUpEvents = (
       approvedNotSent = true;
     }
     if (event.type === 'REPLY_CORRELATED') {
-      if (
-        !event.replyReference?.trim() ||
-        !event.correlationKey?.trim()
-      )
+      if (!event.replyReference?.trim() || !event.correlationKey?.trim())
         throw new Error('Attributed reply and correlation key required');
       replies.push(event.replyReference);
     }
@@ -383,7 +506,11 @@ export const reduceFinanceFollowUpEvents = (
     state,
     evidenceReferences: Object.freeze([...new Set(evidence)]),
     draft,
-    approval: approvedNotSent ? ('APPROVED_NOT_SENT' as const) : draft ? ('DRAFT' as const) : null,
+    approval: approvedNotSent
+      ? ('APPROVED_NOT_SENT' as const)
+      : draft
+        ? ('DRAFT' as const)
+        : null,
     replyReferences: Object.freeze([...new Set(replies)]),
     sendAuthorized: false as const,
     history: Object.freeze(ordered),

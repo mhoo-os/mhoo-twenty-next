@@ -58,6 +58,11 @@ const PAGE_TITLES: Readonly<Record<FinanceView, string>> = {
   sources: 'Add a source',
 };
 
+// The source defines CAS/event contracts, but the current install candidate
+// intentionally grants reviewers no write authority. Enable only after an
+// installed, row-bounded mutation receipt is independently accepted.
+const WORKSPACE_REVIEW_MUTATIONS_ENABLED = false;
+
 type BrushKind = 'move' | 'start' | 'end';
 
 const SOURCE_ROUTES: readonly {
@@ -1388,9 +1393,7 @@ const WorkspaceFinanceScreen = ({
       )
     : [];
   const chartMax = Number(
-    minor(moneyInMinor) > minor(moneyOutMinor)
-      ? moneyInMinor
-      : moneyOutMinor,
+    minor(moneyInMinor) > minor(moneyOutMinor) ? moneyInMinor : moneyOutMinor,
   );
   const chartSpan = Math.max(
     1,
@@ -1500,7 +1503,12 @@ const WorkspaceFinanceScreen = ({
     setSourceHandoff({ route, result: await handoffSource(route) });
   };
   const appendEvidenceAction = async (action: WorkspaceEvidenceAction) => {
-    if (!selectedFact?.artifactId || savingEvidence) return;
+    if (
+      !WORKSPACE_REVIEW_MUTATIONS_ENABLED ||
+      !selectedFact?.artifactId ||
+      savingEvidence
+    )
+      return;
     setSavingEvidence(true);
     try {
       const history = await appendWorkspaceEvidenceDecision({
@@ -1520,7 +1528,12 @@ const WorkspaceFinanceScreen = ({
   };
 
   const transitionFollowUp = async (to: FinanceFollowUpState) => {
-    if (!selectedFollowUp || isSynthetic || followUpMutation === 'saving')
+    if (
+      !WORKSPACE_REVIEW_MUTATIONS_ENABLED ||
+      !selectedFollowUp ||
+      isSynthetic ||
+      followUpMutation === 'saving'
+    )
       return;
     setFollowUpMutation('saving');
     try {
@@ -1544,6 +1557,7 @@ const WorkspaceFinanceScreen = ({
   const approveFollowUpDraft = async () => {
     if (
       !selectedFollowUp?.draftEmail ||
+      !WORKSPACE_REVIEW_MUTATIONS_ENABLED ||
       isSynthetic ||
       followUpMutation === 'saving'
     )
@@ -2107,6 +2121,12 @@ const WorkspaceFinanceScreen = ({
               Finance follow-ups are native Twenty Tasks with bounded Finance
               context. A reply or checked task is not proof of reconciliation.
             </p>
+            {!WORKSPACE_REVIEW_MUTATIONS_ENABLED ? (
+              <p className="fw-warning" role="status">
+                Review actions are read-only until installed, row-bounded
+                mutation authority is accepted.
+              </p>
+            ) : null}
             <div className="fw-followup-list" aria-label="Finance follow-ups">
               {data.followUps.map((followUp) => (
                 <button
@@ -2239,7 +2259,11 @@ const WorkspaceFinanceScreen = ({
                       <button
                         type="button"
                         className="fw-button"
-                        disabled={isSynthetic || followUpMutation === 'saving'}
+                        disabled={
+                          !WORKSPACE_REVIEW_MUTATIONS_ENABLED ||
+                          isSynthetic ||
+                          followUpMutation === 'saving'
+                        }
                         onClick={() =>
                           void transitionFollowUp('WAITING_FOR_REPLY')
                         }
@@ -2249,7 +2273,11 @@ const WorkspaceFinanceScreen = ({
                       <button
                         type="button"
                         className="fw-button"
-                        disabled={isSynthetic || followUpMutation === 'saving'}
+                        disabled={
+                          !WORKSPACE_REVIEW_MUTATIONS_ENABLED ||
+                          isSynthetic ||
+                          followUpMutation === 'saving'
+                        }
                         onClick={() =>
                           void transitionFollowUp('READY_FOR_REVIEW')
                         }
@@ -2262,7 +2290,11 @@ const WorkspaceFinanceScreen = ({
                       <button
                         type="button"
                         className="fw-button"
-                        disabled={isSynthetic || followUpMutation === 'saving'}
+                        disabled={
+                          !WORKSPACE_REVIEW_MUTATIONS_ENABLED ||
+                          isSynthetic ||
+                          followUpMutation === 'saving'
+                        }
                         onClick={() =>
                           void transitionFollowUp('READY_FOR_REVIEW')
                         }
@@ -2272,7 +2304,11 @@ const WorkspaceFinanceScreen = ({
                       <button
                         type="button"
                         className="fw-button"
-                        disabled={isSynthetic || followUpMutation === 'saving'}
+                        disabled={
+                          !WORKSPACE_REVIEW_MUTATIONS_ENABLED ||
+                          isSynthetic ||
+                          followUpMutation === 'saving'
+                        }
                         onClick={() => void transitionFollowUp('TO_DO')}
                       >
                         Return to do
@@ -2283,7 +2319,11 @@ const WorkspaceFinanceScreen = ({
                       <button
                         type="button"
                         className="fw-button"
-                        disabled={isSynthetic || followUpMutation === 'saving'}
+                        disabled={
+                          !WORKSPACE_REVIEW_MUTATIONS_ENABLED ||
+                          isSynthetic ||
+                          followUpMutation === 'saving'
+                        }
                         onClick={() =>
                           void transitionFollowUp('WAITING_FOR_REPLY')
                         }
@@ -2293,7 +2333,11 @@ const WorkspaceFinanceScreen = ({
                       <button
                         type="button"
                         className="fw-button"
-                        disabled={isSynthetic || followUpMutation === 'saving'}
+                        disabled={
+                          !WORKSPACE_REVIEW_MUTATIONS_ENABLED ||
+                          isSynthetic ||
+                          followUpMutation === 'saving'
+                        }
                         onClick={() => void transitionFollowUp('RESOLVED')}
                       >
                         Resolve after review
@@ -2303,7 +2347,11 @@ const WorkspaceFinanceScreen = ({
                     <button
                       type="button"
                       className="fw-button"
-                      disabled={isSynthetic || followUpMutation === 'saving'}
+                      disabled={
+                        !WORKSPACE_REVIEW_MUTATIONS_ENABLED ||
+                        isSynthetic ||
+                        followUpMutation === 'saving'
+                      }
                       onClick={() =>
                         void transitionFollowUp('READY_FOR_REVIEW')
                       }
@@ -2312,7 +2360,11 @@ const WorkspaceFinanceScreen = ({
                     </button>
                   )}
                 </div>
-                {isSynthetic ? (
+                {!WORKSPACE_REVIEW_MUTATIONS_ENABLED ? (
+                  <p className="fw-local" role="status">
+                    Task actions remain read-only in this install candidate.
+                  </p>
+                ) : isSynthetic ? (
                   <p className="fw-local">
                     Synthetic adapter is read-only; no mock state transition is
                     shown.
@@ -2429,6 +2481,7 @@ const WorkspaceFinanceScreen = ({
                           className="fw-button"
                           disabled={
                             isSynthetic ||
+                            !WORKSPACE_REVIEW_MUTATIONS_ENABLED ||
                             followUpMutation === 'saving' ||
                             !hasExactSelectedRecipients(
                               selectedFollowUp.draftEmail,
@@ -2600,6 +2653,12 @@ const WorkspaceFinanceScreen = ({
                   Reviewer actions append immutable Workspace decision records;
                   they do not delete either original or change classification.
                 </p>
+                {!WORKSPACE_REVIEW_MUTATIONS_ENABLED ? (
+                  <p className="fw-warning" role="status">
+                    Evidence link actions remain read-only in this install
+                    candidate.
+                  </p>
+                ) : null}
                 {evidenceHistory.kind === 'ready' ? (
                   <>
                     <div className="fw-actions">
@@ -2608,7 +2667,10 @@ const WorkspaceFinanceScreen = ({
                         <button
                           type="button"
                           className="fw-button"
-                          disabled={savingEvidence}
+                          disabled={
+                            !WORKSPACE_REVIEW_MUTATIONS_ENABLED ||
+                            savingEvidence
+                          }
                           onClick={() => void appendEvidenceAction('UNLINKED')}
                         >
                           Unlink evidence
@@ -2617,7 +2679,10 @@ const WorkspaceFinanceScreen = ({
                         <button
                           type="button"
                           className="fw-button"
-                          disabled={savingEvidence}
+                          disabled={
+                            !WORKSPACE_REVIEW_MUTATIONS_ENABLED ||
+                            savingEvidence
+                          }
                           onClick={() => void appendEvidenceAction('RESTORED')}
                         >
                           Restore link

@@ -69,6 +69,18 @@ describe('@mhoo/finance fixture manifest contracts', () => {
       fieldPermissions: [],
       permissionFlagUniversalIdentifiers: [],
     });
+    expect(
+      financeFixtureReaderRole.config?.rowLevelPermissionPredicates,
+    ).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          objectUniversalIdentifier:
+            STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.task.universalIdentifier,
+          fieldUniversalIdentifier: '33e50c7f-1214-45c0-a776-da19f30e01fb',
+          value: 'mhoo-finance:',
+        }),
+      ]),
+    );
   });
 
   it('keeps the application writer non-assignable and unable to mutate native Tasks', () => {
@@ -81,14 +93,30 @@ describe('@mhoo/finance fixture manifest contracts', () => {
       canBeAssignedToAgents: false,
       canBeAssignedToApiKeys: false,
     });
-    const permissions = financeApplicationWriterRole.config?.objectPermissions ?? [];
+    const permissions =
+      financeApplicationWriterRole.config?.objectPermissions ?? [];
     expect(
       permissions.find(
         ({ objectUniversalIdentifier }) =>
           objectUniversalIdentifier ===
           STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.task.universalIdentifier,
       ),
-    ).toMatchObject({ canReadObjectRecords: true, canUpdateObjectRecords: false });
+    ).toMatchObject({
+      canReadObjectRecords: true,
+      canUpdateObjectRecords: false,
+    });
+    expect(
+      financeApplicationWriterRole.config?.rowLevelPermissionPredicates,
+    ).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          objectUniversalIdentifier:
+            STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.task.universalIdentifier,
+          fieldUniversalIdentifier: '33e50c7f-1214-45c0-a776-da19f30e01fb',
+          value: 'mhoo-finance:',
+        }),
+      ]),
+    );
     for (const objectUniversalIdentifier of [
       FINANCE_INVESTIGATION_EVENT_OBJECT_UNIVERSAL_IDENTIFIER,
     ]) {

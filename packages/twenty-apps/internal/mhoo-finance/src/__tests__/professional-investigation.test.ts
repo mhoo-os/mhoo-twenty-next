@@ -13,6 +13,45 @@ import {
 
 const RUN = 'b976fbe8-7d49-4d87-bdf2-5245192149e0';
 const TASK = '20202020-0001-4e7c-8001-123456789def';
+const completenessReceipt = (
+  month: string,
+  coverageState: 'PROVEN_COMPLETE' | 'PARTIAL',
+) =>
+  JSON.stringify({
+    version: 'finance-completeness/v1',
+    population: `Operating statement · ${month}`,
+    entityScope: 'synthetic-hass-kitchen',
+    accountScope: 'operating-demo',
+    periodStart: `${month}-01`,
+    periodEnd: `${month}-28`,
+    timezone: 'America/New_York',
+    basis: 'CASH',
+    acquisitionMethod: 'AUTHORIZED_UPLOAD',
+    acquiredAt: '2026-09-14T02:00:00.000Z',
+    authorityReceiptId: `receipt-${month}`,
+    contentHash: `sha256:${'a'.repeat(64)}`,
+    sourceLocator: 'pages=1-6',
+    lifecycleState: 'SNAPSHOT_ONLY',
+    expectedPopulation: '6 pages',
+    observedPopulation:
+      coverageState === 'PROVEN_COMPLETE' ? '6 pages' : '5 pages',
+    tests: [
+      {
+        id: 'page-continuity',
+        result: coverageState === 'PROVEN_COMPLETE' ? 'PASS' : 'FAIL',
+        detail:
+          coverageState === 'PROVEN_COMPLETE'
+            ? 'Pages 1-6 present.'
+            : 'Page 6 is missing.',
+      },
+    ],
+    gaps: coverageState === 'PROVEN_COMPLETE' ? [] : ['page 6 missing'],
+    exclusions: [],
+    accessState: 'AUTHORIZED',
+    coverageState,
+    reviewerReference: 'synthetic-reviewer',
+    reviewedAt: '2026-09-14T02:05:00.000Z',
+  });
 
 describe('professional investigation domain', () => {
   it('freezes an exact InvestigationRun envelope and rejects impossible scope', () => {
@@ -100,17 +139,46 @@ describe('professional investigation domain', () => {
   it('keeps a one-cent MatchGroup residual in review', () => {
     expect(
       evaluateMatchGroup('SPLIT_ONE_TO_MANY', [
-        { factReference: 'source', side: 'SOURCE', amountMinor: '1000', currency: 'USD', explicitReference: 'batch-7' },
-        { factReference: 'target-1', side: 'TARGET', amountMinor: '400', currency: 'USD', explicitReference: 'batch-7' },
-        { factReference: 'target-2', side: 'TARGET', amountMinor: '599', currency: 'USD', explicitReference: 'batch-7' },
+        {
+          factReference: 'source',
+          side: 'SOURCE',
+          amountMinor: '1000',
+          currency: 'USD',
+          explicitReference: 'batch-7',
+        },
+        {
+          factReference: 'target-1',
+          side: 'TARGET',
+          amountMinor: '400',
+          currency: 'USD',
+          explicitReference: 'batch-7',
+        },
+        {
+          factReference: 'target-2',
+          side: 'TARGET',
+          amountMinor: '599',
+          currency: 'USD',
+          explicitReference: 'batch-7',
+        },
       ]),
-    ).toMatchObject({ residualMinor: '1', status: 'REVIEW_REQUIRED', autoLinkEligible: false });
+    ).toMatchObject({
+      residualMinor: '1',
+      status: 'REVIEW_REQUIRED',
+      autoLinkEligible: false,
+    });
   });
 
-  it('bridges Clover gross, tender, fees, reserves, payout and bank exactly', () => {
+  it('bridges Clover sale components, tender, funding batch and bank exactly', () => {
     expect(
       evaluateCloverFundingBridge({
         currency: 'USD',
+        batchReference: 'batch-7',
+        saleBaseMinor: '85000',
+        taxMinor: '7000',
+        tipMinor: '8000',
+        chargeMinor: '2000',
+        refundMinor: '3000',
+        adjustmentMinor: '1000',
         grossSalesMinor: '100000',
         tenderMinor: '100000',
         feeMinor: '2500',
@@ -120,6 +188,8 @@ describe('professional investigation domain', () => {
       }),
     ).toMatchObject({
       status: 'RECONCILED',
+      batchReference: 'batch-7',
+      expectedGrossMinor: '100000',
       expectedPayoutMinor: '92500',
       residualMinor: '0',
     });
@@ -129,6 +199,13 @@ describe('professional investigation domain', () => {
     expect(
       evaluateCloverFundingBridge({
         currency: 'USD',
+        batchReference: 'batch-7',
+        saleBaseMinor: '85000',
+        taxMinor: '7000',
+        tipMinor: '8000',
+        chargeMinor: '2000',
+        refundMinor: '3000',
+        adjustmentMinor: '1000',
         grossSalesMinor: '100000',
         tenderMinor: '100000',
         feeMinor: null,
@@ -139,24 +216,115 @@ describe('professional investigation domain', () => {
     ).toEqual({ status: 'PARTIAL', gaps: ['feeMinor', 'reserveMinor'] });
   });
 
+  it('does not hide a contradictory Clover sale component inside gross sales', () => {
+    expect(
+      evaluateCloverFundingBridge({
+        currency: 'USD',
+        batchReference: 'batch-7',
+        saleBaseMinor: '85000',
+        taxMinor: '7000',
+        tipMinor: '8000',
+        chargeMinor: '2000',
+        refundMinor: '3000',
+        adjustmentMinor: '999',
+        grossSalesMinor: '100000',
+        tenderMinor: '100000',
+        feeMinor: '2500',
+        reserveMinor: '5000',
+        payoutMinor: '92500',
+        bankDepositMinor: '92500',
+      }),
+    ).toMatchObject({
+      status: 'CONTRADICTED',
+      expectedGrossMinor: '99999',
+      contradictions: ['SALE_COMPONENT_MISMATCH'],
+    });
+  });
+
   it('retains pending and removed rows while counting only the supported replacement', () => {
     const state = reduceBankLifecycle([
-      { sequence: 1, sourceRecordId: 'pending-1', state: 'PENDING', replacesSourceRecordId: null },
-      { sequence: 2, sourceRecordId: 'posted-1', state: 'POSTED', replacesSourceRecordId: 'pending-1' },
-      { sequence: 3, sourceRecordId: 'posted-1', state: 'REMOVED', replacesSourceRecordId: null },
-      { sequence: 4, sourceRecordId: 'posted-2', state: 'REPLACED', replacesSourceRecordId: 'posted-1' },
+      {
+        sequence: 1,
+        sourceRecordId: 'pending-1',
+        state: 'PENDING',
+        replacesSourceRecordId: null,
+      },
+      {
+        sequence: 2,
+        sourceRecordId: 'posted-1',
+        state: 'POSTED',
+        replacesSourceRecordId: 'pending-1',
+      },
+      {
+        sequence: 3,
+        sourceRecordId: 'posted-1',
+        state: 'REMOVED',
+        replacesSourceRecordId: null,
+      },
+      {
+        sequence: 4,
+        sourceRecordId: 'posted-2',
+        state: 'REPLACED',
+        replacesSourceRecordId: 'posted-1',
+      },
     ]);
     expect(state.countedSourceRecordIds).toEqual(['posted-2']);
     expect(state.history).toHaveLength(4);
     expect(state.preservesAllSourceRecords).toBe(true);
   });
 
+  it.each([
+    [
+      'self replacement',
+      [
+        {
+          sequence: 1,
+          sourceRecordId: 'posted-1',
+          state: 'POSTED' as const,
+          replacesSourceRecordId: 'posted-1',
+        },
+      ],
+    ],
+    [
+      'missing replacement target',
+      [
+        {
+          sequence: 1,
+          sourceRecordId: 'posted-2',
+          state: 'REPLACED' as const,
+          replacesSourceRecordId: 'absent',
+        },
+      ],
+    ],
+    [
+      'impossible first removal',
+      [
+        {
+          sequence: 1,
+          sourceRecordId: 'posted-1',
+          state: 'REMOVED' as const,
+          replacesSourceRecordId: null,
+        },
+      ],
+    ],
+  ])('rejects an invalid bank lifecycle: %s', (_label, events) => {
+    expect(() => reduceBankLifecycle(events)).toThrow();
+  });
+
   it('makes every expected month and gap visible without treating missing as zero', () => {
     const result = evaluatePeriodCompleteness(
       ['2025-01', '2025-02', '2025-03'],
       [
-        { month: '2025-01', state: 'PROVEN_COMPLETE', receiptReference: 'receipt-jan' },
-        { month: '2025-03', state: 'PARTIAL', receiptReference: 'receipt-mar' },
+        {
+          month: '2025-01',
+          state: 'PROVEN_COMPLETE',
+          receiptJson: completenessReceipt('2025-01', 'PROVEN_COMPLETE'),
+        },
+        {
+          month: '2025-03',
+          state: 'PARTIAL',
+          receiptJson: completenessReceipt('2025-03', 'PARTIAL'),
+        },
       ],
     );
     expect(result).toMatchObject({
@@ -164,12 +332,36 @@ describe('professional investigation domain', () => {
       gaps: ['2025-02', '2025-03'],
       missingIsZeroActivity: false,
     });
-    expect(result.months[1]).toEqual({ month: '2025-02', state: 'MISSING', receiptReference: null });
+    expect(result.months[1]).toEqual({
+      month: '2025-02',
+      state: 'MISSING',
+      receiptReference: null,
+    });
+  });
+
+  it('rejects a month-completeness label backed by the wrong period', () => {
+    expect(() =>
+      evaluatePeriodCompleteness(
+        ['2025-01'],
+        [
+          {
+            month: '2025-01',
+            state: 'PROVEN_COMPLETE',
+            receiptJson: completenessReceipt('2025-02', 'PROVEN_COMPLETE'),
+          },
+        ],
+      ),
+    ).toThrow('Month coverage requires a scope-matched receipt');
   });
 
   it('creates a native-Task follow-up history with evidence, approve-not-send and reply correlation', () => {
     const people = [
-      { personId: '30303030-0001-4e7c-8001-123456789def', name: 'Owner', role: 'Owner', selectedRecipient: true },
+      {
+        personId: '30303030-0001-4e7c-8001-123456789def',
+        name: 'Owner',
+        role: 'Owner',
+        selectedRecipient: true,
+      },
     ];
     const draft = {
       mailboxLabel: 'Authorized Gmail',
@@ -191,7 +383,11 @@ describe('professional investigation domain', () => {
         { ...base(3, 'DRAFT_PREPARED'), draft },
         { ...base(4, 'DRAFT_APPROVED_NOT_SENT') },
         { ...base(5, 'STATE_CHANGED'), to: 'WAITING_FOR_REPLY' },
-        { ...base(6, 'REPLY_CORRELATED'), replyReference: 'message-9', correlationKey: 'finance:fact-7' },
+        {
+          ...base(6, 'REPLY_CORRELATED'),
+          replyReference: 'message-9',
+          correlationKey: 'finance:fact-7',
+        },
       ],
       people,
     );
