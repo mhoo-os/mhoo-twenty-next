@@ -38,7 +38,7 @@ UI until its actual mutation prerequisites are satisfied.
 The existing `workspace-finance-follow-ups.ts` adapter now rejects a Task outside
 the exact `MHOO_FINANCE_V1` scope before either state or approval writes and in
 the final receipt. Native PATCH filters bind ID, scope, revision and `updatedAt`
-together. Invalid/overflowing revisions and noncanonical freshness timestamps
+together (native date equality compares a one-millisecond range). Invalid/overflowing revisions and noncanonical freshness timestamps
 are rejected before requests; native denials propagate without a retry under a
 different identity. This closes an adapter gap for callers who already possess
 native Task write permission; it grants none.
@@ -58,7 +58,14 @@ worktree's source. Unchanged 271-test baseline, build and UI reviews are retaine
 No UI changed. Task creation, attachments, exact draft-content persistence and
 immutable actor attribution still need a separately reviewed implementation;
 the legacy approval adapter is not acceptance of those features. Hosted route,
-role and concurrency proof remain open.
+role and concurrency proof remain open. Independent source review accepted
+`c5dac052ab` with no actionable regression: native REST retains row-level
+permissions, and native DATE_TIME equality handles API millisecond precision.
+The revision coordinates Finance writers; same-millisecond native edits that
+do not advance financeRevision are not universally detected. This is not an
+exact database-timestamp compare-and-swap. Source custody and trajectory checks
+passed for the implementation commit; the final receipt-only commit repeats
+those exact-head checks without rerunning unchanged tests.
 
 ARCHITECTURE IMPACT: LOCAL
 
