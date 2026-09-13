@@ -16,7 +16,7 @@ const frontComponentSource = readFileSync(
   'utf8',
 );
 const questionComponentSource = readFileSync(
-  new URL('../components/finance-question-prototype.tsx', import.meta.url),
+  new URL('../components/finance-workspace.tsx', import.meta.url),
   'utf8',
 );
 
@@ -29,6 +29,13 @@ describe('workspace preparation', () => {
       'component: FinanceWorkspacePreparation',
     );
     expect(questionComponentSource).toContain('visibleDemoAttentionItems');
+    expect(questionComponentSource).toContain('aria-label="Window start"');
+    expect(questionComponentSource).toContain('onPointerMove={moveBrushDrag}');
+    expect(questionComponentSource).toContain('ILLUSTRATIVE_HISTORY');
+    expect(questionComponentSource).toContain("id: 'overview'");
+    expect(questionComponentSource).toContain("id: 'transactions'");
+    expect(questionComponentSource).toContain("id: 'statements'");
+    expect(questionComponentSource).toContain("id: 'accounts'");
     expect(questionComponentSource).not.toContain('Accept demo match');
     const widget = dashboard.config?.tabs
       ?.flatMap((tab) => tab.widgets ?? [])
