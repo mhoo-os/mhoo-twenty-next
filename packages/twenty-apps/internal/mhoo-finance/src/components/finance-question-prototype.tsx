@@ -3,7 +3,10 @@ import { useEffect, useReducer, useRef, useState } from 'react';
 import { Button } from 'twenty-ui/input';
 
 import {
+  DEMO_FORECAST_ASSUMPTIONS,
   DEMO_QUESTIONS,
+  DEMO_RECONCILIATION_ITEMS,
+  DEMO_SOURCE_LANES,
   demoMoney,
   demoTrace,
   initialDemoState,
@@ -56,6 +59,31 @@ const Shell = styled.section({
     fontSize: '11px',
     fontWeight: 600,
   },
+  '& .mhoo-fq-story-nav': {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+    gap: '10px',
+    margin: '18px 0 24px',
+  },
+  '& .mhoo-fq-story-link': {
+    color: '#34482c',
+    background: '#fff',
+    border: '1px solid #d8ded2',
+    borderRadius: '12px',
+    padding: '14px',
+    textDecoration: 'none',
+    fontSize: '12px',
+    lineHeight: 1.45,
+  },
+  '& .mhoo-fq-story-link strong': {
+    display: 'block',
+    fontSize: '14px',
+    marginBottom: '3px',
+  },
+  '& .mhoo-fq-story-link:focus-visible': {
+    outline: '3px solid #9caf7e',
+    outlineOffset: '3px',
+  },
   '& .mhoo-fq-notice': {
     padding: '12px 16px',
     border: '1px solid #e7dcb8',
@@ -71,6 +99,65 @@ const Shell = styled.section({
     gap: '18px',
     alignItems: 'start',
   },
+  '& .mhoo-fq-source-grid': {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 230px), 1fr))',
+    gap: '12px',
+    marginTop: '16px',
+  },
+  '& .mhoo-fq-source': {
+    border: '1px solid #e1e5dc',
+    borderRadius: '12px',
+    padding: '16px',
+    background: '#fbfcf9',
+    minWidth: 0,
+  },
+  '& .mhoo-fq-source h3': {
+    fontSize: '14px',
+    margin: '10px 0 8px',
+  },
+  '& .mhoo-fq-status': {
+    display: 'inline-block',
+    fontSize: '10px',
+    fontWeight: 700,
+    letterSpacing: '0.7px',
+    borderRadius: '999px',
+    padding: '5px 8px',
+    color: '#4c593f',
+    background: '#e9eee5',
+  },
+  '& .mhoo-fq-status[data-tone="warn"]': {
+    color: '#765f2f',
+    background: '#fff2cc',
+  },
+  '& .mhoo-fq-status[data-tone="review"]': {
+    color: '#6c4e3b',
+    background: '#f9e7dc',
+  },
+  '& .mhoo-fq-definition-list': {
+    display: 'grid',
+    gridTemplateColumns: 'minmax(120px, 0.7fr) minmax(0, 2fr)',
+    gap: '7px 14px',
+    margin: '12px 0 0',
+    fontSize: '12px',
+    lineHeight: 1.55,
+  },
+  '& .mhoo-fq-definition-list dt': { color: '#687064' },
+  '& .mhoo-fq-definition-list dd': { margin: 0 },
+  '& .mhoo-fq-review-list': {
+    display: 'grid',
+    gap: '10px',
+    marginTop: '16px',
+  },
+  '& .mhoo-fq-review-item': {
+    display: 'grid',
+    gridTemplateColumns: 'minmax(160px, 0.7fr) minmax(0, 2fr)',
+    gap: '12px 20px',
+    padding: '15px 0',
+    borderTop: '1px solid #e8ece4',
+  },
+  '& .mhoo-fq-review-item:first-of-type': { borderTop: 0 },
+  '& .mhoo-fq-review-item h3': { fontSize: '14px', margin: '8px 0 0' },
   '& .mhoo-fq-card': {
     background: '#fff',
     border: '1px solid #e1e5dc',
@@ -227,6 +314,13 @@ const Shell = styled.section({
     gap: '12px',
     alignItems: 'center',
   },
+  '@media (max-width: 680px)': {
+    padding: '16px',
+    borderRadius: 0,
+    '& .mhoo-fq-story-nav': { gridTemplateColumns: '1fr' },
+    '& .mhoo-fq-review-item': { gridTemplateColumns: '1fr' },
+    '& .mhoo-fq-title': { fontSize: '24px' },
+  },
 });
 
 export const FinanceQuestionPrototype = ({
@@ -286,10 +380,13 @@ export const FinanceQuestionPrototype = ({
     <Shell aria-label="Finance question prototype">
       <header className="mhoo-fq-header">
         <div>
-          <div className="mhoo-fq-eyebrow">mhoo / finance lab</div>
-          <h1 className="mhoo-fq-title">A question. A clear trail.</h1>
+          <div className="mhoo-fq-eyebrow">mhoo / finance walkthrough</div>
+          <h1 className="mhoo-fq-title">
+            Understand yesterday. Review today. Plan tomorrow.
+          </h1>
           <div className="mhoo-fq-muted">
-            Explore the explanation, then follow the evidence.
+            Finance is the first focused workspace experience—not the whole
+            workspace. It turns permitted records into a reviewable trail.
           </div>
         </div>
         <span className="mhoo-fq-badge">SYNTHETIC DEMONSTRATION</span>
@@ -299,7 +396,62 @@ export const FinanceQuestionPrototype = ({
         connection, live agent, Workspace query or original file. Every amount
         below is a demonstration.
       </div>
-      <div className="mhoo-fq-controls">
+      <nav className="mhoo-fq-story-nav" aria-label="Finance walkthrough">
+        <a className="mhoo-fq-story-link" href="#finance-history">
+          <strong>1 · History</strong>
+          Collect source evidence without forcing it to agree.
+        </a>
+        <a className="mhoo-fq-story-link" href="#finance-review">
+          <strong>2 · Review</strong>
+          Ask, inspect, reconcile and record uncertainty.
+        </a>
+        <a className="mhoo-fq-story-link" href="#finance-planning">
+          <strong>3 · Planning</strong>
+          Build scenarios only from explicit assumptions.
+        </a>
+      </nav>
+      <section
+        id="finance-history"
+        className="mhoo-fq-card"
+        aria-label="Historical evidence sources"
+      >
+        <div className="mhoo-fq-eyebrow">History / what do we actually have?</div>
+        <h2 className="mhoo-fq-heading">One review, several independent sources</h2>
+        <p className="mhoo-fq-muted">
+          Each source keeps its own period, basis and provenance. A tax return,
+          bank row, Clover sale and emailed invoice can support one another; none
+          is silently rewritten to make the others match.
+        </p>
+        <div className="mhoo-fq-source-grid">
+          {DEMO_SOURCE_LANES.map((source) => (
+            <article className="mhoo-fq-source" key={source.id}>
+              <span
+                className="mhoo-fq-status"
+                data-tone={
+                  source.status === 'REVIEWABLE'
+                    ? 'ok'
+                    : source.status === 'PARTIAL'
+                      ? 'warn'
+                      : 'review'
+                }
+              >
+                DEMO · {source.status.replace('_', ' ')}
+              </span>
+              <h3>{source.label}</h3>
+              <dl className="mhoo-fq-definition-list">
+                <dt>Period</dt>
+                <dd>{source.period}</dd>
+                <dt>Basis</dt>
+                <dd>{source.basis}</dd>
+                <dt>Provenance</dt>
+                <dd>{source.provenance}</dd>
+              </dl>
+              <p className="mhoo-fq-muted">{source.limitation}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+      <div id="finance-review" className="mhoo-fq-controls">
         <label className="mhoo-fq-label">
           Account
           <select
@@ -591,6 +743,74 @@ export const FinanceQuestionPrototype = ({
             evidence is retained when scope changes.
           </p>
         )}
+      </section>
+      <section
+        className="mhoo-fq-card mhoo-fq-records"
+        aria-label="Reconciliation review"
+      >
+        <div className="mhoo-fq-eyebrow">Review / how disagreements are handled</div>
+        <h2 className="mhoo-fq-heading">Keep the difference visible</h2>
+        <p className="mhoo-fq-muted">
+          Deterministic rules propose treatment. Evidence and uncertainty travel
+          with the item. Only a human reviewer resolves an uncertain match.
+        </p>
+        <div className="mhoo-fq-review-list">
+          {DEMO_RECONCILIATION_ITEMS.map((item) => (
+            <article className="mhoo-fq-review-item" key={item.id}>
+              <div>
+                <span
+                  className="mhoo-fq-status"
+                  data-tone={
+                    item.status === 'MATCHED'
+                      ? 'ok'
+                      : item.status === 'PARTIAL'
+                        ? 'warn'
+                        : 'review'
+                  }
+                >
+                  {item.status.replace('_', ' ')}
+                </span>
+                <h3>{item.title}</h3>
+              </div>
+              <dl className="mhoo-fq-definition-list">
+                <dt>Treatment</dt>
+                <dd>{item.treatment}</dd>
+                <dt>Evidence</dt>
+                <dd>{item.evidence}</dd>
+                <dt>Uncertainty</dt>
+                <dd>{item.uncertainty}</dd>
+              </dl>
+            </article>
+          ))}
+        </div>
+      </section>
+      <section
+        id="finance-planning"
+        className="mhoo-fq-card mhoo-fq-records"
+        aria-label="Future planning assumptions"
+      >
+        <div className="mhoo-fq-eyebrow">Planning / what could happen next?</div>
+        <h2 className="mhoo-fq-heading">Scenario before forecast</h2>
+        <p className="mhoo-fq-muted">
+          This walkthrough does not calculate a forecast. The planned product
+          first records the reviewed actuals baseline and every human-authored
+          assumption; then it can compare scenarios without presenting a promise.
+        </p>
+        <div className="mhoo-fq-source-grid">
+          {DEMO_FORECAST_ASSUMPTIONS.map(([label, value]) => (
+            <article className="mhoo-fq-source" key={label}>
+              <span className="mhoo-fq-status" data-tone="review">
+                PLANNED
+              </span>
+              <h3>{label}</h3>
+              <p className="mhoo-fq-muted">{value}</p>
+            </article>
+          ))}
+        </div>
+        <div className="mhoo-fq-notice">
+          <strong>Forecast withheld in this demo.</strong> Reviewed actuals,
+          coverage, accounting basis and approved assumptions are not available.
+        </div>
       </section>
       <footer className="mhoo-fq-footer">
         <label className="mhoo-fq-label">

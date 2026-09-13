@@ -26,7 +26,7 @@ await writeFile(
   resolve(output, 'index.html'),
   '<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>mhoo Finance · synthetic question prototype</title></head><body style="margin:0;padding:24px;background:#eef0e9"><div id="root"></div><script type="module" src="/app.js"></script></body></html>',
 );
-console.log('Built actual FinanceQuestionPrototype at ' + output);
+process.stdout.write('Built actual FinanceQuestionPrototype at ' + output + '\n');
 if (!process.argv.includes('--build-only')) {
   const routes = {
     '/': ['index.html', 'text/html'],
@@ -52,9 +52,10 @@ if (!process.argv.includes('--build-only')) {
     }
   });
   server.listen(4331, '127.0.0.1', () =>
-    console.log(
+    process.stdout.write(
       'Finance-only synthetic preview http://127.0.0.1:4331 · PID ' +
-        process.pid,
+        process.pid +
+        '\n',
     ),
   );
 }

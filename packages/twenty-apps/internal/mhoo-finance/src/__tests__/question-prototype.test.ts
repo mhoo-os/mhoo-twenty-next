@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
+  DEMO_FORECAST_ASSUMPTIONS,
   DEMO_QUESTIONS,
+  DEMO_RECONCILIATION_ITEMS,
+  DEMO_SOURCE_LANES,
   demoTrace,
   initialDemoScope,
   initialDemoState,
@@ -31,6 +34,48 @@ const ready = () =>
   );
 
 describe('synthetic question-to-evidence exploration', () => {
+  it('keeps source periods, bases and provenance separate', () => {
+    expect(DEMO_SOURCE_LANES.map((source) => source.id)).toEqual([
+      'tax',
+      'bank',
+      'clover',
+      'email',
+    ]);
+    expect(
+      DEMO_SOURCE_LANES.every(
+        (source) => source.period && source.basis && source.provenance,
+      ),
+    ).toBe(true);
+    expect(DEMO_SOURCE_LANES.find((source) => source.id === 'clover')).toMatchObject(
+      { status: 'NOT_CONNECTED' },
+    );
+    expect(DEMO_SOURCE_LANES.find((source) => source.id === 'email')?.limitation).toContain(
+      'not a complete',
+    );
+  });
+
+  it('keeps duplicates, transfers, settlements and uncertain invoices explicit', () => {
+    expect(DEMO_RECONCILIATION_ITEMS.map((item) => item.id)).toEqual([
+      'duplicate-export',
+      'internal-transfer',
+      'clover-settlement',
+      'invoice-payment',
+    ]);
+    expect(
+      DEMO_RECONCILIATION_ITEMS.find((item) => item.id === 'clover-settlement')
+        ?.treatment,
+    ).toContain('gross sales, refunds and processor fees');
+    expect(
+      DEMO_RECONCILIATION_ITEMS.find((item) => item.id === 'invoice-payment')
+        ?.status,
+    ).toBe('HUMAN_REVIEW');
+  });
+
+  it('withholds forecast output until reviewed actuals and assumptions exist', () => {
+    expect(DEMO_FORECAST_ASSUMPTIONS).toHaveLength(4);
+    expect(DEMO_FORECAST_ASSUMPTIONS[0][1]).toContain('Requires reviewed');
+  });
+
   it('uses exact shared money logic and one population for both questions', () => {
     const outflow = resolveDemoQuestion(
       initialDemoScope,

@@ -25,6 +25,106 @@ export type DemoRow = {
   includedInRealTotals: false;
 };
 
+export type DemoSourceLane = {
+  id: 'tax' | 'bank' | 'clover' | 'email';
+  label: string;
+  period: string;
+  basis: string;
+  status: 'REVIEWABLE' | 'PARTIAL' | 'NOT_CONNECTED';
+  provenance: string;
+  limitation: string;
+};
+
+export const DEMO_SOURCE_LANES: readonly DemoSourceLane[] = [
+  {
+    id: 'tax',
+    label: 'Filed tax return',
+    period: 'Example tax year 2024',
+    basis: 'Filed basis shown; reporting basis remains separate',
+    status: 'PARTIAL',
+    provenance: 'invented-return-2024.pdf · demo checksum',
+    limitation: 'A filed return is a historical source, not proof of current-year activity.',
+  },
+  {
+    id: 'bank',
+    label: 'Bank + Plaid activity',
+    period: 'Example Jan–Feb 2025',
+    basis: 'Transaction date; statement controls unavailable',
+    status: 'REVIEWABLE',
+    provenance: 'demo-v1-invented-transactions.csv · rows 2–8',
+    limitation: 'Plaid-style rows do not prove statement completeness or account ownership.',
+  },
+  {
+    id: 'clover',
+    label: 'Clover sales + settlement',
+    period: 'Example February settlement',
+    basis: 'Sale date kept separate from bank settlement date',
+    status: 'NOT_CONNECTED',
+    provenance: 'illustrative settlement packet only',
+    limitation: 'No live merchant, token, import, payout coverage or connection is represented.',
+  },
+  {
+    id: 'email',
+    label: 'Invoice + vendor evidence',
+    period: 'Example February correspondence',
+    basis: 'Document and message dates; payment date remains separate',
+    status: 'PARTIAL',
+    provenance: 'invented invoice excerpt · no mailbox custody',
+    limitation: 'CRM email sync is not a complete invoice, vendor or payment-evidence archive.',
+  },
+];
+
+export type DemoReconciliationItem = {
+  id: string;
+  title: string;
+  status: 'MATCHED' | 'PARTIAL' | 'HUMAN_REVIEW';
+  treatment: string;
+  evidence: string;
+  uncertainty: string;
+};
+
+export const DEMO_RECONCILIATION_ITEMS: readonly DemoReconciliationItem[] = [
+  {
+    id: 'duplicate-export',
+    title: 'Repeated bank / Plaid export',
+    status: 'MATCHED',
+    treatment: 'Suppress the repeated acquisition; keep both import receipts and one eligible fact.',
+    evidence: 'Stable source identity plus matching content and row keys.',
+    uncertainty: 'A similar description or amount alone never proves a duplicate.',
+  },
+  {
+    id: 'internal-transfer',
+    title: 'Operating → reserve transfer',
+    status: 'MATCHED',
+    treatment: 'Pair both sides and exclude the internal movement from revenue and expense.',
+    evidence: 'Opposite signed entries, compatible dates, currency and owned-account scope.',
+    uncertainty: 'One visible side remains an unclassified movement, not an expense.',
+  },
+  {
+    id: 'clover-settlement',
+    title: 'Clover settlement → bank deposit',
+    status: 'PARTIAL',
+    treatment: 'Bridge gross sales, refunds and processor fees before comparing the net deposit.',
+    evidence: 'Illustrative settlement components and one bank deposit candidate.',
+    uncertainty: 'Do not force gross sales to equal a net deposit or collapse fees and refunds.',
+  },
+  {
+    id: 'invoice-payment',
+    title: 'Vendor invoice → bank payment',
+    status: 'HUMAN_REVIEW',
+    treatment: 'Show ranked candidates with reasons; a reviewer accepts, rejects or requests evidence.',
+    evidence: 'Vendor, amount and date proximity from invented excerpts.',
+    uncertainty: 'Email presence is supporting evidence, not payment proof or a complete mailbox search.',
+  },
+];
+
+export const DEMO_FORECAST_ASSUMPTIONS = [
+  ['Actuals baseline', 'Requires reviewed, sufficiently covered source periods'],
+  ['Revenue pattern', 'Use approved historical sales definition; do not substitute bank deposits'],
+  ['Cost pattern', 'Keep fixed, variable, refund and fee behavior explicit'],
+  ['Scenario changes', 'Human-entered assumptions with author, as-of date and version'],
+] as const;
+
 // Fixed invented data only. No client records, provider identifiers or Files.
 const ROWS: readonly DemoRow[] = [
   ['d1', 'operating', '2025-01-08', 'Demo produce supplier', '42000', 2, true],

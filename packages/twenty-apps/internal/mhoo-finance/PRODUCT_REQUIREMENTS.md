@@ -1,5 +1,13 @@
 # Finance: question-driven analysis with traceable evidence
 
+> **Current product-definition entrypoint (2026-09-13):**
+> [HASS_FINANCE_PRODUCT_DEFINITION.md](HASS_FINANCE_PRODUCT_DEFINITION.md)
+> finalizes the Hass-specific source, reconciliation, human-review and
+> planning contract and records the current capability/gap map. Its now-versus-
+> planned status supersedes older prototype-status wording in this historical
+> planning ledger. The detailed reusable product principles below remain in
+> force where they do not conflict with that entrypoint.
+
 Status: existing product requirements updated for documentation and planning only, September 7, 2026. This document records owner decisions and the existing MHO146/Finance project scope. The next clickable prototype is **PLANNED ONLY**; this update authorizes no implementation or operational action. Repository portability remains a proposal pending the coordinator-owned architecture decision.
 
 ARCHITECTURE IMPACT: LOCAL

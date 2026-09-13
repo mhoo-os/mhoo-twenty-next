@@ -2,6 +2,25 @@
 
 ARCHITECTURE IMPACT: LOCAL
 
+## Hass product walkthrough — 2026-09-13 local source
+
+The retained local `FinanceQuestionPrototype` now tells one coherent story:
+historical source inventory, present question-to-evidence review, reconciliation
+of duplicates/transfers/refunds/fees/settlements/invoice candidates, and future
+scenario planning gated on reviewed actuals and explicit assumptions. Tax,
+bank/Plaid, Clover and email/document examples retain separate source periods,
+bases, provenance and limitations. Every item is visibly synthetic; Clover is
+not connected, email is not represented as complete audit evidence, and forecast
+output is withheld.
+
+This is an additive local walkthrough on the current native Finance component,
+not a new dashboard authority. It reuses the existing exact-money result,
+chart-to-record filtering, record-to-source trace, scope invalidation, late-result
+guard and empty/missing/denied/failed simulations. The canonical scope and
+acceptance are in `HASS_FINANCE_PRODUCT_DEFINITION.md`; proposed guide copy is in
+`HASS_WELCOME_GUIDE_COPY.md`. No live guide, Workspace, provider, customer data,
+credential, OAuth scope or deployment was changed.
+
 This App-only increment makes existing sample transactions and their evidence reachable. It does not change the frozen host image release candidate or install anything into a workspace.
 
 Finance groups Overview, Accounts, Transactions, Evidence, Coverage and Exceptions using native v2.37 navigation folders and saved views. Transactions exposes existing date/account/description/exact minor-unit/currency/classification/exclusion/source fields; native records retain their normal opening and filtering behavior. The native record-label key remains visible first, as required by the live Twenty metadata validator. Other technical fields and the legacy numeric amount stay available but hidden by default. No object field or source record is changed.
