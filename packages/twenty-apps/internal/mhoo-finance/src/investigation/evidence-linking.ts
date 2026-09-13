@@ -18,6 +18,7 @@ const evaluatedEvidenceLink: unique symbol = Symbol('evaluatedEvidenceLink');
 
 export type EvaluatedEvidenceLink = Readonly<{
   [evaluatedEvidenceLink]: true;
+  ruleVersion: 'finance-evidence-link/v1';
   kind: 'AUTO_LINK' | 'REVIEW_REQUIRED' | 'NO_LINK';
   reasonCode:
     | 'DUPLICATE_SOURCE_RECORD'
@@ -57,6 +58,7 @@ export const evaluateEvidenceLink = (
   evidence: EvidenceLinkInput,
 ): EvaluatedEvidenceLink => {
   const common = {
+    ruleVersion: 'finance-evidence-link/v1' as const,
     sourceReferences: [
       entry.sourceReference,
       evidence.sourceReference,
@@ -144,6 +146,102 @@ export const evaluateEvidenceLink = (
     explanation:
       'No explicit identifier rule matched. Direction remains unchanged and no relationship is inferred from description text.',
     preventsDuplicateFinancialEntry: evidence.sourceType === 'EMAIL',
+  });
+};
+
+export type EvaluatedEvidenceCandidateSet = Readonly<{
+  ruleVersion: 'finance-evidence-candidates/v1';
+  kind: 'AUTO_LINK' | 'REVIEW_REQUIRED' | 'NO_LINK';
+  reasonCode:
+    | 'SINGLE_EXPLICIT_MATCH'
+    | 'MULTIPLE_EXPLICIT_CANDIDATES'
+    | 'CANDIDATES_REQUIRE_REVIEW'
+    | 'NO_SUPPORTED_CANDIDATE';
+  selectedEvidenceId: string | null;
+  alternatives: readonly Readonly<{
+    evidenceId: string;
+    sourceReference: string;
+    verdict: EvaluatedEvidenceLink['kind'];
+    reasonCode: EvaluatedEvidenceLink['reasonCode'];
+  }>[];
+  requiresHumanReview: boolean;
+}>;
+
+/**
+ * Applies the pairwise rule to a bounded candidate set. Explicit evidence wins
+ * only when it identifies exactly one candidate; ties remain visible and never
+ * fall through to source ordering.
+ */
+export const evaluateEvidenceCandidates = (
+  entry: EvidenceLinkInput,
+  candidates: readonly EvidenceLinkInput[],
+): EvaluatedEvidenceCandidateSet => {
+  if (candidates.length > 100) {
+    throw new Error('Evidence candidate bound exceeded');
+  }
+  const alternatives = candidates
+    .map((candidate) => ({
+      evidenceId: candidate.id,
+      sourceReference: candidate.sourceReference,
+      result: evaluateEvidenceLink(entry, candidate),
+    }))
+    .filter(({ result }) => result.kind !== 'NO_LINK')
+    .sort(
+      (left, right) =>
+        left.sourceReference.localeCompare(right.sourceReference) ||
+        left.evidenceId.localeCompare(right.evidenceId),
+    );
+  const explicit = alternatives.filter(
+    ({ result }) => result.kind === 'AUTO_LINK',
+  );
+  const publicAlternatives = Object.freeze(
+    alternatives.map(({ evidenceId, sourceReference, result }) =>
+      Object.freeze({
+        evidenceId,
+        sourceReference,
+        verdict: result.kind,
+        reasonCode: result.reasonCode,
+      }),
+    ),
+  );
+
+  if (explicit.length === 1) {
+    return Object.freeze({
+      ruleVersion: 'finance-evidence-candidates/v1',
+      kind: 'AUTO_LINK',
+      reasonCode: 'SINGLE_EXPLICIT_MATCH',
+      selectedEvidenceId: explicit[0].evidenceId,
+      alternatives: publicAlternatives,
+      requiresHumanReview: false,
+    });
+  }
+  if (explicit.length > 1) {
+    return Object.freeze({
+      ruleVersion: 'finance-evidence-candidates/v1',
+      kind: 'REVIEW_REQUIRED',
+      reasonCode: 'MULTIPLE_EXPLICIT_CANDIDATES',
+      selectedEvidenceId: null,
+      alternatives: publicAlternatives,
+      requiresHumanReview: true,
+    });
+  }
+  if (alternatives.length) {
+    return Object.freeze({
+      ruleVersion: 'finance-evidence-candidates/v1',
+      kind: 'REVIEW_REQUIRED',
+      reasonCode: 'CANDIDATES_REQUIRE_REVIEW',
+      selectedEvidenceId: null,
+      alternatives: publicAlternatives,
+      requiresHumanReview: true,
+    });
+  }
+  return Object.freeze({
+    ruleVersion: 'finance-evidence-candidates/v1',
+    kind: 'NO_LINK',
+    reasonCode: 'NO_SUPPORTED_CANDIDATE',
+    selectedEvidenceId: null,
+    alternatives: publicAlternatives,
+    requiresHumanReview: false,
   });
 };
 

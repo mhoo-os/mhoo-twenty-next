@@ -52,8 +52,27 @@ describe('Workspace evidence decision persistence', () => {
     expect(history[0].createdAt).toBe('2026-09-14T01:00:00.000Z');
     expect(Object.isFrozen(history)).toBe(true);
     expect(get).toHaveBeenCalledWith('/rest/financeEvidenceLinkDecisions', {
-      query: expect.objectContaining({ filter: `entryReference[eq]:${ENTRY}` }),
+      query: expect.objectContaining({
+        filter: `entryReference[eq]:${ENTRY},evidenceReference[eq]:${EVIDENCE}`,
+      }),
     });
+  });
+
+  it('fails closed when exact relationship history reaches the read bound', async () => {
+    const get = vi.fn().mockResolvedValue({
+      data: {
+        financeEvidenceLinkDecisions: Array.from({ length: 100 }, (_, index) =>
+          row({
+            id: `00000000-0000-4000-8000-${String(index).padStart(12, '0')}`,
+          }),
+        ),
+      },
+    });
+    await expect(
+      readWorkspaceEvidenceHistory(ENTRY, EVIDENCE, {
+        get,
+      } as unknown as RestApiClient),
+    ).rejects.toThrow('reached its read bound');
   });
 
   it('appends an event, verifies its exact receipt, then rereads history', async () => {

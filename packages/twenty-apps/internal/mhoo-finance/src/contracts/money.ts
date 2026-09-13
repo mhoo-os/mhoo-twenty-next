@@ -62,6 +62,19 @@ export function sumMoney(values: readonly Money[], code: Currency): Money {
   return { currency: code, minor: minor(total.toString()).toString() };
 }
 
+/** Exact, locale-neutral display that never converts minor units to Number. */
+export function formatMoney(value: Money): string {
+  const unit = currency(value.currency);
+  const amount = minor(value.minor);
+  const exponent = EXPONENTS[unit];
+  const absolute = amount < 0n ? -amount : amount;
+  const digits = absolute.toString().padStart(exponent + 1, '0');
+  const whole = exponent === 0 ? digits : digits.slice(0, -exponent);
+  const fraction = exponent === 0 ? '' : `.${digits.slice(-exponent)}`;
+  const grouped = whole.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return `${amount < 0n ? '-' : ''}${unit} ${grouped}${fraction}`;
+}
+
 /** CSV readers and notebooks MUST retain these columns as strings (Python int). */
 export function moneyCsv(value: Money): string {
   currency(value.currency);

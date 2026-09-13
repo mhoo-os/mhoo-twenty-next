@@ -4,6 +4,9 @@ For the current Hass product scope, capability/gap map and acceptance contract,
 start with [HASS_FINANCE_PRODUCT_DEFINITION.md](HASS_FINANCE_PRODUCT_DEFINITION.md).
 The private welcome-guide handoff copy is in
 [HASS_WELCOME_GUIDE_COPY.md](HASS_WELCOME_GUIDE_COPY.md).
+The research-to-code evidence map and explicit remaining professional-method
+gaps are in
+[PROFESSIONAL_METHOD_ACCEPTANCE.md](PROFESSIONAL_METHOD_ACCEPTANCE.md).
 
 `@mhoo/finance` is the native Twenty Finance workspace for permission-aware
 accounts, transactions, statements and bounded evidence review. Its installed

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   MAX_MINOR,
+  formatMoney,
   legacyCents,
   moneyCsv,
   readMoneyCsv,
@@ -34,6 +35,10 @@ describe('Exact transport money', () => {
     expect(sourceMoney('1.001', 'KWD', 'OUTFLOW_POSITIVE').minor).toBe('-1001');
     expect(sourceMoney('1', 'JPY', 'INFLOW_POSITIVE').minor).toBe('1');
     expect(sourceMoney('0.00', 'USD', 'OUTFLOW_POSITIVE').minor).toBe('0');
+    expect(formatMoney({ currency: 'USD', minor: '9007199254740993' })).toBe(
+      'USD 90,071,992,547,409.93',
+    );
+    expect(formatMoney({ currency: 'JPY', minor: '-1200' })).toBe('-JPY 1,200');
   });
   it.each([
     ['1.001', 'USD', 'INFLOW_POSITIVE'],

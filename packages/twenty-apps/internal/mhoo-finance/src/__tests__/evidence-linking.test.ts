@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  evaluateEvidenceCandidates,
   evaluateEvidenceLink,
   initialEvidenceLinkState,
   reduceEvidenceLink,
@@ -86,6 +87,61 @@ describe('explainable related-evidence linking', () => {
       preventsDuplicateFinancialEntry: true,
     });
     expect(ambiguousBank.kind).toBe('REVIEW_REQUIRED');
+  });
+
+  it('selects one explicit candidate ahead of weaker alternatives', () => {
+    const verdict = evaluateEvidenceCandidates(
+      record({ settlementReference: 'settlement-0312' }),
+      [
+        record({
+          id: 'weak',
+          sourceReference: 'statement.pdf#row-4',
+          sourceRecordId: 'statement-4',
+          sourceType: 'STATEMENT',
+        }),
+        record({
+          id: 'explicit',
+          sourceReference: 'clover:settlement-0312',
+          sourceRecordId: 'clover-1',
+          sourceType: 'POS',
+          settlementReference: 'settlement-0312',
+        }),
+      ],
+    );
+
+    expect(verdict).toMatchObject({
+      kind: 'AUTO_LINK',
+      reasonCode: 'SINGLE_EXPLICIT_MATCH',
+      selectedEvidenceId: 'explicit',
+      requiresHumanReview: false,
+    });
+  });
+
+  it('keeps tied explicit candidates visible for human review', () => {
+    const verdict = evaluateEvidenceCandidates(
+      record({ settlementReference: 'settlement-0312' }),
+      ['b', 'a'].map((id) =>
+        record({
+          id,
+          sourceReference: `clover:${id}`,
+          sourceRecordId: `clover-${id}`,
+          sourceType: 'POS',
+          settlementReference: 'settlement-0312',
+        }),
+      ),
+    );
+
+    expect(verdict).toMatchObject({
+      kind: 'REVIEW_REQUIRED',
+      reasonCode: 'MULTIPLE_EXPLICIT_CANDIDATES',
+      selectedEvidenceId: null,
+      requiresHumanReview: true,
+    });
+    expect(verdict.alternatives.map(({ evidenceId }) => evidenceId)).toEqual([
+      'a',
+      'b',
+    ]);
+    expect(Object.isFrozen(verdict.alternatives)).toBe(true);
   });
 
   it('links explicit transfer pairs without turning them into income or expense', () => {

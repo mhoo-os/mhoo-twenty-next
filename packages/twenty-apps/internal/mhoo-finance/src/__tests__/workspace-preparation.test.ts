@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import account from '../objects/financial-account.object';
 import fact from '../objects/finance-fact.object';
+import coverage from '../objects/coverage-period.object';
 import overviewNavigation from '../navigation-menu-items/finance-audit-dashboard.navigation-menu-item';
 import accountNavigation from '../navigation-menu-items/financial-accounts.navigation-menu-item';
 import transactionNavigation from '../navigation-menu-items/finance-facts.navigation-menu-item';
@@ -123,6 +124,20 @@ describe('native Finance workspace', () => {
     ).toMatchObject({
       relationTargetFieldMetadataUniversalIdentifier:
         I.FINANCIAL_ACCOUNT_FACTS_FIELD_UNIVERSAL_IDENTIFIER,
+    });
+  });
+
+  it('stores validated completeness proof separately from the legacy coverage badge', () => {
+    expect(coverage.success).toBe(true);
+    expect(
+      coverage.config?.fields?.find(
+        (field) => field.name === 'completenessReceipt',
+      ),
+    ).toMatchObject({
+      universalIdentifier:
+        I.COVERAGE_PERIOD_COMPLETENESS_RECEIPT_FIELD_UNIVERSAL_IDENTIFIER,
+      type: 'TEXT',
+      isNullable: true,
     });
   });
 });

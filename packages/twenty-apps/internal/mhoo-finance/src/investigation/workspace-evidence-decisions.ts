@@ -54,15 +54,15 @@ export const readWorkspaceEvidenceHistory = async (
     data: { financeEvidenceLinkDecisions?: NativeDecisionRow[] };
   }>('/rest/financeEvidenceLinkDecisions', {
     query: {
-      filter: `entryReference[eq]:${entryReference}`,
+      filter: `entryReference[eq]:${entryReference},evidenceReference[eq]:${evidenceReference}`,
       limit: 100,
       depth: 0,
       order_by: 'createdAt[AscNullsLast]',
     },
   });
   const rows = response.data.financeEvidenceLinkDecisions ?? [];
-  if (rows.length > 100)
-    throw new Error('Evidence history exceeded read bound');
+  if (rows.length === 100)
+    throw new Error('Evidence history reached its read bound');
   return Object.freeze(
     rows
       .filter((row) => isDecision(row, entryReference, evidenceReference))

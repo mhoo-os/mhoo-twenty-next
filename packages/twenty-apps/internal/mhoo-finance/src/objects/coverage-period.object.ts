@@ -1,6 +1,7 @@
 import { defineObject, FieldType } from 'twenty-sdk/define';
 
 import {
+  COVERAGE_PERIOD_COMPLETENESS_RECEIPT_FIELD_UNIVERSAL_IDENTIFIER,
   COVERAGE_PERIOD_EXPECTED_FIELD_UNIVERSAL_IDENTIFIER,
   COVERAGE_PERIOD_FRESHNESS_FIELD_UNIVERSAL_IDENTIFIER,
   COVERAGE_PERIOD_KEY_FIELD_UNIVERSAL_IDENTIFIER,
@@ -117,6 +118,15 @@ export default defineObject({
       name: 'lineage',
       label: 'Lineage',
       icon: 'IconRoute',
+    },
+    {
+      universalIdentifier: COVERAGE_PERIOD_COMPLETENESS_RECEIPT_FIELD_UNIVERSAL_IDENTIFIER,
+      type: FieldType.TEXT,
+      name: 'completenessReceipt',
+      label: 'Completeness receipt',
+      description: 'Validated named-population proof. The legacy coverage badge alone cannot support PROVEN_COMPLETE.',
+      icon: 'IconListCheck',
+      isNullable: true,
     },
   ],
 });

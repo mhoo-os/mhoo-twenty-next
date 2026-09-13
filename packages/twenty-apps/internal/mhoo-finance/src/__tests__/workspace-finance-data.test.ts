@@ -118,6 +118,7 @@ describe('current Workspace Finance data adapter', () => {
       expect.objectContaining({
         id: '20202020-0001-4e7c-8001-123456789def',
         state: 'READY_FOR_REVIEW',
+        questionRoute: 'UNCHANGED',
         ownerName: 'Finance Reviewer',
         contractWarning: false,
       }),

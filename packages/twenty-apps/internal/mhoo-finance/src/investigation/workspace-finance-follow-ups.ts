@@ -2,9 +2,12 @@ import { RestApiClient, RestApiClientError } from 'twenty-client-sdk/rest';
 
 import {
   financeNativeTaskStatus,
+  hasExactSelectedRecipients,
   isFinanceFollowUpTransitionAllowed,
   parseFinanceProvenance,
+  type FinanceDraftEmail,
   type FinanceFollowUpState,
+  type FinanceFollowUpPerson,
 } from './finance-follow-up-contract';
 
 const UUID =
@@ -16,6 +19,7 @@ type NativeTaskReceipt = Readonly<{
   financeFollowUpState?: unknown;
   financeEmailApproval?: unknown;
   financeProvenanceHistory?: unknown;
+  updatedAt?: unknown;
 }>;
 
 const validatedProvenance = (value: string | null) => {
@@ -46,12 +50,50 @@ const readTaskReceipt = async (
   return response.data.task ?? {};
 };
 
+const assertFreshTask = (
+  receipt: NativeTaskReceipt,
+  input: Readonly<{
+    taskId: string;
+    expectedUpdatedAt: string;
+    from: FinanceFollowUpState;
+  }>,
+) => {
+  if (!input.expectedUpdatedAt) {
+    throw new Error('Finance follow-up freshness receipt is unavailable');
+  }
+  if (
+    receipt.id !== input.taskId ||
+    receipt.updatedAt !== input.expectedUpdatedAt ||
+    receipt.financeFollowUpState !== input.from
+  ) {
+    throw new Error('Finance follow-up changed since it was read');
+  }
+};
+
+const appendProvenance = (
+  current: unknown,
+  event: Readonly<Record<string, string>>,
+) => {
+  if (
+    current !== null &&
+    current !== undefined &&
+    typeof current !== 'string'
+  ) {
+    throw new Error('Invalid Finance provenance history');
+  }
+  const provenance = validatedProvenance(current ?? null);
+  if (provenance.length >= 100) {
+    throw new Error('Finance provenance history reached its write bound');
+  }
+  return JSON.stringify([...provenance, event]);
+};
+
 export const updateWorkspaceFinanceFollowUpState = async (
   input: Readonly<{
     taskId: string;
     from: FinanceFollowUpState;
     to: FinanceFollowUpState;
-    currentProvenance: string | null;
+    expectedUpdatedAt: string;
     at: string;
   }>,
   client = new RestApiClient({ runAs: 'user' }),
@@ -60,19 +102,20 @@ export const updateWorkspaceFinanceFollowUpState = async (
   if (!isFinanceFollowUpTransitionAllowed(input.from, input.to)) {
     throw new Error('Invalid Finance follow-up transition');
   }
-  const provenance = [
-    ...validatedProvenance(input.currentProvenance),
-    {
-      at: input.at,
-      action: 'REVIEWER_STATE_CHANGED',
-      from: input.from,
-      to: input.to,
-    },
-  ];
+  const before = await readTaskReceipt(input.taskId, client);
+  assertFreshTask(before, input);
   const expected = {
     financeFollowUpState: input.to,
     status: financeNativeTaskStatus(input.to),
-    financeProvenanceHistory: JSON.stringify(provenance),
+    financeProvenanceHistory: appendProvenance(
+      before.financeProvenanceHistory,
+      {
+        at: input.at,
+        action: 'REVIEWER_STATE_CHANGED',
+        from: input.from,
+        to: input.to,
+      },
+    ),
   } as const;
   await client.patch(`/rest/tasks/${input.taskId}`, expected);
   const receipt = await readTaskReceipt(input.taskId, client);
@@ -91,7 +134,10 @@ export const approveWorkspaceFinanceDraft = async (
   input: Readonly<{
     taskId: string;
     from: 'AWAITING_APPROVAL';
-    currentProvenance: string | null;
+    financeState: FinanceFollowUpState;
+    expectedUpdatedAt: string;
+    draftEmail: FinanceDraftEmail;
+    people: readonly FinanceFollowUpPerson[];
     at: string;
   }>,
   client = new RestApiClient({ runAs: 'user' }),
@@ -100,16 +146,27 @@ export const approveWorkspaceFinanceDraft = async (
   if (input.from !== 'AWAITING_APPROVAL') {
     throw new Error('Finance email draft is not awaiting approval');
   }
-  const provenance = [
-    ...validatedProvenance(input.currentProvenance),
-    {
-      at: input.at,
-      action: 'EMAIL_DRAFT_APPROVED_NOT_SENT',
-    },
-  ];
+  if (!hasExactSelectedRecipients(input.draftEmail, input.people)) {
+    throw new Error('Finance email draft has no valid selected recipients');
+  }
+  const before = await readTaskReceipt(input.taskId, client);
+  assertFreshTask(before, {
+    taskId: input.taskId,
+    expectedUpdatedAt: input.expectedUpdatedAt,
+    from: input.financeState,
+  });
+  if (before.financeEmailApproval !== input.from) {
+    throw new Error('Finance email approval changed since it was read');
+  }
   const expected = {
     financeEmailApproval: 'APPROVED_NOT_SENT',
-    financeProvenanceHistory: JSON.stringify(provenance),
+    financeProvenanceHistory: appendProvenance(
+      before.financeProvenanceHistory,
+      {
+        at: input.at,
+        action: 'EMAIL_DRAFT_APPROVED_NOT_SENT',
+      },
+    ),
   } as const;
   await client.patch(`/rest/tasks/${input.taskId}`, expected);
   const receipt = await readTaskReceipt(input.taskId, client);

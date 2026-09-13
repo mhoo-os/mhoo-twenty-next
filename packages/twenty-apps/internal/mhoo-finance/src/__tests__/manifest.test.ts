@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
+import { STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS } from 'twenty-sdk/define';
 
 import {
+  FINANCE_EVIDENCE_LINK_DECISION_OBJECT_UNIVERSAL_IDENTIFIER,
   FINANCE_FACT_OBJECT_UNIVERSAL_IDENTIFIER,
   FINANCIAL_ACCOUNT_OBJECT_UNIVERSAL_IDENTIFIER,
   SOURCE_ARTIFACT_OBJECT_UNIVERSAL_IDENTIFIER,
@@ -14,7 +16,7 @@ describe('@mhoo/finance fixture manifest contracts', () => {
     expect(application.config?.serverVariables).toBeUndefined();
   });
 
-  it('grants only Finance facts, accounts and source evidence read access, without mutation authority', () => {
+  it('grants bounded review access without deletion, settings, provider or agent authority', () => {
     expect(financeFixtureReaderRole.success).toBe(true);
     expect(financeFixtureReaderRole.config).toMatchObject({
       canAccessAllTools: false,
@@ -27,16 +29,34 @@ describe('@mhoo/finance fixture manifest contracts', () => {
       canBeAssignedToUsers: true,
       canBeAssignedToApiKeys: false,
       objectPermissions: [
-        FINANCE_FACT_OBJECT_UNIVERSAL_IDENTIFIER,
-        FINANCIAL_ACCOUNT_OBJECT_UNIVERSAL_IDENTIFIER,
-    SOURCE_ARTIFACT_OBJECT_UNIVERSAL_IDENTIFIER,
-      ].map((objectUniversalIdentifier) => ({
-        objectUniversalIdentifier,
-        canReadObjectRecords: true,
-        canUpdateObjectRecords: false,
-        canSoftDeleteObjectRecords: false,
-        canDestroyObjectRecords: false,
-      })),
+        ...[
+          FINANCE_FACT_OBJECT_UNIVERSAL_IDENTIFIER,
+          FINANCIAL_ACCOUNT_OBJECT_UNIVERSAL_IDENTIFIER,
+          SOURCE_ARTIFACT_OBJECT_UNIVERSAL_IDENTIFIER,
+        ].map((objectUniversalIdentifier) => ({
+          objectUniversalIdentifier,
+          canReadObjectRecords: true,
+          canUpdateObjectRecords: false,
+          canSoftDeleteObjectRecords: false,
+          canDestroyObjectRecords: false,
+        })),
+        {
+          objectUniversalIdentifier:
+            STANDARD_OBJECT_UNIVERSAL_IDENTIFIERS.task.universalIdentifier,
+          canReadObjectRecords: true,
+          canUpdateObjectRecords: true,
+          canSoftDeleteObjectRecords: false,
+          canDestroyObjectRecords: false,
+        },
+        {
+          objectUniversalIdentifier:
+            FINANCE_EVIDENCE_LINK_DECISION_OBJECT_UNIVERSAL_IDENTIFIER,
+          canReadObjectRecords: true,
+          canUpdateObjectRecords: true,
+          canSoftDeleteObjectRecords: false,
+          canDestroyObjectRecords: false,
+        },
+      ],
       fieldPermissions: [],
       permissionFlagUniversalIdentifiers: [],
     });

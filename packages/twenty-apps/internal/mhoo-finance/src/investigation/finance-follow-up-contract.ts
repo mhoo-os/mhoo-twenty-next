@@ -4,6 +4,9 @@ export type FinanceFollowUpState =
 export type FinanceEmailApproval =
   'DRAFT' | 'AWAITING_APPROVAL' | 'APPROVED_NOT_SENT' | 'SENT';
 
+export type FinanceQuestionRoute =
+  'UNCHANGED' | 'NEUTRALIZED_MISCONDUCT' | 'QUALIFIED_PROFESSIONAL_REQUIRED';
+
 export type FinanceFollowUpSubject = Readonly<{
   kind: 'TRANSACTION' | 'MISSING_STATEMENT_PERIOD';
   reference: string;
@@ -33,6 +36,18 @@ export type FinanceDraftEmail = Readonly<{
   attachmentReferences: readonly string[];
 }>;
 
+export const hasExactSelectedRecipients = (
+  draft: FinanceDraftEmail,
+  people: readonly FinanceFollowUpPerson[],
+): boolean =>
+  draft.recipientPersonIds.length > 0 &&
+  draft.recipientPersonIds.every((personId) =>
+    people.some(
+      (person) =>
+        person.personId === personId && person.selectedRecipient === true,
+    ),
+  );
+
 export type FinanceProvenanceEvent = Readonly<{
   at: string;
   action: string;
@@ -54,6 +69,10 @@ const EMAIL_APPROVALS = new Set<FinanceEmailApproval>([
 ]);
 const UUID =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const MISCONDUCT_CONCLUSION =
+  /\b(?:fraud|fraudulent|theft|thief|steal|stole|stolen|embezzl\w*|guilt\w*)\b/i;
+const PROFESSIONAL_CONCLUSION =
+  /\b(?:audit(?:ed|ing)?|clean opinion|agreed-upon procedures?|AUP|taxable|tax opinion|legal conclusion)\b/i;
 
 const parseArray = (value: string | null): unknown[] => {
   if (!value) return [];
@@ -63,6 +82,27 @@ const parseArray = (value: string | null): unknown[] => {
   } catch {
     return [];
   }
+};
+
+export const routeFinanceInvestigationQuestion = (
+  value: string | null | undefined,
+): Readonly<{ question: string; route: FinanceQuestionRoute }> => {
+  const question = value?.trim() || 'Untitled Finance follow-up';
+  if (MISCONDUCT_CONCLUSION.test(question)) {
+    return Object.freeze({
+      question:
+        'Which scoped movements lack corroborating business purpose or documented treatment?',
+      route: 'NEUTRALIZED_MISCONDUCT',
+    });
+  }
+  if (PROFESSIONAL_CONCLUSION.test(question)) {
+    return Object.freeze({
+      question:
+        'Which scoped records, procedures and gaps require qualified professional review?',
+      route: 'QUALIFIED_PROFESSIONAL_REQUIRED',
+    });
+  }
+  return Object.freeze({ question, route: 'UNCHANGED' });
 };
 
 export const parseFinanceFollowUpState = (
@@ -264,6 +304,9 @@ export const financeNativeTaskStatus = (
   state: FinanceFollowUpState,
 ): 'TODO' | 'IN_PROGRESS' | 'DONE' =>
   state === 'TO_DO' ? 'TODO' : state === 'RESOLVED' ? 'DONE' : 'IN_PROGRESS';
+
+export const financeFollowUpResolutionEffect = () =>
+  'NO_RECONCILIATION_EFFECT' as const;
 
 export const isFinanceFollowUpTransitionAllowed = (
   from: FinanceFollowUpState,

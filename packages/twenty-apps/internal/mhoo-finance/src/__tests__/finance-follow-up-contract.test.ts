@@ -1,11 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  financeFollowUpResolutionEffect,
   financeNativeTaskStatus,
   isFinanceFollowUpTransitionAllowed,
   parseFinanceDraftEmail,
   parseFinancePeople,
   parseFinanceSubjects,
+  routeFinanceInvestigationQuestion,
 } from '../investigation/finance-follow-up-contract';
 
 describe('native Task Finance follow-up contract', () => {
@@ -14,7 +16,27 @@ describe('native Task Finance follow-up contract', () => {
     expect(financeNativeTaskStatus('WAITING_FOR_REPLY')).toBe('IN_PROGRESS');
     expect(financeNativeTaskStatus('READY_FOR_REVIEW')).toBe('IN_PROGRESS');
     expect(financeNativeTaskStatus('RESOLVED')).toBe('DONE');
+    expect(financeFollowUpResolutionEffect()).toBe('NO_RECONCILIATION_EFFECT');
   });
+
+  it.each([
+    ['Did the manager steal this money?', 'NEUTRALIZED_MISCONDUCT'],
+    [
+      'Audit these books and give a clean opinion',
+      'QUALIFIED_PROFESSIONAL_REQUIRED',
+    ],
+    ['Is this deposit taxable?', 'QUALIFIED_PROFESSIONAL_REQUIRED'],
+  ] as const)(
+    'routes conclusion-seeking wording to neutral review: %s',
+    (question, route) => {
+      const result = routeFinanceInvestigationQuestion(question);
+
+      expect(result.route).toBe(route);
+      expect(result.question).not.toMatch(
+        /fraud|theft|steal|stole|stolen|guilt|audit|taxable/i,
+      );
+    },
+  );
 
   it('allows bounded human-review transitions only', () => {
     expect(isFinanceFollowUpTransitionAllowed('TO_DO', 'RESOLVED')).toBe(false);

@@ -33,6 +33,17 @@ The current Linear truth is deliberately mixed: MHO-146 is Done for its bounded 
 - Workspace operator: manages membership, source connections and retention under Twenty-owned identity and permission controls.
 - Agent: selects and explains authorized tools. It cannot invent totals, broaden scope, publish findings or resolve uncertainty.
 
+Finance operates as bookkeeping support and a bounded management
+investigation/reconciliation system. Each run must declare `engagementMode`
+(`BOOKKEEPING_SUPPORT`, `MANAGEMENT_INVESTIGATION` or
+`PROFESSIONAL_SUPPORT_PACKET`), intended use/users and decision, entity/period/
+basis/authority scope, and prohibited outputs. An external
+`professionalEngagementRef` is recorded only when a qualified professional
+supplies it. Finance does not perform or issue an audit, review, AUP, tax
+opinion, legal conclusion or forensic finding. Conclusion-seeking prompts are
+converted to neutral evidence questions or stopped with
+`QUALIFIED_PROFESSIONAL_REQUIRED`.
+
 ## One review, independent sources
 
 Every source enters through an acquisition receipt and retains its own source identity, period, effective/observed time, revision, original values, provenance and coverage state.
@@ -46,6 +57,20 @@ Every source enters through an acquisition receipt and retains its own source id
 | Email/document         | message/document identity, sender/recipient, document date, vendor/customer identity, invoice number, amount/currency, attachment/source reference | Message receipt is not proof of delivery, invoice validity, goods received or payment. CRM sync is not complete audit evidence.                                                   |
 
 Coverage uses explicit states: `PROVEN_COMPLETE`, `SOURCE_COMPLETE_UNRECONCILED`, `PARTIAL`, `MISSING`, `OUT_OF_SCOPE` and `SUPERSEDED`. Missing evidence never becomes zero activity.
+
+Every completeness claim names its entity/account/merchant population,
+period/timezone/basis, acquisition and authority receipt, content hash and exact
+locator, expected/observed population, continuity/balance/pagination tests,
+gaps/exclusions, lifecycle state and reviewer/time. `PROVEN_COMPLETE` is invalid
+without a passed named-population procedure. Complete received rows never imply
+complete business activity.
+
+Coverage, claim and workflow are independent axes. Claim state is `OBSERVED`,
+`DERIVED`, `SUPPORTED`, `CONTRADICTED`, `UNRESOLVED` or
+`EXTERNAL_PROFESSIONAL_CONCLUSION`; workflow is `NEW`, `INVESTIGATING`,
+`EVIDENCE_REQUESTED`, `HUMAN_REVIEW`, `DISPOSED` or `REOPENED`. An external
+professional conclusion must link its immutable report and issuer; Finance
+cannot author it or compress the three axes into one confidence score.
 
 ## Period and basis rules
 
@@ -68,6 +93,25 @@ The engagement planning horizon is approximately 2020–2026. It is not an exact
 5. **Invoices and payments:** use vendor, invoice/reference, amount/currency, date and evidence links to propose candidates. An email attachment may support an invoice; a bank debit may support payment. Neither alone resolves the other.
 6. **Conflicts:** preserve contradictory values and their sources. The product may show possible explanations and request evidence; it cannot edit a source fact to force agreement.
 7. **Human review:** uncertain candidates have `proposed`, `accepted`, `rejected` or `needs evidence` disposition with reviewer, time and evidence. No confidence score substitutes for the explanation.
+8. **Match groups:** use `EXACT_ONE_TO_ONE`, `SPLIT_ONE_TO_MANY`,
+   `BATCH_MANY_TO_ONE`, `MANY_TO_MANY`, `REVERSAL_OR_REPOST`,
+   `CANDIDATE_ONLY` or `UNMATCHED`. Store member facts, debit/credit sums,
+   residual cents, timing, rule version, excluded candidates, alternatives and
+   disposition. A tie remains `AMBIGUOUS`.
+9. **Owner/related-party flows:** record economic direction and confirmed
+   endpoints separately from contribution, loan, repayment, interest,
+   distribution, payroll, reimbursement, personal-expense or unresolved
+   classification. A memo cannot decide accounting, tax or legal treatment.
+10. **Thresholds:** matching tolerance never changes source money; a management
+    review threshold cannot suppress duplicates, contradictions, related-party
+    items or coverage gaps; professional materiality requires a named external
+    engagement, basis and approver.
+
+Source, derived fact, hypothesis, human disposition and linked external
+professional conclusion remain distinct. A contradiction retains its assertion,
+all conflicting facts, monetary/period effect, alternatives, procedure and next
+evidence request. New evidence reopens and appends; it never overwrites the
+prior disposition.
 
 ## Experience: past → present → future
 
@@ -77,11 +121,18 @@ Build a source-by-period map for tax returns, bank/Plaid activity, Clover sales/
 
 ### 2. Review the present
 
-The reviewer asks a bounded question. One account/period/snapshot/filter context drives the answer, chart, contributing transactions and exact source trail. A deterministic procedure supplies arithmetic and exclusions. The screen shows supporting and contradictory evidence, uncertainty and the next allowed action. Scope changes clear incompatible selections and late results cannot replace the active result.
+The reviewer asks a bounded question. One account/period/snapshot/filter context drives the answer, chart, contributing transactions and exact source trail. A deterministic procedure supplies arithmetic and exclusions. The screen shows supporting and contradictory evidence, uncertainty and the next allowed action. Scope changes clear incompatible selections and late results cannot replace the active result. An evidence request names the exact assertion and amount/period, live alternatives, smallest useful artifact or field and why it discriminates, owner/due date, authority/privacy boundary and result—including when the request could not establish the fact.
 
 ### 3. Plan the future
 
 Planning starts from a named, reviewed actuals baseline. Each scenario records assumption name, value, unit, author, effective/as-of date, version and rationale. Revenue, fixed/variable costs, refunds, fees, timing, seasonality and source-coverage sensitivity remain separate. Outputs are scenarios, not promises, tax advice or financing decisions. If the baseline, basis or assumptions are not eligible, the forecast is withheld.
+
+Historical-to-ongoing use requires an immutable cutoff receipt naming date,
+source periods, opening balances, basis, unresolved carry-forwards, reviewer and
+report hash. Planning inputs keep `ACTUAL_REVIEWED`, `ACTUAL_PARTIAL` and
+`FORECAST_ASSUMPTION` separate. A reopened prior-period fact invalidates the
+affected close receipt; partial actuals become an explicit range or block the
+baseline, never zero.
 
 ## Acceptance criteria
 

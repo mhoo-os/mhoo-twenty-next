@@ -8,6 +8,7 @@ import {
   parseFinancePeople,
   parseFinanceProvenance,
   parseFinanceSubjects,
+  routeFinanceInvestigationQuestion,
   type FinanceDraftEmail,
   type FinanceEmailApproval,
   type FinanceFollowUpEvidence,
@@ -15,6 +16,7 @@ import {
   type FinanceFollowUpState,
   type FinanceFollowUpSubject,
   type FinanceProvenanceEvent,
+  type FinanceQuestionRoute,
 } from './finance-follow-up-contract';
 
 export type WorkspaceFinanceAccount = Readonly<{
@@ -55,6 +57,7 @@ export type WorkspaceStatement = Readonly<{
 export type WorkspaceFinanceFollowUp = Readonly<{
   id: string;
   title: string;
+  questionRoute: FinanceQuestionRoute;
   nativeStatus: string;
   state: FinanceFollowUpState;
   dueAt: string | null;
@@ -252,6 +255,7 @@ export const readWorkspaceFinance = async (
     const evidence = parseFinanceEvidence(rawEvidence);
     const draftEmail = parseFinanceDraftEmail(rawDraftEmail);
     const provenance = parseFinanceProvenance(rawProvenance);
+    const routedQuestion = routeFinanceInvestigationQuestion(node.title);
     const ownerName = [
       node.assignee?.name?.firstName,
       node.assignee?.name?.lastName,
@@ -261,7 +265,8 @@ export const readWorkspaceFinance = async (
     return [
       {
         id: node.id,
-        title: node.title ?? 'Untitled Finance follow-up',
+        title: routedQuestion.question,
+        questionRoute: routedQuestion.route,
         nativeStatus: node.status ?? 'UNKNOWN',
         state,
         dueAt: node.dueAt ?? null,

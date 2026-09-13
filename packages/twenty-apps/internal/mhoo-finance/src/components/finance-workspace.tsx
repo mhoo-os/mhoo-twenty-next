@@ -1,10 +1,11 @@
 import styled from '@emotion/styled';
 import { useEffect, useRef, useState } from 'react';
 
-import { demoMoney } from '../investigation/question-prototype';
+import { currency, formatMoney } from '../contracts/money';
 import {
   financeFollowUpNextAction,
   financeFollowUpStateLabel,
+  hasExactSelectedRecipients,
   type FinanceFollowUpState,
 } from '../investigation/finance-follow-up-contract';
 import {
@@ -38,6 +39,7 @@ import {
   timelineMonthSpan,
 } from '../investigation/timeline-domain';
 import { SYNTHETIC_WORKSPACE_FINANCE_DATA } from '../investigation/synthetic-workspace-data';
+import { workspaceAggregateCurrency } from '../investigation/workspace-aggregate';
 
 export type FinanceView =
   | 'overview'
@@ -144,6 +146,16 @@ const Workspace = styled.section({
         '3px solid color-mix(in srgb, var(--fw-accent) 42%, transparent)',
       outlineOffset: '2px',
     },
+  '& .fw-table-action': {
+    border: 0,
+    padding: 0,
+    color: 'var(--fw-text)',
+    background: 'transparent',
+    cursor: 'pointer',
+    fontWeight: 650,
+    textAlign: 'left',
+  },
+  '& .fw-table-action:hover': { color: 'var(--fw-accent)' },
   '& .fw-chrome': {
     minHeight: '54px',
     display: 'flex',
@@ -1085,7 +1097,18 @@ const validWorkspaceFacts = (data: WorkspaceFinanceData) =>
     );
 
 const workspaceFactMoney = (fact: WorkspaceFinanceFact) =>
-  fact.amountMinor === null ? '—' : demoMoney(fact.amountMinor);
+  fact.amountMinor === null
+    ? '—'
+    : (() => {
+        try {
+          return formatMoney({
+            currency: currency(fact.currency),
+            minor: fact.amountMinor,
+          });
+        } catch {
+          return `${fact.amountMinor} minor units · currency unavailable`;
+        }
+      })();
 
 const parseStatementControls = (value: string | null) => {
   if (!value) return null;
@@ -1161,6 +1184,8 @@ const WorkspaceFinanceScreen = ({
     start: number;
     end: number;
   } | null>(null);
+  const drawerRef = useRef<HTMLElement | null>(null);
+  const factReturnFocusRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -1216,6 +1241,42 @@ const WorkspaceFinanceScreen = ({
       cancelled = true;
     };
   }, [selectedFact?.artifactId, selectedFact?.id]);
+
+  useEffect(() => {
+    if (!selectedFact) return;
+    const drawer = drawerRef.current;
+    const focusable = () =>
+      Array.from(
+        drawer?.querySelectorAll<HTMLElement>(
+          'button:not(:disabled), a[href], input:not(:disabled), select:not(:disabled), [tabindex]:not([tabindex="-1"])',
+        ) ?? [],
+      );
+    focusable()[0]?.focus();
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        setSelectedFact(null);
+        return;
+      }
+      if (event.key !== 'Tab') return;
+      const items = focusable();
+      if (!items.length) return;
+      const first = items[0];
+      const last = items.at(-1);
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last?.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first?.focus();
+      }
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+      factReturnFocusRef.current?.focus();
+    };
+  }, [selectedFact]);
 
   if (loadState.kind !== 'ready') {
     return (
@@ -1283,6 +1344,26 @@ const WorkspaceFinanceScreen = ({
   const eligibleFacts = scopedFacts.filter(
     (fact) => fact.includedInTotals && fact.status !== 'SUPERSEDED',
   );
+  const aggregateCurrency = workspaceAggregateCurrency(
+    eligibleFacts,
+    data.truncated,
+  );
+  const aggregateAvailable = aggregateCurrency.kind === 'available';
+  const aggregateUnavailableReason =
+    aggregateCurrency.kind === 'truncated'
+      ? 'Result limit reached · totals and chart withheld'
+      : aggregateCurrency.kind === 'mixed'
+        ? 'Mixed currencies · totals and chart withheld'
+        : aggregateCurrency.kind === 'currency-unavailable'
+          ? 'Currency unavailable · totals and chart withheld'
+          : null;
+  const aggregateMoney = (value: bigint) =>
+    aggregateCurrency.kind === 'available'
+      ? formatMoney({
+          currency: aggregateCurrency.currency,
+          minor: value.toString(),
+        })
+      : '—';
   const selectedAccountLabel =
     data.accounts.find((account) => account.id === accountId)?.label ?? null;
   const visibleStatements = data.statements.filter(
@@ -1299,9 +1380,11 @@ const WorkspaceFinanceScreen = ({
     .reduce((sum, fact) => sum + BigInt(fact.amountMinor ?? '0'), 0n);
   let cumulativeIn = 0n;
   let cumulativeOut = 0n;
-  const chartFacts = [...eligibleFacts].sort((left, right) =>
-    left.date.localeCompare(right.date),
-  );
+  const chartFacts = aggregateAvailable
+    ? [...eligibleFacts].sort((left, right) =>
+        left.date.localeCompare(right.date),
+      )
+    : [];
   const chartMax = Number(
     moneyInMinor > moneyOutMinor ? moneyInMinor : moneyOutMinor,
   );
@@ -1441,7 +1524,7 @@ const WorkspaceFinanceScreen = ({
         taskId: selectedFollowUp.id,
         from: selectedFollowUp.state,
         to,
-        currentProvenance: JSON.stringify(selectedFollowUp.provenance),
+        expectedUpdatedAt: selectedFollowUp.updatedAt,
         at: new Date().toISOString(),
       });
       setSelectedFollowUp(null);
@@ -1465,7 +1548,10 @@ const WorkspaceFinanceScreen = ({
       await approveWorkspaceFinanceDraft({
         taskId: selectedFollowUp.id,
         from: 'AWAITING_APPROVAL',
-        currentProvenance: JSON.stringify(selectedFollowUp.provenance),
+        financeState: selectedFollowUp.state,
+        expectedUpdatedAt: selectedFollowUp.updatedAt,
+        draftEmail: selectedFollowUp.draftEmail,
+        people: selectedFollowUp.people,
         at: new Date().toISOString(),
       });
       setSelectedFollowUp(null);
@@ -1490,7 +1576,10 @@ const WorkspaceFinanceScreen = ({
               min={domainStart}
               max={activeEnd}
               value={activeStart}
-              onChange={(event) => setRangeStart(event.target.value)}
+              onChange={(event) => {
+                setRangeStart(event.target.value);
+                setSelectedFact(null);
+              }}
             />
           </label>
           <label className="fw-date-field">
@@ -1502,7 +1591,10 @@ const WorkspaceFinanceScreen = ({
               min={activeStart}
               max={domainEnd}
               value={activeEnd}
-              onChange={(event) => setRangeEnd(event.target.value)}
+              onChange={(event) => {
+                setRangeEnd(event.target.value);
+                setSelectedFact(null);
+              }}
             />
           </label>
         </div>
@@ -1601,20 +1693,19 @@ const WorkspaceFinanceScreen = ({
         </thead>
         <tbody>
           {facts.map((fact) => (
-            <tr
-              key={fact.id}
-              tabIndex={0}
-              onClick={() => setSelectedFact(fact)}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter' || event.key === ' ') {
-                  event.preventDefault();
-                  setSelectedFact(fact);
-                }
-              }}
-            >
+            <tr key={fact.id}>
               <td>{fact.date}</td>
               <td>
-                <strong>{fact.description}</strong>
+                <button
+                  type="button"
+                  className="fw-table-action"
+                  onClick={(event) => {
+                    factReturnFocusRef.current = event.currentTarget;
+                    setSelectedFact(fact);
+                  }}
+                >
+                  {fact.description}
+                </button>
               </td>
               <td>{fact.accountLabel}</td>
               <td>{fact.status}</td>
@@ -1673,7 +1764,10 @@ const WorkspaceFinanceScreen = ({
                   className="fw-select"
                   aria-label="Account"
                   value={accountId}
-                  onChange={(event) => setAccountId(event.target.value)}
+                  onChange={(event) => {
+                    setAccountId(event.target.value);
+                    setSelectedFact(null);
+                  }}
                 >
                   <option value="all">All accounts</option>
                   {data.accounts.map((account) => (
@@ -1709,20 +1803,16 @@ const WorkspaceFinanceScreen = ({
             <div className="fw-metrics" aria-label="Qualified cash movement">
               <div>
                 <span className="fw-label">Money in</span>
-                <div className="fw-value">
-                  {demoMoney(moneyInMinor.toString())}
-                </div>
+                <div className="fw-value">{aggregateMoney(moneyInMinor)}</div>
               </div>
               <div>
                 <span className="fw-label">Money out</span>
-                <div className="fw-value">
-                  {demoMoney(moneyOutMinor.toString())}
-                </div>
+                <div className="fw-value">{aggregateMoney(moneyOutMinor)}</div>
               </div>
               <div>
                 <span className="fw-label">Net movement</span>
                 <div className="fw-value">
-                  {demoMoney((moneyInMinor - moneyOutMinor).toString())}
+                  {aggregateMoney(moneyInMinor - moneyOutMinor)}
                 </div>
               </div>
             </div>
@@ -1733,85 +1823,99 @@ const WorkspaceFinanceScreen = ({
                   {eligibleFacts.length} included · {facts.length} visible ·
                   superseded and excluded records do not enter totals
                 </p>
+                {aggregateUnavailableReason ? (
+                  <p className="fw-warning" role="status">
+                    {aggregateUnavailableReason}
+                  </p>
+                ) : null}
               </div>
               <div>
-                <svg
-                  className="fw-line-chart"
-                  viewBox="0 0 650 250"
-                  role="img"
-                  aria-label={`Money in ${demoMoney(moneyInMinor.toString())}; money out ${demoMoney(moneyOutMinor.toString())}`}
-                >
-                  <line
-                    className="fw-line-chart-grid"
-                    x1="64"
-                    x2="585"
-                    y1="27"
-                    y2="27"
-                  />
-                  <line
-                    className="fw-line-chart-grid"
-                    x1="64"
-                    x2="585"
-                    y1="123"
-                    y2="123"
-                  />
-                  <line
-                    className="fw-line-chart-grid"
-                    x1="64"
-                    x2="585"
-                    y1="220"
-                    y2="220"
-                  />
-                  {line('in') ? (
-                    <path
-                      className="fw-line-chart-path"
-                      data-direction="in"
-                      d={line('in')}
+                {aggregateAvailable ? (
+                  <svg
+                    className="fw-line-chart"
+                    viewBox="0 0 650 250"
+                    role="img"
+                    aria-label={`Money in ${aggregateMoney(moneyInMinor)}; money out ${aggregateMoney(moneyOutMinor)}`}
+                  >
+                    <line
+                      className="fw-line-chart-grid"
+                      x1="64"
+                      x2="585"
+                      y1="27"
+                      y2="27"
                     />
-                  ) : null}
-                  {line('out') ? (
-                    <path
-                      className="fw-line-chart-path"
-                      data-direction="out"
-                      d={line('out')}
+                    <line
+                      className="fw-line-chart-grid"
+                      x1="64"
+                      x2="585"
+                      y1="123"
+                      y2="123"
                     />
-                  ) : null}
-                  {chartPoints.map((point) => (
-                    <g key={point.fact.id}>
-                      <circle
-                        className="fw-line-chart-dot"
+                    <line
+                      className="fw-line-chart-grid"
+                      x1="64"
+                      x2="585"
+                      y1="220"
+                      y2="220"
+                    />
+                    {line('in') ? (
+                      <path
+                        className="fw-line-chart-path"
                         data-direction="in"
-                        cx={chartX(point.fact.date)}
-                        cy={chartY(point.cumulativeIn)}
-                        r="3"
-                      >
-                        <title>{`${point.fact.date} · Money in ${demoMoney(point.cumulativeIn.toString())}`}</title>
-                      </circle>
-                      <circle
-                        className="fw-line-chart-dot"
+                        d={line('in')}
+                      />
+                    ) : null}
+                    {line('out') ? (
+                      <path
+                        className="fw-line-chart-path"
                         data-direction="out"
-                        cx={chartX(point.fact.date)}
-                        cy={chartY(point.cumulativeOut)}
-                        r="3"
-                      >
-                        <title>{`${point.fact.date} · Money out ${demoMoney(point.cumulativeOut.toString())}`}</title>
-                      </circle>
-                    </g>
-                  ))}
-                  <text x="64" y="244">
-                    {activeStart}
-                  </text>
-                  <text x="585" y="244" textAnchor="end">
-                    {activeEnd}
-                  </text>
-                </svg>
-                <div className="fw-chart-key">
-                  <span style={{ color: 'var(--fw-success)' }}>—</span> Money in
-                  <span style={{ color: 'var(--fw-accent)', marginLeft: 8 }}>
-                    —
-                  </span>{' '}
-                  Money out
-                </div>
+                        d={line('out')}
+                      />
+                    ) : null}
+                    {chartPoints.map((point) => (
+                      <g key={point.fact.id}>
+                        <circle
+                          className="fw-line-chart-dot"
+                          data-direction="in"
+                          cx={chartX(point.fact.date)}
+                          cy={chartY(point.cumulativeIn)}
+                          r="3"
+                        >
+                          <title>{`${point.fact.date} · Money in ${aggregateMoney(point.cumulativeIn)}`}</title>
+                        </circle>
+                        <circle
+                          className="fw-line-chart-dot"
+                          data-direction="out"
+                          cx={chartX(point.fact.date)}
+                          cy={chartY(point.cumulativeOut)}
+                          r="3"
+                        >
+                          <title>{`${point.fact.date} · Money out ${aggregateMoney(point.cumulativeOut)}`}</title>
+                        </circle>
+                      </g>
+                    ))}
+                    <text x="64" y="244">
+                      {activeStart}
+                    </text>
+                    <text x="585" y="244" textAnchor="end">
+                      {activeEnd}
+                    </text>
+                  </svg>
+                ) : (
+                  <div className="fw-empty" role="status">
+                    {aggregateUnavailableReason}
+                  </div>
+                )}
+                {aggregateAvailable ? (
+                  <div className="fw-chart-key">
+                    <span style={{ color: 'var(--fw-success)' }}>—</span> Money
+                    in
+                    <span style={{ color: 'var(--fw-accent)', marginLeft: 8 }}>
+                      —
+                    </span>{' '}
+                    Money out
+                  </div>
+                ) : null}
               </div>
             </section>
             {facts.length ? (
@@ -1884,6 +1988,17 @@ const WorkspaceFinanceScreen = ({
                         (sum, fact) => sum + BigInt(fact.amountMinor ?? '0'),
                         0n,
                       );
+                    const accountAggregate = workspaceAggregateCurrency(
+                      accountFacts,
+                      data.truncated,
+                    );
+                    const accountMoney = (value: bigint) =>
+                      accountAggregate.kind === 'available'
+                        ? formatMoney({
+                            currency: accountAggregate.currency,
+                            minor: value.toString(),
+                          })
+                        : '—';
                     return (
                       <tr key={account.id}>
                         <td>
@@ -1892,10 +2007,10 @@ const WorkspaceFinanceScreen = ({
                         <td>{account.sourceKind}</td>
                         <td>{accountFacts.length}</td>
                         <td className="fw-money-col">
-                          {demoMoney(incoming.toString())}
+                          {accountMoney(incoming)}
                         </td>
                         <td className="fw-money-col">
-                          {demoMoney(outgoing.toString())}
+                          {accountMoney(outgoing)}
                         </td>
                       </tr>
                     );
@@ -1907,6 +2022,10 @@ const WorkspaceFinanceScreen = ({
                   No financial accounts are visible to your role.
                 </div>
               ) : null}
+              <p className="fw-local">
+                Account totals show — when results are truncated, currency is
+                unavailable, or an account contains mixed currencies.
+              </p>
             </div>
           </>
         ) : null}
@@ -1942,22 +2061,22 @@ const WorkspaceFinanceScreen = ({
                         <td>{statement.sourceKind}</td>
                         <td className="fw-money-col">
                           {controls?.moneyIn
-                            ? demoMoney(controls.moneyIn)
+                            ? `${controls.moneyIn} minor units · currency unavailable`
                             : 'Unavailable'}
                         </td>
                         <td className="fw-money-col">
                           {controls?.moneyOut
-                            ? demoMoney(controls.moneyOut)
+                            ? `${controls.moneyOut} minor units · currency unavailable`
                             : 'Unavailable'}
                         </td>
                         <td>
                           {controls?.opening
-                            ? demoMoney(controls.opening)
+                            ? `${controls.opening} minor units · currency unavailable`
                             : 'Unavailable'}
                         </td>
                         <td>
                           {controls?.closing
-                            ? demoMoney(controls.closing)
+                            ? `${controls.closing} minor units · currency unavailable`
                             : 'Unavailable'}
                         </td>
                         <td>{statement.status}</td>
@@ -1971,6 +2090,11 @@ const WorkspaceFinanceScreen = ({
                   No statement source artifacts are visible to your role.
                 </div>
               ) : null}
+              <p className="fw-local">
+                Statement controls retain exact minor-unit text, but no money
+                display is inferred until the source records an explicit
+                currency.
+              </p>
             </div>
           </>
         ) : null}
@@ -2038,6 +2162,13 @@ const WorkspaceFinanceScreen = ({
                 Owner: {selectedFollowUp.ownerName} · Next:{' '}
                 {financeFollowUpNextAction(selectedFollowUp.state)}
               </p>
+              {selectedFollowUp.questionRoute !== 'UNCHANGED' ? (
+                <div className="fw-reason" role="status">
+                  Conclusion-seeking wording is withheld here. Finance keeps a
+                  neutral evidence question; qualified professionals own audit,
+                  tax, legal and misconduct conclusions.
+                </div>
+              ) : null}
               {selectedFollowUp.contractWarning ? (
                 <div className="fw-reason" role="status">
                   Some Finance context failed validation and is withheld.
@@ -2295,7 +2426,12 @@ const WorkspaceFinanceScreen = ({
                           type="button"
                           className="fw-button"
                           disabled={
-                            isSynthetic || followUpMutation === 'saving'
+                            isSynthetic ||
+                            followUpMutation === 'saving' ||
+                            !hasExactSelectedRecipients(
+                              selectedFollowUp.draftEmail,
+                              selectedFollowUp.people,
+                            )
                           }
                           onClick={() => void approveFollowUpDraft()}
                         >
@@ -2383,6 +2519,7 @@ const WorkspaceFinanceScreen = ({
             aria-hidden="true"
           />
           <aside
+            ref={drawerRef}
             className="fw-drawer"
             role="dialog"
             aria-modal="true"

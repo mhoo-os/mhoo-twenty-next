@@ -7,32 +7,50 @@ import {
 } from '../investigation/workspace-finance-follow-ups';
 
 describe('user-scoped native Task Finance mutations', () => {
+  const taskId = '20202020-0001-4e7c-8001-123456789def';
+  const updatedAt = '2026-09-14T00:00:00.000Z';
+  const personId = '65f1e8e2-3f37-4b6e-b257-9812d16cda16';
+  const draftEmail = {
+    mailboxLabel: 'Authorized mailbox',
+    subject: 'Evidence request',
+    body: 'Please share the receipt.',
+    recipientPersonIds: [personId],
+    attachmentReferences: [],
+  } as const;
+  const people = [
+    { personId, name: 'Pat', role: 'Owner', selectedRecipient: true },
+  ] as const;
+
   it('persists and verifies a bounded review transition', async () => {
     const patch = vi.fn().mockResolvedValue({});
-    const get = vi.fn().mockImplementation(async () => {
-      const update = patch.mock.calls[0][1];
-      return {
+    const get = vi
+      .fn()
+      .mockResolvedValueOnce({
         data: {
           task: {
-            id: '20202020-0001-4e7c-8001-123456789def',
-            ...update,
+            id: taskId,
+            updatedAt,
+            financeFollowUpState: 'READY_FOR_REVIEW',
+            financeProvenanceHistory: '[]',
           },
         },
-      };
-    });
+      })
+      .mockImplementation(async () => ({
+        data: { task: { id: taskId, ...patch.mock.calls[0][1] } },
+      }));
     const result = await updateWorkspaceFinanceFollowUpState(
       {
-        taskId: '20202020-0001-4e7c-8001-123456789def',
+        taskId,
         from: 'READY_FOR_REVIEW',
         to: 'RESOLVED',
-        currentProvenance: '[]',
-        at: '2026-09-14T00:00:00.000Z',
+        expectedUpdatedAt: updatedAt,
+        at: updatedAt,
       },
       { patch, get } as unknown as RestApiClient,
     );
     expect(result.status).toBe('DONE');
     expect(patch).toHaveBeenCalledWith(
-      '/rest/tasks/20202020-0001-4e7c-8001-123456789def',
+      `/rest/tasks/${taskId}`,
       expect.objectContaining({ financeFollowUpState: 'RESOLVED' }),
     );
   });
@@ -41,11 +59,11 @@ describe('user-scoped native Task Finance mutations', () => {
     await expect(
       updateWorkspaceFinanceFollowUpState(
         {
-          taskId: '20202020-0001-4e7c-8001-123456789def',
+          taskId,
           from: 'TO_DO',
           to: 'RESOLVED',
-          currentProvenance: null,
-          at: '2026-09-14T00:00:00.000Z',
+          expectedUpdatedAt: updatedAt,
+          at: updatedAt,
         },
         {} as RestApiClient,
       ),
@@ -54,20 +72,31 @@ describe('user-scoped native Task Finance mutations', () => {
 
   it('approves a visible draft without sending it', async () => {
     const patch = vi.fn().mockResolvedValue({});
-    const get = vi.fn().mockImplementation(async () => ({
-      data: {
-        task: {
-          id: '20202020-0001-4e7c-8001-123456789def',
-          ...patch.mock.calls[0][1],
+    const get = vi
+      .fn()
+      .mockResolvedValueOnce({
+        data: {
+          task: {
+            id: taskId,
+            updatedAt,
+            financeFollowUpState: 'WAITING_FOR_REPLY',
+            financeEmailApproval: 'AWAITING_APPROVAL',
+            financeProvenanceHistory: null,
+          },
         },
-      },
-    }));
+      })
+      .mockImplementation(async () => ({
+        data: { task: { id: taskId, ...patch.mock.calls[0][1] } },
+      }));
     const result = await approveWorkspaceFinanceDraft(
       {
-        taskId: '20202020-0001-4e7c-8001-123456789def',
+        taskId,
         from: 'AWAITING_APPROVAL',
-        currentProvenance: null,
-        at: '2026-09-14T00:00:00.000Z',
+        financeState: 'WAITING_FOR_REPLY',
+        expectedUpdatedAt: updatedAt,
+        draftEmail,
+        people,
+        at: updatedAt,
       },
       { patch, get } as unknown as RestApiClient,
     );
@@ -75,5 +104,78 @@ describe('user-scoped native Task Finance mutations', () => {
     expect(JSON.parse(result.financeProvenanceHistory)).toEqual([
       expect.objectContaining({ action: 'EMAIL_DRAFT_APPROVED_NOT_SENT' }),
     ]);
+  });
+
+  it('refuses stale state before writing and refuses a full provenance log', async () => {
+    const patch = vi.fn();
+    const staleGet = vi.fn().mockResolvedValue({
+      data: {
+        task: {
+          id: taskId,
+          updatedAt: '2026-09-14T00:00:01.000Z',
+          financeFollowUpState: 'READY_FOR_REVIEW',
+          financeProvenanceHistory: '[]',
+        },
+      },
+    });
+    await expect(
+      updateWorkspaceFinanceFollowUpState(
+        {
+          taskId,
+          from: 'READY_FOR_REVIEW',
+          to: 'RESOLVED',
+          expectedUpdatedAt: updatedAt,
+          at: updatedAt,
+        },
+        { get: staleGet, patch } as unknown as RestApiClient,
+      ),
+    ).rejects.toThrow('changed since it was read');
+
+    const fullGet = vi.fn().mockResolvedValue({
+      data: {
+        task: {
+          id: taskId,
+          updatedAt,
+          financeFollowUpState: 'READY_FOR_REVIEW',
+          financeProvenanceHistory: JSON.stringify(
+            Array.from({ length: 100 }, () => ({ at: updatedAt, action: 'A' })),
+          ),
+        },
+      },
+    });
+    await expect(
+      updateWorkspaceFinanceFollowUpState(
+        {
+          taskId,
+          from: 'READY_FOR_REVIEW',
+          to: 'RESOLVED',
+          expectedUpdatedAt: updatedAt,
+          at: updatedAt,
+        },
+        { get: fullGet, patch } as unknown as RestApiClient,
+      ),
+    ).rejects.toThrow('reached its write bound');
+    expect(patch).not.toHaveBeenCalled();
+  });
+
+  it('refuses approval when a draft recipient is not explicitly selected', async () => {
+    const get = vi.fn();
+    const patch = vi.fn();
+    await expect(
+      approveWorkspaceFinanceDraft(
+        {
+          taskId,
+          from: 'AWAITING_APPROVAL',
+          financeState: 'WAITING_FOR_REPLY',
+          expectedUpdatedAt: updatedAt,
+          draftEmail,
+          people: [{ ...people[0], selectedRecipient: false }],
+          at: updatedAt,
+        },
+        { get, patch } as unknown as RestApiClient,
+      ),
+    ).rejects.toThrow('no valid selected recipients');
+    expect(get).not.toHaveBeenCalled();
+    expect(patch).not.toHaveBeenCalled();
   });
 });

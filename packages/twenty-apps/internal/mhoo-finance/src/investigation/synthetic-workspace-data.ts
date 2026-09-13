@@ -120,6 +120,7 @@ export const SYNTHETIC_WORKSPACE_FINANCE_DATA: WorkspaceFinanceData =
       {
         id: '21db1e48-ff40-49bd-96e0-317769495a69',
         title: 'Which invoice explains the February receipt?',
+        questionRoute: 'UNCHANGED',
         nativeStatus: 'IN_PROGRESS',
         state: 'WAITING_FOR_REPLY',
         dueAt: '2025-03-05T12:00:00.000Z',
@@ -186,6 +187,7 @@ export const SYNTHETIC_WORKSPACE_FINANCE_DATA: WorkspaceFinanceData =
       {
         id: 'b64219dd-51df-47e4-9d6d-6a47fa28b2d7',
         title: 'Find the missing March operating statement',
+        questionRoute: 'UNCHANGED',
         nativeStatus: 'TODO',
         state: 'TO_DO',
         dueAt: null,
@@ -210,6 +212,7 @@ export const SYNTHETIC_WORKSPACE_FINANCE_DATA: WorkspaceFinanceData =
       {
         id: 'f9325ee3-6ac6-4d74-9c25-78d9e24ed84a',
         title: 'Review the owned-account transfer pair',
+        questionRoute: 'UNCHANGED',
         nativeStatus: 'IN_PROGRESS',
         state: 'READY_FOR_REVIEW',
         dueAt: null,
