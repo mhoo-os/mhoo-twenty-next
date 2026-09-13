@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import { useEffect, useRef, useState } from 'react';
 
-import { currency, formatMoney } from '../contracts/money';
+import { currency, formatMoney, minor } from '../contracts/money';
 import {
   financeFollowUpNextAction,
   financeFollowUpStateLabel,
@@ -1356,12 +1356,12 @@ const WorkspaceFinanceScreen = ({
         ? 'Mixed currencies · totals and chart withheld'
         : aggregateCurrency.kind === 'currency-unavailable'
           ? 'Currency unavailable · totals and chart withheld'
-          : null;
-  const aggregateMoney = (value: bigint) =>
+          : 'Money exceeds the exact supported range · totals and chart withheld';
+  const aggregateMoney = (value: string) =>
     aggregateCurrency.kind === 'available'
       ? formatMoney({
           currency: aggregateCurrency.currency,
-          minor: value.toString(),
+          minor: value,
         })
       : '—';
   const selectedAccountLabel =
@@ -1372,12 +1372,14 @@ const WorkspaceFinanceScreen = ({
       (!activeEnd || statement.period <= activeEnd.slice(0, 7)) &&
       (accountId === 'all' || statement.accountKey === selectedAccountLabel),
   );
-  const moneyInMinor = eligibleFacts
-    .filter((fact) => fact.direction === 'in')
-    .reduce((sum, fact) => sum + BigInt(fact.amountMinor ?? '0'), 0n);
-  const moneyOutMinor = eligibleFacts
-    .filter((fact) => fact.direction === 'out')
-    .reduce((sum, fact) => sum + BigInt(fact.amountMinor ?? '0'), 0n);
+  const moneyInMinor =
+    aggregateCurrency.kind === 'available'
+      ? aggregateCurrency.moneyInMinor
+      : '0';
+  const moneyOutMinor =
+    aggregateCurrency.kind === 'available'
+      ? aggregateCurrency.moneyOutMinor
+      : '0';
   let cumulativeIn = 0n;
   let cumulativeOut = 0n;
   const chartFacts = aggregateAvailable
@@ -1386,7 +1388,9 @@ const WorkspaceFinanceScreen = ({
       )
     : [];
   const chartMax = Number(
-    moneyInMinor > moneyOutMinor ? moneyInMinor : moneyOutMinor,
+    minor(moneyInMinor) > minor(moneyOutMinor)
+      ? moneyInMinor
+      : moneyOutMinor,
   );
   const chartSpan = Math.max(
     1,
@@ -1525,6 +1529,7 @@ const WorkspaceFinanceScreen = ({
         from: selectedFollowUp.state,
         to,
         expectedUpdatedAt: selectedFollowUp.updatedAt,
+        expectedRevision: selectedFollowUp.revision,
         at: new Date().toISOString(),
       });
       setSelectedFollowUp(null);
@@ -1550,6 +1555,7 @@ const WorkspaceFinanceScreen = ({
         from: 'AWAITING_APPROVAL',
         financeState: selectedFollowUp.state,
         expectedUpdatedAt: selectedFollowUp.updatedAt,
+        expectedRevision: selectedFollowUp.revision,
         draftEmail: selectedFollowUp.draftEmail,
         people: selectedFollowUp.people,
         at: new Date().toISOString(),
@@ -1976,27 +1982,15 @@ const WorkspaceFinanceScreen = ({
                         fact.includedInTotals &&
                         fact.status !== 'SUPERSEDED',
                     );
-                    const incoming = accountFacts
-                      .filter((fact) => fact.direction === 'in')
-                      .reduce(
-                        (sum, fact) => sum + BigInt(fact.amountMinor ?? '0'),
-                        0n,
-                      );
-                    const outgoing = accountFacts
-                      .filter((fact) => fact.direction === 'out')
-                      .reduce(
-                        (sum, fact) => sum + BigInt(fact.amountMinor ?? '0'),
-                        0n,
-                      );
                     const accountAggregate = workspaceAggregateCurrency(
                       accountFacts,
                       data.truncated,
                     );
-                    const accountMoney = (value: bigint) =>
+                    const accountMoney = (value: string) =>
                       accountAggregate.kind === 'available'
                         ? formatMoney({
                             currency: accountAggregate.currency,
-                            minor: value.toString(),
+                            minor: value,
                           })
                         : '—';
                     return (
@@ -2007,10 +2001,18 @@ const WorkspaceFinanceScreen = ({
                         <td>{account.sourceKind}</td>
                         <td>{accountFacts.length}</td>
                         <td className="fw-money-col">
-                          {accountMoney(incoming)}
+                          {accountMoney(
+                            accountAggregate.kind === 'available'
+                              ? accountAggregate.moneyInMinor
+                              : '0',
+                          )}
                         </td>
                         <td className="fw-money-col">
-                          {accountMoney(outgoing)}
+                          {accountMoney(
+                            accountAggregate.kind === 'available'
+                              ? accountAggregate.moneyOutMinor
+                              : '0',
+                          )}
                         </td>
                       </tr>
                     );

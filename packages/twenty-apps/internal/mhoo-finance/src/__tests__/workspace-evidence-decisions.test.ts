@@ -61,7 +61,7 @@ describe('Workspace evidence decision persistence', () => {
   it('fails closed when exact relationship history reaches the read bound', async () => {
     const get = vi.fn().mockResolvedValue({
       data: {
-        financeEvidenceLinkDecisions: Array.from({ length: 100 }, (_, index) =>
+        financeEvidenceLinkDecisions: Array.from({ length: 101 }, (_, index) =>
           row({
             id: `00000000-0000-4000-8000-${String(index).padStart(12, '0')}`,
           }),
@@ -80,10 +80,10 @@ describe('Workspace evidence decision persistence', () => {
     const post = vi.fn().mockResolvedValue({ data: {} });
     const get = vi
       .fn()
-      .mockResolvedValueOnce({ data: { financeEvidenceLinkDecision: stored } })
       .mockResolvedValueOnce({
-        data: { financeEvidenceLinkDecisions: [stored] },
-      });
+        data: { financeEvidenceLinkDecisions: [] },
+      })
+      .mockResolvedValueOnce({ data: { financeEvidenceLinkDecision: stored } });
 
     const history = await appendWorkspaceEvidenceDecision(
       {
@@ -107,6 +107,35 @@ describe('Workspace evidence decision persistence', () => {
       }),
     );
     expect(history).toHaveLength(1);
+  });
+
+  it('refuses a full history before writing a 101st event', async () => {
+    const post = vi.fn();
+    const get = vi.fn().mockResolvedValue({
+      data: {
+        financeEvidenceLinkDecisions: Array.from({ length: 100 }, (_, index) =>
+          row({
+            id: `00000000-0000-4000-8000-${String(index).padStart(12, '0')}`,
+          }),
+        ),
+      },
+    });
+
+    await expect(
+      appendWorkspaceEvidenceDecision(
+        {
+          entryReference: ENTRY,
+          evidenceReference: EVIDENCE,
+          sourceTypes: 'FINANCE_FACT|SOURCE_ARTIFACT',
+          action: 'UNLINKED',
+          reasonCode: 'EXISTING_FACT_ARTIFACT_RELATION',
+          at: '2026-09-14T01:00:00.000Z',
+          eventId: EVENT,
+        },
+        { get, post } as unknown as RestApiClient,
+      ),
+    ).rejects.toThrow('reached its write bound');
+    expect(post).not.toHaveBeenCalled();
   });
 
   it('rejects untrusted record identities before making a request', async () => {

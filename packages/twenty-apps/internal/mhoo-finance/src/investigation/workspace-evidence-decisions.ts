@@ -55,13 +55,13 @@ export const readWorkspaceEvidenceHistory = async (
   }>('/rest/financeEvidenceLinkDecisions', {
     query: {
       filter: `entryReference[eq]:${entryReference},evidenceReference[eq]:${evidenceReference}`,
-      limit: 100,
+      limit: 101,
       depth: 0,
       order_by: 'createdAt[AscNullsLast]',
     },
   });
   const rows = response.data.financeEvidenceLinkDecisions ?? [];
-  if (rows.length === 100)
+  if (rows.length > 100)
     throw new Error('Evidence history reached its read bound');
   return Object.freeze(
     rows
@@ -97,6 +97,14 @@ export const appendWorkspaceEvidenceDecision = async (
     decisionHistory: JSON.stringify({ at: input.at, action: input.action }),
     preservesOriginals: true,
   } as const;
+  const before = await readWorkspaceEvidenceHistory(
+    input.entryReference,
+    input.evidenceReference,
+    client,
+  );
+  if (before.length >= 100) {
+    throw new Error('Evidence history reached its write bound');
+  }
   try {
     await client.post('/rest/financeEvidenceLinkDecisions', event);
   } catch {
@@ -117,10 +125,10 @@ export const appendWorkspaceEvidenceDecision = async (
   ) {
     throw new Error('Evidence decision receipt mismatch');
   }
-  return readWorkspaceEvidenceHistory(
-    input.entryReference,
-    input.evidenceReference,
-    client,
+  return Object.freeze(
+    [...before, stored].sort((left, right) =>
+      left.createdAt.localeCompare(right.createdAt),
+    ),
   );
 };
 

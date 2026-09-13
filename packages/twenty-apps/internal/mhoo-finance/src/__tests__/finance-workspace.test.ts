@@ -51,7 +51,27 @@ describe('Finance workspace cash-direction timeline', () => {
     expect(workspaceAggregateCurrency([fact('USD')], false)).toEqual({
       kind: 'available',
       currency: 'USD',
+      moneyInMinor: '100',
+      moneyOutMinor: '0',
     });
+  });
+
+  it('withholds aggregates when a fact or directional total exceeds the exact-money bound', () => {
+    expect(
+      workspaceAggregateCurrency(
+        [{ ...fact('USD'), amountMinor: '9223372036854775808' }],
+        false,
+      ),
+    ).toEqual({ kind: 'money-unavailable' });
+    expect(
+      workspaceAggregateCurrency(
+        [
+          { ...fact('USD'), amountMinor: '9223372036854775807' },
+          { ...fact('USD'), id: 'second', amountMinor: '1' },
+        ],
+        false,
+      ),
+    ).toEqual({ kind: 'money-unavailable' });
   });
   it('keeps Jan-Jun all-account totals exact and includes one unknown direction', () => {
     const rows = financeTimelineRows(

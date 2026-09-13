@@ -25,6 +25,12 @@ import {
   FINANCE_FACT_REVISION_FIELD_UNIVERSAL_IDENTIFIER,
   FINANCE_FACT_SOURCE_ROW_FIELD_UNIVERSAL_IDENTIFIER,
   FINANCE_FACT_STATUS_FIELD_UNIVERSAL_IDENTIFIER,
+  FINANCE_FACT_KIND_FIELD_UNIVERSAL_IDENTIFIER,
+  FINANCE_FACT_SOURCE_NATIVE_ID_FIELD_UNIVERSAL_IDENTIFIER,
+  FINANCE_FACT_PROVIDER_LIFECYCLE_FIELD_UNIVERSAL_IDENTIFIER,
+  FINANCE_FACT_EFFECTIVE_AT_FIELD_UNIVERSAL_IDENTIFIER,
+  FINANCE_FACT_OBSERVED_AT_FIELD_UNIVERSAL_IDENTIFIER,
+  FINANCE_FACT_NORMALIZATION_RULE_FIELD_UNIVERSAL_IDENTIFIER,
   SOURCE_ARTIFACT_OBJECT_UNIVERSAL_IDENTIFIER,
   SOURCE_ARTIFACT_FACTS_FIELD_UNIVERSAL_IDENTIFIER,
 } from 'src/constants/universal-identifiers';
@@ -44,6 +50,15 @@ enum FactStatus {
   POSTED = 'POSTED',
   PENDING = 'PENDING',
   SUPERSEDED = 'SUPERSEDED',
+}
+
+enum ProviderLifecycleState {
+  PENDING = 'PENDING',
+  POSTED = 'POSTED',
+  REMOVED = 'REMOVED',
+  REPLACED = 'REPLACED',
+  SUPERSEDED = 'SUPERSEDED',
+  SNAPSHOT_ONLY = 'SNAPSHOT_ONLY',
 }
 
 export default defineObject({
@@ -312,6 +327,63 @@ export default defineObject({
       name: 'description',
       label: 'Description',
       icon: 'IconNotes',
+    },
+    {
+      universalIdentifier: FINANCE_FACT_KIND_FIELD_UNIVERSAL_IDENTIFIER,
+      type: FieldType.TEXT,
+      name: 'factKind',
+      label: 'Fact kind',
+      description: 'Bank movement, sale, tender, fee, reserve, payout or other normalized component.',
+      icon: 'IconCategory',
+      isNullable: true,
+    },
+    {
+      universalIdentifier: FINANCE_FACT_SOURCE_NATIVE_ID_FIELD_UNIVERSAL_IDENTIFIER,
+      type: FieldType.TEXT,
+      name: 'sourceNativeId',
+      label: 'Source native ID',
+      icon: 'IconId',
+      isNullable: true,
+    },
+    {
+      universalIdentifier: FINANCE_FACT_PROVIDER_LIFECYCLE_FIELD_UNIVERSAL_IDENTIFIER,
+      type: FieldType.SELECT,
+      name: 'providerLifecycleState',
+      label: 'Provider lifecycle',
+      icon: 'IconTimelineEvent',
+      isNullable: true,
+      options: [
+        { id: 'abfe1172-f6d9-4253-bd85-9d7cfdcd10d1', value: ProviderLifecycleState.PENDING, label: 'Pending', color: 'yellow', position: 0 },
+        { id: '9628166d-63d2-48a9-8856-04a5be7922ce', value: ProviderLifecycleState.POSTED, label: 'Posted', color: 'green', position: 1 },
+        { id: '2d5f89b9-ff1c-492c-8a7f-ff6d0f62c432', value: ProviderLifecycleState.REMOVED, label: 'Removed', color: 'red', position: 2 },
+        { id: '97e88382-4f41-42c6-a9df-958a8c454687', value: ProviderLifecycleState.REPLACED, label: 'Replaced', color: 'blue', position: 3 },
+        { id: 'c16e58a4-13bb-4272-9a7f-d6d7300e8313', value: ProviderLifecycleState.SUPERSEDED, label: 'Superseded', color: 'gray', position: 4 },
+        { id: '6bfdd777-e26b-44e1-93be-2f6ef2100dd1', value: ProviderLifecycleState.SNAPSHOT_ONLY, label: 'Snapshot only', color: 'purple', position: 5 },
+      ],
+    },
+    {
+      universalIdentifier: FINANCE_FACT_EFFECTIVE_AT_FIELD_UNIVERSAL_IDENTIFIER,
+      type: FieldType.DATE_TIME,
+      name: 'effectiveAt',
+      label: 'Effective at',
+      icon: 'IconCalendarTime',
+      isNullable: true,
+    },
+    {
+      universalIdentifier: FINANCE_FACT_OBSERVED_AT_FIELD_UNIVERSAL_IDENTIFIER,
+      type: FieldType.DATE_TIME,
+      name: 'observedAt',
+      label: 'Observed at',
+      icon: 'IconClock',
+      isNullable: true,
+    },
+    {
+      universalIdentifier: FINANCE_FACT_NORMALIZATION_RULE_FIELD_UNIVERSAL_IDENTIFIER,
+      type: FieldType.TEXT,
+      name: 'normalizationRuleVersion',
+      label: 'Normalization rule',
+      icon: 'IconVersions',
+      isNullable: true,
     },
   ],
 });

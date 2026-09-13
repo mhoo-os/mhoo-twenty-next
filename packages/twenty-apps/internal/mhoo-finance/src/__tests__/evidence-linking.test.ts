@@ -17,6 +17,7 @@ const record = (patch: Partial<EvidenceLinkInput> = {}): EvidenceLinkInput => ({
   date: '2025-03-12',
   direction: 'in',
   amountMinor: '125000',
+  currency: 'USD',
   ...patch,
 });
 
@@ -58,6 +59,38 @@ describe('explainable related-evidence linking', () => {
       reasonCode: 'EXPLICIT_SETTLEMENT_REFERENCE',
       preventsDuplicateFinancialEntry: true,
       incomeExpenseClassification: 'UNCHANGED',
+    });
+  });
+
+  it('requires review when an explicit settlement conflicts on currency or direction', () => {
+    const entry = record({ settlementReference: 'settlement-0312' });
+    expect(
+      evaluateEvidenceLink(
+        entry,
+        record({
+          id: 'currency-conflict',
+          sourceType: 'POS',
+          settlementReference: 'settlement-0312',
+          currency: 'THB',
+        }),
+      ),
+    ).toMatchObject({
+      kind: 'REVIEW_REQUIRED',
+      reasonCode: 'CURRENCY_MISMATCH',
+    });
+    expect(
+      evaluateEvidenceLink(
+        entry,
+        record({
+          id: 'direction-conflict',
+          sourceType: 'POS',
+          settlementReference: 'settlement-0312',
+          direction: 'out',
+        }),
+      ),
+    ).toMatchObject({
+      kind: 'REVIEW_REQUIRED',
+      reasonCode: 'DIRECTION_MISMATCH',
     });
   });
 

@@ -26,6 +26,8 @@ describe('native Task Finance follow-up contract', () => {
       'QUALIFIED_PROFESSIONAL_REQUIRED',
     ],
     ['Is this deposit taxable?', 'QUALIFIED_PROFESSIONAL_REQUIRED'],
+    ['Did the manager falsify this?', 'NEUTRALIZED_MISCONDUCT'],
+    ['Is this payment deductible?', 'QUALIFIED_PROFESSIONAL_REQUIRED'],
   ] as const)(
     'routes conclusion-seeking wording to neutral review: %s',
     (question, route) => {

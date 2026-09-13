@@ -70,9 +70,9 @@ const EMAIL_APPROVALS = new Set<FinanceEmailApproval>([
 const UUID =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const MISCONDUCT_CONCLUSION =
-  /\b(?:fraud|fraudulent|theft|thief|steal|stole|stolen|embezzl\w*|guilt\w*)\b/i;
+  /\b(?:brib\w*|conceal\w*|corrupt\w*|falsif\w*|fraud|fraudulent|misappropriat\w*|theft|thief|steal|stole|stolen|embezzl\w*|guilt\w*)\b/i;
 const PROFESSIONAL_CONCLUSION =
-  /\b(?:audit(?:ed|ing)?|clean opinion|agreed-upon procedures?|AUP|taxable|tax opinion|legal conclusion)\b/i;
+  /\b(?:audit(?:ed|ing)?|clean opinion|agreed-upon procedures?|AUP|deductib\w*|deduction|taxable|tax opinion|tax treatment|legal conclusion)\b/i;
 
 const parseArray = (value: string | null): unknown[] => {
   if (!value) return [];

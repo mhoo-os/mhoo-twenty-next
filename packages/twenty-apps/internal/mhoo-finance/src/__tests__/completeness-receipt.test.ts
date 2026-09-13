@@ -94,4 +94,25 @@ describe('professional source-completeness receipt', () => {
       observedPopulation: 'No authorized artifact',
     });
   });
+
+  it.each([
+    { periodEnd: '2025-99-99' },
+    { timezone: 'Moon/Sea_of_Tranquility' },
+    { lifecycleState: 'DELETED' },
+    { observedPopulation: '5 pages' },
+    { reviewedAt: '2026-09-14T01:59:59.000Z' },
+    {
+      tests: [
+        {
+          id: 'trust-me',
+          result: 'PASS',
+          detail: 'No recognized completeness procedure was performed.',
+        },
+      ],
+    },
+  ])('rejects an impossible PROVEN_COMPLETE invariant: %o', (patch) => {
+    expect(
+      parseFinanceCompletenessReceipt(JSON.stringify(receipt(patch))),
+    ).toBeNull();
+  });
 });

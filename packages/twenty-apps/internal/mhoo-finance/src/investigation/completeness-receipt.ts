@@ -6,7 +6,12 @@ export type FinanceCoverageState =
   | 'OUT_OF_SCOPE'
   | 'SUPERSEDED';
 
+const validatedCompletenessReceipt: unique symbol = Symbol(
+  'validatedCompletenessReceipt',
+);
+
 export type FinanceCompletenessReceipt = Readonly<{
+  [validatedCompletenessReceipt]: true;
   version: 'finance-completeness/v1';
   population: string;
   entityScope: string;
@@ -46,10 +51,44 @@ const COVERAGE_STATES = new Set<FinanceCoverageState>([
 ]);
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const SHA256 = /^sha256:[0-9a-f]{64}$/i;
+const COMPLETE_LIFECYCLE_STATES = new Set([
+  'ACTIVE',
+  'POSTED',
+  'SNAPSHOT_ONLY',
+]);
+const COMPLETENESS_PROCEDURES = new Set([
+  'authority-check',
+  'balance-control',
+  'hash-locator',
+  'page-continuity',
+  'pagination-cursor',
+  'period-continuity',
+  'population-count',
+  'statement-balance',
+]);
 const nonEmpty = (value: unknown): value is string =>
   typeof value === 'string' && value.trim().length > 0;
 const validInstant = (value: unknown): value is string =>
   nonEmpty(value) && !Number.isNaN(Date.parse(value));
+const validIsoDate = (value: unknown): value is string => {
+  if (typeof value !== 'string' || !ISO_DATE.test(value)) return false;
+  const [year, month, day] = value.split('-').map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return (
+    date.getUTCFullYear() === year &&
+    date.getUTCMonth() === month - 1 &&
+    date.getUTCDate() === day
+  );
+};
+const validTimezone = (value: unknown): value is string => {
+  if (!nonEmpty(value)) return false;
+  try {
+    new Intl.DateTimeFormat('en-US', { timeZone: value }).format();
+    return true;
+  } catch {
+    return false;
+  }
+};
 const stringArray = (value: unknown): value is string[] =>
   Array.isArray(value) &&
   value.length <= 100 &&
@@ -74,12 +113,10 @@ export const parseFinanceCompletenessReceipt = (
       !nonEmpty(row.population) ||
       !nonEmpty(row.entityScope) ||
       !nonEmpty(row.accountScope) ||
-      typeof row.periodStart !== 'string' ||
-      !ISO_DATE.test(row.periodStart) ||
-      typeof row.periodEnd !== 'string' ||
-      !ISO_DATE.test(row.periodEnd) ||
+      !validIsoDate(row.periodStart) ||
+      !validIsoDate(row.periodEnd) ||
       row.periodStart > row.periodEnd ||
-      !nonEmpty(row.timezone) ||
+      !validTimezone(row.timezone) ||
       !nonEmpty(row.basis) ||
       !nonEmpty(row.acquisitionMethod) ||
       !validInstant(row.acquiredAt) ||
@@ -119,7 +156,17 @@ export const parseFinanceCompletenessReceipt = (
       (row.accessState !== 'AUTHORIZED' ||
         row.contentHash === null ||
         row.sourceLocator === null ||
+        !COMPLETE_LIFECYCLE_STATES.has(row.lifecycleState as string) ||
+        row.expectedPopulation !== row.observedPopulation ||
         row.gaps.length > 0 ||
+        Date.parse(row.reviewedAt as string) <
+          Date.parse(row.acquiredAt as string) ||
+        !tests.some(
+          (test) =>
+            COMPLETENESS_PROCEDURES.has(
+              (test as Record<string, unknown>).id as string,
+            ) && (test as Record<string, unknown>).result === 'PASS',
+        ) ||
         tests.some(
           (test) => (test as Record<string, unknown>).result !== 'PASS',
         ))
@@ -153,6 +200,7 @@ export const parseFinanceCompletenessReceipt = (
       coverageState: row.coverageState as FinanceCoverageState,
       reviewerReference: row.reviewerReference,
       reviewedAt: row.reviewedAt,
+      [validatedCompletenessReceipt]: true as const,
     }) as FinanceCompletenessReceipt;
   } catch {
     return null;

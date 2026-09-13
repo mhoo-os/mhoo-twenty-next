@@ -1,5 +1,7 @@
 import { CoreApiClient } from 'twenty-client-sdk/core';
 
+import { minor } from '../contracts/money';
+
 import {
   parseFinanceDraftEmail,
   parseFinanceEmailApproval,
@@ -71,6 +73,7 @@ export type WorkspaceFinanceFollowUp = Readonly<{
   correlationKey: string;
   provenance: readonly FinanceProvenanceEvent[];
   updatedAt: string;
+  revision: number;
   contractWarning: boolean;
 }>;
 
@@ -106,7 +109,12 @@ export const normalizeWorkspaceAmount = (
   if (!amountMinor || !EXACT_MINOR.test(amountMinor)) {
     return { amountMinor: null, direction: 'unknown' };
   }
-  const value = BigInt(amountMinor);
+  let value: bigint;
+  try {
+    value = minor(amountMinor);
+  } catch {
+    return { amountMinor: null, direction: 'unknown' };
+  }
   return {
     amountMinor: (value < 0n ? -value : value).toString(),
     direction: value > 0n ? 'in' : value < 0n ? 'out' : 'unknown',
@@ -196,6 +204,7 @@ export const readWorkspaceFinance = async (
           financeEmailApproval: true,
           financeCorrelationKey: true,
           financeProvenanceHistory: true,
+          financeRevision: true,
         },
       },
     },
@@ -282,6 +291,12 @@ export const readWorkspaceFinance = async (
         correlationKey: optionalString(node.financeCorrelationKey) ?? '',
         provenance,
         updatedAt: node.updatedAt ?? '',
+        revision:
+          typeof node.financeRevision === 'number' &&
+          Number.isSafeInteger(node.financeRevision) &&
+          node.financeRevision >= 0
+            ? node.financeRevision
+            : 0,
         contractWarning: Boolean(
           hasInvalidStructuredArray(rawSubjects, subjects.length) ||
           hasInvalidStructuredArray(rawPeople, people.length) ||

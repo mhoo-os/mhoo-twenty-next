@@ -14,6 +14,7 @@ describe('current Workspace Finance data adapter', () => {
     ['-125', { amountMinor: '125', direction: 'out' }],
     ['0', { amountMinor: '0', direction: 'unknown' }],
     ['12.5', { amountMinor: null, direction: 'unknown' }],
+    ['9223372036854775808', { amountMinor: null, direction: 'unknown' }],
     [undefined, { amountMinor: null, direction: 'unknown' }],
   ] as const)(
     'normalizes explicit signed minor units %s',

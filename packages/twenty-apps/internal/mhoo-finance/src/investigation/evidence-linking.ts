@@ -12,6 +12,7 @@ export type EvidenceLinkInput = Readonly<{
   date: string;
   direction: EvidenceDirection;
   amountMinor: string;
+  currency: string;
 }>;
 
 const evaluatedEvidenceLink: unique symbol = Symbol('evaluatedEvidenceLink');
@@ -24,6 +25,8 @@ export type EvaluatedEvidenceLink = Readonly<{
     | 'DUPLICATE_SOURCE_RECORD'
     | 'EXPLICIT_SETTLEMENT_REFERENCE'
     | 'EXPLICIT_TRANSFER_PAIR'
+    | 'CURRENCY_MISMATCH'
+    | 'DIRECTION_MISMATCH'
     | 'AMOUNT_DATE_CANDIDATE'
     | 'INSUFFICIENT_EXPLICIT_EVIDENCE';
   explanation: string;
@@ -83,11 +86,50 @@ export const evaluateEvidenceLink = (
   }
 
   const sameAmount = entry.amountMinor === evidence.amountMinor;
+  const sameCurrency =
+    entry.currency.length > 0 && entry.currency === evidence.currency;
   const sameDirection =
     entry.direction !== 'unknown' && entry.direction === evidence.direction;
 
   if (
     sameAmount &&
+    !sameCurrency &&
+    ((entry.settlementReference &&
+      entry.settlementReference === evidence.settlementReference) ||
+      (entry.transferReference &&
+        entry.transferReference === evidence.transferReference))
+  ) {
+    return seal({
+      ...common,
+      kind: 'REVIEW_REQUIRED',
+      reasonCode: 'CURRENCY_MISMATCH',
+      explanation:
+        'The explicit reference agrees, but currency does not. Keep both records visible and require human review.',
+      preventsDuplicateFinancialEntry: false,
+    });
+  }
+
+  if (
+    sameAmount &&
+    sameCurrency &&
+    entry.settlementReference &&
+    entry.settlementReference === evidence.settlementReference &&
+    !sameDirection
+  ) {
+    return seal({
+      ...common,
+      kind: 'REVIEW_REQUIRED',
+      reasonCode: 'DIRECTION_MISMATCH',
+      explanation:
+        'The settlement reference and currency agree, but cash direction conflicts. Keep both records visible and require human review.',
+      preventsDuplicateFinancialEntry: false,
+    });
+  }
+
+  if (
+    sameAmount &&
+    sameCurrency &&
+    sameDirection &&
     entry.settlementReference &&
     entry.settlementReference === evidence.settlementReference &&
     new Set([entry.sourceType, evidence.sourceType]).has('BANK') &&
@@ -105,6 +147,7 @@ export const evaluateEvidenceLink = (
 
   if (
     sameAmount &&
+    sameCurrency &&
     entry.transferReference &&
     entry.transferReference === evidence.transferReference &&
     entry.account !== evidence.account &&
@@ -124,6 +167,7 @@ export const evaluateEvidenceLink = (
 
   if (
     sameAmount &&
+    sameCurrency &&
     sameDirection &&
     dateDistance(entry.date, evidence.date) <= 2
   ) {

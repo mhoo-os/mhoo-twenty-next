@@ -20,6 +20,8 @@ type NativeTaskReceipt = Readonly<{
   financeEmailApproval?: unknown;
   financeProvenanceHistory?: unknown;
   updatedAt?: unknown;
+  financeRevision?: unknown;
+  financeLastOperationId?: unknown;
 }>;
 
 const validatedProvenance = (value: string | null) => {
@@ -55,6 +57,7 @@ const assertFreshTask = (
   input: Readonly<{
     taskId: string;
     expectedUpdatedAt: string;
+    expectedRevision: number;
     from: FinanceFollowUpState;
   }>,
 ) => {
@@ -64,6 +67,7 @@ const assertFreshTask = (
   if (
     receipt.id !== input.taskId ||
     receipt.updatedAt !== input.expectedUpdatedAt ||
+    receipt.financeRevision !== input.expectedRevision ||
     receipt.financeFollowUpState !== input.from
   ) {
     throw new Error('Finance follow-up changed since it was read');
@@ -94,7 +98,9 @@ export const updateWorkspaceFinanceFollowUpState = async (
     from: FinanceFollowUpState;
     to: FinanceFollowUpState;
     expectedUpdatedAt: string;
+    expectedRevision: number;
     at: string;
+    operationId?: string;
   }>,
   client = new RestApiClient({ runAs: 'user' }),
 ) => {
@@ -104,6 +110,8 @@ export const updateWorkspaceFinanceFollowUpState = async (
   }
   const before = await readTaskReceipt(input.taskId, client);
   assertFreshTask(before, input);
+  const operationId = input.operationId ?? crypto.randomUUID();
+  if (!UUID.test(operationId)) throw new Error('Invalid Finance operation identity');
   const expected = {
     financeFollowUpState: input.to,
     status: financeNativeTaskStatus(input.to),
@@ -116,14 +124,22 @@ export const updateWorkspaceFinanceFollowUpState = async (
         to: input.to,
       },
     ),
+    financeRevision: input.expectedRevision + 1,
+    financeLastOperationId: operationId,
   } as const;
-  await client.patch(`/rest/tasks/${input.taskId}`, expected);
+  await client.patch('/rest/tasks', expected, {
+    query: {
+      filter: `and(id[eq]:${input.taskId},financeRevision[eq]:${input.expectedRevision})`,
+    },
+  });
   const receipt = await readTaskReceipt(input.taskId, client);
   if (
     receipt.id !== input.taskId ||
     receipt.financeFollowUpState !== expected.financeFollowUpState ||
     receipt.status !== expected.status ||
     receipt.financeProvenanceHistory !== expected.financeProvenanceHistory
+    || receipt.financeRevision !== expected.financeRevision
+    || receipt.financeLastOperationId !== operationId
   ) {
     throw new Error('Finance follow-up state receipt mismatch');
   }
@@ -136,9 +152,11 @@ export const approveWorkspaceFinanceDraft = async (
     from: 'AWAITING_APPROVAL';
     financeState: FinanceFollowUpState;
     expectedUpdatedAt: string;
+    expectedRevision: number;
     draftEmail: FinanceDraftEmail;
     people: readonly FinanceFollowUpPerson[];
     at: string;
+    operationId?: string;
   }>,
   client = new RestApiClient({ runAs: 'user' }),
 ) => {
@@ -153,11 +171,14 @@ export const approveWorkspaceFinanceDraft = async (
   assertFreshTask(before, {
     taskId: input.taskId,
     expectedUpdatedAt: input.expectedUpdatedAt,
+    expectedRevision: input.expectedRevision,
     from: input.financeState,
   });
   if (before.financeEmailApproval !== input.from) {
     throw new Error('Finance email approval changed since it was read');
   }
+  const operationId = input.operationId ?? crypto.randomUUID();
+  if (!UUID.test(operationId)) throw new Error('Invalid Finance operation identity');
   const expected = {
     financeEmailApproval: 'APPROVED_NOT_SENT',
     financeProvenanceHistory: appendProvenance(
@@ -167,13 +188,21 @@ export const approveWorkspaceFinanceDraft = async (
         action: 'EMAIL_DRAFT_APPROVED_NOT_SENT',
       },
     ),
+    financeRevision: input.expectedRevision + 1,
+    financeLastOperationId: operationId,
   } as const;
-  await client.patch(`/rest/tasks/${input.taskId}`, expected);
+  await client.patch('/rest/tasks', expected, {
+    query: {
+      filter: `and(id[eq]:${input.taskId},financeRevision[eq]:${input.expectedRevision})`,
+    },
+  });
   const receipt = await readTaskReceipt(input.taskId, client);
   if (
     receipt.id !== input.taskId ||
     receipt.financeEmailApproval !== expected.financeEmailApproval ||
     receipt.financeProvenanceHistory !== expected.financeProvenanceHistory
+    || receipt.financeRevision !== expected.financeRevision
+    || receipt.financeLastOperationId !== operationId
   ) {
     throw new Error('Finance email approval receipt mismatch');
   }

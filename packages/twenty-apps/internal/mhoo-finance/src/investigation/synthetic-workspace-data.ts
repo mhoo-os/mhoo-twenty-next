@@ -182,6 +182,7 @@ export const SYNTHETIC_WORKSPACE_FINANCE_DATA: WorkspaceFinanceData =
           },
         ]),
         updatedAt: '2025-02-21T09:00:00.000Z',
+        revision: 0,
         contractWarning: false,
       },
       {
@@ -207,6 +208,7 @@ export const SYNTHETIC_WORKSPACE_FINANCE_DATA: WorkspaceFinanceData =
         correlationKey: 'finance-follow-up:synthetic-missing-march',
         provenance: Object.freeze([]),
         updatedAt: '2025-03-31T09:00:00.000Z',
+        revision: 0,
         contractWarning: false,
       },
       {
@@ -238,6 +240,7 @@ export const SYNTHETIC_WORKSPACE_FINANCE_DATA: WorkspaceFinanceData =
         correlationKey: 'finance-follow-up:synthetic-transfer-pair',
         provenance: Object.freeze([]),
         updatedAt: '2025-05-14T09:00:00.000Z',
+        revision: 0,
         contractWarning: false,
       },
     ] satisfies readonly WorkspaceFinanceFollowUp[]),
