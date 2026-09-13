@@ -3,9 +3,16 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import account from '../objects/financial-account.object';
 import fact from '../objects/finance-fact.object';
-import navigation from '../navigation-menu-items/financial-accounts.navigation-menu-item';
-import dashboard from '../page-layouts/finance-audit-dashboard.page-layout';
-import transactions from '../views/finance-facts.view';
+import overviewNavigation from '../navigation-menu-items/finance-audit-dashboard.navigation-menu-item';
+import accountNavigation from '../navigation-menu-items/financial-accounts.navigation-menu-item';
+import transactionNavigation from '../navigation-menu-items/finance-facts.navigation-menu-item';
+import statementNavigation from '../navigation-menu-items/finance-statements.navigation-menu-item';
+import followUpNavigation from '../navigation-menu-items/finance-follow-ups.navigation-menu-item';
+import overviewLayout from '../page-layouts/finance-audit-dashboard.page-layout';
+import accountLayout from '../page-layouts/finance-accounts.page-layout';
+import transactionLayout from '../page-layouts/finance-transactions.page-layout';
+import statementLayout from '../page-layouts/finance-statements.page-layout';
+import followUpLayout from '../page-layouts/finance-follow-ups.page-layout';
 import * as I from '../constants/universal-identifiers';
 
 const frontComponentSource = readFileSync(
@@ -15,99 +22,107 @@ const frontComponentSource = readFileSync(
   ),
   'utf8',
 );
-const questionComponentSource = readFileSync(
+const workspaceSource = readFileSync(
   new URL('../components/finance-workspace.tsx', import.meta.url),
   'utf8',
 );
 
-describe('workspace preparation', () => {
-  it('registers the review surface used by the Overview page layout', () => {
+const frontComponentId = (layout: typeof overviewLayout) => {
+  const configuration = layout.config?.tabs?.[0]?.widgets?.[0]?.configuration;
+  return configuration?.configurationType === 'FRONT_COMPONENT'
+    ? configuration.frontComponentUniversalIdentifier
+    : undefined;
+};
+
+describe('native Finance workspace', () => {
+  it('opens the Overview directly without obsolete setup or count tabs', () => {
     expect(frontComponentSource).toContain(
-      "useState<'review' | 'setup' | 'fixture'>('review')",
+      'FinanceWorkspacePreparation = () => <FinanceWorkspace />',
     );
-    expect(frontComponentSource).toContain(
-      'component: FinanceWorkspacePreparation',
+    expect(overviewLayout.config?.tabs).toHaveLength(1);
+    expect(overviewLayout.config?.tabs?.[0]?.title).toBe('Overview');
+    expect(frontComponentId(overviewLayout)).toBe(
+      I.FINANCE_AUDIT_DASHBOARD_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER,
     );
-    expect(questionComponentSource).toContain('visibleDemoAttentionItems');
-    expect(questionComponentSource).toContain('aria-label="Window start"');
-    expect(questionComponentSource).toContain('onPointerMove={moveBrushDrag}');
-    expect(questionComponentSource).toContain('ILLUSTRATIVE_HISTORY');
-    expect(questionComponentSource).toContain("id: 'overview'");
-    expect(questionComponentSource).toContain("id: 'transactions'");
-    expect(questionComponentSource).toContain("id: 'statements'");
-    expect(questionComponentSource).toContain("id: 'accounts'");
-    expect(questionComponentSource).not.toContain('Accept demo match');
-    const widget = dashboard.config?.tabs
-      ?.flatMap((tab) => tab.widgets ?? [])
-      .find((candidate) => candidate.type === 'FRONT_COMPONENT');
-    expect(widget?.configuration).toMatchObject({
-      frontComponentUniversalIdentifier:
-        I.FINANCE_AUDIT_DASHBOARD_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER,
-    });
   });
 
-  it('declares both account/fact relation directions and account navigation', () => {
+  it('keeps the four core pages in order and adds the linked Follow-ups page', () => {
+    const navigation = [
+      overviewNavigation,
+      accountNavigation,
+      transactionNavigation,
+      statementNavigation,
+      followUpNavigation,
+    ];
+    expect(
+      navigation.map((item) => ({
+        name: item.config?.name,
+        position: item.config?.position,
+        type: item.config?.type,
+      })),
+    ).toEqual([
+      { name: 'Overview', position: 1, type: 'PAGE_LAYOUT' },
+      { name: 'Accounts', position: 2, type: 'PAGE_LAYOUT' },
+      { name: 'Transactions', position: 3, type: 'PAGE_LAYOUT' },
+      { name: 'Statements', position: 4, type: 'PAGE_LAYOUT' },
+      { name: 'Follow-ups', position: 5, type: 'PAGE_LAYOUT' },
+    ]);
+    expect(accountNavigation.config?.pageLayoutUniversalIdentifier).toBe(
+      I.FINANCE_ACCOUNTS_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
+    );
+    expect(transactionNavigation.config?.pageLayoutUniversalIdentifier).toBe(
+      I.FINANCE_TRANSACTIONS_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
+    );
+    expect(statementNavigation.config?.pageLayoutUniversalIdentifier).toBe(
+      I.FINANCE_STATEMENTS_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
+    );
+    expect(followUpNavigation.config?.pageLayoutUniversalIdentifier).toBe(
+      I.FINANCE_FOLLOW_UPS_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
+    );
+  });
+
+  it('renders each native destination through its designed Finance component', () => {
+    expect(frontComponentId(accountLayout as typeof overviewLayout)).toBe(
+      I.FINANCE_ACCOUNTS_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER,
+    );
+    expect(frontComponentId(transactionLayout as typeof overviewLayout)).toBe(
+      I.FINANCE_TRANSACTIONS_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER,
+    );
+    expect(frontComponentId(statementLayout as typeof overviewLayout)).toBe(
+      I.FINANCE_STATEMENTS_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER,
+    );
+    expect(frontComponentId(followUpLayout as typeof overviewLayout)).toBe(
+      I.FINANCE_FOLLOW_UPS_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER,
+    );
+  });
+
+  it('uses Twenty theme tokens and no duplicate embedded shell navigation', () => {
+    expect(workspaceSource).toContain(
+      "'--fw-text': 'var(--t-font-color-primary)'",
+    );
+    expect(workspaceSource).toContain("fontFamily: 'var(--t-font-family)'");
+    expect(workspaceSource).not.toContain('<header className="fw-chrome">');
+    expect(workspaceSource).not.toContain('<nav className="fw-nav"');
+    expect(workspaceSource).toContain("dataSource = 'workspace'");
+    expect(workspaceSource).toContain('No demo data was substituted');
+    expect(workspaceSource).toContain('Native Twenty Task');
+    expect(workspaceSource).toContain('Approve draft · do not send');
+  });
+
+  it('retains both account/fact relation directions without exposing raw tables as primary navigation', () => {
     expect(account.success).toBe(true);
     expect(fact.success).toBe(true);
-    expect(navigation.success).toBe(true);
     expect(
-      account.config?.fields?.find((f) => f.name === 'facts'),
+      account.config?.fields?.find((field) => field.name === 'facts'),
     ).toMatchObject({
       relationTargetFieldMetadataUniversalIdentifier:
         I.FINANCE_FACT_ACCOUNT_FIELD_UNIVERSAL_IDENTIFIER,
     });
     expect(
-      fact.config?.fields?.find((f) => f.name === 'financialAccount'),
+      fact.config?.fields?.find((field) => field.name === 'financialAccount'),
     ).toMatchObject({
       relationTargetFieldMetadataUniversalIdentifier:
         I.FINANCIAL_ACCOUNT_FACTS_FIELD_UNIVERSAL_IDENTIFIER,
     });
-  });
-});
-
-// A raw SUM would include excluded/superseded rows and cannot be a qualified financial metric.
-describe('preparation dashboard financial limits', () => {
-  it('uses record counts only until a qualified snapshot metric is connected', () => {
-    const tabs = dashboard.config?.tabs ?? [];
-    const graphs = tabs
-      .flatMap((tab) => tab.widgets ?? [])
-      .filter((widget) => widget.type === 'GRAPH');
-    expect(graphs).toHaveLength(4);
-    for (const widget of graphs)
-      expect(widget.configuration).toMatchObject({
-        aggregateOperation: 'COUNT',
-      });
-    expect(
-      graphs.find((widget) => widget.title === 'Unclassified records (count)')
-        ?.configuration,
-    ).toMatchObject({
-      filter: {
-        recordFilters: [
-          {
-            fieldMetadataUniversalIdentifier:
-              I.FINANCE_FACT_CLASSIFICATION_FIELD_UNIVERSAL_IDENTIFIER,
-            operand: 'IS',
-            value: '["UNCLASSIFIED"]',
-          },
-        ],
-      },
-    });
-  });
-});
-
-// The live metadata validator requires the label identifier to be first and visible.
-describe('native transaction view contract', () => {
-  it('keeps the object label identifier visible at the lowest position', () => {
-    const fields = transactions.config?.fields ?? [];
-    const label = fields.find(
-      (field) =>
-        field.fieldMetadataUniversalIdentifier ===
-        fact.config?.labelIdentifierFieldMetadataUniversalIdentifier,
-    );
-    expect(label).toBeDefined();
-    expect(label?.isVisible).toBe(true);
-    expect(label?.position).toBe(
-      Math.min(...fields.map((field) => field.position)),
-    );
   });
 });

@@ -9,7 +9,7 @@ export default defineNavigationMenuItem({
   name: 'Accounts',
   icon: 'IconBuildingBank',
   position: 2,
-  type: NavigationMenuItemType.OBJECT,
-  targetObjectUniversalIdentifier:
-    I.FINANCIAL_ACCOUNT_OBJECT_UNIVERSAL_IDENTIFIER,
+  type: NavigationMenuItemType.PAGE_LAYOUT,
+  pageLayoutUniversalIdentifier:
+    I.FINANCE_ACCOUNTS_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
 });

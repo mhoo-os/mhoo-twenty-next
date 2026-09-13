@@ -8,9 +8,47 @@
 > planning ledger. The detailed reusable product principles below remain in
 > force where they do not conflict with that entrypoint.
 
-Status: existing product requirements updated for documentation and planning only, September 7, 2026. This document records owner decisions and the existing MHO146/Finance project scope. The next clickable prototype is **PLANNED ONLY**; this update authorizes no implementation or operational action. Repository portability remains a proposal pending the coordinator-owned architecture decision.
+Status: the September 7 planning-only entry is retained as history. The
+September 14 native Finance implementation section below records the later
+owner authorization and supersedes its prototype-only wording. Repository
+portability remains a proposal pending the coordinator-owned architecture
+decision.
 
 ARCHITECTURE IMPACT: LOCAL
+
+## Authorized native Finance implementation — 2026-09-14
+
+The owner authorized the current increment to become a real Twenty App rather
+than a permanently hardcoded demonstration. Overview, Accounts, Transactions
+and Statements are four native Finance page-layout destinations in that order;
+each renders the governed Finance component instead of a raw object table. The
+owner-facing Overview opens directly, without the obsolete Workspace
+preparation or Record counts tabs and without a second embedded app header or
+sidebar.
+
+Installed screens read only current-Workspace `financialAccounts`,
+`financeFacts` and `sourceArtifacts` through Twenty's generated client, with
+explicit loading, empty, permission-denied, failed and bounded-result states.
+There is no synthetic fallback. The invented history remains an isolated local
+preview/test source using the same direction and display contracts and can be
+removed without touching persisted Workspace records.
+
+Cash direction comes only from the signed exact-minor-unit field contract;
+description text never determines direction or income/expense classification.
+Included, non-superseded facts supply Money in, Money out and net movement.
+Invalid or undated facts and sparse coverage remain visible limitations. The
+selected inclusive interval drives the overview, chart, transactions, accounts
+and statement list. Its timeline derives from available history, scrolls across
+years, exposes month/year/all zoom and does not reset at January.
+
+Source entry keeps bank, Clover/POS, uploaded statements and Workspace Gmail
+evidence distinct. It hands off only to supported Twenty-owned Apps or Source
+artifact surfaces and never reports a connection or import without one. An
+explicit Finance fact-to-Source artifact relation may receive append-only
+link/unlink/restore decision events in Workspace records. Each event preserves
+both references and cannot change classification; absent or ambiguous evidence
+offers no unsafe action. Provider grants, live imports, retroactive matching,
+role expansion and deployment remain separate gates.
 
 ## Product outcome
 
@@ -51,15 +89,15 @@ Acceptance must include at least two distinct questions over the same fixture/sn
 
 ## First vertical slice: journey and screens
 
-| Screen | Question answered | Required behavior |
-| --- | --- | --- |
-| Conversation and overview | What can I investigate, and what deserves attention? | Question, evidence-backed answer or limitation, explainable concerns and bounded next action. Show actual source period, snapshot/as-of or sample mode, coverage and reconciliation state before results. Never turn no data into zero activity. |
-| Chart | What pattern supports this answer? | An approved metric or sample-only count view from the same scope. Selection opens contributing transactions and keeps the explanation and evidence context aligned. Missing prerequisites produce an explicit unavailable state. |
-| Transactions | Which records explain this result? | Secondary inspection surface reached from the question or chart, with shared account/date/snapshot scope, exact money/currency/sign, classification/exclusion, record opening and bounded pagination. Distinguish the loaded page from the full population. |
-| Evidence | Can I verify it? | Fact → artifact → exact source row; original filename/hash/acquisition receipt, raw values, parser/source revision and original Files availability. Show missing/denied evidence honestly. |
-| Accounts | Which source does this belong to? | Explicit bank/card identity and masked labels; no guessed ownership or automatic mapping by display name. |
-| Coverage | What is missing or unproven? | Account/source/month evidence state; missing, partial, unreconciled and proven populations remain distinct. Status transitions require receipts. |
-| Exceptions | Why does this matter and what next? | Deterministic rule, expected/observed/difference, scope, supporting/limiting evidence, reviewer state and a bounded evidence/reconciliation action. An exception is not a fraud finding. |
+| Screen                    | Question answered                                    | Required behavior                                                                                                                                                                                                                                           |
+| ------------------------- | ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Conversation and overview | What can I investigate, and what deserves attention? | Question, evidence-backed answer or limitation, explainable concerns and bounded next action. Show actual source period, snapshot/as-of or sample mode, coverage and reconciliation state before results. Never turn no data into zero activity.            |
+| Chart                     | What pattern supports this answer?                   | An approved metric or sample-only count view from the same scope. Selection opens contributing transactions and keeps the explanation and evidence context aligned. Missing prerequisites produce an explicit unavailable state.                            |
+| Transactions              | Which records explain this result?                   | Secondary inspection surface reached from the question or chart, with shared account/date/snapshot scope, exact money/currency/sign, classification/exclusion, record opening and bounded pagination. Distinguish the loaded page from the full population. |
+| Evidence                  | Can I verify it?                                     | Fact → artifact → exact source row; original filename/hash/acquisition receipt, raw values, parser/source revision and original Files availability. Show missing/denied evidence honestly.                                                                  |
+| Accounts                  | Which source does this belong to?                    | Explicit bank/card identity and masked labels; no guessed ownership or automatic mapping by display name.                                                                                                                                                   |
+| Coverage                  | What is missing or unproven?                         | Account/source/month evidence state; missing, partial, unreconciled and proven populations remain distinct. Status transitions require receipts.                                                                                                            |
+| Exceptions                | Why does this matter and what next?                  | Deterministic rule, expected/observed/difference, scope, supporting/limiting evidence, reviewer state and a bounded evidence/reconciliation action. An exception is not a fraud finding.                                                                    |
 
 Use one native Finance navigation folder. Native saved views, App-owned page layouts and approved widgets/components are the presentation layer. The same financial definition and snapshot must drive UI, tools and exported dataset results. Do not add dashboard-local financial arithmetic.
 
@@ -111,11 +149,11 @@ A separate Finance product repository is intended, but remains **PROPOSED** pend
 
 The proposed separation preserves one versioned financial domain implementation, a reusable React presentation layer and shared typed tool/result contracts. Host adapters should translate only the host-specific authentication context, authorized data/file access, navigation, lifecycle and tool invocation. They must not duplicate financial calculations, create their own identity or credential store, or turn browser-supplied selectors into authority.
 
-| Proposed reusable part | Shared responsibility | Twenty adapter responsibility |
-| --- | --- | --- |
-| Domain logic | Exact-money semantics, eligibility, coverage, deterministic procedures and evidence lineage | Obtain authorized records and persist approved results through existing Twenty primitives. |
-| React UI | Question/chart/transaction/evidence presentation, selection and visible state semantics | Host navigation, supported components and permission-aware delivery. |
-| Tool contracts | Bounded inputs, qualified results, provenance, exclusions and refusal states | Enforce the caller/App permission intersection and invoke approved functions. |
+| Proposed reusable part | Shared responsibility                                                                       | Twenty adapter responsibility                                                              |
+| ---------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| Domain logic           | Exact-money semantics, eligibility, coverage, deterministic procedures and evidence lineage | Obtain authorized records and persist approved results through existing Twenty primitives. |
+| React UI               | Question/chart/transaction/evidence presentation, selection and visible state semantics     | Host navigation, supported components and permission-aware delivery.                       |
+| Tool contracts         | Bounded inputs, qualified results, provenance, exclusions and refusal states                | Enforce the caller/App permission intersection and invoke approved functions.              |
 
 Before extraction, a reviewed plan must identify immutable source paths/versions, dependencies and retained licenses, and demonstrate equivalent behavior and denial semantics through the first host adapter. No alternate host is accepted or implemented here. No repository creation/move, D1 or other backend, provider access, credential transfer or migration belongs to this planning increment. Portability must preserve Twenty-backed identity, permissions and credential/data custody in the first release.
 
@@ -123,17 +161,17 @@ Before extraction, a reviewed plan must identify immutable source paths/versions
 
 Installed observations below come from accepted September 7 receipts in [MHO259](https://linear.app/mhoo/issue/MHO-259), not fresh verification during this documentation increment. Historical source-stage details remain in [INVESTIGATION_UI.md](INVESTIGATION_UI.md) and [PREPARATION.md](PREPARATION.md); their earlier pending-install wording must not trigger a repeat installation.
 
-| Increment | Status | Acceptance still required |
-| --- | --- | --- |
-| Shared exact-money/snapshot/read contracts | Merged source and synthetic proof (MHO257/258). | Actual eligible-population publication and parity on a deployed Workspace. |
-| Accounts, preparation and saved sample read | Accepted installed receipt includes working sample reader after the host loader release and preservation of 20 excluded samples. | Remaining permission/reload acceptance follows its existing evidence ledger; no full eligible-population claim. |
-| PR36 navigation + transaction/evidence UI | Merged and installed; accepted receipt confirms native navigation, selected transaction→artifact/row inspection, missing-original notice and zero post-plan changes. | Representative restricted-user denial remains unproved; cross-workspace/runtime acceptance is not inferred from source or mocked tests. No repeat apply. |
-| Preparation count widgets | Accepted installed receipt records counts and explicit sample/uncertainty labels; no qualified monetary aggregate. | Snapshot-qualified charts and complete state/permission acceptance remain separate. |
-| Qualified overview/chart→exception→fact→source | Existing required MHO146/135 journey, unfinished. | Same metric/snapshot parity, supporting/contrary evidence and next action; work without agent. |
-| Full historical/incremental connectors, procedures and case lifecycle | Existing gated MHO125–134 work, unfinished. | Provider/source authority, complete-population and reviewer evidence per each issue. |
-| Question→chart→transaction→source prototype | PLANNED ONLY in existing MHO146 UI scope; not implemented. | Explicit next-task authorization and the acceptance/refusal examples below. |
-| Constrained generative view proposal | Design proposal only. | Allowlisted host/tool contracts, shared exploration state and permission/source-fidelity proof before implementation. |
-| Separate Finance product repository | Intended, PROPOSED only. | Reviewed accepted ownership ADR, central reuse reconciliation and extraction/parity proof before any move. |
+| Increment                                                             | Status                                                                                                                                                               | Acceptance still required                                                                                                                                |
+| --------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Shared exact-money/snapshot/read contracts                            | Merged source and synthetic proof (MHO257/258).                                                                                                                      | Actual eligible-population publication and parity on a deployed Workspace.                                                                               |
+| Accounts, preparation and saved sample read                           | Accepted installed receipt includes working sample reader after the host loader release and preservation of 20 excluded samples.                                     | Remaining permission/reload acceptance follows its existing evidence ledger; no full eligible-population claim.                                          |
+| PR36 navigation + transaction/evidence UI                             | Merged and installed; accepted receipt confirms native navigation, selected transaction→artifact/row inspection, missing-original notice and zero post-plan changes. | Representative restricted-user denial remains unproved; cross-workspace/runtime acceptance is not inferred from source or mocked tests. No repeat apply. |
+| Preparation count widgets                                             | Accepted installed receipt records counts and explicit sample/uncertainty labels; no qualified monetary aggregate.                                                   | Snapshot-qualified charts and complete state/permission acceptance remain separate.                                                                      |
+| Qualified overview/chart→exception→fact→source                        | Existing required MHO146/135 journey, unfinished.                                                                                                                    | Same metric/snapshot parity, supporting/contrary evidence and next action; work without agent.                                                           |
+| Full historical/incremental connectors, procedures and case lifecycle | Existing gated MHO125–134 work, unfinished.                                                                                                                          | Provider/source authority, complete-population and reviewer evidence per each issue.                                                                     |
+| Question→chart→transaction→source prototype                           | PLANNED ONLY in existing MHO146 UI scope; not implemented.                                                                                                           | Explicit next-task authorization and the acceptance/refusal examples below.                                                                              |
+| Constrained generative view proposal                                  | Design proposal only.                                                                                                                                                | Allowlisted host/tool contracts, shared exploration state and permission/source-fidelity proof before implementation.                                    |
+| Separate Finance product repository                                   | Intended, PROPOSED only.                                                                                                                                             | Reviewed accepted ownership ADR, central reuse reconciliation and extraction/parity proof before any move.                                               |
 
 Outstanding installed acceptance remains with the existing owners and receipts: allowed/denied and cross-workspace access, reload and visible-state behavior, original Files custody and eligible-snapshot parity. Do not manufacture identities or broaden roles to obtain a pass. Temporary setup-key revocation follows completion of its authorized setup, not this documentation change. These remaining obligations do not reopen the completed PR36 application step.
 
@@ -143,15 +181,15 @@ The next proposed task belongs to the existing MHO146 UI slice: prepare a clicka
 
 Use sanitized synthetic examples, prominently labeled as demonstration data and excluded from real financial conclusions. Do not copy the engagement's personal details or available customer sample rows into new UI examples. Demonstrate two different questions on the same fixture/context, with a traceable deterministic result and a clear route to its source reference. Conversation is the primary entry, an approved chart is the visual explanation, and the table supports inspection. The prototype may use fixture-backed responses; it must say so and must not imply a connected provider, live agent or original-file custody.
 
-| Review scenario | Required acceptance or refusal behavior |
-| --- | --- |
-| “What changed in outflows?” on a qualified synthetic comparison | Show both examined periods, metric/population/exclusions and a clearly labeled demonstration chart. Explain the observed change without calling it profit or asserting its cause; selecting a bar shows exactly the contributing fixture transactions. |
-| “Which periods need more evidence?” on the same fixture | Use the same account/snapshot context to show coverage states and missing controls. Selecting a gap opens its evidence status rather than inventing transactions or treating missing data as zero. |
-| Select a transaction, then its source | Keep question, chart filter and selected record aligned; show the exact synthetic row/page reference and artifact identity. Missing original bytes display unavailable, not a fabricated document. Back navigation preserves the valid selection context. |
-| Follow up with a new period while a prior response is pending | Mark the prior answer stale, clear incompatible transaction/evidence selections, and accept only the response for the new context. No cross-period or cross-workspace mixing. |
-| “What was actual six-year profit?” with only unreconciled samples or partial recent exports | Refuse a real profit/completeness conclusion. Explain absent coverage, eligibility and statement controls, show available evidence limits and offer a bounded coverage investigation. No authoritative total from excluded samples. |
-| “Is this fraud?” or “Publish this as confirmed” | Do not make the accusation or publish a finding. Separate observation and possible explanations, cite supporting/contrary evidence and identify the required human review. |
-| Evidence access is denied, missing or fails | Show the actual state, clear stale evidence and offer an allowed next action. No permission expansion, credential request, broader fallback read or synthetic data presented as the failed real response. |
+| Review scenario                                                                             | Required acceptance or refusal behavior                                                                                                                                                                                                                   |
+| ------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| “What changed in outflows?” on a qualified synthetic comparison                             | Show both examined periods, metric/population/exclusions and a clearly labeled demonstration chart. Explain the observed change without calling it profit or asserting its cause; selecting a bar shows exactly the contributing fixture transactions.    |
+| “Which periods need more evidence?” on the same fixture                                     | Use the same account/snapshot context to show coverage states and missing controls. Selecting a gap opens its evidence status rather than inventing transactions or treating missing data as zero.                                                        |
+| Select a transaction, then its source                                                       | Keep question, chart filter and selected record aligned; show the exact synthetic row/page reference and artifact identity. Missing original bytes display unavailable, not a fabricated document. Back navigation preserves the valid selection context. |
+| Follow up with a new period while a prior response is pending                               | Mark the prior answer stale, clear incompatible transaction/evidence selections, and accept only the response for the new context. No cross-period or cross-workspace mixing.                                                                             |
+| “What was actual six-year profit?” with only unreconciled samples or partial recent exports | Refuse a real profit/completeness conclusion. Explain absent coverage, eligibility and statement controls, show available evidence limits and offer a bounded coverage investigation. No authoritative total from excluded samples.                       |
+| “Is this fraud?” or “Publish this as confirmed”                                             | Do not make the accusation or publish a finding. Separate observation and possible explanations, cite supporting/contrary evidence and identify the required human review.                                                                                |
+| Evidence access is denied, missing or fails                                                 | Show the actual state, clear stale evidence and offer an allowed next action. No permission expansion, credential request, broader fallback read or synthetic data presented as the failed real response.                                                 |
 
 Product review must check visible sample labels, consistent scope/selection across all four surfaces, qualified metric parity, traceability, contradictory/missing evidence, and loading/empty/partial/stale/error/denied behavior. It must work through explicit controls without an agent. Prototype review does not establish installed role enforcement, provider connectivity, durable import, a six-year result or production readiness. No prototype code, tests, builds, provider calls, data changes or deployment are part of this documentation update.
 
@@ -164,3 +202,34 @@ No payment/transfer/refund initiation, automatic fraud finding, tax opinion, unr
 Existing source ownership: this PRD is the product plan; [INVESTIGATION_UI.md](INVESTIGATION_UI.md) retains the original UI increment receipts, [PREPARATION.md](PREPARATION.md) the bounded preparation scope, and [INGESTION.md](INGESTION.md) the ingestion contract. The central `mhoo/docs/architecture/FINANCE_FORENSIC_REVIEW.md` engagement contract remains preserved; this update does not replace it.
 
 References: [Finance project](https://linear.app/mhoo/project/mhoo-finance-hass-kitchen-six-year-forensic-review-da85b4d06e8e/overview), [MHO146](https://linear.app/mhoo/issue/MHO-146), [PR36](https://github.com/mhoo-os/mhoo-twenty-next/pull/36), existing App contracts/INGESTION.md/PREPARATION.md/INVESTIGATION_UI.md and accepted Mhoo ADR0008. The standalone Clover App dependency follows the September 7 owner decision; exact producer identifiers remain pending its owning lane. Framework source is pinned by .twenty-source; the separate research matrix records official upstream evidence and unverified capability limits.
+
+## Native Task follow-up refinement — source candidate
+
+Finance Follow-ups reuse Twenty Tasks as the action record and extend them with
+validated Finance context. A follow-up can cover several transactions and/or a
+missing statement period. Required Finance states are To do, Waiting for reply,
+Ready for review and Resolved; native Task status is supporting workflow state,
+not reconciliation evidence.
+
+The main Follow-ups view stays concise and spacious: question, state, owner and
+next action only. Investigation work opens a full detail surface with Summary,
+People, Evidence and Email sections on demand. Transaction quick inspection
+links into the related follow-up without packing the investigation into its
+narrow drawer. Back navigation keeps the component's selected date, account and
+search context.
+
+People context stores Person references, role and explicit recipient selection.
+It grants no membership or Finance data access. A branded Mhoo Finance draft
+must disclose mailbox label, selected recipients, personalized body and
+attachments before approval. Approval persists only `APPROVED_NOT_SENT`; this
+increment includes no send path, new mailbox scope, broadcast, invite or access
+grant. Replies and attachments retain original attribution and a stable
+correlation key; ambiguous matches require review and private replies are never
+automatically shared with other participants.
+
+Implemented source paths are Task-field validation, current-Workspace reads,
+progressive detail UI, receipt-verified review transitions and receipt-verified
+draft approval. Unsupported paths are Task/draft creation in this surface,
+native attachment upload here, email send, reply ingestion/correlation, hosted
+permission behavior and production acceptance. Unsupported actions have no
+mock-success control.

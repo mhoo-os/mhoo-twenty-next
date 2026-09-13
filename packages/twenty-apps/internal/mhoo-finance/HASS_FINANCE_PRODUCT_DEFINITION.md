@@ -12,17 +12,17 @@ Finance never makes disagreeing sources look tidy by changing their facts. It pr
 
 ## Current capability and gap map
 
-| Capability | Actual state | Gap before a real Hass result |
-| --- | --- | --- |
-| Native Finance objects, views, navigation and sample evidence inspection | Merged source exists in this repository. Accepted receipts record a bounded installed sample reader and transaction-to-source inspection. | Fresh restricted-role, cross-Workspace, original-File and eligible-population acceptance are not proved by this work. |
-| Exact money, immutable snapshot and bounded read contracts | Merged source and synthetic tests exist. Duplicate acquisitions, stale responses and scope-bound reads fail closed. | Durable authorized `SourceSnapshot` publication/currentness and native client/permission binding remain open under MHO-124 → MHO-128 → MHO-135. |
-| Question → chart → transaction → source | Local React walkthrough exists and uses deterministic invented fixtures. | It is not a live agent, installed Workspace journey, provider read or production UI acceptance. |
-| Bank / statement intake | Governed CSV/QFX/PDF fixture validation and import contracts exist. | No complete Hass statement inventory, original-file custody, statement-balance controls or approved live import exists. |
-| Plaid evidence | Export validation and recorded recent-source inventory exist outside this walkthrough. | No live Workspace Plaid connection, transformation attestation, six-year completeness or amount-sign provenance is proved. |
-| Clover | A separate native Clover App owns connection custody and provider records; current source includes bounded read-only primitives. | Finance consumer mapping, merchant/location scope, complete historical reach, settlement coverage and live activation remain separate gates. |
-| Tax returns | Product treatment is defined below and represented only as an invented walkthrough source card. | No reviewed Hass return package, filing basis, amendment history or accountant-approved interpretation is present here. |
-| Email invoices, vendors and payment evidence | Product treatment is defined below and represented only as invented excerpts. | CRM email sync is not a complete mailbox, invoice archive, vendor master or payment proof. No mailbox import or new email scope is authorized. |
-| Forecasting and planning | Assumption-first experience is defined and visible in the walkthrough. | No real forecast is calculated. Reviewed actuals, coverage, basis and approved scenario assumptions are prerequisites. |
+| Capability                                                               | Actual state                                                                                                                              | Gap before a real Hass result                                                                                                                   |
+| ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| Native Finance objects, views, navigation and sample evidence inspection | Merged source exists in this repository. Accepted receipts record a bounded installed sample reader and transaction-to-source inspection. | Fresh restricted-role, cross-Workspace, original-File and eligible-population acceptance are not proved by this work.                           |
+| Exact money, immutable snapshot and bounded read contracts               | Merged source and synthetic tests exist. Duplicate acquisitions, stale responses and scope-bound reads fail closed.                       | Durable authorized `SourceSnapshot` publication/currentness and native client/permission binding remain open under MHO-124 → MHO-128 → MHO-135. |
+| Question → chart → transaction → source                                  | Local React walkthrough exists and uses deterministic invented fixtures.                                                                  | It is not a live agent, installed Workspace journey, provider read or production UI acceptance.                                                 |
+| Bank / statement intake                                                  | Governed CSV/QFX/PDF fixture validation and import contracts exist.                                                                       | No complete Hass statement inventory, original-file custody, statement-balance controls or approved live import exists.                         |
+| Plaid evidence                                                           | Export validation and recorded recent-source inventory exist outside this walkthrough.                                                    | No live Workspace Plaid connection, transformation attestation, six-year completeness or amount-sign provenance is proved.                      |
+| Clover                                                                   | A separate native Clover App owns connection custody and provider records; current source includes bounded read-only primitives.          | Finance consumer mapping, merchant/location scope, complete historical reach, settlement coverage and live activation remain separate gates.    |
+| Tax returns                                                              | Product treatment is defined below and represented only as an invented walkthrough source card.                                           | No reviewed Hass return package, filing basis, amendment history or accountant-approved interpretation is present here.                         |
+| Email invoices, vendors and payment evidence                             | Product treatment is defined below and represented only as invented excerpts.                                                             | CRM email sync is not a complete mailbox, invoice archive, vendor master or payment proof. No mailbox import or new email scope is authorized.  |
+| Forecasting and planning                                                 | Assumption-first experience is defined and visible in the walkthrough.                                                                    | No real forecast is calculated. Reviewed actuals, coverage, basis and approved scenario assumptions are prerequisites.                          |
 
 The current Linear truth is deliberately mixed: MHO-146 is Done for its bounded local fixture-first slice; MHO-123, MHO-124, MHO-135 and the parent product issue MHO-7 remain In Progress. Source completion is not installed, live-data, runtime, release or client acceptance.
 
@@ -37,13 +37,13 @@ The current Linear truth is deliberately mixed: MHO-146 is Done for its bounded 
 
 Every source enters through an acquisition receipt and retains its own source identity, period, effective/observed time, revision, original values, provenance and coverage state.
 
-| Source | Required facts | Important separation |
-| --- | --- | --- |
-| Tax return | entity, tax year, form/version, filed/amended status, filing date, accounting basis when evidenced, source artifact | A filed tax period is not silently converted into a calendar, operating or management-report period. Return totals are historical assertions, not current bank or sales activity. |
-| Bank statement/export | masked account, statement period, opening/closing controls, transaction/posting dates, amount/currency/sign, row/page reference | A Plaid/export row is not a bank-issued statement control. Pending and posted rows remain distinct. |
-| Plaid export/connector | item/account identity, export/acquisition time, transaction ID, pending-to-posted/revision/removal state, transformation provenance | `100% of received rows` does not mean `100% of business activity`. Combined and account exports cannot be double counted. |
-| Clover | merchant/location, sale/payment/refund/fee/settlement identity, source/effective/observed times, amount/currency/sign and acquisition limits | Sale date, tender date and bank settlement date are separate. Gross sales do not equal net deposits. Clover retains connection and provider-record custody. |
-| Email/document | message/document identity, sender/recipient, document date, vendor/customer identity, invoice number, amount/currency, attachment/source reference | Message receipt is not proof of delivery, invoice validity, goods received or payment. CRM sync is not complete audit evidence. |
+| Source                 | Required facts                                                                                                                                     | Important separation                                                                                                                                                              |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Tax return             | entity, tax year, form/version, filed/amended status, filing date, accounting basis when evidenced, source artifact                                | A filed tax period is not silently converted into a calendar, operating or management-report period. Return totals are historical assertions, not current bank or sales activity. |
+| Bank statement/export  | masked account, statement period, opening/closing controls, transaction/posting dates, amount/currency/sign, row/page reference                    | A Plaid/export row is not a bank-issued statement control. Pending and posted rows remain distinct.                                                                               |
+| Plaid export/connector | item/account identity, export/acquisition time, transaction ID, pending-to-posted/revision/removal state, transformation provenance                | `100% of received rows` does not mean `100% of business activity`. Combined and account exports cannot be double counted.                                                         |
+| Clover                 | merchant/location, sale/payment/refund/fee/settlement identity, source/effective/observed times, amount/currency/sign and acquisition limits       | Sale date, tender date and bank settlement date are separate. Gross sales do not equal net deposits. Clover retains connection and provider-record custody.                       |
+| Email/document         | message/document identity, sender/recipient, document date, vendor/customer identity, invoice number, amount/currency, attachment/source reference | Message receipt is not proof of delivery, invoice validity, goods received or payment. CRM sync is not complete audit evidence.                                                   |
 
 Coverage uses explicit states: `PROVEN_COMPLETE`, `SOURCE_COMPLETE_UNRECONCILED`, `PARTIAL`, `MISSING`, `OUT_OF_SCOPE` and `SUPERSEDED`. Missing evidence never becomes zero activity.
 
@@ -123,6 +123,23 @@ Planning starts from a named, reviewed actuals baseline. Each scenario records a
 - [ ] The local walkthrough visibly labels every fixture and simulation and exercises ready, empty, missing, denied, failed and stale states.
 - [ ] A clickable chart selection opens only its contributing rows; a row opens only its matching synthetic source trace.
 - [ ] Local/source proof remains separate from native installed, permission, provider, production and client acceptance.
+- [ ] Native Finance navigation lists Overview, Accounts, Transactions and Statements in that order, and every route renders the designed Finance surface rather than a raw table.
+- [ ] Follow-ups is an additional native page after the four core pages and reuses Twenty Tasks; its list shows only question, state, owner and next action, while People, evidence and email open progressively in a full detail surface.
+- [ ] Follow-up subjects may reference one or more transactions or missing statement periods. People retain explicit roles and recipient selection without gaining membership or Finance access.
+- [ ] Email review shows authorized mailbox label, selected recipients, body and attachments before approval; approved, sent, replied, Task Done and reconciled are never treated as synonyms.
+- [ ] Hosted Finance uses current Workspace records by default; synthetic fixtures are isolated to an explicit test/preview adapter and never become a fallback.
+- [ ] The selected inclusive interval and a separately zoomable/scrollable timeline support cross-year and multi-year history without resetting at January.
+- [ ] Explicit evidence-link review actions append receipt-verified Workspace events; unlink/restore never delete originals or change income/expense classification.
+
+## Follow-up implementation boundary — source candidate
+
+Native Task fields now carry validated Finance state, subjects, People context,
+findings, evidence references, draft-email preview, correlation and append
+history. User-scoped state transitions and `APPROVED_NOT_SENT` updates require a
+matching read-back receipt. The app deliberately has no email send path. Native
+Task attachments remain the authorized upload surface; creating/editing drafts,
+uploading files in this custom surface, inviting People, mailbox-scope changes,
+reply ingestion/correlation and hosted permission proof are still unsupported.
 
 ## Explicitly out of scope for this slice
 
@@ -131,4 +148,3 @@ Live Hass bank, Plaid, Clover, email or customer import; new OAuth scopes; crede
 ## Remaining factual and commitment decisions
 
 Before the first live source: current client authority and executed engagement evidence; masked source/account/merchant inventory; exact acquisition periods; reviewer/recipient roles; retention/deletion/export/legal-hold terms; report language; original-file custody; accountant-approved accounting/tax basis where needed; accepted storage/recovery verdict; and the exact Finance consumer contract from the Clover owner.
-

@@ -2,17 +2,20 @@ import {
   defineNavigationMenuItem,
   NavigationMenuItemType,
 } from 'twenty-sdk/define';
+
 import {
   FINANCE_FOLDER_UNIVERSAL_IDENTIFIER,
-  FINANCE_TRANSACTIONS_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
+  FINANCE_STATEMENTS_NAVIGATION_UNIVERSAL_IDENTIFIER,
+  FINANCE_STATEMENTS_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
 } from 'src/constants/universal-identifiers';
+
 export default defineNavigationMenuItem({
-  universalIdentifier: '46716e4c-62ed-4ee9-8e20-7c84327ecbaa',
-  name: 'Transactions',
-  icon: 'IconList',
-  position: 3,
+  universalIdentifier: FINANCE_STATEMENTS_NAVIGATION_UNIVERSAL_IDENTIFIER,
+  name: 'Statements',
+  icon: 'IconFileDescription',
+  position: 4,
   type: NavigationMenuItemType.PAGE_LAYOUT,
   folderUniversalIdentifier: FINANCE_FOLDER_UNIVERSAL_IDENTIFIER,
   pageLayoutUniversalIdentifier:
-    FINANCE_TRANSACTIONS_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
+    FINANCE_STATEMENTS_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
 });

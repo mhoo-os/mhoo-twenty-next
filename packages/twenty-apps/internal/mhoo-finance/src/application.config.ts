@@ -6,5 +6,5 @@ export default defineApplication({
   universalIdentifier: APPLICATION_UNIVERSAL_IDENTIFIER,
   displayName: 'Mhoo Finance',
   description:
-    'Finance workspace preparation, bounded export validation, and evidence review previews.',
+    'Permission-aware Finance review over current Workspace records and retained evidence.',
 });

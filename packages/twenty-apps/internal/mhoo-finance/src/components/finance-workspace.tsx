@@ -1,73 +1,107 @@
 import styled from '@emotion/styled';
-import { useEffect, useReducer, useRef, useState } from 'react';
-import { Button } from 'twenty-ui/input';
+import { useEffect, useRef, useState } from 'react';
 
+import { demoMoney } from '../investigation/question-prototype';
 import {
-  DEMO_QUESTIONS,
-  demoMoney,
-  demoReviewContextKey,
-  demoTrace,
-  initialDemoState,
-  reduceDemo,
-  resolveDemoQuestion,
-  visibleDemoAttentionItems,
-  type DemoRow,
-  type DemoScenario,
-  type DemoScope,
-} from '../investigation/question-prototype';
+  financeFollowUpNextAction,
+  financeFollowUpStateLabel,
+  type FinanceFollowUpState,
+} from '../investigation/finance-follow-up-contract';
+import {
+  handoffSource,
+  type HandoffResult,
+  type SourceEntry,
+} from '../investigation/source-handoff';
+import {
+  readWorkspaceFinance,
+  workspaceReadFailure,
+  type WorkspaceFinanceData,
+  type WorkspaceFinanceFact,
+  type WorkspaceFinanceFollowUp,
+} from '../investigation/workspace-finance-data';
+import {
+  appendWorkspaceEvidenceDecision,
+  evidenceDecisionFailure,
+  readWorkspaceEvidenceHistory,
+  type WorkspaceEvidenceAction,
+  type WorkspaceEvidenceDecision,
+} from '../investigation/workspace-evidence-decisions';
+import {
+  approveWorkspaceFinanceDraft,
+  financeFollowUpMutationFailure,
+  updateWorkspaceFinanceFollowUpState,
+} from '../investigation/workspace-finance-follow-ups';
+import {
+  isSparseCoverageGap,
+  timelineDateAt,
+  timelineDayOffset,
+  timelineMonthSpan,
+} from '../investigation/timeline-domain';
+import { SYNTHETIC_WORKSPACE_FINANCE_DATA } from '../investigation/synthetic-workspace-data';
 
-type FinanceView = 'overview' | 'transactions' | 'statements' | 'accounts';
-type ReviewDecision =
-  | 'UNREVIEWED'
-  | 'EVIDENCE_REQUEST_DRAFTED'
-  | 'KEPT_UNCLASSIFIED'
-  | 'REJECTED_CANDIDATE';
+export type FinanceView =
+  | 'overview'
+  | 'transactions'
+  | 'statements'
+  | 'accounts'
+  | 'followups'
+  | 'sources';
 
-const NAV_ITEMS: readonly { id: FinanceView; label: string; glyph: string }[] =
-  [
-    { id: 'overview', label: 'Overview', glyph: '⌁' },
-    { id: 'transactions', label: 'Transactions', glyph: '≡' },
-    { id: 'statements', label: 'Statements', glyph: '▤' },
-    { id: 'accounts', label: 'Accounts', glyph: '▣' },
-  ];
+const PAGE_TITLES: Readonly<Record<FinanceView, string>> = {
+  overview: 'Overview',
+  transactions: 'Transactions',
+  statements: 'Statements',
+  accounts: 'Accounts',
+  followups: 'Follow-ups',
+  sources: 'Add a source',
+};
 
-type TimelineRow = DemoRow & { illustrativeHistory?: true };
 type BrushKind = 'move' | 'start' | 'end';
 
-// Explicitly invented interaction history. These rows remain separate from the
-// seven demo-v1 source-backed fixture rows.
-const ILLUSTRATIVE_HISTORY: readonly TimelineRow[] = [
-  ['s1', '2025-03-07', 'Illustrative supplier payment', 'operating', '61000'],
-  ['s2', '2025-03-21', 'Illustrative maintenance', 'reserve', '23000'],
-  ['s3', '2025-04-09', 'Illustrative supplier payment', 'operating', '45000'],
-  ['s4', '2025-04-24', 'Illustrative maintenance', 'reserve', '31000'],
-  ['s5', '2025-05-06', 'Illustrative supplier payment', 'operating', '78000'],
-  ['s6', '2025-05-23', 'Illustrative maintenance', 'reserve', '16000'],
-  ['s7', '2025-06-10', 'Illustrative supplier payment', 'operating', '52000'],
-  ['s8', '2025-06-25', 'Illustrative maintenance', 'reserve', '29000'],
-  ['s9', '2025-07-08', 'Illustrative supplier payment', 'operating', '66000'],
-  ['s10', '2025-07-23', 'Illustrative maintenance', 'reserve', '19000'],
-  ['s11', '2025-08-11', 'Illustrative supplier payment', 'operating', '43000'],
-  ['s12', '2025-08-22', 'Illustrative maintenance', 'reserve', '26000'],
-].map(([id, date, description, account, outflowMinor], index) => ({
-  id,
-  date,
-  description,
-  account: account as DemoRow['account'],
-  outflowMinor,
-  sourceLine: 9 + index,
-  sourceAvailable: false,
-  includedInRealTotals: false,
-  illustrativeHistory: true,
-}));
+const SOURCE_ROUTES: readonly {
+  id: Exclude<SourceEntry, 'apps' | 'csv'>;
+  title: string;
+  type: string;
+  description: string;
+  boundary: string;
+  action: string;
+}[] = [
+  {
+    id: 'bank',
+    title: 'Bank',
+    type: 'BANK CONNECTION',
+    description: 'Use a bank source app already available to this Workspace.',
+    boundary: 'No bank connection is established by this screen.',
+    action: 'Open Apps',
+  },
+  {
+    id: 'pos',
+    title: 'POS · Clover',
+    type: 'POINT OF SALE',
+    description: 'Manage Clover as a distinct POS source in Workspace Apps.',
+    boundary: 'Clover installation and connection remain separate actions.',
+    action: 'Open Apps',
+  },
+  {
+    id: 'statement',
+    title: 'Uploaded statements',
+    type: 'DOCUMENT SOURCE',
+    description:
+      'Open governed Source artifacts for current, historical, or closed-account statements.',
+    boundary: 'This review surface does not upload or import a file.',
+    action: 'Open source artifacts',
+  },
+  {
+    id: 'email',
+    title: 'Email evidence',
+    type: 'WORKSPACE GMAIL EVIDENCE',
+    description:
+      'Use an already authorized Workspace Gmail connection for supporting evidence.',
+    boundary: 'Email evidence never creates a financial entry by itself.',
+    action: 'Open Apps',
+  },
+];
 
-const DAY_MS = 86_400_000;
-const TIMELINE_EPOCH = Date.parse('2025-01-01T00:00:00Z');
-const LAST_TIMELINE_DAY = 364;
-const dayOfTimeline = (date: string) =>
-  Math.round((Date.parse(`${date}T00:00:00Z`) - TIMELINE_EPOCH) / DAY_MS);
-const timelineDate = (day: number) =>
-  new Date(TIMELINE_EPOCH + day * DAY_MS).toISOString().slice(0, 10);
 const readableDate = (date: string) =>
   new Date(`${date}T00:00:00Z`).toLocaleDateString('en-US', {
     month: 'short',
@@ -77,26 +111,27 @@ const readableDate = (date: string) =>
   });
 
 const Workspace = styled.section({
-  '--fw-canvas': 'var(--color-background-secondary, #f7f8fa)',
-  '--fw-surface': 'var(--color-background-primary, #ffffff)',
-  '--fw-nav': 'var(--color-background-tertiary, #edf0f4)',
-  '--fw-text': 'var(--color-text-primary, #202938)',
-  '--fw-muted': 'var(--color-text-secondary, #59677a)',
-  '--fw-line': 'var(--color-border-secondary, #dfe4eb)',
-  '--fw-accent': 'var(--color-text-info, #285ee7)',
-  '--fw-soft': 'var(--color-background-info, #edf2ff)',
-  '--fw-warn': 'var(--color-text-warning, #875413)',
-  '--fw-warn-bg': 'var(--color-background-warning, #fff4e2)',
+  '--fw-canvas': 'var(--t-background-primary)',
+  '--fw-surface': 'var(--t-background-primary)',
+  '--fw-nav': 'var(--t-background-secondary)',
+  '--fw-text': 'var(--t-font-color-primary)',
+  '--fw-muted': 'var(--t-font-color-secondary)',
+  '--fw-line': 'var(--t-border-color-light)',
+  '--fw-accent': 'var(--t-accent-primary)',
+  '--fw-soft': 'var(--t-background-transparent-blue)',
+  '--fw-warn': 'var(--t-color-orange9)',
+  '--fw-warn-bg': 'var(--t-background-transparent-orange)',
+  '--fw-success': 'var(--t-color-green9)',
   color: 'var(--fw-text)',
   background: 'var(--fw-canvas)',
-  border: '1px solid var(--fw-line)',
-  borderRadius: '12px',
+  border: 0,
+  borderRadius: 0,
   overflow: 'hidden',
-  minHeight: '760px',
+  minHeight: '640px',
   width: '100%',
   position: 'relative',
   isolation: 'isolate',
-  fontFamily: 'var(--font-family, Inter, system-ui, sans-serif)',
+  fontFamily: 'var(--t-font-family)',
   fontSize: '13px',
   lineHeight: 1.45,
   boxSizing: 'border-box',
@@ -179,7 +214,7 @@ const Workspace = styled.section({
   '& .fw-nav-button[aria-current="page"]': {
     color: 'var(--fw-accent)',
     background: 'var(--fw-surface)',
-    boxShadow: '0 1px 3px rgba(30, 45, 36, .05)',
+    boxShadow: 'var(--t-box-shadow-light)',
   },
   '& .fw-nav-glyph': { width: '15px', textAlign: 'center', fontSize: '14px' },
   '& .fw-nav-meta': {
@@ -188,7 +223,7 @@ const Workspace = styled.section({
     fontSize: '9px',
     lineHeight: 1.55,
   },
-  '& .fw-main': { minWidth: 0, padding: '23px 25px 19px' },
+  '& .fw-main': { minWidth: 0, padding: '8px 4px 16px' },
   '& .fw-top': {
     minHeight: '38px',
     display: 'flex',
@@ -320,8 +355,7 @@ const Workspace = styled.section({
   '& .fw-segment:nth-of-type(even)': { opacity: 0.72 },
   '& .fw-segment[data-missing="true"]': {
     opacity: 1,
-    background:
-      'repeating-linear-gradient(135deg, #edbb73 0 4px, #f9dca9 4px 8px)',
+    background: 'var(--fw-warn-bg)',
   },
   '& .fw-month-label': {
     paddingTop: '7px',
@@ -339,9 +373,8 @@ const Workspace = styled.section({
   '& .fw-hatch': {
     width: '12px',
     height: '8px',
-    border: '1px solid #c8954b',
-    background:
-      'repeating-linear-gradient(135deg, #edbb73 0 3px, #f9dca9 3px 6px)',
+    border: '1px solid var(--fw-warn)',
+    background: 'var(--fw-warn-bg)',
   },
   '& .fw-insight': {
     width: '100%',
@@ -429,8 +462,10 @@ const Workspace = styled.section({
     verticalAlign: 'middle',
     overflowWrap: 'anywhere',
   },
-  '& .fw-table tbody tr': { cursor: 'pointer' },
-  '& .fw-table tbody tr:hover td': { background: 'var(--fw-soft)' },
+  '& .fw-table tbody tr[tabindex]': { cursor: 'pointer' },
+  '& .fw-table tbody tr[tabindex]:hover td': {
+    background: 'var(--fw-soft)',
+  },
   '& .fw-check-col': { width: '34px' },
   '& .fw-date-col': { width: '13%' },
   '& .fw-account-col': { width: '16%' },
@@ -480,7 +515,7 @@ const Workspace = styled.section({
     borderColor: 'var(--fw-accent)',
   },
   '& .fw-primary': {
-    color: '#fff',
+    color: 'var(--t-font-color-inverted)',
     borderColor: 'var(--fw-accent)',
     background: 'var(--fw-accent)',
   },
@@ -573,6 +608,34 @@ const Workspace = styled.section({
     color: 'var(--fw-text)',
     background: 'var(--fw-surface)',
     fontSize: '10px',
+  },
+  '& .fw-timeline-tools': {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    flexWrap: 'wrap',
+    margin: '12px 0 8px',
+  },
+  '& .fw-timeline-scroll': {
+    width: '100%',
+    overflowX: 'auto',
+    padding: '2px 0 7px',
+    scrollbarColor: 'var(--fw-line) transparent',
+  },
+  '& .fw-timeline-canvas': {
+    minWidth: '100%',
+  },
+  '& .fw-year-labels': {
+    position: 'relative',
+    height: '18px',
+    margin: '5px 13px 0',
+    color: 'var(--fw-muted)',
+    fontSize: '10px',
+  },
+  '& .fw-year-labels span': {
+    position: 'absolute',
+    transform: 'translateX(-50%)',
+    fontVariantNumeric: 'tabular-nums',
   },
   '& .fw-brush': {
     height: '47px',
@@ -693,7 +756,8 @@ const Workspace = styled.section({
   },
   '& .fw-line-chart text': {
     fill: 'var(--fw-muted)',
-    font: '9px Inter, system-ui, sans-serif',
+    fontFamily: 'var(--t-font-family)',
+    fontSize: '11px',
   },
   '& .fw-line-chart-grid': {
     stroke: 'var(--fw-line)',
@@ -705,10 +769,16 @@ const Workspace = styled.section({
     stroke: 'var(--fw-accent)',
     strokeWidth: 2.2,
   },
+  '& .fw-line-chart-path[data-direction="in"]': {
+    stroke: 'var(--fw-success)',
+  },
   '& .fw-line-chart-dot': {
     fill: 'var(--fw-accent)',
     stroke: 'var(--fw-surface)',
     strokeWidth: 2,
+  },
+  '& .fw-line-chart-dot[data-direction="in"]': {
+    fill: 'var(--fw-success)',
   },
   '& .fw-overview-foot': {
     display: 'flex',
@@ -719,11 +789,122 @@ const Workspace = styled.section({
     paddingTop: '15px',
     borderTop: '1px solid var(--fw-line)',
   },
+  '& .fw-followup-list': {
+    display: 'grid',
+    marginTop: '8px',
+    borderTop: '1px solid var(--fw-line)',
+  },
+  '& .fw-followup-row': {
+    minHeight: '78px',
+    display: 'grid',
+    gridTemplateColumns:
+      'minmax(260px, 1.7fr) minmax(120px, .7fr) minmax(120px, .7fr) minmax(220px, 1fr)',
+    alignItems: 'center',
+    gap: '24px',
+    padding: '18px 4px',
+    border: 0,
+    borderBottom: '1px solid var(--fw-line)',
+    color: 'var(--fw-text)',
+    background: 'var(--fw-surface)',
+    cursor: 'pointer',
+    textAlign: 'left',
+    transition: 'background calc(var(--t-animation-duration-fast) * 1s) ease',
+  },
+  '& .fw-followup-row:hover': { background: 'var(--fw-soft)' },
+  '& .fw-followup-question': {
+    display: 'block',
+    marginBottom: '4px',
+    fontSize: '14px',
+    fontWeight: 600,
+  },
+  '& .fw-followup-meta': { color: 'var(--fw-muted)', fontSize: '10px' },
+  '& .fw-followup-status': {
+    display: 'inline-flex',
+    width: 'fit-content',
+    padding: '4px 7px',
+    borderRadius: '999px',
+    color: 'var(--fw-text)',
+    background: 'var(--fw-nav)',
+    fontSize: '10px',
+  },
+  '& .fw-detail-back': { marginBottom: '18px' },
+  '& .fw-detail-heading': {
+    maxWidth: '900px',
+    marginBottom: '22px',
+    paddingBottom: '20px',
+    borderBottom: '1px solid var(--fw-line)',
+  },
+  '& .fw-detail-heading h2': {
+    maxWidth: '720px',
+    margin: '8px 0 12px',
+    fontSize: '24px',
+    fontWeight: 600,
+    letterSpacing: '-.6px',
+  },
+  '& .fw-detail-heading .fw-page-note': { margin: '8px 0 0' },
+  '& .fw-detail-tabs': {
+    display: 'flex',
+    gap: '5px',
+    overflowX: 'auto',
+    marginBottom: '24px',
+    borderBottom: '1px solid var(--fw-line)',
+  },
+  '& .fw-detail-tab': {
+    minHeight: '42px',
+    flex: '0 0 auto',
+    padding: '8px 12px',
+    border: 0,
+    borderBottom: '2px solid transparent',
+    color: 'var(--fw-muted)',
+    background: 'transparent',
+    cursor: 'pointer',
+  },
+  '& .fw-detail-tab[aria-selected="true"]': {
+    color: 'var(--fw-text)',
+    borderBottomColor: 'var(--fw-accent)',
+  },
+  '& .fw-detail-section': { maxWidth: '900px' },
+  '& .fw-detail-section h3': {
+    margin: '26px 0 8px',
+    fontSize: '13px',
+    fontWeight: 650,
+  },
+  '& .fw-detail-list': {
+    display: 'grid',
+    gap: '9px',
+    margin: 0,
+    padding: 0,
+    listStyle: 'none',
+  },
+  '& .fw-detail-item': {
+    padding: '12px 0',
+    borderBottom: '1px solid var(--fw-line)',
+  },
+  '& .fw-detail-item strong': { display: 'block', marginBottom: '3px' },
+  '& .fw-detail-actions': {
+    display: 'flex',
+    gap: '8px',
+    flexWrap: 'wrap',
+    marginTop: '24px',
+  },
+  '& .fw-email-preview': {
+    marginTop: '15px',
+    padding: '20px',
+    border: '1px solid var(--fw-line)',
+    borderRadius: '8px',
+    background: 'var(--fw-surface)',
+  },
+  '& .fw-email-body': {
+    marginTop: '16px',
+    paddingTop: '16px',
+    borderTop: '1px solid var(--fw-line)',
+    whiteSpace: 'pre-wrap',
+  },
   '& .fw-shade': {
     position: 'absolute',
     inset: 0,
     zIndex: 3,
-    background: 'rgba(16, 24, 40, .24)',
+    background: 'var(--t-background-transparent-strong)',
   },
   '& .fw-drawer': {
     position: 'absolute',
@@ -734,7 +915,7 @@ const Workspace = styled.section({
     padding: '23px',
     borderLeft: '1px solid var(--fw-line)',
     background: 'var(--fw-surface)',
-    boxShadow: '-12px 0 40px rgba(24, 35, 29, .10)',
+    boxShadow: 'var(--t-box-shadow-strong)',
   },
   '& .fw-drawer-top': {
     display: 'flex',
@@ -802,6 +983,11 @@ const Workspace = styled.section({
       gridTemplateColumns: '165px minmax(0, 1fr)',
       gap: '20px',
     },
+    '& .fw-followup-row': {
+      gridTemplateColumns:
+        'minmax(220px, 1.5fr) minmax(110px, .7fr) minmax(180px, 1fr)',
+    },
+    '& .fw-followup-owner': { display: 'none' },
   },
   '@media (max-width: 580px)': {
     minHeight: 0,
@@ -865,6 +1051,14 @@ const Workspace = styled.section({
       marginTop: '15px',
     },
     '& .fw-line-chart': { height: '230px' },
+    '& .fw-followup-row': {
+      minHeight: 'auto',
+      gridTemplateColumns: '1fr',
+      gap: '8px',
+      padding: '17px 2px',
+    },
+    '& .fw-followup-owner': { display: 'block' },
+    '& .fw-email-preview': { padding: '15px' },
   },
   '@media (pointer: coarse)': {
     '& .fw-window-handle': { width: '44px', marginLeft: '-22px' },
@@ -875,24 +1069,92 @@ const Workspace = styled.section({
   },
 });
 
-export const FinanceWorkspace = ({ onExit }: { onExit?: () => void }) => {
-  const [state, dispatch] = useReducer(reduceDemo, initialDemoState);
-  const [view, setView] = useState<FinanceView>('overview');
-  const [selectedAttentionId, setSelectedAttentionId] = useState<string | null>(
+type WorkspaceLoadState =
+  | { kind: 'loading' }
+  | { kind: 'denied' | 'failed' }
+  | { kind: 'ready'; data: WorkspaceFinanceData };
+
+const validWorkspaceFacts = (data: WorkspaceFinanceData) =>
+  data.facts
+    .filter((fact) => fact.date && fact.amountMinor !== null)
+    .slice()
+    .sort((left, right) =>
+      left.date === right.date
+        ? left.id.localeCompare(right.id)
+        : left.date.localeCompare(right.date),
+    );
+
+const workspaceFactMoney = (fact: WorkspaceFinanceFact) =>
+  fact.amountMinor === null ? '—' : demoMoney(fact.amountMinor);
+
+const parseStatementControls = (value: string | null) => {
+  if (!value) return null;
+  try {
+    const parsed: unknown = JSON.parse(value);
+    if (!parsed || typeof parsed !== 'object') return null;
+    const record = parsed as Record<string, unknown>;
+    const readMinor = (key: string) =>
+      typeof record[key] === 'string' && /^-?(0|[1-9]\d*)$/.test(record[key])
+        ? record[key]
+        : null;
+    const controls = {
+      opening: readMinor('openingBalanceMinor'),
+      closing: readMinor('closingBalanceMinor'),
+      moneyIn: readMinor('moneyInMinor'),
+      moneyOut: readMinor('moneyOutMinor'),
+    };
+    return Object.values(controls).every((item) => item !== null)
+      ? controls
+      : null;
+  } catch {
+    return null;
+  }
+};
+
+const WorkspaceFinanceScreen = ({
+  initialView,
+  dataOverride,
+}: {
+  initialView: Exclude<FinanceView, 'sources'>;
+  dataOverride?: WorkspaceFinanceData;
+}) => {
+  const [loadState, setLoadState] = useState<WorkspaceLoadState>(
+    dataOverride
+      ? { kind: 'ready', data: dataOverride }
+      : {
+          kind: 'loading',
+        },
+  );
+  const [refresh, setRefresh] = useState(0);
+  const [view, setView] = useState<FinanceView>(initialView);
+  const [accountId, setAccountId] = useState('all');
+  const [rangeStart, setRangeStart] = useState('');
+  const [rangeEnd, setRangeEnd] = useState('');
+  const [timelineZoom, setTimelineZoom] = useState<'month' | 'year' | 'all'>(
+    'year',
+  );
+  const [search, setSearch] = useState('');
+  const [selectedFact, setSelectedFact] = useState<WorkspaceFinanceFact | null>(
     null,
   );
-  const [reviewDecision, setReviewDecision] =
-    useState<ReviewDecision>('UNREVIEWED');
-  const [rangeStart, setRangeStart] = useState('2025-01-01');
-  const [rangeEnd, setRangeEnd] = useState('2025-06-30');
-  const [selectedIllustrative, setSelectedIllustrative] =
-    useState<TimelineRow | null>(null);
-  const [transactionSearch, setTransactionSearch] = useState('');
-  const requestSequence = useRef(0);
-  const timers = useRef<Array<ReturnType<typeof setTimeout>>>([]);
-  const closeButton = useRef<HTMLButtonElement>(null);
-  const returnFocus = useRef<HTMLElement | null>(null);
-  const dragState = useRef<{
+  const [selectedFollowUp, setSelectedFollowUp] =
+    useState<WorkspaceFinanceFollowUp | null>(null);
+  const [followUpDetailSection, setFollowUpDetailSection] = useState<
+    'summary' | 'people' | 'evidence' | 'email'
+  >('summary');
+  const [followUpMutation, setFollowUpMutation] = useState<
+    'idle' | 'saving' | 'denied' | 'failed'
+  >('idle');
+  const [evidenceHistory, setEvidenceHistory] = useState<
+    | { kind: 'idle' | 'loading' | 'denied' | 'failed' }
+    | { kind: 'ready'; rows: readonly WorkspaceEvidenceDecision[] }
+  >({ kind: 'idle' });
+  const [savingEvidence, setSavingEvidence] = useState(false);
+  const [sourceHandoff, setSourceHandoff] = useState<{
+    route: SourceEntry;
+    result: HandoffResult;
+  } | null>(null);
+  const liveDrag = useRef<{
     kind: BrushKind;
     x: number;
     width: number;
@@ -900,413 +1162,388 @@ export const FinanceWorkspace = ({ onExit }: { onExit?: () => void }) => {
     end: number;
   } | null>(null);
 
-  const request = (
-    scope: DemoScope,
-    question: string,
-    scenario: DemoScenario,
-  ) => {
-    const id = ++requestSequence.current;
-    dispatch({ type: 'request', id, scope, question, scenario });
-    const timer = setTimeout(
-      () =>
-        dispatch({
-          type: 'resolved',
-          id,
-          result: resolveDemoQuestion(scope, question, scenario),
-        }),
-      scenario === 'slow' ? 2400 : 250,
-    );
-    timers.current.push(timer);
-  };
+  useEffect(() => {
+    let cancelled = false;
+    if (dataOverride) {
+      setLoadState({ kind: 'ready', data: dataOverride });
+      const dates = validWorkspaceFacts(dataOverride)
+        .map((fact) => fact.date)
+        .sort();
+      setRangeStart(dates[0] ?? '');
+      setRangeEnd(dates.at(-1) ?? '');
+      return () => {
+        cancelled = true;
+      };
+    }
+    setLoadState({ kind: 'loading' });
+    readWorkspaceFinance()
+      .then((data) => {
+        if (cancelled) return;
+        setLoadState({ kind: 'ready', data });
+        const dates = validWorkspaceFacts(data)
+          .map((fact) => fact.date)
+          .sort();
+        setRangeStart((current) => current || dates[0] || '');
+        setRangeEnd((current) => current || dates.at(-1) || '');
+      })
+      .catch((error: unknown) => {
+        if (!cancelled) setLoadState({ kind: workspaceReadFailure(error) });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [dataOverride, refresh]);
 
   useEffect(() => {
-    request(initialDemoState.scope, DEMO_QUESTIONS[0], 'normal');
+    let cancelled = false;
+    if (!selectedFact?.artifactId) {
+      setEvidenceHistory({ kind: 'idle' });
+      return () => {
+        cancelled = true;
+      };
+    }
+    setEvidenceHistory({ kind: 'loading' });
+    readWorkspaceEvidenceHistory(selectedFact.id, selectedFact.artifactId)
+      .then((rows) => {
+        if (!cancelled) setEvidenceHistory({ kind: 'ready', rows });
+      })
+      .catch((error: unknown) => {
+        if (!cancelled) {
+          setEvidenceHistory({ kind: evidenceDecisionFailure(error) });
+        }
+      });
     return () => {
-      for (const timer of timers.current) clearTimeout(timer);
+      cancelled = true;
     };
-  }, []);
+  }, [selectedFact?.artifactId, selectedFact?.id]);
 
-  const result = state.result;
-  const sourceRows =
-    result?.status === 'ready'
-      ? result.rows.filter(
-          (row) =>
-            row.date >= rangeStart &&
-            row.date <= rangeEnd &&
-            (state.scope.account === 'all' ||
-              row.account === state.scope.account),
-        )
-      : [];
-  const historyRows =
-    result?.status === 'ready'
-      ? ILLUSTRATIVE_HISTORY.filter(
-          (row) =>
-            row.date >= rangeStart &&
-            row.date <= rangeEnd &&
-            (state.scope.account === 'all' ||
-              row.account === state.scope.account),
-        )
-      : [];
-  const rows: TimelineRow[] = [...sourceRows, ...historyRows].sort((a, b) =>
-    a.date.localeCompare(b.date),
-  );
-  const attentionItems = visibleDemoAttentionItems(result, sourceRows);
-  const trace = demoTrace(state);
-  const drawerRow = trace?.row ?? selectedIllustrative;
-  const reviewContextKey = demoReviewContextKey(
-    selectedAttentionId,
-    drawerRow?.id ?? null,
-    trace?.snapshot ?? state.scope.snapshot,
-  );
-  const selectedRowFlags = drawerRow
-    ? attentionItems.filter((item) => item.contributingRowId === drawerRow.id)
+  if (loadState.kind !== 'ready') {
+    return (
+      <Workspace aria-label={`${PAGE_TITLES[initialView]} Finance content`}>
+        <main className="fw-main">
+          <h1 className="fw-title">{PAGE_TITLES[initialView]}</h1>
+          <div className="fw-empty" role="status">
+            {loadState.kind === 'loading'
+              ? 'Reading authorized Workspace records…'
+              : loadState.kind === 'denied'
+                ? 'You do not have permission to read these Finance records.'
+                : 'Finance records could not be read. No demo data was substituted.'}
+          </div>
+          {loadState.kind !== 'loading' ? (
+            <button
+              type="button"
+              className="fw-button"
+              onClick={() => setRefresh((value) => value + 1)}
+            >
+              Retry
+            </button>
+          ) : null}
+        </main>
+      </Workspace>
+    );
+  }
+
+  const data = loadState.data;
+  const isSynthetic = dataOverride !== undefined;
+  const relatedFollowUps = selectedFact
+    ? data.followUps.filter((followUp) =>
+        followUp.subjects.some(
+          (subject) =>
+            subject.kind === 'TRANSACTION' &&
+            subject.reference === selectedFact.id,
+        ),
+      )
     : [];
-  const uniqueAttentionRows = Array.from(
-    new Map(
-      attentionItems.map((item) => [
-        item.contributingRowId,
-        {
-          row: sourceRows.find((row) => row.id === item.contributingRowId),
-          items: attentionItems.filter(
-            (candidate) =>
-              candidate.contributingRowId === item.contributingRowId,
-          ),
-        },
-      ]),
-    ).values(),
-  ).filter((item) => item.row !== undefined);
-  const selectedTotal = rows.reduce(
-    (sum, row) => sum + BigInt(row.outflowMinor),
-    0n,
+  const allFacts = validWorkspaceFacts(data);
+  const invalidFactCount = data.facts.length - allFacts.length;
+  const domainStart = allFacts.map((fact) => fact.date).sort()[0] ?? '';
+  const domainEnd =
+    allFacts
+      .map((fact) => fact.date)
+      .sort()
+      .at(-1) ?? '';
+  const domainLast = domainEnd
+    ? Math.max(0, timelineDayOffset(domainStart, domainEnd))
+    : 0;
+  const liveDay = (date: string) => timelineDayOffset(domainStart, date);
+  const liveDate = (day: number) => timelineDateAt(domainStart, day);
+  const activeStart = rangeStart || domainStart;
+  const activeEnd = rangeEnd || domainEnd;
+  const scopedFacts = allFacts.filter(
+    (fact) =>
+      (accountId === 'all' || fact.accountId === accountId) &&
+      (!activeStart || fact.date >= activeStart) &&
+      (!activeEnd || fact.date <= activeEnd),
   );
-  const operatingTotal = rows
-    .filter((row) => row.account === 'operating')
-    .reduce((sum, row) => sum + BigInt(row.outflowMinor), 0n);
-  const reserveTotal = rows
-    .filter((row) => row.account === 'reserve')
-    .reduce((sum, row) => sum + BigInt(row.outflowMinor), 0n);
-  const largestRow = rows.reduce<TimelineRow | null>(
-    (largest, row) =>
-      !largest || BigInt(largest.outflowMinor) < BigInt(row.outflowMinor)
-        ? row
-        : largest,
-    null,
+  const facts = scopedFacts.filter(
+    (fact) =>
+      view !== 'transactions' ||
+      fact.description.toLowerCase().includes(search.toLowerCase()),
   );
-  let cumulativeMinor = 0n;
-  const chartPoints = rows.map((row) => {
-    cumulativeMinor += BigInt(row.outflowMinor);
-    return { row, cumulativeMinor };
-  });
-  const chartMaximum = selectedTotal > 0n ? Number(selectedTotal) * 1.15 : 1;
+  const eligibleFacts = scopedFacts.filter(
+    (fact) => fact.includedInTotals && fact.status !== 'SUPERSEDED',
+  );
+  const selectedAccountLabel =
+    data.accounts.find((account) => account.id === accountId)?.label ?? null;
+  const visibleStatements = data.statements.filter(
+    (statement) =>
+      (!activeStart || statement.period >= activeStart.slice(0, 7)) &&
+      (!activeEnd || statement.period <= activeEnd.slice(0, 7)) &&
+      (accountId === 'all' || statement.accountKey === selectedAccountLabel),
+  );
+  const moneyInMinor = eligibleFacts
+    .filter((fact) => fact.direction === 'in')
+    .reduce((sum, fact) => sum + BigInt(fact.amountMinor ?? '0'), 0n);
+  const moneyOutMinor = eligibleFacts
+    .filter((fact) => fact.direction === 'out')
+    .reduce((sum, fact) => sum + BigInt(fact.amountMinor ?? '0'), 0n);
+  let cumulativeIn = 0n;
+  let cumulativeOut = 0n;
+  const chartFacts = [...eligibleFacts].sort((left, right) =>
+    left.date.localeCompare(right.date),
+  );
+  const chartMax = Number(
+    moneyInMinor > moneyOutMinor ? moneyInMinor : moneyOutMinor,
+  );
   const chartSpan = Math.max(
     1,
-    dayOfTimeline(rangeEnd) - dayOfTimeline(rangeStart),
+    activeStart && activeEnd ? liveDay(activeEnd) - liveDay(activeStart) : 1,
   );
-  const chartX = (date: string) =>
-    64 + ((dayOfTimeline(date) - dayOfTimeline(rangeStart)) / chartSpan) * 521;
-  const chartY = (value: bigint) => 220 - (Number(value) / chartMaximum) * 193;
-  const chartPath = chartPoints
-    .map(
-      (point, index) =>
-        `${index === 0 ? 'M' : 'L'}${chartX(point.row.date)},${chartY(point.cumulativeMinor)}`,
-    )
-    .join(' ');
-  const chartAreaPath = chartPoints.length
-    ? `${chartPath} L${chartX(chartPoints.at(-1)!.row.date)},220 L64,220 Z`
-    : '';
-  const monthlyTotals = Array.from({ length: 12 }, (_, index) => {
-    const month = String(index + 1).padStart(2, '0');
-    return [
-      ...(result?.status === 'ready' ? result.rows : []),
-      ...ILLUSTRATIVE_HISTORY,
-    ]
-      .filter(
-        (row) =>
-          row.date.slice(5, 7) === month &&
-          (state.scope.account === 'all' ||
-            row.account === state.scope.account),
-      )
-      .reduce((sum, row) => sum + Number(row.outflowMinor), 0);
+  const chartPoints = chartFacts.map((fact) => {
+    if (fact.direction === 'in')
+      cumulativeIn += BigInt(fact.amountMinor ?? '0');
+    if (fact.direction === 'out')
+      cumulativeOut += BigInt(fact.amountMinor ?? '0');
+    return { fact, cumulativeIn, cumulativeOut };
   });
-  const maximumMonth = Math.max(1, ...monthlyTotals);
-  const pageTitle =
-    NAV_ITEMS.find((item) => item.id === view)?.label ?? 'Finance';
+  const chartX = (date: string) =>
+    64 + ((liveDay(date) - liveDay(activeStart)) / chartSpan) * 521;
+  const chartY = (value: bigint) =>
+    220 - (Number(value) / Math.max(1, chartMax * 1.15)) * 193;
+  const line = (direction: 'in' | 'out') =>
+    chartPoints
+      .map((point, index) => {
+        const value =
+          direction === 'in' ? point.cumulativeIn : point.cumulativeOut;
+        const previous = chartPoints[index - 1];
+        const gap = previous
+          ? isSparseCoverageGap(previous.fact.date, point.fact.date)
+          : true;
+        return `${gap ? 'M' : 'L'}${chartX(point.fact.date)},${chartY(value)}`;
+      })
+      .join(' ');
+  const domainMonths =
+    domainStart && domainEnd ? timelineMonthSpan(domainStart, domainEnd) : 1;
+  const timelineWidth =
+    timelineZoom === 'all'
+      ? '100%'
+      : `${Math.max(640, domainMonths * (timelineZoom === 'month' ? 96 : 28))}px`;
+  const timelineYears =
+    domainStart && domainEnd
+      ? Array.from(
+          {
+            length:
+              Number(domainEnd.slice(0, 4)) -
+              Number(domainStart.slice(0, 4)) +
+              1,
+          },
+          (_, index) => Number(domainStart.slice(0, 4)) + index,
+        )
+      : [];
 
-  useEffect(() => setReviewDecision('UNREVIEWED'), [reviewContextKey]);
-  useEffect(() => {
-    if (
-      selectedAttentionId &&
-      !attentionItems.some((item) => item.id === selectedAttentionId)
-    )
-      setSelectedAttentionId(null);
-  }, [attentionItems, selectedAttentionId]);
-  useEffect(() => {
-    if (drawerRow) closeButton.current?.focus();
-  }, [drawerRow?.id]);
-
-  const clearDrawer = (restoreFocus: boolean) => {
-    dispatch({ type: 'row', id: null });
-    setSelectedIllustrative(null);
-    setSelectedAttentionId(null);
-    if (restoreFocus) requestAnimationFrame(() => returnFocus.current?.focus());
-  };
-  const closeDrawer = () => clearDrawer(true);
-  const changeScope = (patch: Partial<DemoScope>) => {
-    clearDrawer(false);
-    request({ ...state.scope, ...patch }, state.question, state.scenario);
-  };
-  const switchView = (nextView: FinanceView) => {
-    setView(nextView);
-    if (
-      nextView === 'accounts' &&
-      (state.scope.account !== 'all' || state.scope.period !== 'comparison')
-    ) {
-      request(
-        { ...state.scope, account: 'all', period: 'comparison' },
-        state.question,
-        state.scenario,
-      );
-    } else if (
-      nextView !== 'statements' &&
-      state.scope.period !== 'comparison'
-    ) {
-      request(
-        { ...state.scope, period: 'comparison' },
-        state.question,
-        state.scenario,
-      );
-    }
-  };
-  const openRow = (
-    rowId: string,
-    attentionId: string | null,
-    sourceElement: EventTarget | null,
-  ) => {
-    returnFocus.current =
-      sourceElement instanceof HTMLElement ? sourceElement : null;
-    setSelectedAttentionId(attentionId);
-    const illustrative = historyRows.find((row) => row.id === rowId);
-    if (illustrative) {
-      dispatch({ type: 'row', id: null });
-      setSelectedIllustrative(illustrative);
-    } else {
-      setSelectedIllustrative(null);
-      dispatch({ type: 'row', id: rowId });
-    }
-  };
-  const transactionRows = rows.filter((row) =>
-    row.description.toLowerCase().includes(transactionSearch.toLowerCase()),
-  );
-  const displayRows =
-    view === 'transactions' ? transactionRows : transactionRows.slice(0, 7);
-
-  const changeWindow = (
+  const changeLiveWindow = (
     kind: BrushKind,
     delta: number,
-    initialStart = dayOfTimeline(rangeStart),
-    initialEnd = dayOfTimeline(rangeEnd),
+    initialStart = liveDay(activeStart),
+    initialEnd = liveDay(activeEnd),
   ) => {
-    let nextStart = initialStart;
-    let nextEnd = initialEnd;
+    if (!domainStart || !domainEnd) return;
+    let start = initialStart;
+    let end = initialEnd;
     if (kind === 'move') {
-      const boundedDelta = Math.max(
-        -initialStart,
-        Math.min(LAST_TIMELINE_DAY - initialEnd, delta),
-      );
-      nextStart += boundedDelta;
-      nextEnd += boundedDelta;
+      const bounded = Math.max(-start, Math.min(domainLast - end, delta));
+      start += bounded;
+      end += bounded;
     } else if (kind === 'start') {
-      nextStart = Math.max(0, Math.min(initialEnd, initialStart + delta));
+      start = Math.max(0, Math.min(end, start + delta));
     } else {
-      nextEnd = Math.max(
-        initialStart,
-        Math.min(LAST_TIMELINE_DAY, initialEnd + delta),
-      );
+      end = Math.max(start, Math.min(domainLast, end + delta));
     }
-    setRangeStart(timelineDate(nextStart));
-    setRangeEnd(timelineDate(nextEnd));
-    if (drawerRow) clearDrawer(false);
+    setRangeStart(liveDate(start));
+    setRangeEnd(liveDate(end));
+    setSelectedFact(null);
   };
-
-  const startBrushDrag = (
+  const startLiveDrag = (
     kind: BrushKind,
     event: React.PointerEvent<HTMLButtonElement>,
   ) => {
     const brush = event.currentTarget.parentElement;
-    if (!brush) return;
+    if (!brush || !activeStart || !activeEnd) return;
     event.preventDefault();
     event.currentTarget.setPointerCapture(event.pointerId);
-    dragState.current = {
+    liveDrag.current = {
       kind,
       x: event.clientX,
       width: brush.getBoundingClientRect().width,
-      start: dayOfTimeline(rangeStart),
-      end: dayOfTimeline(rangeEnd),
+      start: liveDay(activeStart),
+      end: liveDay(activeEnd),
     };
   };
-
-  const moveBrushDrag = (event: React.PointerEvent<HTMLButtonElement>) => {
-    const drag = dragState.current;
-    if (!drag) return;
-    changeWindow(
+  const moveLiveDrag = (event: React.PointerEvent<HTMLButtonElement>) => {
+    if (!liveDrag.current) return;
+    const drag = liveDrag.current;
+    changeLiveWindow(
       drag.kind,
-      Math.round(((event.clientX - drag.x) / drag.width) * 365),
+      Math.round(((event.clientX - drag.x) / drag.width) * (domainLast + 1)),
       drag.start,
       drag.end,
     );
   };
-
-  const endBrushDrag = () => {
-    dragState.current = null;
-  };
-
-  const brushKey = (
+  const liveKey = (
     kind: BrushKind,
     event: React.KeyboardEvent<HTMLButtonElement>,
   ) => {
     if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
     event.preventDefault();
     const step = kind === 'move' || event.shiftKey ? 7 : 1;
-    changeWindow(kind, event.key === 'ArrowRight' ? step : -step);
+    changeLiveWindow(kind, event.key === 'ArrowRight' ? step : -step);
+  };
+  const openSource = async (route: SourceEntry) => {
+    setSourceHandoff(null);
+    setSourceHandoff({ route, result: await handoffSource(route) });
+  };
+  const appendEvidenceAction = async (action: WorkspaceEvidenceAction) => {
+    if (!selectedFact?.artifactId || savingEvidence) return;
+    setSavingEvidence(true);
+    try {
+      const history = await appendWorkspaceEvidenceDecision({
+        entryReference: selectedFact.id,
+        evidenceReference: selectedFact.artifactId,
+        sourceTypes: 'FINANCE_FACT|SOURCE_ARTIFACT',
+        action,
+        reasonCode: 'EXISTING_FACT_ARTIFACT_RELATION',
+        at: new Date().toISOString(),
+      });
+      setEvidenceHistory({ kind: 'ready', rows: history });
+    } catch (error) {
+      setEvidenceHistory({ kind: evidenceDecisionFailure(error) });
+    } finally {
+      setSavingEvidence(false);
+    }
   };
 
-  const table = (tableRows = displayRows) => (
-    <div className="fw-table-wrap">
-      <table className="fw-table">
-        <thead>
-          <tr>
-            <th className="fw-check-col">
-              <span className="fw-checkbox" />
-            </th>
-            <th className="fw-date-col">Date</th>
-            <th>Description</th>
-            <th className="fw-account-col">Account</th>
-            <th className="fw-evidence-col">Evidence</th>
-            <th className="fw-money-col">Paid out</th>
-          </tr>
-        </thead>
-        <tbody>
-          {tableRows.map((row) => (
-            <tr
-              key={row.id}
-              tabIndex={0}
-              onClick={(event) => openRow(row.id, null, event.currentTarget)}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter' || event.key === ' ') {
-                  event.preventDefault();
-                  openRow(row.id, null, event.currentTarget);
-                }
-              }}
-            >
-              <td>
-                <span className="fw-checkbox" />
-              </td>
-              <td className="fw-date-cell">{row.date}</td>
-              <td>
-                <strong>{row.description}</strong>
-              </td>
-              <td className="fw-account-cell">{row.account}</td>
-              <td>
-                <span
-                  className="fw-status"
-                  data-tone={row.sourceAvailable ? 'ok' : 'warn'}
-                >
-                  {row.illustrativeHistory
-                    ? 'Illustrative · no source'
-                    : row.sourceAvailable
-                      ? 'Excerpt available'
-                      : 'Missing excerpt'}
-                </span>
-              </td>
-              <td className="fw-money-col">{demoMoney(row.outflowMinor)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
+  const transitionFollowUp = async (to: FinanceFollowUpState) => {
+    if (!selectedFollowUp || isSynthetic || followUpMutation === 'saving')
+      return;
+    setFollowUpMutation('saving');
+    try {
+      await updateWorkspaceFinanceFollowUpState({
+        taskId: selectedFollowUp.id,
+        from: selectedFollowUp.state,
+        to,
+        currentProvenance: JSON.stringify(selectedFollowUp.provenance),
+        at: new Date().toISOString(),
+      });
+      setSelectedFollowUp(null);
+      setFollowUpDetailSection('summary');
+      setFollowUpMutation('idle');
+      setRefresh((value) => value + 1);
+    } catch (error) {
+      setFollowUpMutation(financeFollowUpMutationFailure(error));
+    }
+  };
 
-  const unavailable = (
-    <div className="fw-empty" role="status">
-      {state.loading
-        ? 'Refreshing this scope…'
-        : result?.status === 'empty'
-          ? 'No matching demo records in this scope.'
-          : 'No records returned. Nothing has been inferred.'}
-    </div>
-  );
+  const approveFollowUpDraft = async () => {
+    if (
+      !selectedFollowUp?.draftEmail ||
+      isSynthetic ||
+      followUpMutation === 'saving'
+    )
+      return;
+    setFollowUpMutation('saving');
+    try {
+      await approveWorkspaceFinanceDraft({
+        taskId: selectedFollowUp.id,
+        from: 'AWAITING_APPROVAL',
+        currentProvenance: JSON.stringify(selectedFollowUp.provenance),
+        at: new Date().toISOString(),
+      });
+      setSelectedFollowUp(null);
+      setFollowUpDetailSection('summary');
+      setFollowUpMutation('idle');
+      setRefresh((value) => value + 1);
+    } catch (error) {
+      setFollowUpMutation(financeFollowUpMutationFailure(error));
+    }
+  };
 
-  const overview = (
+  const dateControls = domainStart ? (
     <>
-      {state.loading || result?.status !== 'ready' ? (
-        unavailable
-      ) : (
-        <>
-          <div className="fw-window-tools">
-            <div className="fw-date-fields">
-              <label className="fw-date-field">
-                From
-                <input
-                  className="fw-date-input"
-                  type="date"
-                  aria-label="Window start"
-                  min="2025-01-01"
-                  max={rangeEnd}
-                  value={rangeStart}
-                  onChange={(event) => {
-                    if (event.target.value && event.target.value <= rangeEnd) {
-                      setRangeStart(event.target.value);
-                      if (drawerRow) clearDrawer(false);
-                    }
-                  }}
-                />
-              </label>
-              <label className="fw-date-field">
-                To
-                <input
-                  className="fw-date-input"
-                  type="date"
-                  aria-label="Window end"
-                  min={rangeStart}
-                  max="2025-12-31"
-                  value={rangeEnd}
-                  onChange={(event) => {
-                    if (
-                      event.target.value &&
-                      event.target.value >= rangeStart
-                    ) {
-                      setRangeEnd(event.target.value);
-                      if (drawerRow) clearDrawer(false);
-                    }
-                  }}
-                />
-              </label>
-            </div>
-            <span className="fw-label">Inclusive · transaction dates</span>
-          </div>
+      <div className="fw-window-tools">
+        <div className="fw-date-fields">
+          <label className="fw-date-field">
+            From
+            <input
+              className="fw-date-input"
+              type="date"
+              aria-label="Window start"
+              min={domainStart}
+              max={activeEnd}
+              value={activeStart}
+              onChange={(event) => setRangeStart(event.target.value)}
+            />
+          </label>
+          <label className="fw-date-field">
+            To
+            <input
+              className="fw-date-input"
+              type="date"
+              aria-label="Window end"
+              min={activeStart}
+              max={domainEnd}
+              value={activeEnd}
+              onChange={(event) => setRangeEnd(event.target.value)}
+            />
+          </label>
+        </div>
+        <span className="fw-label">
+          Inclusive · {isSynthetic ? 'synthetic test' : 'authorized'} records
+        </span>
+      </div>
+      <div className="fw-timeline-tools">
+        <span className="fw-label">Visible timeline</span>
+        <select
+          className="fw-select"
+          aria-label="Timeline zoom"
+          value={timelineZoom}
+          onChange={(event) =>
+            setTimelineZoom(event.target.value as 'month' | 'year' | 'all')
+          }
+        >
+          <option value="month">Month detail</option>
+          <option value="year">Year overview</option>
+          <option value="all">Fit all history</option>
+        </select>
+        <span className="fw-label">
+          Scroll horizontally to continue across years
+        </span>
+      </div>
+      <div className="fw-timeline-scroll">
+        <div className="fw-timeline-canvas" style={{ width: timelineWidth }}>
           <div className="fw-brush" aria-label="Selected date window">
-            <div className="fw-brush-bars" aria-hidden="true">
-              {monthlyTotals.map((total, index) => (
-                <span
-                  className="fw-brush-bar"
-                  key={index}
-                  style={{ height: `${(total / maximumMonth) * 100}%` }}
-                />
-              ))}
-            </div>
             <button
               type="button"
               className="fw-window-selection"
               aria-label="Move selected date window. Left or right arrow moves seven days."
               style={{
-                left: `${(dayOfTimeline(rangeStart) / 365) * 100}%`,
-                width: `${((dayOfTimeline(rangeEnd) - dayOfTimeline(rangeStart) + 1) / 365) * 100}%`,
+                left: `${(liveDay(activeStart) / Math.max(1, domainLast + 1)) * 100}%`,
+                width: `${((liveDay(activeEnd) - liveDay(activeStart) + 1) / Math.max(1, domainLast + 1)) * 100}%`,
               }}
-              onPointerDown={(event) => startBrushDrag('move', event)}
-              onPointerMove={moveBrushDrag}
-              onPointerUp={endBrushDrag}
-              onPointerCancel={endBrushDrag}
-              onKeyDown={(event) => brushKey('move', event)}
+              onPointerDown={(event) => startLiveDrag('move', event)}
+              onPointerMove={moveLiveDrag}
+              onPointerUp={() => (liveDrag.current = null)}
+              onPointerCancel={() => (liveDrag.current = null)}
+              onKeyDown={(event) => liveKey('move', event)}
             />
             {(['start', 'end'] as const).map((kind) => (
               <button
@@ -1315,728 +1552,989 @@ export const FinanceWorkspace = ({ onExit }: { onExit?: () => void }) => {
                 key={kind}
                 aria-label={`Resize window ${kind}. Arrow keys change one day, Shift changes seven days.`}
                 style={{
-                  left: `${((dayOfTimeline(kind === 'start' ? rangeStart : rangeEnd) + (kind === 'end' ? 1 : 0)) / 365) * 100}%`,
+                  left: `${((liveDay(kind === 'start' ? activeStart : activeEnd) + (kind === 'end' ? 1 : 0)) / Math.max(1, domainLast + 1)) * 100}%`,
                 }}
-                onPointerDown={(event) => startBrushDrag(kind, event)}
-                onPointerMove={moveBrushDrag}
-                onPointerUp={endBrushDrag}
-                onPointerCancel={endBrushDrag}
-                onKeyDown={(event) => brushKey(kind, event)}
+                onPointerDown={(event) => startLiveDrag(kind, event)}
+                onPointerMove={moveLiveDrag}
+                onPointerUp={() => (liveDrag.current = null)}
+                onPointerCancel={() => (liveDrag.current = null)}
+                onKeyDown={(event) => liveKey(kind, event)}
               >
                 ‖
               </button>
             ))}
           </div>
-          <div className="fw-month-labels" aria-hidden="true">
-            {[
-              'Jan',
-              'Feb',
-              'Mar',
-              'Apr',
-              'May',
-              'Jun',
-              'Jul',
-              'Aug',
-              'Sep',
-              'Oct',
-              'Nov',
-              'Dec',
-            ].map((month) => (
-              <span key={month}>{month}</span>
-            ))}
-          </div>
-          <div className="fw-brush-note">
-            <span>Drag window to move · drag edges to resize</span>
-            <span>2025 synthetic history · Sep–Dec has no records</span>
-          </div>
-          <section
-            className="fw-insights-layout"
-            aria-label="Selected interval summary"
-          >
-            <div>
-              <span className="fw-label">Selected outflow · synthetic</span>
-              <div className="fw-selected-money">
-                {rows.length
-                  ? demoMoney(selectedTotal.toString())
-                  : 'No records'}
-              </div>
-              <div className="fw-sub" aria-live="polite">
-                {readableDate(rangeStart)} – {readableDate(rangeEnd)} ·{' '}
-                {rows.length} records
-              </div>
-              <div className="fw-recap">
-                {largestRow ? (
-                  <button
-                    type="button"
-                    className="fw-recap-button"
-                    onClick={(event) =>
-                      openRow(largestRow.id, null, event.currentTarget)
-                    }
-                  >
-                    <span aria-hidden="true">↗</span>
-                    <span>
-                      <strong>
-                        {demoMoney(largestRow.outflowMinor)} largest movement
-                      </strong>
-                      <span className="fw-sub">
-                        {largestRow.description} ·{' '}
-                        {readableDate(largestRow.date)}
-                      </span>
-                    </span>
-                  </button>
-                ) : null}
-                {sourceRows.some((row) => !row.sourceAvailable) ? (
-                  <button
-                    type="button"
-                    className="fw-recap-button"
-                    onClick={(event) =>
-                      openRow('d6', 'missing-evidence', event.currentTarget)
-                    }
-                  >
-                    <span aria-hidden="true">↳</span>
-                    <span>
-                      <strong className="fw-warning">
-                        Source excerpt missing
-                      </strong>
-                      <span className="fw-sub">
-                        The $360 movement stays unclassified.
-                      </span>
-                    </span>
-                  </button>
-                ) : null}
-                <button
-                  type="button"
-                  className="fw-recap-button"
-                  onClick={() => switchView('transactions')}
-                >
-                  <span aria-hidden="true">↳</span>
-                  <span>
-                    <strong>
-                      {uniqueAttentionRows.length} transactions need review
-                    </strong>
-                    <span className="fw-sub">
-                      Within the selected account and dates.
-                    </span>
-                  </span>
-                </button>
-              </div>
-            </div>
-            <div>
-              <div className="fw-chart-stats">
-                <div className="fw-chart-stat">
-                  <span className="fw-label">Operating outflow</span>
-                  <strong>
-                    {rows.length ? demoMoney(operatingTotal.toString()) : '—'}
-                  </strong>
-                </div>
-                <div className="fw-chart-stat">
-                  <span className="fw-label">Reserve outflow</span>
-                  <strong>
-                    {rows.length ? demoMoney(reserveTotal.toString()) : '—'}
-                  </strong>
-                </div>
-                <div className="fw-chart-stat">
-                  <span className="fw-label">Income / profit</span>
-                  <strong className="fw-label">Not modeled</strong>
-                </div>
-              </div>
-              <svg
-                className="fw-line-chart"
-                viewBox="0 0 600 250"
-                role="img"
-                aria-label={
-                  rows.length
-                    ? `${readableDate(rangeStart)} through ${readableDate(rangeEnd)}, ${rows.length} synthetic records, cumulative outflow ${demoMoney(selectedTotal.toString())}`
-                    : `${readableDate(rangeStart)} through ${readableDate(rangeEnd)}, no records in this interval`
-                }
+          <div className="fw-year-labels" aria-hidden="true">
+            {timelineYears.map((year) => (
+              <span
+                key={year}
+                style={{
+                  left: `${(Math.max(0, liveDay(`${year}-01-01`)) / Math.max(1, domainLast + 1)) * 100}%`,
+                }}
               >
-                <defs>
-                  <linearGradient
-                    id="fw-chart-fill"
-                    x1="0"
-                    y1="0"
-                    x2="0"
-                    y2="1"
-                  >
-                    <stop
-                      offset="0%"
-                      stopColor="currentColor"
-                      stopOpacity=".11"
-                    />
-                    <stop
-                      offset="100%"
-                      stopColor="currentColor"
-                      stopOpacity="0"
-                    />
-                  </linearGradient>
-                </defs>
-                {[0, 0.5, 1].map((fraction) => {
-                  const value = BigInt(Math.round(chartMaximum * fraction));
-                  const y = chartY(value);
-                  return (
-                    <g key={fraction}>
-                      <line
-                        className="fw-line-chart-grid"
-                        x1="64"
-                        x2="585"
-                        y1={y}
-                        y2={y}
-                      />
-                      <text x="55" y={y + 4} textAnchor="end">
-                        {rows.length ? demoMoney(value.toString()) : '—'}
-                      </text>
-                    </g>
-                  );
-                })}
-                <text x="64" y="15">
-                  Outflow (USD)
-                </text>
-                {chartAreaPath ? (
-                  <path
-                    d={chartAreaPath}
-                    fill="url(#fw-chart-fill)"
-                    style={{ color: 'var(--fw-accent)' }}
-                  />
-                ) : null}
-                {chartPath ? (
-                  <path className="fw-line-chart-path" d={chartPath} />
-                ) : null}
-                {chartPoints.map((point) => (
-                  <circle
-                    className="fw-line-chart-dot"
-                    key={point.row.id}
-                    cx={chartX(point.row.date)}
-                    cy={chartY(point.cumulativeMinor)}
-                    r="3"
-                  />
-                ))}
-                {!chartPoints.length ? (
-                  <text x="325" y="125" textAnchor="middle">
-                    No records in this interval
-                  </text>
-                ) : null}
-                <text x="64" y="241">
-                  {rangeStart.slice(5)}
-                </text>
-                <text x="585" y="241" textAnchor="end">
-                  {rangeEnd.slice(5)}
-                </text>
-              </svg>
-              <div className="fw-chart-key">
-                <span style={{ color: 'var(--fw-accent)' }}>—</span>Cumulative
-                selected outflows · USD{' '}
-                <span style={{ marginLeft: 'auto' }}>
-                  No balance is represented
-                </span>
-              </div>
-            </div>
-          </section>
-          <div className="fw-overview-foot">
-            <span className="fw-sub">
-              Jan–Feb: 7 demo-v1 rows · Mar–Aug: invented interaction examples
-            </span>
-            <button
-              type="button"
-              className="fw-link"
-              onClick={() => switchView('transactions')}
-            >
-              Explore contributing transactions →
-            </button>
-          </div>
-        </>
-      )}
-    </>
-  );
-
-  const transactions = (
-    <>
-      <p className="fw-page-note">
-        Working list · evidence status stays beside each transaction.
-      </p>
-      <div className="fw-window-tools">
-        <div className="fw-date-fields">
-          <label className="fw-date-field">
-            From
-            <input
-              className="fw-date-input"
-              type="date"
-              aria-label="Transaction window start"
-              min="2025-01-01"
-              max={rangeEnd}
-              value={rangeStart}
-              onChange={(event) =>
-                event.target.value &&
-                event.target.value <= rangeEnd &&
-                setRangeStart(event.target.value)
-              }
-            />
-          </label>
-          <label className="fw-date-field">
-            To
-            <input
-              className="fw-date-input"
-              type="date"
-              aria-label="Transaction window end"
-              min={rangeStart}
-              max="2025-12-31"
-              value={rangeEnd}
-              onChange={(event) =>
-                event.target.value &&
-                event.target.value >= rangeStart &&
-                setRangeEnd(event.target.value)
-              }
-            />
-          </label>
-        </div>
-        <span className="fw-label">
-          {rows.length} transactions in the inclusive window
-        </span>
-      </div>
-      <div className="fw-actions">
-        <button type="button" className="fw-button" disabled>
-          Export fixture
-        </button>
-        <button type="button" className="fw-button" disabled>
-          Request paperwork
-        </button>
-        <select
-          className="fw-select fw-account-picker"
-          aria-label="Transaction account"
-          value={state.scope.account}
-          onChange={(event) =>
-            changeScope({
-              account: event.target.value as DemoScope['account'],
-              period: 'comparison',
-            })
-          }
-        >
-          <option value="all">All accounts</option>
-          <option value="operating">Operating</option>
-          <option value="reserve">Reserve</option>
-        </select>
-        <input
-          className="fw-date-input"
-          aria-label="Search transactions"
-          placeholder="Search"
-          value={transactionSearch}
-          onChange={(event) => setTransactionSearch(event.target.value)}
-        />
-      </div>
-      {transactionRows.length ? table(transactionRows) : unavailable}
-    </>
-  );
-
-  const statements = (
-    <>
-      <p className="fw-page-note">
-        Statement coverage is separate from transaction excerpts.
-      </p>
-      <div className="fw-actions">
-        <button type="button" className="fw-button" disabled>
-          Add statement
-        </button>
-        <span className="fw-label">
-          No original statement files are present in this demonstration.
-        </span>
-      </div>
-      <div className="fw-table-wrap">
-        <table className="fw-table">
-          <thead>
-            <tr>
-              <th>Period</th>
-              <th>Account scope</th>
-              <th>Observed rows</th>
-              <th>Outflow</th>
-              <th>Statement control</th>
-            </tr>
-          </thead>
-          <tbody>
-            {(result?.groups ?? []).map((group) => (
-              <tr key={group.month}>
-                <td>
-                  <strong>{group.label} 2025</strong>
-                </td>
-                <td>
-                  {state.scope.account === 'all'
-                    ? 'All accounts'
-                    : state.scope.account}
-                </td>
-                <td>{group.count}</td>
-                <td>{demoMoney(group.outflowMinor)}</td>
-                <td>
-                  <span className="fw-status" data-tone="warn">
-                    Unavailable
-                  </span>
-                </td>
-              </tr>
+                {year}
+              </span>
             ))}
-          </tbody>
-        </table>
+          </div>
+        </div>
       </div>
-      <div className="fw-panels" style={{ marginTop: 13 }}>
-        <article className="fw-panel">
-          <div className="fw-panel-top">
-            <h2 className="fw-panel-title">Coverage boundary</h2>
-            <span className="fw-status" data-tone="warn">
-              PARTIAL
-            </span>
-          </div>
-          <p className="fw-sub">
-            Available row excerpts do not prove a complete bank statement or
-            beginning and ending balances.
-          </p>
-        </article>
-        <article className="fw-panel">
-          <div className="fw-panel-top">
-            <h2 className="fw-panel-title">Next evidence</h2>
-            <span className="fw-status">NOT REQUESTED</span>
-          </div>
-          <p className="fw-sub">
-            A production request requires authorized Files custody and a
-            retained reviewer identity.
-          </p>
-        </article>
+      <div className="fw-month-labels" aria-hidden="true">
+        <span>{readableDate(domainStart)}</span>
+        <span>{readableDate(domainEnd)}</span>
       </div>
     </>
-  );
+  ) : null;
 
-  const accounts = (
-    <>
-      <p className="fw-page-note">
-        Two demo account scopes · balances and live connection state are not
-        supplied.
-      </p>
-      <div className="fw-table-wrap">
-        <table className="fw-table">
-          <thead>
-            <tr>
-              <th>Bank account</th>
-              <th>Status</th>
-              <th>Source</th>
-              <th>Currency</th>
-              <th>Observed records</th>
-              <th className="fw-money-col">Observed outflow</th>
-              <th></th>
+  const factTable = (
+    <div className="fw-table-wrap">
+      <table className="fw-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Description</th>
+            <th>Account</th>
+            <th>Status</th>
+            <th>Classification</th>
+            <th className="fw-money-col">Money in</th>
+            <th className="fw-money-col">Money out</th>
+          </tr>
+        </thead>
+        <tbody>
+          {facts.map((fact) => (
+            <tr
+              key={fact.id}
+              tabIndex={0}
+              onClick={() => setSelectedFact(fact)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault();
+                  setSelectedFact(fact);
+                }
+              }}
+            >
+              <td>{fact.date}</td>
+              <td>
+                <strong>{fact.description}</strong>
+              </td>
+              <td>{fact.accountLabel}</td>
+              <td>{fact.status}</td>
+              <td>{fact.classification}</td>
+              <td className="fw-money-col">
+                {fact.direction === 'in' ? workspaceFactMoney(fact) : '—'}
+              </td>
+              <td className="fw-money-col">
+                {fact.direction === 'out' ? workspaceFactMoney(fact) : '—'}
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {(['operating', 'reserve'] as const).map((account) => {
-              const accountRows: TimelineRow[] = [
-                ...(result?.status === 'ready' ? result.rows : []),
-                ...ILLUSTRATIVE_HISTORY,
-              ].filter((row) => row.account === account);
-              const accountTotal = accountRows.reduce(
-                (sum, row) => sum + BigInt(row.outflowMinor),
-                0n,
-              );
-              const evidenceCount = accountRows.filter(
-                (row) => !row.illustrativeHistory && row.sourceAvailable,
-              ).length;
-              return (
-                <tr key={account}>
-                  <td>
-                    <strong>
-                      {account === 'operating'
-                        ? 'Operating account'
-                        : 'Reserve account'}
-                    </strong>
-                  </td>
-                  <td>
-                    <span className="fw-status">Not connected</span>
-                  </td>
-                  <td>Demo + illustrative history</td>
-                  <td>USD</td>
-                  <td>
-                    {accountRows.length} · {evidenceCount} excerpts
-                  </td>
-                  <td className="fw-money-col">
-                    {demoMoney(accountTotal.toString())}
-                  </td>
-                  <td>
-                    <button
-                      type="button"
-                      className="fw-link"
-                      onClick={() => {
-                        setView('transactions');
-                        changeScope({ account, period: 'comparison' });
-                      }}
-                    >
-                      Transactions →
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-      <p className="fw-page-note" style={{ marginTop: 17 }}>
-        Observed outflow is not a balance. Account ownership and connection
-        state remain unverified.
-      </p>
-    </>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 
   return (
-    <Workspace aria-label="Mhoo Finance application">
-      <header className="fw-chrome">
-        <span className="fw-logo">mhoo.</span>
-        <span className="fw-divider" />
-        <span className="fw-product">Finance</span>
-        <span className="fw-demo">Demo data · design implementation</span>
-      </header>
-      <div className="fw-layout">
-        <nav className="fw-nav" aria-label="Finance navigation">
-          <div className="fw-nav-label">Bank</div>
-          {NAV_ITEMS.map((item) => (
-            <button
-              type="button"
-              className="fw-nav-button"
-              key={item.id}
-              aria-current={view === item.id ? 'page' : undefined}
-              onClick={() => switchView(item.id)}
-            >
-              <span className="fw-nav-glyph" aria-hidden="true">
-                {item.glyph}
-              </span>
-              {item.label}
-            </button>
-          ))}
-          <div className="fw-nav-meta">
-            Jan–Feb 2025
-            <br />
-            Partial source coverage
+    <Workspace aria-label={`${PAGE_TITLES[view]} Finance content`}>
+      <main className="fw-main">
+        <div className="fw-top">
+          <div>
+            <h1 className="fw-title">
+              {selectedFollowUp ? 'Follow-up detail' : PAGE_TITLES[view]}
+            </h1>
+            <span className="fw-sub">
+              {isSynthetic
+                ? 'Synthetic test records · removable adapter'
+                : 'Current Workspace records'}
+            </span>
           </div>
-        </nav>
-        <main className="fw-main">
-          <div className="fw-top">
-            <h1 className="fw-title">{pageTitle}</h1>
-            {view === 'overview' || view === 'statements' ? (
-              <div className="fw-controls">
+          <div className="fw-controls">
+            {selectedFollowUp ? (
+              <button
+                type="button"
+                className="fw-button"
+                onClick={() => {
+                  setSelectedFollowUp(null);
+                  setFollowUpDetailSection('summary');
+                  setFollowUpMutation('idle');
+                }}
+              >
+                ← Back to Follow-ups
+              </button>
+            ) : view === 'sources' ? (
+              <button
+                type="button"
+                className="fw-button"
+                onClick={() => setView(initialView)}
+              >
+                ← Back to {PAGE_TITLES[initialView]}
+              </button>
+            ) : view === 'followups' ? null : (
+              <>
                 <select
                   className="fw-select"
                   aria-label="Account"
-                  value={state.scope.account}
-                  onChange={(event) =>
-                    changeScope({
-                      account: event.target.value as DemoScope['account'],
-                      period:
-                        view === 'overview' ? 'comparison' : state.scope.period,
-                    })
-                  }
+                  value={accountId}
+                  onChange={(event) => setAccountId(event.target.value)}
                 >
                   <option value="all">All accounts</option>
-                  <option value="operating">Operating</option>
-                  <option value="reserve">Reserve</option>
+                  {data.accounts.map((account) => (
+                    <option key={account.id} value={account.id}>
+                      {account.label}
+                    </option>
+                  ))}
                 </select>
-                {view === 'statements' ? (
-                  <select
-                    className="fw-select"
-                    aria-label="Period"
-                    value={state.scope.period}
-                    onChange={(event) =>
-                      changeScope({
-                        period: event.target.value as DemoScope['period'],
-                      })
-                    }
+                <button
+                  type="button"
+                  className="fw-button"
+                  onClick={() => setView('sources')}
+                >
+                  + Add source
+                </button>
+                {view === 'transactions' ? (
+                  <button
+                    type="button"
+                    className="fw-button"
+                    onClick={() => setView('followups')}
                   >
-                    <option value="comparison">Jan–Feb 2025</option>
-                    <option value="february">February 2025</option>
-                    <option value="march">March 2025</option>
-                  </select>
+                    Follow-ups
+                  </button>
                 ) : null}
+              </>
+            )}
+          </div>
+        </div>
+
+        {view === 'overview' && !selectedFollowUp ? (
+          <>
+            {dateControls}
+            <div className="fw-metrics" aria-label="Qualified cash movement">
+              <div>
+                <span className="fw-label">Money in</span>
+                <div className="fw-value">
+                  {demoMoney(moneyInMinor.toString())}
+                </div>
+              </div>
+              <div>
+                <span className="fw-label">Money out</span>
+                <div className="fw-value">
+                  {demoMoney(moneyOutMinor.toString())}
+                </div>
+              </div>
+              <div>
+                <span className="fw-label">Net movement</span>
+                <div className="fw-value">
+                  {demoMoney((moneyInMinor - moneyOutMinor).toString())}
+                </div>
+              </div>
+            </div>
+            <section className="fw-insights-layout">
+              <div>
+                <h2 className="fw-heading">Included records</h2>
+                <p className="fw-sub">
+                  {eligibleFacts.length} included · {facts.length} visible ·
+                  superseded and excluded records do not enter totals
+                </p>
+              </div>
+              <div>
+                <svg
+                  className="fw-line-chart"
+                  viewBox="0 0 650 250"
+                  role="img"
+                  aria-label={`Money in ${demoMoney(moneyInMinor.toString())}; money out ${demoMoney(moneyOutMinor.toString())}`}
+                >
+                  <line
+                    className="fw-line-chart-grid"
+                    x1="64"
+                    x2="585"
+                    y1="27"
+                    y2="27"
+                  />
+                  <line
+                    className="fw-line-chart-grid"
+                    x1="64"
+                    x2="585"
+                    y1="123"
+                    y2="123"
+                  />
+                  <line
+                    className="fw-line-chart-grid"
+                    x1="64"
+                    x2="585"
+                    y1="220"
+                    y2="220"
+                  />
+                  {line('in') ? (
+                    <path
+                      className="fw-line-chart-path"
+                      data-direction="in"
+                      d={line('in')}
+                    />
+                  ) : null}
+                  {line('out') ? (
+                    <path
+                      className="fw-line-chart-path"
+                      data-direction="out"
+                      d={line('out')}
+                    />
+                  ) : null}
+                  {chartPoints.map((point) => (
+                    <g key={point.fact.id}>
+                      <circle
+                        className="fw-line-chart-dot"
+                        data-direction="in"
+                        cx={chartX(point.fact.date)}
+                        cy={chartY(point.cumulativeIn)}
+                        r="3"
+                      >
+                        <title>{`${point.fact.date} · Money in ${demoMoney(point.cumulativeIn.toString())}`}</title>
+                      </circle>
+                      <circle
+                        className="fw-line-chart-dot"
+                        data-direction="out"
+                        cx={chartX(point.fact.date)}
+                        cy={chartY(point.cumulativeOut)}
+                        r="3"
+                      >
+                        <title>{`${point.fact.date} · Money out ${demoMoney(point.cumulativeOut.toString())}`}</title>
+                      </circle>
+                    </g>
+                  ))}
+                  <text x="64" y="244">
+                    {activeStart}
+                  </text>
+                  <text x="585" y="244" textAnchor="end">
+                    {activeEnd}
+                  </text>
+                </svg>
+                <div className="fw-chart-key">
+                  <span style={{ color: 'var(--fw-success)' }}>—</span> Money in
+                  <span style={{ color: 'var(--fw-accent)', marginLeft: 8 }}>
+                    —
+                  </span>{' '}
+                  Money out
+                </div>
+              </div>
+            </section>
+            {facts.length ? (
+              factTable
+            ) : (
+              <div className="fw-empty">
+                No matching Finance facts in this window.
+              </div>
+            )}
+          </>
+        ) : null}
+
+        {view === 'transactions' && !selectedFollowUp ? (
+          <>
+            {dateControls}
+            <div className="fw-actions">
+              <input
+                className="fw-date-input"
+                aria-label="Search transactions"
+                placeholder="Search transactions"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+              />
+              <span className="fw-label">
+                {facts.length} {isSynthetic ? 'synthetic test' : 'authorized'}{' '}
+                records
+              </span>
+            </div>
+            {facts.length ? (
+              factTable
+            ) : (
+              <div className="fw-empty">No matching Finance facts.</div>
+            )}
+          </>
+        ) : null}
+
+        {view === 'accounts' && !selectedFollowUp ? (
+          <>
+            {dateControls}
+            <div className="fw-table-wrap">
+              <table className="fw-table">
+                <thead>
+                  <tr>
+                    <th>Account</th>
+                    <th>Type</th>
+                    <th>Observed records</th>
+                    <th className="fw-money-col">Money in</th>
+                    <th className="fw-money-col">Money out</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.accounts.map((account) => {
+                    const accountFacts = allFacts.filter(
+                      (fact) =>
+                        fact.accountId === account.id &&
+                        (!activeStart || fact.date >= activeStart) &&
+                        (!activeEnd || fact.date <= activeEnd) &&
+                        fact.includedInTotals &&
+                        fact.status !== 'SUPERSEDED',
+                    );
+                    const incoming = accountFacts
+                      .filter((fact) => fact.direction === 'in')
+                      .reduce(
+                        (sum, fact) => sum + BigInt(fact.amountMinor ?? '0'),
+                        0n,
+                      );
+                    const outgoing = accountFacts
+                      .filter((fact) => fact.direction === 'out')
+                      .reduce(
+                        (sum, fact) => sum + BigInt(fact.amountMinor ?? '0'),
+                        0n,
+                      );
+                    return (
+                      <tr key={account.id}>
+                        <td>
+                          <strong>{account.label}</strong>
+                        </td>
+                        <td>{account.sourceKind}</td>
+                        <td>{accountFacts.length}</td>
+                        <td className="fw-money-col">
+                          {demoMoney(incoming.toString())}
+                        </td>
+                        <td className="fw-money-col">
+                          {demoMoney(outgoing.toString())}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+              {!data.accounts.length ? (
+                <div className="fw-empty">
+                  No financial accounts are visible to your role.
+                </div>
+              ) : null}
+            </div>
+          </>
+        ) : null}
+
+        {view === 'statements' && !selectedFollowUp ? (
+          <>
+            {dateControls}
+            <div className="fw-table-wrap">
+              <table className="fw-table">
+                <thead>
+                  <tr>
+                    <th>Period</th>
+                    <th>Account</th>
+                    <th>Source</th>
+                    <th className="fw-money-col">Money in</th>
+                    <th className="fw-money-col">Money out</th>
+                    <th>Opening</th>
+                    <th>Closing</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {visibleStatements.map((statement) => {
+                    const controls = parseStatementControls(
+                      statement.statementControls,
+                    );
+                    return (
+                      <tr key={statement.id}>
+                        <td>
+                          <strong>{statement.period}</strong>
+                        </td>
+                        <td>{statement.accountKey}</td>
+                        <td>{statement.sourceKind}</td>
+                        <td className="fw-money-col">
+                          {controls?.moneyIn
+                            ? demoMoney(controls.moneyIn)
+                            : 'Unavailable'}
+                        </td>
+                        <td className="fw-money-col">
+                          {controls?.moneyOut
+                            ? demoMoney(controls.moneyOut)
+                            : 'Unavailable'}
+                        </td>
+                        <td>
+                          {controls?.opening
+                            ? demoMoney(controls.opening)
+                            : 'Unavailable'}
+                        </td>
+                        <td>
+                          {controls?.closing
+                            ? demoMoney(controls.closing)
+                            : 'Unavailable'}
+                        </td>
+                        <td>{statement.status}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+              {!visibleStatements.length ? (
+                <div className="fw-empty">
+                  No statement source artifacts are visible to your role.
+                </div>
+              ) : null}
+            </div>
+          </>
+        ) : null}
+
+        {view === 'followups' && !selectedFollowUp ? (
+          <>
+            <p className="fw-page-note">
+              Finance follow-ups are native Twenty Tasks with bounded Finance
+              context. A reply or checked task is not proof of reconciliation.
+            </p>
+            <div className="fw-followup-list" aria-label="Finance follow-ups">
+              {data.followUps.map((followUp) => (
+                <button
+                  type="button"
+                  className="fw-followup-row"
+                  key={followUp.id}
+                  onClick={() => {
+                    setSelectedFollowUp(followUp);
+                    setFollowUpDetailSection('summary');
+                    setFollowUpMutation('idle');
+                  }}
+                >
+                  <span>
+                    <span className="fw-followup-question">
+                      {followUp.title}
+                    </span>
+                    <span className="fw-followup-meta">
+                      {followUp.subjects.length} linked subject
+                      {followUp.subjects.length === 1 ? '' : 's'}
+                    </span>
+                  </span>
+                  <span className="fw-followup-status">
+                    {financeFollowUpStateLabel(followUp.state)}
+                  </span>
+                  <span className="fw-followup-owner">
+                    <span className="fw-followup-meta">Owner</span>
+                    <br />
+                    {followUp.ownerName}
+                  </span>
+                  <span>
+                    <span className="fw-followup-meta">Next action</span>
+                    <br />
+                    {financeFollowUpNextAction(followUp.state)}
+                  </span>
+                </button>
+              ))}
+            </div>
+            {!data.followUps.length ? (
+              <div className="fw-empty">
+                No Finance follow-up Tasks are visible to your role.
               </div>
             ) : null}
-          </div>
-          {view === 'overview' && overview}
-          {view === 'transactions' && transactions}
-          {view === 'statements' && statements}
-          {view === 'accounts' && accounts}
-          <details className="fw-details">
-            <summary>Demo controls and methodology</summary>
-            <p>
-              Invented USD outflow records only. No original files, statement
-              controls, live providers, balances, income, profit, connection
-              state, or persisted review are represented.
-            </p>
-            <div className="fw-actions" style={{ marginTop: 10 }}>
-              <select
-                className="fw-select"
-                aria-label="Snapshot"
-                value={state.scope.snapshot}
-                onChange={(event) =>
-                  changeScope({
-                    snapshot: event.target.value as DemoScope['snapshot'],
-                  })
-                }
-              >
-                <option value="demo-v1">Partial excerpts</option>
-                <option value="demo-v2">Supplied excerpts</option>
-              </select>
-              <select
-                className="fw-select"
-                aria-label="Demo response simulation"
-                value={state.scenario}
-                onChange={(event) =>
-                  request(
-                    state.scope,
-                    state.question,
-                    event.target.value as DemoScenario,
-                  )
-                }
-              >
-                <option value="normal">Normal</option>
-                <option value="empty">Empty</option>
-                <option value="missing">Missing excerpts</option>
-                <option value="denied">Denied</option>
-                <option value="failed">Failed</option>
-                <option value="slow">Slow</option>
-              </select>
-              {onExit && (
-                <Button
-                  title="Back to workspace preparation"
-                  onClick={onExit}
-                />
-              )}
+          </>
+        ) : null}
+
+        {view === 'followups' && selectedFollowUp ? (
+          <>
+            <section className="fw-detail-heading">
+              <span className="fw-kicker">Native Twenty Task</span>
+              <h2>{selectedFollowUp.title}</h2>
+              <span className="fw-followup-status">
+                {financeFollowUpStateLabel(selectedFollowUp.state)}
+              </span>
+              <p className="fw-page-note">
+                Owner: {selectedFollowUp.ownerName} · Next:{' '}
+                {financeFollowUpNextAction(selectedFollowUp.state)}
+              </p>
+              {selectedFollowUp.contractWarning ? (
+                <div className="fw-reason" role="status">
+                  Some Finance context failed validation and is withheld.
+                </div>
+              ) : null}
+            </section>
+            <div className="fw-detail-tabs" role="tablist">
+              {(
+                [
+                  ['summary', 'Summary'],
+                  ['people', 'People'],
+                  ['evidence', 'Evidence'],
+                  ['email', 'Email'],
+                ] as const
+              ).map(([section, label]) => (
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={followUpDetailSection === section}
+                  className="fw-detail-tab"
+                  key={section}
+                  onClick={() => setFollowUpDetailSection(section)}
+                >
+                  {label}
+                </button>
+              ))}
             </div>
-          </details>
-          <footer className="fw-bottom">
-            <span>
-              Snapshot {state.scope.snapshot} · USD · No live connections
-            </span>
-            <span>{result?.limitation ?? 'Loading scoped fixture…'}</span>
-          </footer>
-        </main>
-      </div>
-      {drawerRow ? (
+
+            {followUpDetailSection === 'summary' ? (
+              <section className="fw-detail-section" aria-label="Summary">
+                <h3>Question scope</h3>
+                <ul className="fw-detail-list">
+                  {selectedFollowUp.subjects.map((subject) => (
+                    <li
+                      className="fw-detail-item"
+                      key={`${subject.kind}:${subject.reference}`}
+                    >
+                      <strong>{subject.label}</strong>
+                      <span className="fw-local">
+                        {subject.kind === 'TRANSACTION'
+                          ? 'Transaction'
+                          : 'Missing statement period'}{' '}
+                        · {subject.reference}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+                {!selectedFollowUp.subjects.length ? (
+                  <div className="fw-empty">
+                    No valid Finance subject links.
+                  </div>
+                ) : null}
+                <h3>What we found</h3>
+                <p>
+                  {selectedFollowUp.findings ||
+                    'No reviewer explanation has been recorded.'}
+                </p>
+                <p className="fw-local">
+                  Explanations, authorized uploads and existing records retain
+                  their own attribution. Native Task attachments are the file
+                  surface; this Finance view does not upload automatically.
+                </p>
+                <div className="fw-detail-actions">
+                  {selectedFollowUp.state === 'TO_DO' ? (
+                    <>
+                      <button
+                        type="button"
+                        className="fw-button"
+                        disabled={isSynthetic || followUpMutation === 'saving'}
+                        onClick={() =>
+                          void transitionFollowUp('WAITING_FOR_REPLY')
+                        }
+                      >
+                        Mark waiting for reply
+                      </button>
+                      <button
+                        type="button"
+                        className="fw-button"
+                        disabled={isSynthetic || followUpMutation === 'saving'}
+                        onClick={() =>
+                          void transitionFollowUp('READY_FOR_REVIEW')
+                        }
+                      >
+                        Ready for review
+                      </button>
+                    </>
+                  ) : selectedFollowUp.state === 'WAITING_FOR_REPLY' ? (
+                    <>
+                      <button
+                        type="button"
+                        className="fw-button"
+                        disabled={isSynthetic || followUpMutation === 'saving'}
+                        onClick={() =>
+                          void transitionFollowUp('READY_FOR_REVIEW')
+                        }
+                      >
+                        Ready for review
+                      </button>
+                      <button
+                        type="button"
+                        className="fw-button"
+                        disabled={isSynthetic || followUpMutation === 'saving'}
+                        onClick={() => void transitionFollowUp('TO_DO')}
+                      >
+                        Return to do
+                      </button>
+                    </>
+                  ) : selectedFollowUp.state === 'READY_FOR_REVIEW' ? (
+                    <>
+                      <button
+                        type="button"
+                        className="fw-button"
+                        disabled={isSynthetic || followUpMutation === 'saving'}
+                        onClick={() =>
+                          void transitionFollowUp('WAITING_FOR_REPLY')
+                        }
+                      >
+                        Request more information
+                      </button>
+                      <button
+                        type="button"
+                        className="fw-button"
+                        disabled={isSynthetic || followUpMutation === 'saving'}
+                        onClick={() => void transitionFollowUp('RESOLVED')}
+                      >
+                        Resolve after review
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      type="button"
+                      className="fw-button"
+                      disabled={isSynthetic || followUpMutation === 'saving'}
+                      onClick={() =>
+                        void transitionFollowUp('READY_FOR_REVIEW')
+                      }
+                    >
+                      Reopen review
+                    </button>
+                  )}
+                </div>
+                {isSynthetic ? (
+                  <p className="fw-local">
+                    Synthetic adapter is read-only; no mock state transition is
+                    shown.
+                  </p>
+                ) : followUpMutation === 'denied' ? (
+                  <p className="fw-local" role="status">
+                    Your Workspace role cannot update this Task.
+                  </p>
+                ) : followUpMutation === 'failed' ? (
+                  <p className="fw-local" role="status">
+                    The Task update could not be verified and was not shown as
+                    complete.
+                  </p>
+                ) : null}
+              </section>
+            ) : null}
+
+            {followUpDetailSection === 'people' ? (
+              <section className="fw-detail-section" aria-label="People">
+                <p className="fw-page-note">
+                  People are shown only when requested. Being listed here does
+                  not grant Workspace membership or Finance-record access.
+                </p>
+                <ul className="fw-detail-list">
+                  {selectedFollowUp.people.map((person) => (
+                    <li className="fw-detail-item" key={person.personId}>
+                      <strong>{person.name}</strong>
+                      <span>
+                        {person.role} ·{' '}
+                        {person.selectedRecipient
+                          ? 'Selected recipient'
+                          : 'Not selected for email'}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+                {!selectedFollowUp.people.length ? (
+                  <div className="fw-empty">No involved People recorded.</div>
+                ) : null}
+              </section>
+            ) : null}
+
+            {followUpDetailSection === 'evidence' ? (
+              <section className="fw-detail-section" aria-label="Evidence">
+                <p className="fw-page-note">
+                  Replies and attachments stay attributed to their source.
+                  Ambiguous correlation requires review and private replies are
+                  not shared with other participants automatically.
+                </p>
+                <ul className="fw-detail-list">
+                  {selectedFollowUp.evidence.map((item) => (
+                    <li
+                      className="fw-detail-item"
+                      key={`${item.kind}:${item.reference}`}
+                    >
+                      <strong>{item.label}</strong>
+                      <span>
+                        {item.kind} · {item.attribution} ·{' '}
+                        {item.reviewerAccepted
+                          ? 'Reviewer accepted'
+                          : 'Needs reviewer acceptance'}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+                {!selectedFollowUp.evidence.length ? (
+                  <div className="fw-empty">No valid evidence references.</div>
+                ) : null}
+              </section>
+            ) : null}
+
+            {followUpDetailSection === 'email' ? (
+              <section className="fw-detail-section" aria-label="Email">
+                <p className="fw-page-note">
+                  A draft must show its authorized mailbox, selected recipients,
+                  exact body and attachments before approval. This build does
+                  not send email or request new mailbox scopes.
+                </p>
+                {selectedFollowUp.draftEmail ? (
+                  <div className="fw-email-preview">
+                    <span className="fw-kicker">
+                      {selectedFollowUp.emailApproval ?? 'Draft state unknown'}
+                    </span>
+                    <h3>From</h3>
+                    <p>{selectedFollowUp.draftEmail.mailboxLabel}</p>
+                    <h3>Recipients</h3>
+                    <p>
+                      {selectedFollowUp.people
+                        .filter(
+                          (person) =>
+                            person.selectedRecipient &&
+                            selectedFollowUp.draftEmail?.recipientPersonIds.includes(
+                              person.personId,
+                            ),
+                        )
+                        .map((person) => `${person.name} · ${person.role}`)
+                        .join(', ') || 'No valid selected recipient'}
+                    </p>
+                    <h3>Subject</h3>
+                    <p>{selectedFollowUp.draftEmail.subject}</p>
+                    <div className="fw-email-body">
+                      {selectedFollowUp.draftEmail.body}
+                    </div>
+                    <h3>Attachments</h3>
+                    <p>
+                      {selectedFollowUp.draftEmail.attachmentReferences.join(
+                        ', ',
+                      ) || 'None'}
+                    </p>
+                    {selectedFollowUp.emailApproval === 'AWAITING_APPROVAL' ? (
+                      <div className="fw-detail-actions">
+                        <button
+                          type="button"
+                          className="fw-button"
+                          disabled={
+                            isSynthetic || followUpMutation === 'saving'
+                          }
+                          onClick={() => void approveFollowUpDraft()}
+                        >
+                          Approve draft · do not send
+                        </button>
+                      </div>
+                    ) : null}
+                    {isSynthetic ? (
+                      <p className="fw-local">
+                        Synthetic adapter is read-only; approval is not faked.
+                      </p>
+                    ) : null}
+                  </div>
+                ) : (
+                  <div className="fw-empty">
+                    No validated email draft is available. Composition and send
+                    remain unsupported in this increment.
+                  </div>
+                )}
+                <p className="fw-local">
+                  Correlation:{' '}
+                  {selectedFollowUp.correlationKey || 'Unavailable'}
+                </p>
+              </section>
+            ) : null}
+          </>
+        ) : null}
+
+        {view === 'sources' && !selectedFollowUp ? (
+          <>
+            <p className="fw-page-note">
+              Choose a source type. These routes hand off to Twenty-owned
+              Workspace surfaces; they do not claim a connection or import.
+            </p>
+            <div className="fw-source-grid">
+              {SOURCE_ROUTES.map((route) => (
+                <article className="fw-source-card" key={route.id}>
+                  <span className="fw-kicker">{route.type}</span>
+                  <h2>{route.title}</h2>
+                  <p>{route.description}</p>
+                  <button
+                    type="button"
+                    className="fw-button"
+                    onClick={() => void openSource(route.id)}
+                  >
+                    {route.action}
+                  </button>
+                  <p className="fw-local">{route.boundary}</p>
+                </article>
+              ))}
+            </div>
+            {sourceHandoff ? (
+              <div className="fw-empty" role="status">
+                {sourceHandoff.result.ok
+                  ? `${SOURCE_ROUTES.find((route) => route.id === sourceHandoff.route)?.title ?? 'Source'} handoff opened.`
+                  : 'Twenty could not open that source surface. No connection was changed.'}
+              </div>
+            ) : null}
+          </>
+        ) : null}
+
+        <footer className="fw-bottom">
+          <span>
+            {isSynthetic
+              ? 'Synthetic adapter · explicit test data'
+              : 'Current Workspace · permission-checked read'}
+          </span>
+          <span>
+            {isSynthetic
+              ? 'Removable preview source; never substituted into Workspace reads.'
+              : data.truncated
+                ? 'Result limit reached; totals are withheld from completeness claims.'
+                : invalidFactCount
+                  ? `${invalidFactCount} invalid or undated record${invalidFactCount === 1 ? '' : 's'} withheld; no synthetic fallback is active.`
+                  : 'No synthetic fallback is active.'}
+          </span>
+        </footer>
+      </main>
+
+      {selectedFact ? (
         <>
-          <div className="fw-shade" onClick={closeDrawer} aria-hidden="true" />
+          <div
+            className="fw-shade"
+            onClick={() => setSelectedFact(null)}
+            aria-hidden="true"
+          />
           <aside
             className="fw-drawer"
             role="dialog"
             aria-modal="true"
             aria-label="Transaction evidence"
-            onKeyDown={(event) => {
-              if (event.key === 'Escape') closeDrawer();
-            }}
           >
             <div className="fw-drawer-top">
-              <span>INVESTIGATION / {drawerRow.id.toUpperCase()}</span>
+              <span>WORKSPACE RECORD</span>
               <button
-                ref={closeButton}
                 type="button"
                 className="fw-close"
                 aria-label="Close investigation"
-                onClick={closeDrawer}
+                onClick={() => setSelectedFact(null)}
               >
                 ×
               </button>
             </div>
-            <span
-              className="fw-status"
-              data-tone={
-                trace?.raw && !drawerRow.illustrativeHistory ? 'ok' : 'warn'
-              }
-            >
-              {drawerRow.illustrativeHistory
-                ? 'ILLUSTRATIVE HISTORY'
-                : selectedRowFlags.map((item) => item.label).join(' · ') ||
-                  'SOURCE INSPECTION'}
-            </span>
-            <h2 className="fw-drawer-title">{drawerRow.description}</h2>
+            <h2 className="fw-drawer-title">{selectedFact.description}</h2>
             <div className="fw-drawer-value">
-              {demoMoney(drawerRow.outflowMinor)}
+              {workspaceFactMoney(selectedFact)}
             </div>
-            <div className="fw-sub">
-              {drawerRow.date} · {drawerRow.account} · observed outflow
-            </div>
-            <div className="fw-reason">
-              {drawerRow.illustrativeHistory
-                ? 'Invented history for timeline interaction. This is not a source-backed transaction.'
-                : trace?.raw
-                  ? (selectedRowFlags[0]?.explanation ??
-                    'A synthetic excerpt is available. It does not establish statement completeness or business classification.')
-                  : 'The source locator exists, but its excerpt is missing. Classification stays unresolved.'}
-            </div>
-            <h3 className="fw-heading">Source trail</h3>
-            <dl className="fw-definition" style={{ marginTop: 11 }}>
+            <dl className="fw-definition">
+              <dt>Direction</dt>
+              <dd>{selectedFact.direction}</dd>
+              <dt>Classification</dt>
+              <dd>{selectedFact.classification}</dd>
+              <dt>Source location</dt>
+              <dd>{selectedFact.sourceLocation || 'Unavailable'}</dd>
               <dt>Artifact</dt>
-              <dd>{trace?.artifact ?? 'None'}</dd>
-              <dt>Locator</dt>
-              <dd>{trace?.locator ?? 'No source locator'}</dd>
-              <dt>Snapshot</dt>
-              <dd>{trace?.snapshot ?? state.scope.snapshot}</dd>
-              <dt>Source state</dt>
-              <dd>
-                {drawerRow.illustrativeHistory
-                  ? 'No source represented'
-                  : trace?.raw
-                    ? 'Synthetic excerpt available'
-                    : 'Excerpt unavailable'}
-              </dd>
+              <dd>{selectedFact.artifactKey || 'No linked artifact'}</dd>
+              <dt>Included in totals</dt>
+              <dd>{selectedFact.includedInTotals ? 'Yes' : 'No'}</dd>
             </dl>
-            <pre className="fw-raw">
-              {trace?.raw ?? 'No source excerpt supplied.'}
-            </pre>
-            {!drawerRow.illustrativeHistory ? (
-              <div className="fw-drawer-actions">
+            <section className="fw-panel" style={{ marginTop: 14 }}>
+              <div className="fw-panel-top">
+                <h3 className="fw-panel-title">Follow-ups</h3>
+                <span className="fw-status">{relatedFollowUps.length}</span>
+              </div>
+              {relatedFollowUps.length ? (
                 <button
                   type="button"
                   className="fw-button"
-                  aria-pressed={reviewDecision === 'KEPT_UNCLASSIFIED'}
-                  onClick={() => setReviewDecision('KEPT_UNCLASSIFIED')}
+                  onClick={() => {
+                    setSelectedFact(null);
+                    setView('followups');
+                    setSelectedFollowUp(
+                      relatedFollowUps.length === 1
+                        ? (relatedFollowUps[0] ?? null)
+                        : null,
+                    );
+                    setFollowUpDetailSection('summary');
+                  }}
                 >
-                  Keep unclassified
+                  {relatedFollowUps.length === 1
+                    ? 'Open related follow-up'
+                    : 'View related follow-ups'}
                 </button>
-                {trace?.raw &&
-                selectedRowFlags.some(
-                  (item) => item.status === 'PARTIAL_MATCH',
-                ) ? (
-                  <button
-                    type="button"
-                    className="fw-button"
-                    aria-pressed={reviewDecision === 'REJECTED_CANDIDATE'}
-                    onClick={() => setReviewDecision('REJECTED_CANDIDATE')}
-                  >
-                    Reject candidate link
-                  </button>
-                ) : null}
-                <button
-                  type="button"
-                  className="fw-button fw-primary"
-                  aria-pressed={reviewDecision === 'EVIDENCE_REQUEST_DRAFTED'}
-                  onClick={() => setReviewDecision('EVIDENCE_REQUEST_DRAFTED')}
-                >
-                  Draft evidence request
-                </button>
-              </div>
-            ) : null}
-            <p className="fw-local" role="status" aria-live="polite">
-              {drawerRow.illustrativeHistory ? (
-                <>
-                  No evidence action is available for an illustrative history
-                  row.
-                </>
               ) : (
-                <>
-                  Local decision:{' '}
-                  <strong>{reviewDecision.replaceAll('_', ' ')}</strong>
-                  <br />
-                  Preview only · nothing sent or written to Twenty.
-                </>
+                <p className="fw-local">
+                  No native Finance follow-up Task references this transaction.
+                </p>
               )}
-            </p>
-            <details className="fw-details">
-              <summary>Basis and limitations</summary>
-              <p>
-                Outflow-positive fixture values, not profit or verified
-                expenses. No statement controls, original files, live providers
-                or persisted review are represented.
+            </section>
+            {selectedFact.artifactId ? (
+              <section className="fw-panel" style={{ marginTop: 14 }}>
+                <div className="fw-panel-top">
+                  <h3 className="fw-panel-title">Related evidence</h3>
+                  <span className="fw-status">
+                    {evidenceHistory.kind === 'ready'
+                      ? (evidenceHistory.rows.at(-1)?.linkStatus ??
+                        'LINKED BY RECORD')
+                      : evidenceHistory.kind.toUpperCase()}
+                  </span>
+                </div>
+                <p className="fw-sub">
+                  The Finance fact carries an explicit Source artifact relation.
+                  Reviewer actions append immutable Workspace decision records;
+                  they do not delete either original or change classification.
+                </p>
+                {evidenceHistory.kind === 'ready' ? (
+                  <>
+                    <div className="fw-actions">
+                      {(evidenceHistory.rows.at(-1)?.linkStatus ?? 'LINKED') ===
+                      'LINKED' ? (
+                        <button
+                          type="button"
+                          className="fw-button"
+                          disabled={savingEvidence}
+                          onClick={() => void appendEvidenceAction('UNLINKED')}
+                        >
+                          Unlink evidence
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          className="fw-button"
+                          disabled={savingEvidence}
+                          onClick={() => void appendEvidenceAction('RESTORED')}
+                        >
+                          Restore link
+                        </button>
+                      )}
+                    </div>
+                    <ol className="fw-history">
+                      {evidenceHistory.rows.map((event) => (
+                        <li key={event.id}>
+                          {event.createdAt} · {event.linkStatus} ·{' '}
+                          {event.reasonCode}
+                        </li>
+                      ))}
+                    </ol>
+                  </>
+                ) : evidenceHistory.kind === 'denied' ? (
+                  <p className="fw-local" role="status">
+                    Your Workspace role cannot read or write evidence decisions.
+                  </p>
+                ) : evidenceHistory.kind === 'failed' ? (
+                  <p className="fw-local" role="status">
+                    Evidence decisions could not be read. No local fallback was
+                    applied.
+                  </p>
+                ) : null}
+              </section>
+            ) : (
+              <p className="fw-local">
+                No explicit Source artifact relation exists, so no link action
+                is offered.
               </p>
-            </details>
+            )}
+            <p className="fw-local">
+              This drawer reads retained Workspace fields. It does not infer
+              direction from description text or change classification.
+            </p>
           </aside>
         </>
       ) : null}
     </Workspace>
   );
 };
+
+export const FinanceWorkspace = ({
+  initialView = 'overview',
+  dataSource = 'workspace',
+}: {
+  onExit?: () => void;
+  initialView?: Exclude<FinanceView, 'sources'>;
+  dataSource?: 'workspace' | 'synthetic';
+}) =>
+  dataSource === 'synthetic' ? (
+    <WorkspaceFinanceScreen
+      dataOverride={SYNTHETIC_WORKSPACE_FINANCE_DATA}
+      initialView={initialView}
+    />
+  ) : (
+    <WorkspaceFinanceScreen initialView={initialView} />
+  );

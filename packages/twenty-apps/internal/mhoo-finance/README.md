@@ -5,32 +5,48 @@ start with [HASS_FINANCE_PRODUCT_DEFINITION.md](HASS_FINANCE_PRODUCT_DEFINITION.
 The private welcome-guide handoff copy is in
 [HASS_WELCOME_GUIDE_COPY.md](HASS_WELCOME_GUIDE_COPY.md).
 
-`@mhoo/finance` is the native Twenty fixture-first vertical slice for
-synthetic finance evidence, coverage, reconciliation exceptions, and bounded
-source lineage. It is deliberately provider-free and credential-free.
+`@mhoo/finance` is the native Twenty Finance workspace for permission-aware
+accounts, transactions, statements and bounded evidence review. Its installed
+screens read current Workspace records. The deterministic synthetic pack is an
+explicit local test/preview source only. The App remains provider-credential-free.
 
 ## Current boundary
 
 - Canonical source: `mhoo-os/mhoo-twenty-next`
 - Port seed: `mhoo-os/mhoo-twenty` PR #45 at
   `6bef8da9004ea67607315422454a6aa52a65dfd3`
-- Committed data: deterministic, fully synthetic fixtures only; bounded supplied-file validation is supported locally
-- Provider calls, OAuth, credentials, persisted Hass records, installation,
-  deployment, and production mutation: absent from this source increment
+- Committed data: deterministic synthetic fixtures only; no customer records
+  or credentials are stored in Git
+- Installed UI data source: current-Workspace Finance objects through Twenty's
+  generated client; no demo fallback
+- Mutation: append-only evidence-link decision events and receipt-verified
+  Finance review-state/email-approval updates on native Twenty Tasks through
+  the user-scoped REST client; source records and classifications are not mutated
+- Provider calls, new OAuth grants, live imports and deployment remain separate
+  gates
 
 ## What the fixture pack proves
 
 `yarn fixtures:generate` materializes a deterministic fixture pack containing
-bank, card, Toast, and Clover-shaped *synthetic* periods; duplicate artifacts
+bank, card, Toast, and Clover-shaped _synthetic_ periods; duplicate artifacts
 and rows; a correction revision; pending-to-posted activity; a refund, void,
 discount, transfer, card payment, missing period, zero-activity period, stale
 source, resolved control total, and open reconciliation exception.
 
-The Finance audit page uses Twenty's own standalone-page navigation, native
-graph widgets, Cards, status tags, callouts, buttons, and theme tokens. Its
-front component has populated, loading, empty, partial, stale, failed, and
-denied preview states. The dashboard ends one trace at an exact synthetic
-artifact row; it does not make an assurance, fraud, or tax conclusion.
+Native Finance navigation opens Overview, Accounts, Transactions, Statements
+and Follow-ups as single-tab designed surfaces. Follow-ups extend native Twenty
+Tasks with validated Finance context; they are not a parallel task system.
+Components inherit Twenty's `--t-*` theme
+tokens and expose loading, empty, denied, failed and bounded-result states. An
+isolated synthetic preview exercises direction, multi-year selection and
+evidence review without becoming a real-Workspace fallback. No screen makes an
+assurance, fraud or tax conclusion.
+
+Follow-up lists stay concise: question, state, owner and next action. Evidence,
+People and approval-first email previews open progressively on a full detail
+surface. No send action, contact invitation, membership grant, mailbox scope or
+provider call is implemented. `Approved, not sent`, reply receipt, Task Done and
+financial reconciliation remain separate states.
 
 ## Focused checks
 
@@ -73,6 +89,7 @@ fixture commands, and the remaining real-source acceptance gaps.
 
 ## Client workspace preparation
 
-See [PREPARATION.md](PREPARATION.md) for the native account model, empty-first
-landing page, exact-money projection and bounded Plaid export validation
-function. Installation, durable import and live dashboard reads remain open.
+See [PREPARATION.md](PREPARATION.md) for the native account model, exact-money
+projection and bounded Plaid export validation function. Current-Workspace reads
+are implemented; installation, durable provider import and hosted acceptance
+remain separate.

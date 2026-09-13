@@ -2,6 +2,32 @@
 
 ARCHITECTURE IMPACT: LOCAL
 
+## Native shell and real Workspace data — 2026-09-14
+
+The current authorized delta supersedes the demo-only host behavior described
+below. Native Finance core navigation now owns Overview, Accounts, Transactions
+and Statements, followed by Follow-ups. Each route targets a single-tab page layout backed
+by its designed Finance component; Overview has no preparation/count tabs. The
+embedded content has no Mhoo/Finance brand chrome or second navigation rail and
+uses the pinned Twenty `--t-*` font, color, border, shadow and background tokens
+for light/dark inheritance.
+
+Hosted components default to permission-aware generated-client reads of current
+Workspace accounts, facts, Source artifacts and Finance-context Tasks. Loading, denied, failed, empty,
+invalid and truncated states fail closed and never insert fixture rows. The
+local preview explicitly opts into the synthetic data source. Live date bounds
+come from available records and support cross-year selection plus a horizontally
+continuing month/year/all timeline. Qualified totals exclude superseded and
+non-included facts; sparse gaps break the plotted path instead of appearing as
+zero activity.
+
+Existing fact-to-artifact relations can receive append-only reviewer decision
+events through the user-scoped Twenty REST client. Link/unlink/restore writes are
+receipt-verified and retain both record references. This is not provider access,
+classification authority, an email-generated financial entry, or permission to
+perform broad matching. Actual hosted navigation, both themes, user interaction,
+role denial and persistence still require exact-head installation receipts.
+
 ## Hass product walkthrough — 2026-09-13 local source
 
 ### Registered Finance review reference — 2026-09-14
@@ -130,3 +156,26 @@ and its pinned README sources. Repo head task
 this section extends the existing receipt rather than creating another ledger.
 Next owner action is source review of the local commit. No source dependency is
 blocked; installed sandbox/role acceptance remains outside this trial.
+
+## Native Finance follow-ups — source candidate
+
+The Finance group adds Follow-ups after Overview, Accounts, Transactions and
+Statements. It reuses Twenty's native Task object and adds Finance-only fields;
+there is no second task object. The list is intentionally spacious and limited
+to question, state, owner and next action. Selecting a row opens a full-width
+detail workspace with Summary, People, Evidence and Email sections, preserving
+the surrounding component's account/date/search state for back navigation.
+
+The four Finance states map onto native Task status without claiming
+reconciliation: To do → TODO, Waiting for reply/Ready for review → IN_PROGRESS,
+Resolved → DONE. Receipt-verified user-scoped mutations enforce allowed human
+review transitions. A Task being Done or an email reply arriving is not itself
+accepted financial evidence.
+
+People entries use Person IDs, roles and explicit recipient selection. Adding a
+Person does not grant Workspace membership or Finance access. Email is a visible
+preview only: mailbox label, selected recipients, exact body and attachment
+references must be present before `APPROVED_NOT_SENT` can be recorded. No send,
+invite, upload, mailbox-scope or automatic reply-correlation action exists in
+this source candidate. Ambiguous correlation stays review-only and private
+replies are not automatically exposed to other participants.

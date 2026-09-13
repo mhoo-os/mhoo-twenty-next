@@ -3,14 +3,27 @@ import { AppPath } from 'twenty-sdk/front-component';
 import { handoffSource } from '../investigation/source-handoff';
 
 describe('native source handoff', () => {
-  it('hands off only to the native current-workspace Apps catalog', async () => {
+  it.each(['apps', 'bank', 'pos', 'email'] as const)(
+    'hands %s off to the native current-workspace Apps catalog',
+    async (entry) => {
+      const navigate = vi.fn().mockResolvedValue(undefined);
+      expect(await handoffSource(entry, navigate)).toBe('handed-off');
+      expect(navigate).toHaveBeenCalledExactlyOnceWith(
+        AppPath.SettingsCatchAll,
+        { '*': 'applications' },
+      );
+    },
+  );
+  it('opens the governed Source artifacts table for statement custody', async () => {
     const navigate = vi.fn().mockResolvedValue(undefined);
-    expect(await handoffSource('apps', navigate)).toBe('handed-off');
-    expect(navigate).toHaveBeenCalledExactlyOnceWith(AppPath.SettingsCatchAll, { '*': 'applications' });
+    expect(await handoffSource('statement', navigate)).toBe('handed-off');
+    expect(navigate).toHaveBeenCalledExactlyOnceWith(AppPath.RecordIndexPage, {
+      objectNamePlural: 'sourceArtifacts',
+    });
   });
-  it.each(['statement', 'csv'] as const)('does not navigate or import unsupported %s input', async entry => {
+  it('does not navigate or import an unsupported raw CSV input', async () => {
     const navigate = vi.fn();
-    expect(await handoffSource(entry, navigate)).toBe('unavailable');
+    expect(await handoffSource('csv', navigate)).toBe('unavailable');
     expect(navigate).not.toHaveBeenCalled();
   });
   it('does not report connection success or broaden navigation when the host rejects', async () => {

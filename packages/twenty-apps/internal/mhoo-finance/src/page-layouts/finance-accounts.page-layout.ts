@@ -1,31 +1,31 @@
 import { definePageLayout, PageLayoutTabLayoutMode } from 'twenty-sdk/define';
 
 import {
-  FINANCE_AUDIT_DASHBOARD_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER,
-  FINANCE_AUDIT_DASHBOARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
+  FINANCE_ACCOUNTS_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER,
+  FINANCE_ACCOUNTS_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
 } from 'src/constants/universal-identifiers';
 
 export default definePageLayout({
-  universalIdentifier: FINANCE_AUDIT_DASHBOARD_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
-  name: 'Finance overview',
+  universalIdentifier: FINANCE_ACCOUNTS_PAGE_LAYOUT_UNIVERSAL_IDENTIFIER,
+  name: 'Finance accounts',
   type: 'STANDALONE_PAGE',
   tabs: [
     {
-      universalIdentifier: 'b9e1d2f3-a4b5-4678-9012-3456789abf11',
-      title: 'Overview',
+      universalIdentifier: '9de1ebb0-1ff4-4e10-b0d9-a28559860bcd',
+      title: 'Accounts',
       position: 0,
-      icon: 'IconDashboard',
+      icon: 'IconBuildingBank',
       layoutMode: PageLayoutTabLayoutMode.CANVAS,
       widgets: [
         {
-          universalIdentifier: 'b9e1d2f3-a4b5-4678-9012-3456789abf12',
-          title: 'Overview',
+          universalIdentifier: '4826125d-5cf6-412e-9aa1-c32497a8efee',
+          title: 'Accounts',
           type: 'FRONT_COMPONENT',
           position: { layoutMode: PageLayoutTabLayoutMode.CANVAS },
           configuration: {
             configurationType: 'FRONT_COMPONENT',
             frontComponentUniversalIdentifier:
-              FINANCE_AUDIT_DASHBOARD_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER,
+              FINANCE_ACCOUNTS_FRONT_COMPONENT_UNIVERSAL_IDENTIFIER,
           },
         },
       ],

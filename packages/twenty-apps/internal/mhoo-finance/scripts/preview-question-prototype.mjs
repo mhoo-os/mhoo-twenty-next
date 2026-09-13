@@ -1,4 +1,4 @@
-// Local-only preview of the registered Twenty front-component source. No Workspace/API adapter.
+// Local-only preview of the removable synthetic adapter through the production view contract.
 import { build } from 'esbuild';
 import { createServer } from 'node:http';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
@@ -7,11 +7,12 @@ import { dirname, resolve } from 'node:path';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const output = resolve(root, '.twenty/question-preview');
+const themeRoot = resolve(root, '../../../twenty-ui/src/theme-constants');
 await mkdir(output, { recursive: true });
 await build({
   stdin: {
     contents:
-      "import React from 'react'; import {createRoot} from 'react-dom/client'; import {FinanceWorkspacePreparation} from './src/front-components/finance-audit-dashboard.front-component'; createRoot(document.getElementById('root')).render(<FinanceWorkspacePreparation />);",
+      "import React from 'react'; import {createRoot} from 'react-dom/client'; import {FinanceWorkspace} from './src/components/finance-workspace'; import 'twenty-ui/style.css'; const theme=new URLSearchParams(location.search).get('theme')==='dark'?'dark':'light'; document.documentElement.className=theme; const allowed=['overview','accounts','transactions','statements','followups']; const requested=location.hash.slice(1); const initialView=allowed.includes(requested)?requested:'overview'; createRoot(document.getElementById('root')).render(<FinanceWorkspace dataSource='synthetic' initialView={initialView} />);",
     resolveDir: root,
     loader: 'tsx',
   },
@@ -21,11 +22,16 @@ await build({
   format: 'esm',
   jsx: 'automatic',
   alias: { src: resolve(root, 'src') },
-  define: { 'process.env.NODE_ENV': '"development"' },
+  define: {
+    'process.env.NODE_ENV': '"development"',
+    'process.env': '{}',
+  },
 });
+const themeCss = `${await readFile(resolve(themeRoot, 'theme-light.css'), 'utf8')}\n${await readFile(resolve(themeRoot, 'theme-dark.css'), 'utf8')}\nbody{margin:0;padding:24px;background:var(--t-background-primary);color:var(--t-font-color-primary);font-family:var(--t-font-family)}`;
+await writeFile(resolve(output, 'theme.css'), themeCss);
 await writeFile(
   resolve(output, 'index.html'),
-  '<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>mhoo Finance · registered front-component reference</title></head><body style="margin:0;padding:24px;background:#eef0e9"><div id="root"></div><script type="module" src="/app.js"></script></body></html>',
+  '<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>mhoo Finance · isolated synthetic preview</title><link rel="stylesheet" href="/theme.css"></head><body><div id="root"></div><script type="module" src="/app.js"></script></body></html>',
 );
 process.stdout.write(
   'Built registered Finance front-component source at ' + output + '\n',
@@ -34,9 +40,11 @@ if (!process.argv.includes('--build-only')) {
   const routes = {
     '/': ['index.html', 'text/html'],
     '/app.js': ['app.js', 'text/javascript'],
+    '/theme.css': ['theme.css', 'text/css'],
   };
   const server = createServer(async (request, response) => {
-    const route = routes[request.url];
+    const pathname = new URL(request.url ?? '/', 'http://127.0.0.1').pathname;
+    const route = routes[pathname];
     if (request.method !== 'GET' || !route) {
       response.writeHead(404);
       response.end();
