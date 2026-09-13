@@ -1,4 +1,9 @@
 import { getTokenPair } from '@/apollo/utils/getTokenPair';
+import { renewToken } from '@/auth/services/AuthService';
+import { currentUserState } from '@/auth/states/currentUserState';
+import { tokenPairState } from '@/auth/states/tokenPairState';
+import { jotaiStore } from '@/ui/utilities/state/jotai/jotaiStore';
+import { jwtDecode } from 'jwt-decode';
 import { currentWorkspaceState } from '@/auth/states/currentWorkspaceState';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { styled } from '@linaria/react';
@@ -70,8 +75,79 @@ export async function cloverRequest<T>(
   body?: object,
   signal?: AbortSignal,
 ): Promise<T> {
-  const bearer = getTokenPair()?.accessOrWorkspaceAgnosticToken.token;
-  if (!bearer) throw new Error('Sign in to your Workspace again, then retry.');
+  const pair = getTokenPair();
+  if (!pair?.accessOrWorkspaceAgnosticToken.token)
+    throw new Error('Sign in to your Workspace again, then retry.');
+  let bearer = pair.accessOrWorkspaceAgnosticToken.token;
+
+  const expiresAt = Date.parse(pair.accessOrWorkspaceAgnosticToken.expiresAt);
+  if (!Number.isFinite(expiresAt))
+    throw new Error('Sign in to your Workspace again, then retry.');
+  const needsRenewal = expiresAt <= Date.now();
+
+  const workspaceId = jotaiStore.get(currentWorkspaceState.atom)?.id;
+  const userId = jotaiStore.get(currentUserState.atom)?.id;
+  const originalBearer = bearer;
+  const originalRefreshToken = pair?.refreshToken?.token;
+  const authError = () =>
+    new Error('Sign in to your Workspace again, then retry.');
+  const readSubject = (token: string) => {
+    try {
+      const payload = jwtDecode<{
+        type: string;
+        workspaceId: string;
+        sub?: string;
+        userId?: string;
+        userWorkspaceId: string;
+      }>(token);
+      // This only prevents stale-client dispatch; the server verifies authority.
+      if (
+        !workspaceId ||
+        !userId ||
+        payload.type !== 'ACCESS' ||
+        payload.workspaceId !== workspaceId ||
+        (payload.sub ?? payload.userId) !== userId ||
+        !payload.userWorkspaceId
+      )
+        throw authError();
+      return payload.userWorkspaceId;
+    } catch {
+      throw authError();
+    }
+  };
+  const membershipId = readSubject(bearer);
+
+  if (needsRenewal) {
+    if (!originalRefreshToken || signal?.aborted) throw authError();
+    let renewed;
+    try {
+      renewed = await renewToken(`${REACT_APP_SERVER_BASE_URL}/metadata`, pair);
+    } catch {
+      throw authError();
+    }
+    const currentPair = getTokenPair();
+    if (
+      signal?.aborted ||
+      jotaiStore.get(currentWorkspaceState.atom)?.id !== workspaceId ||
+      jotaiStore.get(currentUserState.atom)?.id !== userId ||
+      currentPair?.accessOrWorkspaceAgnosticToken.token !== originalBearer ||
+      currentPair?.refreshToken?.token !== originalRefreshToken ||
+      !renewed?.accessOrWorkspaceAgnosticToken?.token ||
+      readSubject(renewed.accessOrWorkspaceAgnosticToken.token) !==
+        membershipId ||
+      !(
+        Date.parse(renewed.accessOrWorkspaceAgnosticToken.expiresAt) >
+        Date.now()
+      )
+    )
+      throw authError();
+    bearer = renewed.accessOrWorkspaceAgnosticToken.token;
+    jotaiStore.set(tokenPairState.atom, renewed);
+  } else if (!(expiresAt > Date.now())) {
+    throw authError();
+  }
+
+  if (signal?.aborted) throw new Error('Clover request was cancelled.');
 
   const response = await fetch(
     `${REACT_APP_SERVER_BASE_URL}/clover-token/${path}`,

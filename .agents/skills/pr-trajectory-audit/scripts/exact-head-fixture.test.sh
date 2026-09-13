@@ -631,6 +631,9 @@ done
 
 # AI editor repair and runner compatibility retain exact, bounded paths.
 repair_paths=(
+  packages/twenty-front/src/modules/auth/services/AuthService.ts
+  packages/twenty-front/src/modules/auth/services/__tests__/AuthService.test.ts
+  packages/twenty-front/src/modules/settings/accounts/components/__tests__/cloverRequest.test.ts
   packages/twenty-front/src/modules/auth/sign-in-up/components/SignInUpGlobalScopeForm.tsx
   packages/twenty-front/src/modules/auth/sign-in-up/components/__tests__/SignInUpGlobalScopeForm.test.tsx
   packages/twenty-server/src/engine/core-modules/auth/services/auth.service.ts
@@ -672,6 +675,12 @@ for path in "${repair_paths[@]}"; do
   bash "$fixture" HEAD "$candidate_head" >"$temporary_directory/ai-editor-output"
 done
 for path in \
+  packages/twenty-front/src/modules/auth/services/AuthService.ts.backup \
+  packages/twenty-front/src/modules/auth/services/nested/AuthService.ts \
+  packages/twenty-front/src/modules/auth/services/AdjacentAuthService.ts \
+  packages/twenty-front/src/modules/auth/services/__tests__/AuthService.test.ts.backup \
+  packages/twenty-front/src/modules/settings/accounts/components/__tests__/cloverRequest.test.ts.backup \
+  packages/twenty-front/src/modules/settings/accounts/components/__tests__/nested/cloverRequest.test.ts \
   packages/twenty-front/src/modules/auth/sign-in-up/components/__tests__/SignInUpGlobalScopeForm.test.tsx.backup \
   packages/twenty-front/src/modules/auth/sign-in-up/components/__tests__/nested/SignInUpGlobalScopeForm.test.tsx \
   packages/twenty-server/src/engine/core-modules/auth/services/auth-social-sso-creation-intent.spec.ts.backup \
