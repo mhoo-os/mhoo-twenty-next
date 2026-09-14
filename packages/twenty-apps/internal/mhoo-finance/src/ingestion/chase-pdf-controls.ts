@@ -67,7 +67,9 @@ export const parseChaseCheckingPdfControlsText = (text: string): ChaseCheckingPd
   const periodEnd = parseDate(period[4], period[5], period[6]);
   if (periodStart > periodEnd) throw new Error('Statement period is reversed.');
 
-  const pageMarkers = [...normalized.matchAll(/\bPage\s+(\d+)\s+of\s+(\d+)\b/g)];
+  // Text extractors can join adjacent page text on either side of the marker.
+  // Reject a following digit, but do not require word boundaries around it.
+  const pageMarkers = [...normalized.matchAll(/Page\s+(\d+)\s+of\s+(\d+)(?!\d)/g)];
   const expectedPageCount = Number(pageMarkers[0]?.[2]);
   const observedPageNumbers = pageMarkers.map((match) => Number(match[1]));
   if (!Number.isSafeInteger(expectedPageCount) || expectedPageCount < 1 ||

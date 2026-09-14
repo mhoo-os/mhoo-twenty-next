@@ -60,6 +60,13 @@ describe('Chase PDF statement summary controls', () => {
     expect(() => parseChaseCheckingPdfControlsText(valid.replace('Ending Balance 4 $215.00', 'Ending Balance 5 $215.00'))).toThrow('does not reconcile');
   });
 
+  it('accepts an extractor-joined page marker without accepting a longer page count', () => {
+    const valid = fixture('October 01, 2024 through October 31, 2024', '100.00', '215.00');
+    expect(parseChaseCheckingPdfControlsText(valid.replace('Page 2 of 3', 'Page 2 of 3CONTINUED')).observedPageNumbers).toEqual([1, 2, 3]);
+    expect(parseChaseCheckingPdfControlsText(valid.replace('Page 2 of 3', 'CONTINUEDPage 2 of 3')).observedPageNumbers).toEqual([1, 2, 3]);
+    expect(() => parseChaseCheckingPdfControlsText(valid.replace('Page 2 of 3', 'Page 2 of 30CONTINUED'))).toThrow('page sequence');
+  });
+
   it('requires adjacent periods and matching carried balances', () => {
     const october = parseChaseCheckingPdfControlsText(fixture('October 01, 2024 through October 31, 2024', '100.00', '215.00'));
     const november = parseChaseCheckingPdfControlsText(fixture('November 01, 2024 through November 29, 2024', '215.00', '205.00', 'Other Withdrawals 1 -125.00'));
