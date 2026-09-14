@@ -152,11 +152,14 @@ describe('native Finance workspace', () => {
     expect(workspaceSource).not.toContain('No statement source artifacts are visible to your role.');
   });
 
-  it('keeps the exact browser timeline controller isolated from the host gap', () => {
+  it('keeps the browser drag enhancement isolated from the supported-host controls', () => {
     expect(insightsSource).toContain('<FinancePeriodControls');
     expect(workspaceSource).toContain('<FinancePeriodControls');
-    expect(periodControlsSource).toContain('.setPointerCapture(');
-    expect(periodControlsSource).toContain('.getBoundingClientRect()');
+    expect(periodControlsSource).toContain("typeof capture !== 'function' || typeof measure !== 'function'");
+    expect(periodControlsSource).toContain('capture.call(event.currentTarget, event.pointerId)');
+    expect(periodControlsSource).toContain('measure.call(ruler.current).width');
+    expect(periodControlsSource).toContain('timelinePresentation.minimumWidth');
+    expect(periodControlsSource).toContain('timelinePresentation.years.map((month) => <span className="hi-year"');
     expect(workspaceSource).not.toContain('.focus()');
     expect(workspaceSource).not.toContain('document.addEventListener');
     expect(periodControlsSource).toContain('onPointerMove={moveDrag}');
