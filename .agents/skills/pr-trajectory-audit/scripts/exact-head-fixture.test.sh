@@ -82,6 +82,9 @@ grep -Fq "trajectory fixture rejected: $suffix_path" "$temporary_directory/suffi
 }
 
 allowed_paths=(
+  packages/twenty-front/src/modules/settings/accounts/components/CloverSetupPrompt.tsx
+  packages/twenty-front/src/modules/settings/accounts/components/__tests__/CloverSetupPrompt.test.tsx
+  packages/twenty-front/src/modules/ui/layout/page/components/DefaultLayout.tsx
   packages/twenty-server/src/database/commands/upgrade-version-command/2-37/2-37-instance-command-slow-1788846876000-ensure-manual-token-workspace-grant.ts
   packages/twenty-server/src/database/commands/upgrade-version-command/2-37/__tests__/ensure-manual-token-workspace-grant.instance-command.spec.ts
   packages/twenty-server/src/engine/core-modules/upgrade/decorators/registered-instance-command.decorator.ts
@@ -131,6 +134,9 @@ for index in "${!allowed_paths[@]}"; do
 done
 
 rogue_allowed_paths=(
+  packages/twenty-front/src/modules/settings/accounts/components/CloverSetupPrompt.tsx.backup
+  packages/twenty-front/src/modules/settings/accounts/components/__tests__/CloverSetupPrompt.spec.tsx
+  packages/twenty-front/src/modules/ui/layout/page/components/DefaultLayout.tsx.backup
   packages/twenty-server/src/database/commands/upgrade-version-command/2-37/2-37-instance-command-slow-1788846876000-ensure-manual-token-workspace-grant.ts.backup
   packages/twenty-server/src/database/commands/upgrade-version-command/2-37/__tests__/ensure-manual-token-workspace-grant.instance-command.spec.ts.backup
   packages/twenty-server/src/engine/core-modules/upgrade/decorators/registered-instance-command.decorator.ts.backup
