@@ -111,4 +111,41 @@ describe('SettingsApplicationConnectionsSection', () => {
       screen.queryByRole('button', { name: 'Delete' }),
     ).not.toBeInTheDocument();
   });
+
+  it('routes the Clover manual provider to the native Workspace intake', () => {
+    mockedUseFindApplicationConnectionProviders.mockReturnValue({
+      connectionProviders: [
+        {
+          id: 'clover-provider',
+          applicationId: 'app-1',
+          type: 'manualToken',
+          name: 'clover-manual',
+          displayName: 'Clover production (North America) token',
+          oauth: null,
+        },
+      ],
+      loading: false,
+      refetch: jest.fn(),
+    });
+    mockedUseMyAppConnectedAccounts.mockReturnValue({
+      accounts: [],
+      loading: false,
+      refetch: jest.fn(),
+    });
+
+    render(
+      <I18nProvider i18n={i18n}>
+        <MemoryRouter>
+          <SettingsApplicationConnectionsSection applicationId="app-1" />
+        </MemoryRouter>
+      </I18nProvider>,
+    );
+
+    expect(
+      screen.getByRole('link', { name: 'Connect Clover in Account settings' }),
+    ).toHaveAttribute('href', '/settings/accounts');
+    expect(
+      screen.queryByRole('button', { name: 'Add connection' }),
+    ).not.toBeInTheDocument();
+  });
 });

@@ -127,3 +127,27 @@ rollback does not undo Workspace creation, invitations or stored grants.
 An older image does not know the new provider value; compatibility with new
 rows must be proved before rollback. Do not delete credentials or Workspaces
 to make an unproved rollback appear successful.
+
+## Independent Workspace connection source amendment (2026-09-14)
+
+This later source change lets the same native Clover intake serve more than one
+explicitly configured Workspace. `CLOVER_TOKEN_WORKSPACE_ID` remains the legacy
+single-Workspace setting. `CLOVER_TOKEN_WORKSPACE_IDS` adds a comma-separated
+list of Workspace UUIDs. An empty list adds no access. Neither setting grants
+membership or connection-management permission; every request still checks the
+active native Workspace, interactive member, installed Clover manual-token
+provider, and native permission. Tokens remain encrypted and scoped to the
+Workspace that submitted them.
+
+The Clover App's production manual-token provider now links from App connection
+settings to the existing `Settings → Accounts → Connect Clover` form. The
+sandbox provider is intentionally unchanged. Source checks: focused Clover
+service and Workspace-availability tests, App settings UI test, source-custody
+verification, focused lint, formatting, and front typecheck passed locally.
+This does not prove either Workspace has the new image or configuration.
+
+To activate, Infrastructure must separately review the exact immutable image,
+set the intended Workspace UUIDs through its governed configuration path, and
+verify the enabled/denied UI and credential custody in each Workspace. Do not
+reuse or copy one Workspace's merchant credential in the other. Clearing both
+settings closes intake without deleting stored connections.

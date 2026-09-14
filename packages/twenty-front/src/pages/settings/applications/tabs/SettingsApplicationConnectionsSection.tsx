@@ -1,6 +1,7 @@
 import { styled } from '@linaria/react';
 import { useLingui } from '@lingui/react/macro';
 import { useContext } from 'react';
+import { Link } from 'react-router-dom';
 import { SettingsPath } from 'twenty-shared/types';
 import { getSettingsPath } from 'twenty-shared/utils';
 
@@ -113,6 +114,8 @@ export const SettingsApplicationConnectionsSection = ({
     <>
       {connectionProviders.map((provider) => {
         const isOAuth = provider.type === 'oauth';
+        const isCloverManualToken =
+          provider.type === 'manualToken' && provider.name === 'clover-manual';
         const isClientCredentialsConfigured =
           provider.oauth?.isClientCredentialsConfigured ?? false;
 
@@ -217,6 +220,13 @@ export const SettingsApplicationConnectionsSection = ({
                     })
                   }
                 />
+              </StyledFooter>
+            )}
+            {isCloverManualToken && (
+              <StyledFooter>
+                <Link to={getSettingsPath(SettingsPath.Accounts)}>
+                  {t`Connect Clover in Account settings`}
+                </Link>
               </StyledFooter>
             )}
           </Section>
