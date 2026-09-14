@@ -80,32 +80,36 @@ const SOURCE_ROUTES: readonly {
 }[] = [
   {
     id: 'bank',
-    title: 'Bank',
-    type: 'BANK CONNECTION',
-    description: 'Use a bank source app already available to this Workspace.',
-    boundary: 'No bank connection is established by this screen.',
-    action: 'Open Apps',
+    title: 'Find a bank source app',
+    type: 'WORKSPACE APP',
+    description: 'Browse bank-source apps available to this Workspace.',
+    boundary:
+      'Finance does not connect a bank or show whether an integration is installed.',
+    action: 'Browse bank apps',
   },
   {
     id: 'pos',
-    title: 'POS · Clover',
-    type: 'POINT OF SALE',
-    description: 'Manage Clover as a distinct POS source in Workspace Apps.',
-    boundary: 'Clover installation and connection remain separate actions.',
-    action: 'Open Apps',
+    title: 'Manage an existing Clover app',
+    type: 'CLOVER POINT OF SALE',
+    description:
+      'If Clover is already installed for this Workspace, manage it in Apps.',
+    boundary:
+      'Installation and connection are separate actions; Finance verifies neither here.',
+    action: 'Open Clover in Apps',
   },
   {
     id: 'statement',
-    title: 'Uploaded statements',
-    type: 'DOCUMENT SOURCE',
+    title: 'Inspect source documents',
+    type: 'RETAINED EVIDENCE',
     description:
-      'Open governed Source artifacts for current, historical, or closed-account statements.',
-    boundary: 'This review surface does not upload or import a file.',
+      'Open retained artifacts for current, historical, or closed-account statements and exports.',
+    boundary:
+      'Tax returns are separate source-period evidence. This screen does not upload or import files.',
     action: 'Open source artifacts',
   },
   {
     id: 'email',
-    title: 'Email evidence',
+    title: 'Use supporting email evidence',
     type: 'WORKSPACE GMAIL EVIDENCE',
     description:
       'Use an already authorized Workspace Gmail connection for supporting evidence.',
@@ -119,6 +123,20 @@ const readableDate = (date: string) =>
     month: 'short',
     day: 'numeric',
     year: 'numeric',
+    timeZone: 'UTC',
+  });
+
+const readableMonth = (date: string) =>
+  new Date(`${date}T00:00:00Z`).toLocaleDateString('en-US', {
+    month: 'short',
+    year: '2-digit',
+    timeZone: 'UTC',
+  });
+
+const readableWeek = (date: string) =>
+  new Date(`${date}T00:00:00Z`).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
     timeZone: 'UTC',
   });
 
@@ -284,9 +302,16 @@ const Workspace = styled.section({
   '& .fw-metrics': {
     display: 'grid',
     gridTemplateColumns: '1.25fr 1fr 1fr',
-    gap: '18px',
-    paddingBottom: '21px',
-    borderBottom: '1px solid var(--fw-line)',
+    gap: '1px',
+    marginBottom: '22px',
+    overflow: 'hidden',
+    border: '1px solid var(--fw-line)',
+    borderRadius: '12px',
+    background: 'var(--fw-line)',
+  },
+  '& .fw-metrics > div': {
+    padding: '17px 18px 15px',
+    background: 'var(--fw-surface)',
   },
   '& .fw-label': { color: 'var(--fw-muted)', fontSize: '10px' },
   '& .fw-value': {
@@ -604,6 +629,57 @@ const Workspace = styled.section({
     textAlign: 'center',
     fontSize: '11px',
   },
+  '& .fw-source-intro': {
+    maxWidth: '68ch',
+    margin: '0 0 18px',
+    color: 'var(--fw-muted)',
+    fontSize: '12px',
+    lineHeight: 1.55,
+  },
+  '& .fw-source-grid': {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(245px, 1fr))',
+    gap: '12px',
+  },
+  '& .fw-source-card': {
+    display: 'grid',
+    gridTemplateRows: 'auto auto minmax(0, 1fr) auto auto',
+    alignItems: 'start',
+    gap: '9px',
+    minWidth: 0,
+    padding: '16px',
+    border: '1px solid var(--fw-line)',
+    borderRadius: '10px',
+    background: 'var(--fw-nav)',
+  },
+  '& .fw-source-type': {
+    color: 'var(--fw-muted)',
+    fontSize: '9px',
+    fontWeight: 650,
+    letterSpacing: '.06em',
+    textTransform: 'uppercase',
+  },
+  '& .fw-source-card h2': {
+    margin: 0,
+    fontSize: '15px',
+    fontWeight: 650,
+    letterSpacing: '-.01em',
+    lineHeight: 1.25,
+  },
+  '& .fw-source-description': {
+    margin: 0,
+    color: 'var(--fw-text)',
+    fontSize: '11px',
+    lineHeight: 1.5,
+  },
+  '& .fw-source-card .fw-button': { justifySelf: 'start', marginTop: '4px' },
+  '& .fw-source-boundary': {
+    margin: 0,
+    color: 'var(--fw-muted)',
+    fontSize: '10px',
+    lineHeight: 1.45,
+  },
+  '& .fw-source-status': { marginTop: '16px', padding: '13px 16px' },
   '& .fw-bottom': {
     display: 'flex',
     justifyContent: 'space-between',
@@ -628,13 +704,13 @@ const Workspace = styled.section({
     justifyContent: 'space-between',
     gap: '12px',
     flexWrap: 'wrap',
-    marginBottom: '10px',
+    marginBottom: '8px',
   },
   '& .fw-date-fields': {
     display: 'flex',
     alignItems: 'center',
     flexWrap: 'wrap',
-    gap: '8px',
+    gap: '6px',
   },
   '& .fw-date-field': {
     display: 'flex',
@@ -644,7 +720,7 @@ const Workspace = styled.section({
     fontSize: '9px',
   },
   '& .fw-date-input': {
-    minHeight: '31px',
+    minHeight: '29px',
     border: '1px solid var(--fw-line)',
     borderRadius: '5px',
     padding: '5px 7px',
@@ -658,12 +734,12 @@ const Workspace = styled.section({
     alignItems: 'center',
     gap: '8px',
     flexWrap: 'wrap',
-    margin: '12px 0 8px',
+    margin: '14px 0 7px',
   },
   '& .fw-timeline-scroll': {
     width: '100%',
     overflowX: 'auto',
-    padding: '2px 0 7px',
+    padding: '3px 0 8px',
     scrollbarColor: 'var(--fw-line) transparent',
   },
   '& .fw-timeline-canvas': {
@@ -671,8 +747,8 @@ const Workspace = styled.section({
   },
   '& .fw-year-labels': {
     position: 'relative',
-    height: '18px',
-    margin: '5px 13px 0',
+    height: '16px',
+    margin: '7px 13px 0',
     color: 'var(--fw-muted)',
     fontSize: '10px',
   },
@@ -682,11 +758,11 @@ const Workspace = styled.section({
     fontVariantNumeric: 'tabular-nums',
   },
   '& .fw-brush': {
-    height: '47px',
+    height: '52px',
     position: 'relative',
     margin: '0 13px',
     border: '1px solid var(--fw-line)',
-    borderRadius: '5px',
+    borderRadius: '8px',
     background: 'var(--fw-nav)',
     touchAction: 'none',
     userSelect: 'none',
@@ -710,7 +786,7 @@ const Workspace = styled.section({
     zIndex: 1,
     padding: 0,
     border: '1px solid var(--fw-accent)',
-    borderRadius: '4px',
+    borderRadius: '7px',
     background: 'var(--fw-soft)',
     opacity: 0.78,
     cursor: 'grab',
@@ -724,7 +800,7 @@ const Workspace = styled.section({
     marginLeft: '-13px',
     padding: 0,
     border: '1px solid var(--fw-accent)',
-    borderRadius: '4px',
+    borderRadius: '6px',
     color: 'var(--fw-accent)',
     background: 'var(--fw-surface)',
     cursor: 'ew-resize',
@@ -732,11 +808,16 @@ const Workspace = styled.section({
     fontSize: '16px',
   },
   '& .fw-month-labels': {
-    display: 'flex',
-    justifyContent: 'space-around',
-    margin: '6px 0 3px',
+    position: 'relative',
+    height: '18px',
+    margin: '3px 13px 16px',
     color: 'var(--fw-muted)',
     fontSize: '9px',
+  },
+  '& .fw-month-labels span': {
+    position: 'absolute',
+    transform: 'translateX(-50%)',
+    whiteSpace: 'nowrap',
   },
   '& .fw-brush-note': {
     display: 'flex',
@@ -749,8 +830,56 @@ const Workspace = styled.section({
   },
   '& .fw-insights-layout': {
     display: 'grid',
-    gridTemplateColumns: '190px minmax(0, 1fr)',
-    gap: '30px',
+    gridTemplateColumns: 'minmax(210px, .72fr) minmax(0, 1.65fr)',
+    gap: '0',
+    overflow: 'hidden',
+    marginBottom: '21px',
+    border: '1px solid var(--fw-line)',
+    borderRadius: '12px',
+    background: 'var(--fw-surface)',
+  },
+  '& .fw-hero-copy': {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    minHeight: '282px',
+    padding: '22px',
+    background: 'var(--fw-nav)',
+  },
+  '& .fw-hero-copy .fw-sub': { lineHeight: 1.6 },
+  '& .fw-hero-state': {
+    margin: '22px 0 0',
+    padding: '10px 11px',
+    borderRadius: '7px',
+    color: 'var(--fw-warn)',
+    background: 'var(--fw-warn-bg)',
+    fontSize: '10px',
+    lineHeight: 1.5,
+  },
+  '& .fw-hero-meta': {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '7px',
+    marginTop: '20px',
+    color: 'var(--fw-muted)',
+    fontSize: '9px',
+  },
+  '& .fw-hero-meta::before': {
+    width: '7px',
+    height: '7px',
+    content: '""',
+    borderRadius: '50%',
+    background: 'var(--fw-success)',
+  },
+  '& .fw-hero-graph': { minWidth: 0, padding: '18px 20px 12px' },
+  '& .fw-hero-graph .fw-empty': {
+    minHeight: '230px',
+    display: 'flex',
+    alignItems: 'center',
+    padding: '28px',
+    borderRadius: '8px',
+    background: 'var(--fw-soft)',
+    textAlign: 'left',
   },
   '& .fw-selected-money': {
     margin: '4px 0 5px',
@@ -1071,11 +1200,14 @@ const Workspace = styled.section({
     },
     '& .fw-main': { padding: '17px 14px' },
     '& .fw-top': { alignItems: 'flex-start', flexWrap: 'wrap' },
-    '& .fw-controls': { width: '100%' },
+    '& .fw-controls': { width: '100%', justifyContent: 'stretch' },
+    '& .fw-controls .fw-button': { flex: '1 1 calc(50% - 4px)', minHeight: '44px' },
     '& .fw-select': {
       minHeight: '44px',
-      flex: 1,
+      flex: '1 0 100%',
       minWidth: 0,
+      order: -1,
+      width: '100%',
       maxWidth: 'none',
       fontSize: '16px',
     },
@@ -1096,9 +1228,13 @@ const Workspace = styled.section({
     '& .fw-account-picker': { marginLeft: 0, minWidth: 0, width: '100%' },
     '& .fw-bottom': { flexWrap: 'wrap' },
     '& .fw-drawer': { padding: '19px' },
-    '& .fw-date-fields': { width: '100%' },
-    '& .fw-date-field': { flex: 1 },
-    '& .fw-date-input': {
+    '& .fw-date-fields': {
+      display: 'grid',
+      gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+      width: '100%',
+    },
+    '& .fw-date-field': { display: 'grid', minWidth: 0 },
+    '& .fw-date-fields .fw-date-input': {
       minHeight: '44px',
       minWidth: 0,
       width: '100%',
@@ -1237,6 +1373,7 @@ const WorkspaceFinanceScreen = ({
     route: SourceEntry;
     result: HandoffResult;
   } | null>(null);
+  const [openingSource, setOpeningSource] = useState<SourceEntry | null>(null);
   const liveDrag = useRef<{
     kind: BrushKind;
     x: number;
@@ -1467,6 +1604,41 @@ const WorkspaceFinanceScreen = ({
           (_, index) => Number(domainStart.slice(0, 4)) + index,
         )
       : [];
+  const timelineMonthTicks =
+    domainStart && domainEnd
+      ? Array.from({ length: domainMonths + 1 }, (_, index) => {
+          const startYear = Number(domainStart.slice(0, 4));
+          const startMonth = Number(domainStart.slice(5, 7));
+          return new Date(
+            Date.UTC(startYear, startMonth - 1 + index, 1),
+          )
+            .toISOString()
+            .slice(0, 10);
+        }).filter((date) => date >= domainStart && date <= domainEnd)
+      : [];
+  const timelineMonthLabelEvery =
+    timelineZoom === 'month' ? 1 : timelineZoom === 'year' ? 3 : 12;
+  const weekLabelEvery = timelineZoom === 'month' ? 2 : 8;
+  const firstCalendarWeekOffset = domainStart
+    ? (8 - new Date(`${domainStart}T00:00:00Z`).getUTCDay()) % 7
+    : 0;
+  const timelineWeekTicks =
+    domainStart && domainEnd
+      ? Array.from(
+          {
+            length:
+              Math.floor(
+                (domainLast - firstCalendarWeekOffset) /
+                  (7 * weekLabelEvery),
+              ) + 1,
+          },
+          (_, index) =>
+            timelineDateAt(
+              domainStart,
+              firstCalendarWeekOffset + index * 7 * weekLabelEvery,
+            ),
+        ).filter((date) => date <= domainEnd)
+      : [];
 
   const changeLiveWindow = (
     kind: BrushKind,
@@ -1535,7 +1707,12 @@ const WorkspaceFinanceScreen = ({
   };
   const openSource = async (route: SourceEntry) => {
     setSourceHandoff(null);
-    setSourceHandoff({ route, result: await handoffSource(route) });
+    setOpeningSource(route);
+    try {
+      setSourceHandoff({ route, result: await handoffSource(route) });
+    } finally {
+      setOpeningSource(null);
+    }
   };
   const appendEvidenceAction = async (action: WorkspaceEvidenceAction) => {
     if (
@@ -1694,7 +1871,7 @@ const WorkspaceFinanceScreen = ({
         </span>
       </div>
       <div className="fw-timeline-tools">
-        <span className="fw-label">Visible timeline</span>
+        <span className="fw-label">Timeline scale</span>
         <select
           className="fw-select"
           aria-label="Timeline zoom"
@@ -1708,7 +1885,7 @@ const WorkspaceFinanceScreen = ({
           <option value="all">Fit all history</option>
         </select>
         <span className="fw-label">
-          Scroll horizontally to continue across years
+          Drag the selection; scroll sideways for the full history
         </span>
       </div>
       <div className="fw-timeline-scroll">
@@ -1749,22 +1926,48 @@ const WorkspaceFinanceScreen = ({
             ))}
           </div>
           <div className="fw-year-labels" aria-hidden="true">
-            {timelineYears.map((year) => (
+            {timelineYears.map((year, index) => (
               <span
                 key={year}
                 style={{
                   left: `${(Math.max(0, liveDay(`${year}-01-01`)) / Math.max(1, domainLast + 1)) * 100}%`,
+                  transform: index === 0 ? 'none' : 'translateX(-50%)',
                 }}
               >
                 {year}
               </span>
             ))}
           </div>
+          <div className="fw-month-labels" aria-hidden="true">
+            {timelineWeekTicks.map((date, index) => (
+              <span
+                key={date}
+                style={{
+                  left: `${(liveDay(date) / Math.max(1, domainLast + 1)) * 100}%`,
+                  transform: index === 0 ? 'none' : 'translateX(-50%)',
+                }}
+              >
+                {readableWeek(date)}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
       <div className="fw-month-labels" aria-hidden="true">
-        <span>{readableDate(domainStart)}</span>
-        <span>{readableDate(domainEnd)}</span>
+        <span style={{ left: 0, transform: 'none' }}>{readableDate(domainStart)}</span>
+        {timelineMonthTicks
+          .filter((_, index) => index % timelineMonthLabelEvery === 0)
+          .map((date) => (
+            <span
+              key={date}
+              style={{
+                left: `${(liveDay(date) / Math.max(1, domainLast + 1)) * 100}%`,
+              }}
+            >
+              {readableMonth(date)}
+            </span>
+          ))}
+        <span style={{ left: '100%', transform: 'translateX(-100%)' }}>{readableDate(domainEnd)}</span>
       </div>
     </>
   ) : null;
@@ -1918,19 +2121,26 @@ const WorkspaceFinanceScreen = ({
               </div>
             </div>
             <section className="fw-insights-layout">
-              <div>
-                <h2 className="fw-heading">Included records</h2>
-                <p className="fw-sub">
-                  {eligibleFacts.length} included · {facts.length} visible ·
-                  superseded and excluded records do not enter totals
-                </p>
-                {aggregateUnavailableReason ? (
-                  <p className="fw-warning" role="status">
-                    {aggregateUnavailableReason}
+              <div className="fw-hero-copy">
+                <div>
+                  <h2 className="fw-heading">Included records</h2>
+                  <p className="fw-sub">
+                    {eligibleFacts.length} included · {facts.length} visible ·
+                    superseded and excluded records do not enter totals
                   </p>
-                ) : null}
+                  {aggregateUnavailableReason ? (
+                    <p className="fw-hero-state" role="status">
+                      {aggregateUnavailableReason}
+                    </p>
+                  ) : null}
+                </div>
+                <span className="fw-hero-meta">
+                  {aggregateAvailable
+                    ? 'Qualified currency for the current result scope'
+                    : 'Values stay withheld until the selected scope qualifies'}
+                </span>
               </div>
-              <div>
+              <div className="fw-hero-graph">
                 {aggregateAvailable ? (
                   <svg
                     className="fw-line-chart"
@@ -2004,8 +2214,9 @@ const WorkspaceFinanceScreen = ({
                   </svg>
                 ) : (
                   <div className="fw-empty" role="status">
-                    {aggregateUnavailableReason ??
-                      'No cash movement to chart in this window.'}
+                    {aggregateUnavailableReason
+                      ? 'This view is preserving the record scope without combining amounts. Choose a single-currency, untruncated selection to reveal its cash-direction graph.'
+                      : 'No cash movement to chart in this window.'}
                   </div>
                 )}
                 {aggregateAvailable ? (
@@ -2632,32 +2843,36 @@ const WorkspaceFinanceScreen = ({
 
         {view === 'sources' && !selectedFollowUp ? (
           <>
-            <p className="fw-page-note">
-              Choose a source type. These routes hand off to Twenty-owned
-              Workspace surfaces; they do not claim a connection or import.
+            <p className="fw-source-intro">
+              Choose where to continue. These routes hand off to Twenty-owned
+              Workspace surfaces; Finance does not create a connection, import
+              a file, or decide what is available to you.
             </p>
             <div className="fw-source-grid">
               {SOURCE_ROUTES.map((route) => (
                 <article className="fw-source-card" key={route.id}>
-                  <span className="fw-kicker">{route.type}</span>
+                  <span className="fw-source-type">{route.type}</span>
                   <h2>{route.title}</h2>
-                  <p>{route.description}</p>
+                  <p className="fw-source-description">{route.description}</p>
                   <button
                     type="button"
                     className="fw-button"
+                    disabled={openingSource !== null}
                     onClick={() => void openSource(route.id)}
                   >
-                    {route.action}
+                    {openingSource === route.id ? 'Opening…' : route.action}
                   </button>
-                  <p className="fw-local">{route.boundary}</p>
+                  <p className="fw-source-boundary">{route.boundary}</p>
                 </article>
               ))}
             </div>
             {sourceHandoff ? (
-              <div className="fw-empty" role="status">
-                {sourceHandoff.result.ok
+              <div className="fw-empty fw-source-status" role="status">
+                {sourceHandoff.result === 'handed-off'
                   ? `${SOURCE_ROUTES.find((route) => route.id === sourceHandoff.route)?.title ?? 'Source'} handoff opened.`
-                  : 'Twenty could not open that source surface. No connection was changed.'}
+                  : sourceHandoff.result === 'unavailable'
+                    ? 'This source route is not available here. No connection or import was started.'
+                    : 'Twenty could not open that source surface. No connection was changed.'}
               </div>
             ) : null}
           </>
