@@ -215,6 +215,27 @@ email send was performed. This proves live metadata sync, not browser rendering,
 effective-role behavior, runtime logic or rollback readiness. The old-version
 rollback remains unverified and the user accepted that risk for this apply.
 
+### Live Finance read repair — 2026-09-14 12:08 Asia/Bangkok
+
+The post-sync browser audit found all five Finance pages failing their shared
+read. The browser `/graphql` response was HTTP 200 but its `tasks` field was
+null with `INTERNAL_SERVER_ERROR`: `MHOO_FINANCE_V1` was not valid JSON.
+Accounts, Finance facts and source artifacts each returned zero edges without
+errors. Exact v2.37 source shows SELECT row filters parse an array of strings;
+the two App Task row predicates instead supplied a bare string. Both predicate
+values were changed in source from `MHOO_FINANCE_V1` to
+`["MHOO_FINANCE_V1"]`, retaining their identifiers, operands, scope and roles.
+Focused `manifest.test.ts` (3 tests), `yarn twenty dev:typecheck`, `yarn lint`
+and `git diff --check` passed. The authenticated Hass plan proposed 0 add,
+2 in-place predicate-value changes and 0 destroy. `yarn twenty apply` exited 0
+and reported `Synced Mhoo Finance (14 files)`; the subsequent plan reported no
+changes. Built manifest SHA-256:
+`4803321dc717fc906832c7ff42706077c4c3351eca558b61cf3eca5948fc0ce3`.
+Installed browser reads now render Statements, Overview and Follow-ups empty
+states rather than the error. No financial records, Task mutation, provider
+access, email send, permission widening or rollback proof is claimed. Other
+user roles and populated data remain untested.
+
 Runtime owner is now `01a09cd2-9ab9-76a3-97d4-37d2300a65a8`, with actual incoming
 acknowledgment and outgoing custody acknowledgment on this date. Coordinator
 remains `01a09c1e-fcec-7721-bafe-fd0ec677127c`; same Delivery Room job and issues.
