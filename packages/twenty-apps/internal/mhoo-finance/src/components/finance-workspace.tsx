@@ -1,5 +1,7 @@
 import styled from '@emotion/styled';
 import type { RestApiClient } from 'twenty-client-sdk/rest';
+import { scaleLinear } from '@visx/scale';
+import { LinePath } from '@visx/shape';
 import { FinanceFollowUpActions } from './finance-follow-up-actions';
 import { useEffect, useRef, useState } from 'react';
 
@@ -67,6 +69,14 @@ const PAGE_TITLES: Readonly<Record<FinanceView, string>> = {
 // Financial link-decision writes remain disabled. Native Task follow-ups use
 // their separate caller-scoped REST workflow and do not enable this route.
 const WORKSPACE_REVIEW_MUTATIONS_ENABLED = false;
+
+const ACCOUNT_LANE_COLORS = [
+  '#19a99b',
+  '#6273d6',
+  '#c4754d',
+  '#9172bd',
+  '#5b9e67',
+] as const;
 
 type BrushKind = 'move' | 'start' | 'end';
 
@@ -748,9 +758,8 @@ const Workspace = styled.section({
     fontSize: '9px',
   },
   '& .fw-insights-layout': {
-    display: 'grid',
-    gridTemplateColumns: '190px minmax(0, 1fr)',
-    gap: '30px',
+    display: 'block',
+    minWidth: 0,
   },
   '& .fw-selected-money': {
     margin: '4px 0 5px',
@@ -824,6 +833,68 @@ const Workspace = styled.section({
   '& .fw-line-chart-dot[data-direction="in"]': {
     fill: 'var(--fw-success)',
   },
+  '& .fw-movement-hero': {
+    margin: '2px 0 18px',
+    padding: '20px 22px 16px',
+    overflow: 'hidden',
+    border: '1px solid color-mix(in srgb, var(--fw-line) 80%, transparent)',
+    borderRadius: '14px',
+    background:
+      'linear-gradient(135deg, color-mix(in srgb, var(--fw-soft) 48%, var(--fw-surface)) 0%, var(--fw-surface) 48%, color-mix(in srgb, var(--fw-nav) 80%, var(--fw-surface)) 100%)',
+    boxShadow: '0 16px 36px rgba(18, 37, 64, .10)',
+  },
+  '& .fw-movement-head': {
+    display: 'flex',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    gap: '18px',
+    marginBottom: '14px',
+  },
+  '& .fw-movement-head .fw-heading': {
+    marginBottom: '4px',
+    fontSize: '16px',
+    letterSpacing: '-.01em',
+  },
+  '& .fw-lane-chart': {
+    display: 'block',
+    width: '100%',
+    height: 'auto',
+    overflow: 'visible',
+  },
+  '& .fw-lane-viewport': { overflowX: 'auto', overscrollBehaviorInline: 'contain' },
+  '& .fw-lane-chart text': {
+    fill: 'var(--fw-muted)',
+    fontFamily: 'var(--t-font-family)',
+    fontSize: '13px',
+  },
+  '& .fw-lane-grid': {
+    stroke: 'color-mix(in srgb, var(--fw-line) 80%, transparent)',
+    strokeWidth: 1,
+  },
+  '& .fw-lane-band': {
+    fill: 'color-mix(in srgb, var(--fw-soft) 45%, transparent)',
+    stroke: 'color-mix(in srgb, var(--fw-line) 50%, transparent)',
+  },
+  '& .fw-lane-zero': {
+    stroke: 'var(--fw-muted)',
+    strokeWidth: 1,
+    strokeDasharray: '3 4',
+    opacity: .55,
+  },
+  '& .fw-lane-path': { fill: 'none', strokeWidth: 2.75 },
+  '& .fw-lane-glow': { fill: 'none', strokeWidth: 10, opacity: .12 },
+  '& .fw-lane-dot': { stroke: 'var(--fw-surface)', strokeWidth: 2 },
+  '& .fw-lane-hit': { fill: 'transparent', cursor: 'pointer' },
+  '& .fw-lane-legend': {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: '6px 14px',
+    marginTop: '8px',
+    color: 'var(--fw-muted)',
+    fontSize: '9px',
+  },
+  '& .fw-lane-legend span': { display: 'inline-flex', alignItems: 'center', gap: '5px' },
+  '& .fw-lane-swatch': { width: '8px', height: '8px', borderRadius: '50%' },
   '& .fw-overview-foot': {
     display: 'flex',
     justifyContent: 'space-between',
@@ -1043,8 +1114,7 @@ const Workspace = styled.section({
     '& .fw-value': { fontSize: '25px' },
     '& .fw-account-col': { display: 'none' },
     '& .fw-insights-layout': {
-      gridTemplateColumns: '165px minmax(0, 1fr)',
-      gap: '20px',
+      display: 'block',
     },
     '& .fw-followup-row': {
       gridTemplateColumns:
@@ -1114,6 +1184,11 @@ const Workspace = styled.section({
       marginTop: '15px',
     },
     '& .fw-line-chart': { height: '230px' },
+    '& .fw-movement-hero': { padding: '16px 14px 13px', borderRadius: '10px' },
+    '& .fw-movement-head': { display: 'block' },
+    '& .fw-lane-chart': { height: 'auto' },
+    '& .fw-lane-viewport .fw-lane-chart': { minWidth: '760px' },
+    '& .fw-lane-chart text': { fontSize: '18px' },
     '& .fw-followup-row': {
       minHeight: 'auto',
       gridTemplateColumns: '1fr',
@@ -1379,9 +1454,12 @@ const WorkspaceFinanceScreen = ({
     data.truncated,
   );
   const aggregateAvailable = aggregateCurrency.kind === 'available';
+  const noEligibleFacts = facts.length > 0 && !eligibleFacts.length;
   const aggregateUnavailableReason =
     aggregateCurrency.kind === 'available' || !facts.length
       ? null
+      : noEligibleFacts
+        ? 'No transactions are included in totals · review the inclusion state before cash movement can be calculated'
       : aggregateCurrency.kind === 'truncated'
         ? 'Result limit reached · totals and chart withheld'
         : aggregateCurrency.kind === 'mixed'
@@ -1412,43 +1490,53 @@ const WorkspaceFinanceScreen = ({
     aggregateCurrency.kind === 'available'
       ? aggregateCurrency.moneyOutMinor
       : '0';
-  let cumulativeIn = 0n;
-  let cumulativeOut = 0n;
   const chartFacts = aggregateAvailable
     ? [...eligibleFacts].sort((left, right) =>
         left.date.localeCompare(right.date),
       )
     : [];
-  const chartMax = Number(
-    minor(moneyInMinor) > minor(moneyOutMinor) ? moneyInMinor : moneyOutMinor,
-  );
-  const chartSpan = Math.max(
-    1,
-    activeStart && activeEnd ? liveDay(activeEnd) - liveDay(activeStart) : 1,
-  );
-  const chartPoints = chartFacts.map((fact) => {
-    if (fact.direction === 'in')
-      cumulativeIn += BigInt(fact.amountMinor ?? '0');
-    if (fact.direction === 'out')
-      cumulativeOut += BigInt(fact.amountMinor ?? '0');
-    return { fact, cumulativeIn, cumulativeOut };
+  const chartAccountLanes = aggregateAvailable
+    ? data.accounts
+        .map((account) => {
+          let cumulative = 0n;
+          const points = chartFacts
+            .filter((fact) => fact.accountId === account.id)
+            .map((fact) => {
+              const amount = BigInt(fact.amountMinor ?? '0');
+              cumulative += fact.direction === 'in' ? amount : -amount;
+              return { fact, cumulative };
+            });
+          return { account, points };
+        })
+        .filter((lane) => lane.points.length > 0)
+        .slice(0, 5)
+    : [];
+  const laneX = scaleLinear({
+    domain: [liveDay(activeStart), Math.max(liveDay(activeStart) + 1, liveDay(activeEnd))],
+    range: [176, 944],
   });
-  const chartX = (date: string) =>
-    64 + ((liveDay(date) - liveDay(activeStart)) / chartSpan) * 521;
-  const chartY = (value: bigint) =>
-    220 - (Number(value) / Math.max(1, chartMax * 1.15)) * 193;
-  const line = (direction: 'in' | 'out') =>
-    chartPoints
-      .map((point, index) => {
-        const value =
-          direction === 'in' ? point.cumulativeIn : point.cumulativeOut;
-        const previous = chartPoints[index - 1];
-        const gap = previous
-          ? isSparseCoverageGap(previous.fact.date, point.fact.date)
-          : true;
-        return `${gap ? 'M' : 'L'}${chartX(point.fact.date)},${chartY(value)}`;
-      })
-      .join(' ');
+  const laneStep = chartAccountLanes.length <= 2 ? 105 : 76;
+  const laneHeight = 72 + chartAccountLanes.length * laneStep;
+  const laneY = (laneIndex: number, value: bigint, magnitude: number) =>
+    75 + laneIndex * laneStep - (Number(value) / magnitude) * 32;
+  const laneSegments = <T extends { fact: WorkspaceFinanceFact }>(
+    points: readonly T[],
+  ) => {
+    const segments: T[][] = [];
+    for (const point of points) {
+      const segment = segments.at(-1);
+      const previous = segment?.at(-1);
+      if (
+        !segment ||
+        (previous && isSparseCoverageGap(previous.fact.date, point.fact.date))
+      ) {
+        segments.push([point]);
+      } else {
+        segment.push(point);
+      }
+    }
+    return segments;
+  };
   const domainMonths =
     domainStart && domainEnd ? timelineMonthSpan(domainStart, domainEnd) : 1;
   const timelineWidth =
@@ -1918,90 +2006,83 @@ const WorkspaceFinanceScreen = ({
               </div>
             </div>
             <section className="fw-insights-layout">
-              <div>
-                <h2 className="fw-heading">Included records</h2>
-                <p className="fw-sub">
-                  {eligibleFacts.length} included · {facts.length} visible ·
-                  superseded and excluded records do not enter totals
-                </p>
-                {aggregateUnavailableReason ? (
-                  <p className="fw-warning" role="status">
-                    {aggregateUnavailableReason}
-                  </p>
-                ) : null}
-              </div>
-              <div>
+              <div className="fw-movement-hero">
+                <div className="fw-movement-head">
+                  <div>
+                    <h2 className="fw-heading">Cash movement by account</h2>
+                    <p className="fw-sub">
+                      {eligibleFacts.length} included · {facts.length} visible ·
+                      excluded and superseded records remain outside this view
+                    </p>
+                  </div>
+                </div>
                 {aggregateAvailable ? (
+                  <div className="fw-lane-viewport">
                   <svg
-                    className="fw-line-chart"
-                    viewBox="0 0 650 250"
+                    className="fw-lane-chart"
+                    viewBox={`0 0 980 ${laneHeight}`}
                     role="img"
-                    aria-label={`Money in ${aggregateMoney(moneyInMinor)}; money out ${aggregateMoney(moneyOutMinor)}`}
+                    aria-label={`Qualified cumulative cash movement across ${chartAccountLanes.length} account lanes`}
                   >
-                    <line
-                      className="fw-line-chart-grid"
-                      x1="64"
-                      x2="585"
-                      y1="27"
-                      y2="27"
-                    />
-                    <line
-                      className="fw-line-chart-grid"
-                      x1="64"
-                      x2="585"
-                      y1="123"
-                      y2="123"
-                    />
-                    <line
-                      className="fw-line-chart-grid"
-                      x1="64"
-                      x2="585"
-                      y1="220"
-                      y2="220"
-                    />
-                    {line('in') ? (
-                      <path
-                        className="fw-line-chart-path"
-                        data-direction="in"
-                        d={line('in')}
-                      />
-                    ) : null}
-                    {line('out') ? (
-                      <path
-                        className="fw-line-chart-path"
-                        data-direction="out"
-                        d={line('out')}
-                      />
-                    ) : null}
-                    {chartPoints.map((point) => (
-                      <g key={point.fact.id}>
-                        <circle
-                          className="fw-line-chart-dot"
-                          data-direction="in"
-                          cx={chartX(point.fact.date)}
-                          cy={chartY(point.cumulativeIn)}
-                          r="3"
-                        >
-                          <title>{`${point.fact.date} · Money in ${aggregateMoney(point.cumulativeIn)}`}</title>
-                        </circle>
-                        <circle
-                          className="fw-line-chart-dot"
-                          data-direction="out"
-                          cx={chartX(point.fact.date)}
-                          cy={chartY(point.cumulativeOut)}
-                          r="3"
-                        >
-                          <title>{`${point.fact.date} · Money out ${aggregateMoney(point.cumulativeOut)}`}</title>
-                        </circle>
-                      </g>
-                    ))}
-                    <text x="64" y="244">
-                      {activeStart}
-                    </text>
-                    <text x="585" y="244" textAnchor="end">
-                      {activeEnd}
-                    </text>
+                    {chartAccountLanes.map((lane, laneIndex) => {
+                      const color = ACCOUNT_LANE_COLORS[laneIndex];
+                      const baseline = 75 + laneIndex * laneStep;
+                      const magnitude = Math.max(1, ...lane.points.map((point) => Number(point.cumulative < 0n ? -point.cumulative : point.cumulative)));
+                      return (
+                        <g key={lane.account.id}>
+                          <rect className="fw-lane-band" x="164" y={baseline - 41} width="792" height="82" rx="10" />
+                          <text x="0" y={baseline + 5}>
+                            {lane.account.label}
+                          </text>
+                          <line
+                            className="fw-lane-zero"
+                            x1="176"
+                            x2="944"
+                            y1={baseline}
+                            y2={baseline}
+                          />
+                          {laneSegments(lane.points).map((segment, index) => (
+                            <g key={`${lane.account.id}-${index}`}>
+                              <LinePath className="fw-lane-glow" data={segment} x={(point) => laneX(liveDay(point.fact.date)) ?? 176} y={(point) => laneY(laneIndex, point.cumulative, magnitude)} stroke={color} />
+                              <LinePath className="fw-lane-path" data={segment} x={(point) => laneX(liveDay(point.fact.date)) ?? 176} y={(point) => laneY(laneIndex, point.cumulative, magnitude)} stroke={color} />
+                            </g>
+                          ))}
+                          {lane.points.map((point) => (
+                            <g key={point.fact.id}>
+                              <circle
+                                className="fw-lane-dot"
+                                cx={laneX(liveDay(point.fact.date)) ?? 176}
+                                cy={laneY(laneIndex, point.cumulative, magnitude)}
+                                r="4"
+                                fill={color}
+                              >
+                                <title>{`${point.fact.date} · ${lane.account.label} · ${workspaceFactMoney(point.fact)}`}</title>
+                              </circle>
+                              <circle
+                                className="fw-lane-hit"
+                                cx={laneX(liveDay(point.fact.date)) ?? 176}
+                                cy={laneY(laneIndex, point.cumulative, magnitude)}
+                                r="12"
+                                role="button"
+                                tabIndex={0}
+                                aria-label={`Open ${point.fact.description}`}
+                                onClick={() => setSelectedFact(point.fact)}
+                                onKeyDown={(event) => {
+                                  if (event.key === 'Enter' || event.key === ' ') {
+                                    event.preventDefault();
+                                    setSelectedFact(point.fact);
+                                  }
+                                }}
+                              />
+                            </g>
+                          ))}
+                        </g>
+                      );
+                    })}
+                    <text x="176" y={laneHeight - 18}>{readableDate(activeStart)}</text>
+                    <text x="944" y={laneHeight - 18} textAnchor="end">{readableDate(activeEnd)}</text>
                   </svg>
+                  </div>
                 ) : (
                   <div className="fw-empty" role="status">
                     {aggregateUnavailableReason ??
@@ -2009,13 +2090,17 @@ const WorkspaceFinanceScreen = ({
                   </div>
                 )}
                 {aggregateAvailable ? (
-                  <div className="fw-chart-key">
-                    <span style={{ color: 'var(--fw-success)' }}>—</span> Money
-                    in
-                    <span style={{ color: 'var(--fw-accent)', marginLeft: 8 }}>
-                      —
-                    </span>{' '}
-                    Money out
+                  <div className="fw-lane-legend">
+                    {chartAccountLanes.map((lane, index) => (
+                      <span key={lane.account.id}>
+                        <i
+                          className="fw-lane-swatch"
+                          style={{ background: ACCOUNT_LANE_COLORS[index] }}
+                        />
+                        {lane.account.label}
+                      </span>
+                    ))}
+                    <span>Each lane is independently scaled · gaps preserve sparse coverage</span>
                   </div>
                 ) : null}
               </div>
