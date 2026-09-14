@@ -115,6 +115,30 @@ describe('native Finance workspace', () => {
     expect(workspaceSource).toContain('Approve draft · do not send');
   });
 
+  it('keeps narrow headers readable and statement control values scannable', () => {
+    expect(workspaceSource).toContain('flexWrap: \'wrap\'');
+    expect(workspaceSource).toContain('className="fw-top-title"');
+    expect(workspaceSource).toContain('className="fw-table fw-statement-table"');
+    expect(workspaceSource).toContain('Scroll the table sideways to see opening, closing, and status.');
+    expect(workspaceSource).toContain("'& .fw-statement-table': { minWidth: '960px', tableLayout: 'auto' }");
+    expect(workspaceSource).toContain('No financial accounts are available in this Workspace.');
+    expect(workspaceSource).toContain('No statement source artifacts are available in this Workspace.');
+    expect(workspaceSource).toContain('No statement source artifacts match this window and account.');
+    expect(workspaceSource).not.toContain('No financial accounts are visible to your role.');
+    expect(workspaceSource).not.toContain('No statement source artifacts are visible to your role.');
+  });
+
+  it('uses Remote DOM-safe drawer and timeline interactions', () => {
+    expect(workspaceSource).not.toContain('.setPointerCapture(');
+    expect(workspaceSource).not.toContain('.getBoundingClientRect(');
+    expect(workspaceSource).not.toContain('.focus()');
+    expect(workspaceSource).not.toContain('document.addEventListener');
+    expect(workspaceSource).toContain('onPointerMove={moveLiveDrag}');
+    expect(workspaceSource).toContain('onPointerCancel={() => (liveDrag.current = null)}');
+    expect(workspaceSource).toContain("isSynthetic ? 'SYNTHETIC TEST RECORD' : 'WORKSPACE RECORD'");
+    expect(workspaceSource).toContain('This drawer shows sample fields only.');
+  });
+
   it('retains both account/fact relation directions without exposing raw tables as primary navigation', () => {
     expect(account.success).toBe(true);
     expect(fact.success).toBe(true);

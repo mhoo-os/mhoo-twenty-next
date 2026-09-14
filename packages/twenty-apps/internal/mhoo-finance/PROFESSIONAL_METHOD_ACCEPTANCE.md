@@ -528,3 +528,44 @@ live Finance facts, role coverage, or production financial correctness. The
 first real-data tranche remains subject to MHO-227/MHO-228 authorization,
 immutable Files custody, and row-source lineage. A reload returns to live
 Workspace records.
+
+## 2026-09-14 installed visual E2E audit and repair
+
+At 2026-09-14 06:12 UTC, a delegated live browser pass exercised all five
+installed Hass Kitchen Finance pages in default and opt-in sample modes. It
+found two reproducible Remote DOM crashes: timeline pointer capture during
+drag, and unsupported focus restoration while closing transaction evidence.
+It also found a synthetic record labeled as a Workspace record, cramped
+Transactions controls, hard-to-read Statements columns, and misleading empty
+copy. `+ Add source` was rechecked on a healthy page and worked; no source
+connection was made. A date-picker tab crash was not reproduced and remains
+unconfirmed.
+
+The focused App fixes remove unsupported pointer-capture/layout and focus-ref
+calls, use supported pointer events on the timeline brush, distinguish sample
+evidence, clarify empty states, wrap narrow controls, and make Statements a
+horizontal table with an explicit scroll cue when rows exist. `yarn
+test:unit src/__tests__/workspace-preparation.test.ts` passed 8 tests; App
+lint reported 0 issues, `yarn twenty dev:build` succeeded with 14 files,
+and `git diff --check` passed. Reviewed `yarn twenty plan --remote
+finance-install-20260914` showed only five front-component checksum updates,
+zero additions and zero destructions; `yarn twenty apply --remote
+finance-install-20260914` reported `Synced Mhoo Finance (14 files)`.
+
+On the installed Overview, a start-handle drag changed the selected start
+from 2024-11-29 to 2025-01-16 and recomputed totals; moving the shortened
+window then changed both dates and totals without an error. On installed
+Transactions, the sample drawer displayed `SYNTHETIC TEST RECORD` and closed
+without a crash. Desktop and 760px narrow screenshots showed the repaired
+Transactions controls and readable Statements rows with a visible sideways
+scroll cue. These are current single-account visual receipts, invalidated by
+the next App deployment, host change, or browser behavior change.
+
+The repeatable read-only Playwright suite lives in
+`packages/twenty-e2e-testing/tests/mhoo-finance/` and declares five pages
+times two viewports (10 tests). `--list` passed. Its unattended live run was
+**not** performed because no operator-supplied authenticated Playwright
+storage-state file exists; the current browser session was not exported.
+This visual audit does not prove live bank data, customer import, Clover
+connection, other roles, recovery, or financial correctness. Those remain
+separate gated acceptance work.

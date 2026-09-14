@@ -53,6 +53,9 @@ financial reconciliation remain separate states.
 
 ## Focused checks
 
+For the installed five-page browser and visual audit, see the
+[Finance Playwright suite](../../../twenty-e2e-testing/tests/mhoo-finance/README.md).
+
 ```text
 yarn install --immutable
 yarn fixtures:generate

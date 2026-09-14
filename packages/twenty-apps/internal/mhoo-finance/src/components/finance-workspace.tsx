@@ -248,11 +248,13 @@ const Workspace = styled.section({
   '& .fw-top': {
     minHeight: '38px',
     display: 'flex',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'space-between',
     gap: '14px',
+    flexWrap: 'wrap',
     marginBottom: '19px',
   },
+  '& .fw-top-title': { minWidth: '170px', flex: '1 1 170px' },
   '& .fw-title': {
     margin: 0,
     color: 'var(--fw-text)',
@@ -261,7 +263,14 @@ const Workspace = styled.section({
     letterSpacing: '-.8px',
     lineHeight: 1.2,
   },
-  '& .fw-controls': { display: 'flex', alignItems: 'center', gap: '7px' },
+  '& .fw-controls': {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    flexWrap: 'wrap',
+    gap: '7px',
+    maxWidth: '100%',
+  },
   '& .fw-select': {
     maxWidth: '190px',
     border: '1px solid var(--fw-line)',
@@ -483,6 +492,12 @@ const Workspace = styled.section({
     verticalAlign: 'middle',
     overflowWrap: 'anywhere',
   },
+  '& .fw-statement-table': { minWidth: '960px', tableLayout: 'auto' },
+  '& .fw-statement-table .fw-money-col': { width: 'auto' },
+  '& .fw-statement-table .fw-control-value': {
+    whiteSpace: 'nowrap',
+    fontVariantNumeric: 'tabular-nums',
+  },
   '& .fw-table tbody tr[tabindex]': { cursor: 'pointer' },
   '& .fw-table tbody tr[tabindex]:hover td': {
     background: 'var(--fw-soft)',
@@ -529,6 +544,7 @@ const Workspace = styled.section({
     cursor: 'pointer',
     fontSize: '10px',
     fontWeight: 550,
+    whiteSpace: 'nowrap',
   },
   '& .fw-button:hover': { background: 'var(--fw-soft)' },
   '& .fw-button[aria-pressed="true"]': {
@@ -1219,8 +1235,6 @@ const WorkspaceFinanceScreen = ({
     start: number;
     end: number;
   } | null>(null);
-  const drawerRef = useRef<HTMLElement | null>(null);
-  const factReturnFocusRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -1276,42 +1290,6 @@ const WorkspaceFinanceScreen = ({
       cancelled = true;
     };
   }, [selectedFact?.artifactId, selectedFact?.id]);
-
-  useEffect(() => {
-    if (!selectedFact) return;
-    const drawer = drawerRef.current;
-    const focusable = () =>
-      Array.from(
-        drawer?.querySelectorAll<HTMLElement>(
-          'button:not(:disabled), a[href], input:not(:disabled), select:not(:disabled), [tabindex]:not([tabindex="-1"])',
-        ) ?? [],
-      );
-    focusable()[0]?.focus();
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        event.preventDefault();
-        setSelectedFact(null);
-        return;
-      }
-      if (event.key !== 'Tab') return;
-      const items = focusable();
-      if (!items.length) return;
-      const first = items[0];
-      const last = items.at(-1);
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last?.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first?.focus();
-      }
-    };
-    document.addEventListener('keydown', onKeyDown);
-    return () => {
-      document.removeEventListener('keydown', onKeyDown);
-      factReturnFocusRef.current?.focus();
-    };
-  }, [selectedFact]);
 
   if (loadState.kind !== 'ready') {
     return (
@@ -1385,7 +1363,7 @@ const WorkspaceFinanceScreen = ({
   );
   const aggregateAvailable = aggregateCurrency.kind === 'available';
   const aggregateUnavailableReason =
-    aggregateCurrency.kind === 'available'
+    aggregateCurrency.kind === 'available' || !facts.length
       ? null
       : aggregateCurrency.kind === 'truncated'
         ? 'Result limit reached · totals and chart withheld'
@@ -1499,19 +1477,23 @@ const WorkspaceFinanceScreen = ({
     kind: BrushKind,
     event: React.PointerEvent<HTMLButtonElement>,
   ) => {
-    const brush = event.currentTarget.parentElement;
-    if (!brush || !activeStart || !activeEnd) return;
+    if (!activeStart || !activeEnd) return;
     event.preventDefault();
-    event.currentTarget.setPointerCapture(event.pointerId);
+    // Remote DOM buttons do not expose setPointerCapture or layout methods.
+    // Month/year have a known width; fit-all uses a 640px estimate when
+    // Remote DOM cannot report the rendered container width.
+    const canvasWidth = timelineWidth.endsWith('px')
+      ? Number.parseInt(timelineWidth, 10)
+      : 640;
     liveDrag.current = {
       kind,
       x: event.clientX,
-      width: brush.getBoundingClientRect().width,
+      width: Math.max(1, Number.isFinite(canvasWidth) ? canvasWidth - 26 : 614),
       start: liveDay(activeStart),
       end: liveDay(activeEnd),
     };
   };
-  const moveLiveDrag = (event: React.PointerEvent<HTMLButtonElement>) => {
+  const moveLiveDrag = (event: React.PointerEvent<HTMLDivElement>) => {
     if (!liveDrag.current) return;
     const drag = liveDrag.current;
     changeLiveWindow(
@@ -1683,7 +1665,14 @@ const WorkspaceFinanceScreen = ({
       </div>
       <div className="fw-timeline-scroll">
         <div className="fw-timeline-canvas" style={{ width: timelineWidth }}>
-          <div className="fw-brush" aria-label="Selected date window">
+          <div
+            className="fw-brush"
+            aria-label="Selected date window"
+            onPointerMove={moveLiveDrag}
+            onPointerUp={() => (liveDrag.current = null)}
+            onPointerCancel={() => (liveDrag.current = null)}
+            onPointerLeave={() => (liveDrag.current = null)}
+          >
             <button
               type="button"
               className="fw-window-selection"
@@ -1693,9 +1682,6 @@ const WorkspaceFinanceScreen = ({
                 width: `${((liveDay(activeEnd) - liveDay(activeStart) + 1) / Math.max(1, domainLast + 1)) * 100}%`,
               }}
               onPointerDown={(event) => startLiveDrag('move', event)}
-              onPointerMove={moveLiveDrag}
-              onPointerUp={() => (liveDrag.current = null)}
-              onPointerCancel={() => (liveDrag.current = null)}
               onKeyDown={(event) => liveKey('move', event)}
             />
             {(['start', 'end'] as const).map((kind) => (
@@ -1708,9 +1694,6 @@ const WorkspaceFinanceScreen = ({
                   left: `${((liveDay(kind === 'start' ? activeStart : activeEnd) + (kind === 'end' ? 1 : 0)) / Math.max(1, domainLast + 1)) * 100}%`,
                 }}
                 onPointerDown={(event) => startLiveDrag(kind, event)}
-                onPointerMove={moveLiveDrag}
-                onPointerUp={() => (liveDrag.current = null)}
-                onPointerCancel={() => (liveDrag.current = null)}
                 onKeyDown={(event) => liveKey(kind, event)}
               >
                 ‖
@@ -1760,10 +1743,7 @@ const WorkspaceFinanceScreen = ({
                 <button
                   type="button"
                   className="fw-table-action"
-                  onClick={(event) => {
-                    factReturnFocusRef.current = event.currentTarget;
-                    setSelectedFact(fact);
-                  }}
+                  onClick={() => setSelectedFact(fact)}
                 >
                   {fact.description}
                 </button>
@@ -1788,7 +1768,7 @@ const WorkspaceFinanceScreen = ({
     <Workspace aria-label={`${PAGE_TITLES[view]} Finance content`}>
       <main className="fw-main">
         <div className="fw-top">
-          <div>
+          <div className="fw-top-title">
             <h1 className="fw-title">
               {selectedFollowUp ? 'Follow-up detail' : PAGE_TITLES[view]}
             </h1>
@@ -1976,7 +1956,8 @@ const WorkspaceFinanceScreen = ({
                   </svg>
                 ) : (
                   <div className="fw-empty" role="status">
-                    {aggregateUnavailableReason}
+                    {aggregateUnavailableReason ??
+                      'No cash movement to chart in this window.'}
                   </div>
                 )}
                 {aggregateAvailable ? (
@@ -2088,7 +2069,7 @@ const WorkspaceFinanceScreen = ({
               </table>
               {!data.accounts.length ? (
                 <div className="fw-empty">
-                  No financial accounts are visible to your role.
+                  No financial accounts are available in this Workspace.
                 </div>
               ) : null}
               <p className="fw-local">
@@ -2102,8 +2083,13 @@ const WorkspaceFinanceScreen = ({
         {view === 'statements' && !selectedFollowUp ? (
           <>
             {dateControls}
+            {visibleStatements.length ? (
+              <p className="fw-local">
+                Scroll the table sideways to see opening, closing, and status.
+              </p>
+            ) : null}
             <div className="fw-table-wrap">
-              <table className="fw-table">
+              <table className="fw-table fw-statement-table">
                 <thead>
                   <tr>
                     <th>Period</th>
@@ -2129,24 +2115,32 @@ const WorkspaceFinanceScreen = ({
                         <td>{statement.accountKey}</td>
                         <td>{statement.sourceKind}</td>
                         <td className="fw-money-col">
-                          {controls?.moneyIn
-                            ? `${controls.moneyIn} minor units · currency unavailable`
-                            : 'Unavailable'}
+                          <span className="fw-control-value">
+                            {controls?.moneyIn
+                              ? `${controls.moneyIn} minor units`
+                              : 'Unavailable'}
+                          </span>
                         </td>
                         <td className="fw-money-col">
-                          {controls?.moneyOut
-                            ? `${controls.moneyOut} minor units · currency unavailable`
-                            : 'Unavailable'}
+                          <span className="fw-control-value">
+                            {controls?.moneyOut
+                              ? `${controls.moneyOut} minor units`
+                              : 'Unavailable'}
+                          </span>
                         </td>
                         <td>
-                          {controls?.opening
-                            ? `${controls.opening} minor units · currency unavailable`
-                            : 'Unavailable'}
+                          <span className="fw-control-value">
+                            {controls?.opening
+                              ? `${controls.opening} minor units`
+                              : 'Unavailable'}
+                          </span>
                         </td>
                         <td>
-                          {controls?.closing
-                            ? `${controls.closing} minor units · currency unavailable`
-                            : 'Unavailable'}
+                          <span className="fw-control-value">
+                            {controls?.closing
+                              ? `${controls.closing} minor units`
+                              : 'Unavailable'}
+                          </span>
                         </td>
                         <td>{statement.status}</td>
                       </tr>
@@ -2156,7 +2150,9 @@ const WorkspaceFinanceScreen = ({
               </table>
               {!visibleStatements.length ? (
                 <div className="fw-empty">
-                  No statement source artifacts are visible to your role.
+                  {data.statements.length
+                    ? 'No statement source artifacts match this window and account.'
+                    : 'No statement source artifacts are available in this Workspace.'}
                 </div>
               ) : null}
               <p className="fw-local">
@@ -2645,14 +2641,20 @@ const WorkspaceFinanceScreen = ({
             aria-hidden="true"
           />
           <aside
-            ref={drawerRef}
             className="fw-drawer"
             role="dialog"
-            aria-modal="true"
             aria-label="Transaction evidence"
+            onKeyDown={(event) => {
+              if (event.key === 'Escape') {
+                event.preventDefault();
+                setSelectedFact(null);
+              }
+            }}
           >
             <div className="fw-drawer-top">
-              <span>WORKSPACE RECORD</span>
+              <span>
+                {isSynthetic ? 'SYNTHETIC TEST RECORD' : 'WORKSPACE RECORD'}
+              </span>
               <button
                 type="button"
                 className="fw-close"
@@ -2787,8 +2789,9 @@ const WorkspaceFinanceScreen = ({
               </p>
             )}
             <p className="fw-local">
-              This drawer reads retained Workspace fields. It does not infer
-              direction from description text or change classification.
+              {isSynthetic
+                ? 'This drawer shows sample fields only. It does not change Workspace records.'
+                : 'This drawer reads retained Workspace fields. It does not infer direction from description text or change classification.'}
             </p>
           </aside>
         </>
