@@ -70,7 +70,7 @@ const PAGE_TITLES: Readonly<Record<FinanceView, string>> = {
 // their separate caller-scoped REST workflow and do not enable this route.
 const WORKSPACE_REVIEW_MUTATIONS_ENABLED = false;
 
-const ACCOUNT_LANE_COLORS = [
+const ACCOUNT_SERIES_COLORS = [
   '#19a99b',
   '#6273d6',
   '#c4754d',
@@ -835,13 +835,8 @@ const Workspace = styled.section({
   },
   '& .fw-movement-hero': {
     margin: '2px 0 18px',
-    padding: '20px 22px 16px',
-    overflow: 'hidden',
-    border: '1px solid color-mix(in srgb, var(--fw-line) 80%, transparent)',
-    borderRadius: '14px',
-    background:
-      'linear-gradient(135deg, color-mix(in srgb, var(--fw-soft) 48%, var(--fw-surface)) 0%, var(--fw-surface) 48%, color-mix(in srgb, var(--fw-nav) 80%, var(--fw-surface)) 100%)',
-    boxShadow: '0 16px 36px rgba(18, 37, 64, .10)',
+    padding: '20px 4px 16px',
+    background: 'transparent',
   },
   '& .fw-movement-head': {
     display: 'flex',
@@ -855,46 +850,45 @@ const Workspace = styled.section({
     fontSize: '16px',
     letterSpacing: '-.01em',
   },
-  '& .fw-lane-chart': {
+  '& .fw-overlay-chart': {
     display: 'block',
     width: '100%',
     height: 'auto',
     overflow: 'visible',
   },
-  '& .fw-lane-viewport': { overflowX: 'auto', overscrollBehaviorInline: 'contain' },
-  '& .fw-lane-chart text': {
+  '& .fw-chart-viewport': { overflowX: 'auto', overscrollBehaviorInline: 'contain' },
+  '& .fw-overlay-chart text': {
     fill: 'var(--fw-muted)',
     fontFamily: 'var(--t-font-family)',
-    fontSize: '13px',
+    fontSize: '12px',
   },
-  '& .fw-lane-grid': {
-    stroke: 'color-mix(in srgb, var(--fw-line) 80%, transparent)',
+  '& .fw-chart-grid': {
+    stroke: 'color-mix(in srgb, var(--fw-line) 65%, transparent)',
     strokeWidth: 1,
   },
-  '& .fw-lane-band': {
-    fill: 'color-mix(in srgb, var(--fw-soft) 45%, transparent)',
-    stroke: 'color-mix(in srgb, var(--fw-line) 50%, transparent)',
-  },
-  '& .fw-lane-zero': {
-    stroke: 'var(--fw-muted)',
-    strokeWidth: 1,
-    strokeDasharray: '3 4',
-    opacity: .55,
-  },
-  '& .fw-lane-path': { fill: 'none', strokeWidth: 2.75 },
-  '& .fw-lane-glow': { fill: 'none', strokeWidth: 10, opacity: .12 },
-  '& .fw-lane-dot': { stroke: 'var(--fw-surface)', strokeWidth: 2 },
-  '& .fw-lane-hit': { fill: 'transparent', cursor: 'pointer' },
-  '& .fw-lane-legend': {
+  '& .fw-chart-zero': { stroke: 'var(--fw-muted)', strokeWidth: 1, strokeDasharray: '4 5', opacity: .55 },
+  '& .fw-chart-candle': { opacity: .22, pointerEvents: 'none' },
+  '& .fw-chart-candle-wick': { strokeWidth: 2 },
+  '& .fw-chart-candle-body': { strokeWidth: 1.5 },
+  '& .fw-series-area': { opacity: .1, pointerEvents: 'none' },
+  '& .fw-series-glass': { fill: 'none', strokeWidth: 13, opacity: .13, pointerEvents: 'none' },
+  '& .fw-series-path': { fill: 'none', strokeWidth: 2.8, transition: 'opacity 160ms ease, stroke-width 160ms ease' },
+  '& .fw-series-path[data-active="true"]': { strokeWidth: 4, filter: 'drop-shadow(0px 7px 5px rgba(18, 37, 64, .22))' },
+  '& .fw-series-hit': { fill: 'none', stroke: 'transparent', strokeWidth: 20, cursor: 'pointer' },
+  '& .fw-series-dot': { stroke: 'var(--fw-surface)', strokeWidth: 2 },
+  '& .fw-series-point-hit': { fill: 'transparent', cursor: 'pointer' },
+  '& .fw-series-legend': {
     display: 'flex',
     flexWrap: 'wrap',
-    gap: '6px 14px',
-    marginTop: '8px',
+    gap: '8px 16px',
+    marginTop: '2px',
     color: 'var(--fw-muted)',
-    fontSize: '9px',
+    fontSize: '11px',
   },
-  '& .fw-lane-legend span': { display: 'inline-flex', alignItems: 'center', gap: '5px' },
-  '& .fw-lane-swatch': { width: '8px', height: '8px', borderRadius: '50%' },
+  '& .fw-series-legend button': { display: 'inline-flex', alignItems: 'center', gap: '7px', padding: '5px 7px', border: 0, borderRadius: '6px', background: 'transparent', color: 'inherit', cursor: 'pointer' },
+  '& .fw-series-legend button[data-active="true"]': { background: 'color-mix(in srgb, var(--fw-soft) 66%, transparent)', color: 'var(--fw-text)' },
+  '& .fw-series-legend button:focus-visible': { outline: '2px solid var(--fw-accent)', outlineOffset: '2px' },
+  '& .fw-series-swatch': { width: '14px', height: '3px', borderRadius: '2px' },
   '& .fw-overview-foot': {
     display: 'flex',
     justifyContent: 'space-between',
@@ -1184,11 +1178,9 @@ const Workspace = styled.section({
       marginTop: '15px',
     },
     '& .fw-line-chart': { height: '230px' },
-    '& .fw-movement-hero': { padding: '16px 14px 13px', borderRadius: '10px' },
+    '& .fw-movement-hero': { padding: '16px 0 13px' },
     '& .fw-movement-head': { display: 'block' },
-    '& .fw-lane-chart': { height: 'auto' },
-    '& .fw-lane-viewport .fw-lane-chart': { minWidth: '760px' },
-    '& .fw-lane-chart text': { fontSize: '18px' },
+    '& .fw-chart-viewport .fw-overlay-chart': { minWidth: '720px' },
     '& .fw-followup-row': {
       minHeight: 'auto',
       gridTemplateColumns: '1fr',
@@ -1292,6 +1284,7 @@ const WorkspaceFinanceScreen = ({
     'year',
   );
   const [search, setSearch] = useState('');
+  const [focusedChartAccountId, setFocusedChartAccountId] = useState<string | null>(null);
   const [selectedFact, setSelectedFact] = useState<WorkspaceFinanceFact | null>(
     null,
   );
@@ -1495,7 +1488,7 @@ const WorkspaceFinanceScreen = ({
         left.date.localeCompare(right.date),
       )
     : [];
-  const chartAccountLanes = aggregateAvailable
+  const chartAccountSeries = aggregateAvailable
     ? data.accounts
         .map((account) => {
           let cumulative = 0n;
@@ -1511,15 +1504,39 @@ const WorkspaceFinanceScreen = ({
         .filter((lane) => lane.points.length > 0)
         .slice(0, 5)
     : [];
-  const laneX = scaleLinear({
-    domain: [liveDay(activeStart), Math.max(liveDay(activeStart) + 1, liveDay(activeEnd))],
-    range: [176, 944],
-  });
-  const laneStep = chartAccountLanes.length <= 2 ? 105 : 76;
-  const laneHeight = 72 + chartAccountLanes.length * laneStep;
-  const laneY = (laneIndex: number, value: bigint, magnitude: number) =>
-    75 + laneIndex * laneStep - (Number(value) / magnitude) * 32;
-  const laneSegments = <T extends { fact: WorkspaceFinanceFact }>(
+  const chartDaySpan = Math.max(1, liveDay(activeEnd) - liveDay(activeStart) + 1);
+  const candleBucket = (date: string) =>
+    chartDaySpan > 120
+      ? date.slice(0, 7)
+      : chartDaySpan > 42
+        ? `week-${Math.floor(liveDay(date) / 7)}`
+        : date;
+  const dailyMovement = new Map<string, bigint>();
+  for (const fact of chartFacts) {
+    const delta = BigInt(fact.amountMinor ?? '0') * (fact.direction === 'in' ? 1n : -1n);
+    dailyMovement.set(fact.date, (dailyMovement.get(fact.date) ?? 0n) + delta);
+  }
+  const chartCandles: Array<{ key: string; date: string; open: bigint; high: bigint; low: bigint; close: bigint }> = [];
+  let combinedClose = 0n;
+  for (const [date, delta] of dailyMovement) {
+    const key = candleBucket(date);
+    let candle = chartCandles.at(-1);
+    if (!candle || candle.key !== key) {
+      candle = { key, date, open: combinedClose, high: combinedClose, low: combinedClose, close: combinedClose };
+      chartCandles.push(candle);
+    }
+    combinedClose += delta;
+    candle.close = combinedClose;
+    if (combinedClose > candle.high) candle.high = combinedClose;
+    if (combinedClose < candle.low) candle.low = combinedClose;
+  }
+  const chartValues = [0, ...chartAccountSeries.flatMap((series) => series.points.map((point) => Number(point.cumulative))), ...chartCandles.flatMap((candle) => [Number(candle.high), Number(candle.low)])];
+  const chartMinimum = Math.min(...chartValues);
+  const chartMaximum = Math.max(...chartValues);
+  const chartPadding = Math.max(100, (chartMaximum - chartMinimum) * .12);
+  const chartX = scaleLinear({ domain: [liveDay(activeStart), Math.max(liveDay(activeStart) + 1, liveDay(activeEnd))], range: [92, 948] });
+  const chartY = scaleLinear({ domain: [chartMinimum - chartPadding, chartMaximum + chartPadding], range: [338, 44] });
+  const chartSegments = <T extends { fact: WorkspaceFinanceFact }>(
     points: readonly T[],
   ) => {
     const segments: T[][] = [];
@@ -2017,71 +2034,65 @@ const WorkspaceFinanceScreen = ({
                   </div>
                 </div>
                 {aggregateAvailable ? (
-                  <div className="fw-lane-viewport">
-                  <svg
-                    className="fw-lane-chart"
-                    viewBox={`0 0 980 ${laneHeight}`}
-                    role="img"
-                    aria-label={`Qualified cumulative cash movement across ${chartAccountLanes.length} account lanes`}
-                  >
-                    {chartAccountLanes.map((lane, laneIndex) => {
-                      const color = ACCOUNT_LANE_COLORS[laneIndex];
-                      const baseline = 75 + laneIndex * laneStep;
-                      const magnitude = Math.max(1, ...lane.points.map((point) => Number(point.cumulative < 0n ? -point.cumulative : point.cumulative)));
-                      return (
-                        <g key={lane.account.id}>
-                          <rect className="fw-lane-band" x="164" y={baseline - 41} width="792" height="82" rx="10" />
-                          <text x="0" y={baseline + 5}>
-                            {lane.account.label}
-                          </text>
-                          <line
-                            className="fw-lane-zero"
-                            x1="176"
-                            x2="944"
-                            y1={baseline}
-                            y2={baseline}
-                          />
-                          {laneSegments(lane.points).map((segment, index) => (
-                            <g key={`${lane.account.id}-${index}`}>
-                              <LinePath className="fw-lane-glow" data={segment} x={(point) => laneX(liveDay(point.fact.date)) ?? 176} y={(point) => laneY(laneIndex, point.cumulative, magnitude)} stroke={color} />
-                              <LinePath className="fw-lane-path" data={segment} x={(point) => laneX(liveDay(point.fact.date)) ?? 176} y={(point) => laneY(laneIndex, point.cumulative, magnitude)} stroke={color} />
-                            </g>
-                          ))}
-                          {lane.points.map((point) => (
-                            <g key={point.fact.id}>
-                              <circle
-                                className="fw-lane-dot"
-                                cx={laneX(liveDay(point.fact.date)) ?? 176}
-                                cy={laneY(laneIndex, point.cumulative, magnitude)}
-                                r="4"
-                                fill={color}
-                              >
-                                <title>{`${point.fact.date} · ${lane.account.label} · ${workspaceFactMoney(point.fact)}`}</title>
-                              </circle>
-                              <circle
-                                className="fw-lane-hit"
-                                cx={laneX(liveDay(point.fact.date)) ?? 176}
-                                cy={laneY(laneIndex, point.cumulative, magnitude)}
-                                r="12"
-                                role="button"
-                                tabIndex={0}
-                                aria-label={`Open ${point.fact.description}`}
-                                onClick={() => setSelectedFact(point.fact)}
-                                onKeyDown={(event) => {
-                                  if (event.key === 'Enter' || event.key === ' ') {
-                                    event.preventDefault();
-                                    setSelectedFact(point.fact);
-                                  }
-                                }}
-                              />
-                            </g>
-                          ))}
-                        </g>
-                      );
-                    })}
-                    <text x="176" y={laneHeight - 18}>{readableDate(activeStart)}</text>
-                    <text x="944" y={laneHeight - 18} textAnchor="end">{readableDate(activeEnd)}</text>
-                  </svg>
+                  <div className="fw-chart-viewport">
+                    <svg className="fw-overlay-chart" viewBox="0 0 980 400" role="img" aria-label={`Qualified cumulative cash movement for ${chartAccountSeries.length} accounts on one shared ${aggregateCurrency.kind === 'available' ? aggregateCurrency.currency : ''} scale; faint candles show combined period movement`}>
+                      {[0, .25, .5, .75, 1].map((fraction) => {
+                        const y = 44 + fraction * 294;
+                        const amountMinor = chartMaximum + chartPadding - fraction * (chartMaximum - chartMinimum + chartPadding * 2);
+                        const tick = aggregateCurrency.kind === 'available'
+                          ? new Intl.NumberFormat('en-US', { style: 'currency', currency: aggregateCurrency.currency, notation: 'compact', maximumFractionDigits: 1 }).format(amountMinor / 100)
+                          : '';
+                        return <g key={fraction}><line className="fw-chart-grid" x1="92" x2="948" y1={y} y2={y} /><text x="82" y={y + 4} textAnchor="end">{tick}</text></g>;
+                      })}
+                      <line className="fw-chart-zero" x1="92" x2="948" y1={chartY(0) ?? 338} y2={chartY(0) ?? 338} />
+                      {chartCandles.map((candle) => {
+                        const x = chartX(liveDay(candle.date)) ?? 92;
+                        const openY = chartY(Number(candle.open)) ?? 338;
+                        const closeY = chartY(Number(candle.close)) ?? 338;
+                        const color = candle.close >= candle.open ? '#19a99b' : '#c4754d';
+                        return (
+                          <g className="fw-chart-candle" key={candle.key}>
+                            <line className="fw-chart-candle-wick" x1={x} x2={x} y1={chartY(Number(candle.high)) ?? 338} y2={chartY(Number(candle.low)) ?? 338} stroke={color} />
+                            <rect className="fw-chart-candle-body" x={x - 5} y={Math.min(openY, closeY)} width="10" height={Math.max(3, Math.abs(closeY - openY))} rx="2" fill={color} stroke={color} />
+                          </g>
+                        );
+                      })}
+                      {chartAccountSeries.map((series, seriesIndex) => {
+                        const color = ACCOUNT_SERIES_COLORS[seriesIndex];
+                        const active = focusedChartAccountId === series.account.id;
+                        const dimmed = focusedChartAccountId !== null && !active;
+                        const zeroY = chartY(0) ?? 338;
+                        return (
+                          <g key={series.account.id} opacity={dimmed ? .28 : 1}>
+                            {active ? chartSegments(series.points).map((segment, index) => {
+                              const first = segment[0];
+                              const last = segment.at(-1);
+                              if (!first || !last) return null;
+                              const upperEdge = segment.map((point, pointIndex) => `${pointIndex === 0 ? 'M' : 'L'}${chartX(liveDay(point.fact.date)) ?? 92},${chartY(Number(point.cumulative)) ?? zeroY}`).join(' ');
+                              const area = `${upperEdge} L${chartX(liveDay(last.fact.date)) ?? 92},${zeroY} L${chartX(liveDay(first.fact.date)) ?? 92},${zeroY} Z`;
+                              return <path key={`${series.account.id}-shade-${index}`} className="fw-series-area" d={area} fill={color} />;
+                            }) : null}
+                            {chartSegments(series.points).map((segment, index) => (
+                              <g key={`${series.account.id}-${index}`}>
+                                {active ? <LinePath className="fw-series-glass" data={segment} x={(point) => chartX(liveDay(point.fact.date)) ?? 92} y={(point) => chartY(Number(point.cumulative)) ?? 338} stroke={color} /> : null}
+                                <LinePath className="fw-series-path" data-active={active} data={segment} x={(point) => chartX(liveDay(point.fact.date)) ?? 92} y={(point) => chartY(Number(point.cumulative)) ?? 338} stroke={color} />
+                                <LinePath className="fw-series-hit" data={segment} x={(point) => chartX(liveDay(point.fact.date)) ?? 92} y={(point) => chartY(Number(point.cumulative)) ?? 338} onMouseEnter={() => setFocusedChartAccountId(series.account.id)} onMouseLeave={() => setFocusedChartAccountId(null)} stroke="transparent" />
+                              </g>
+                            ))}
+                            {series.points.map((point) => (
+                              <g key={point.fact.id}>
+                                <circle className="fw-series-dot" cx={chartX(liveDay(point.fact.date)) ?? 92} cy={chartY(Number(point.cumulative)) ?? 338} r={active ? 4 : 2.5} fill={color} />
+                                <circle className="fw-series-point-hit" cx={chartX(liveDay(point.fact.date)) ?? 92} cy={chartY(Number(point.cumulative)) ?? 338} r="12" role="button" tabIndex={0} aria-label={`Open ${point.fact.description} in ${series.account.label}`} onMouseEnter={() => setFocusedChartAccountId(series.account.id)} onMouseLeave={() => setFocusedChartAccountId(null)} onFocus={() => setFocusedChartAccountId(series.account.id)} onBlur={() => setFocusedChartAccountId(null)} onClick={() => setSelectedFact(point.fact)} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); setSelectedFact(point.fact); } }}>
+                                  <title>{`${point.fact.date} · ${series.account.label} · ${workspaceFactMoney(point.fact)}`}</title>
+                                </circle>
+                              </g>
+                            ))}
+                          </g>
+                        );
+                      })}
+                      <text x="92" y="384">{readableDate(activeStart)}</text>
+                      <text x="948" y="384" textAnchor="end">{readableDate(activeEnd)}</text>
+                    </svg>
                   </div>
                 ) : (
                   <div className="fw-empty" role="status">
@@ -2090,17 +2101,17 @@ const WorkspaceFinanceScreen = ({
                   </div>
                 )}
                 {aggregateAvailable ? (
-                  <div className="fw-lane-legend">
-                    {chartAccountLanes.map((lane, index) => (
-                      <span key={lane.account.id}>
+                  <div className="fw-series-legend">
+                    {chartAccountSeries.map((series, index) => (
+                      <button key={series.account.id} type="button" data-active={focusedChartAccountId === series.account.id} onClick={() => setFocusedChartAccountId(focusedChartAccountId === series.account.id ? null : series.account.id)}>
                         <i
-                          className="fw-lane-swatch"
-                          style={{ background: ACCOUNT_LANE_COLORS[index] }}
+                          className="fw-series-swatch"
+                          style={{ background: ACCOUNT_SERIES_COLORS[index] }}
                         />
-                        {lane.account.label}
-                      </span>
+                        {series.account.label}
+                      </button>
                     ))}
-                    <span>Each lane is independently scaled · gaps preserve sparse coverage</span>
+                    <span>Shared currency scale · faint candles: combined period movement · gaps preserve sparse coverage</span>
                   </div>
                 ) : null}
               </div>
