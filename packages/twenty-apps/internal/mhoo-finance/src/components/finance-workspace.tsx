@@ -4,6 +4,7 @@ import { FinanceFollowUpActions } from './finance-follow-up-actions';
 import { useEffect, useState } from 'react';
 import { FinanceInsights } from './finance-insights';
 import { FinancePageHeader } from './finance-ui/finance-insights-primitives';
+import { FinancePeriodControls } from './finance-ui/finance-period-controls';
 
 import { currency, formatMoney } from '../contracts/money';
 import {
@@ -36,12 +37,7 @@ import {
   financeFollowUpMutationFailure,
   updateWorkspaceFinanceFollowUpState,
 } from '../investigation/workspace-finance-follow-ups';
-import {
-  timelineDateAt,
-  timelineDayOffset,
-  timelineMonthSpan,
-  validTimelineWindow,
-} from '../investigation/timeline-domain';
+import { validTimelineWindow } from '../investigation/timeline-domain';
 import { SYNTHETIC_WORKSPACE_FINANCE_DATA } from '../investigation/synthetic-workspace-data';
 import {
   workspaceAggregateCurrency,
@@ -67,8 +63,6 @@ const PAGE_TITLES: Readonly<Record<FinanceView, string>> = {
 // Financial link-decision writes remain disabled. Native Task follow-ups use
 // their separate caller-scoped REST workflow and do not enable this route.
 const WORKSPACE_REVIEW_MUTATIONS_ENABLED = false;
-
-type BrushKind = 'move' | 'start' | 'end';
 
 const SOURCE_ROUTES: readonly {
   id: Exclude<SourceEntry, 'apps' | 'csv'>;
@@ -113,14 +107,6 @@ const SOURCE_ROUTES: readonly {
     action: 'Open Apps',
   },
 ];
-
-const readableDate = (date: string) =>
-  new Date(`${date}T00:00:00Z`).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-    timeZone: 'UTC',
-  });
 
 
 
@@ -206,10 +192,7 @@ const WorkspaceFinanceScreen = ({
   const [draftEnd, setDraftEnd] = useState('');
   const [dateError, setDateError] = useState('');
   const [datesOpen, setDatesOpen] = useState(false);
-
-  const [timelineZoom, setTimelineZoom] = useState<'month' | 'year' | 'all'>(
-    'year',
-  );
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   const [createFollowUpOpen, setCreateFollowUpOpen] = useState(false);
   const [search, setSearch] = useState('');
@@ -341,11 +324,6 @@ const WorkspaceFinanceScreen = ({
   const lastFactDate = allFacts.map((fact) => fact.date).sort().at(-1) ?? '';
   const domainStart = firstFactDate ? `${firstFactDate.slice(0, 4)}-01-01` : '';
   const domainEnd = lastFactDate ? `${lastFactDate.slice(0, 4)}-12-31` : '';
-  const domainLast = domainEnd
-    ? Math.max(0, timelineDayOffset(domainStart, domainEnd))
-    : 0;
-  const liveDay = (date: string) => timelineDayOffset(domainStart, date);
-  const liveDate = (day: number) => timelineDateAt(domainStart, day);
   const activeStart = range.start || domainStart;
   const activeEnd = range.end || domainEnd;
   const scopedFacts = allFacts.filter(
@@ -367,24 +345,6 @@ const WorkspaceFinanceScreen = ({
       (!activeEnd || statement.period <= activeEnd.slice(0, 7)) &&
       (accountId === 'all' || statement.accountKey === selectedAccountLabel),
   );
-  const domainMonths =
-    domainStart && domainEnd ? timelineMonthSpan(domainStart, domainEnd) : 1;
-  const timelineWidth =
-    timelineZoom === 'all'
-      ? '100%'
-      : `${Math.max(640, domainMonths * (timelineZoom === 'month' ? 96 : 28))}px`;
-  const timelineYears =
-    domainStart && domainEnd
-      ? Array.from(
-          {
-            length:
-              Number(domainEnd.slice(0, 4)) -
-              Number(domainStart.slice(0, 4)) +
-              1,
-          },
-          (_, index) => Number(domainStart.slice(0, 4)) + index,
-        )
-      : [];
   const timelineMonths = (() => {
     if (!domainStart || !domainEnd) return [];
     const months: Array<{ key: string; label: string; start: string; end: string }> = [];
@@ -405,41 +365,6 @@ const WorkspaceFinanceScreen = ({
     return months;
   })();
 
-  const changeLiveWindow = (
-    kind: BrushKind,
-    delta: number,
-    initialStart = liveDay(activeStart),
-    initialEnd = liveDay(activeEnd),
-  ) => {
-    if (!domainStart || !domainEnd) return;
-    let start = initialStart;
-    let end = initialEnd;
-    if (kind === 'move') {
-      const bounded = Math.max(-start, Math.min(domainLast - end, delta));
-      start += bounded;
-      end += bounded;
-    } else if (kind === 'start') {
-      start = Math.max(0, Math.min(end, start + delta));
-    } else {
-      end = Math.max(start, Math.min(domainLast, end + delta));
-    }
-    const nextStart = liveDate(start);
-    const nextEnd = liveDate(end);
-    setRange({ start: nextStart, end: nextEnd });
-    setDraftStart(nextStart);
-    setDraftEnd(nextEnd);
-    setDateError('');
-    setSelectedFact(null);
-  };
-  const liveKey = (
-    kind: BrushKind,
-    event: React.KeyboardEvent<HTMLButtonElement>,
-  ) => {
-    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
-    event.preventDefault();
-    const step = kind === 'move' || event.shiftKey ? 7 : 1;
-    changeLiveWindow(kind, event.key === 'ArrowRight' ? step : -step);
-  };
   const openSource = async (route: SourceEntry) => {
     setSourceHandoff(null);
     setSourceHandoff({ route, result: await handoffSource(route) });
@@ -534,32 +459,7 @@ const WorkspaceFinanceScreen = ({
     }
   };
 
-  const dateControls = domainStart ? (
-    <>
-      <div className="fw-scope-toolbar">
-        <details className="fw-filter-popover"><summary className="fw-button">Filters {accountId !== 'all' ? '· 1' : ''} <span>⌄</span></summary><div className="fw-filter-body"><label>Account<select className="fw-select" aria-label="Account" value={accountId} onChange={(event) => {setAccountId(event.target.value);setSelectedFact(null);}}><option value="all">All accounts</option>{data.accounts.map((account) => <option key={account.id} value={account.id}>{account.label}</option>)}</select></label></div></details>
-        <div className="fw-window-tools">
-          <button type="button" className="fw-button" aria-expanded={datesOpen} onClick={() => setDatesOpen(!datesOpen)}>{readableDate(activeStart)} – {readableDate(activeEnd)} <span>⌄</span></button>
-
-          {datesOpen ? <div className="fw-date-popover"><div className="fw-date-fields">
-            <label className="fw-date-field">From<input className="fw-date-input" type="text" aria-label="Window start" placeholder="YYYY-MM-DD" value={draftStart} onChange={(event) => {setDraftStart(event.target.value);setDateError('');}} /></label>
-            <label className="fw-date-field">To<input className="fw-date-input" type="text" aria-label="Window end" placeholder="YYYY-MM-DD" value={draftEnd} onChange={(event) => {setDraftEnd(event.target.value);setDateError('');}} /></label>
-            <button type="button" className="fw-button" onClick={() => {if (!validTimelineWindow(draftStart,draftEnd,domainStart,domainEnd)) {setDateError(`Choose valid YYYY-MM-DD dates between ${domainStart} and ${domainEnd}, with From before To.`);return;}setRange({start:draftStart,end:draftEnd});setSelectedFact(null);setDateError('');setDatesOpen(false);}}>Apply dates</button>
-            <button type="button" className="fw-button" onClick={() => {setRange({start:domainStart,end:domainEnd});setDraftStart(domainStart);setDraftEnd(domainEnd);setSelectedFact(null);setDateError('');setDatesOpen(false);}}>All history</button>
-            <label className="fw-date-field">Timeline<select className="fw-select" aria-label="Timeline zoom" value={timelineZoom} onChange={(event) => setTimelineZoom(event.target.value as 'month' | 'year' | 'all')}><option value="month">Month detail</option><option value="year">Year overview</option><option value="all">Fit all history</option></select></label>
-          </div>{dateError ? <p role="alert" className="fw-sub">{dateError}</p> : null}</div> : null}
-        </div>
-      </div>
-      <div className="fw-timeline-scroll"><div className="fw-timeline-canvas" style={{width:timelineWidth}}>
-        <div className="fw-year-labels" aria-hidden="true">{timelineYears.map((year) => <span key={year} style={{left:`${Math.max(0,liveDay(`${year}-01-01`))/(domainLast+1)*100}%`}}>{year}</span>)}</div>
-        <div className="fw-brush" aria-label="Selected date window">
-          {timelineMonths.map((month) => <button type="button" className="fw-month-choice" key={month.key} aria-label={`Select ${month.label} ${month.key.slice(0,4)}`} aria-pressed={activeStart <= month.start && activeEnd >= month.end} style={{left:`${liveDay(month.start)/(domainLast+1)*100}%`,width:`${(liveDay(month.end)-liveDay(month.start)+1)/(domainLast+1)*100}%`}} onClick={(event) => {const next={start:event.shiftKey && activeStart < month.start ? activeStart : month.start,end:event.shiftKey && activeEnd > month.end ? activeEnd : month.end};setRange(next);setDraftStart(next.start);setDraftEnd(next.end);setDateError('');setSelectedFact(null);}}>{month.label}</button>)}
-          <button type="button" className="fw-window-selection" aria-label="Move selected date window. Left or right arrow moves seven days." title="Use arrow keys to move the range; drag the edges to resize" style={{left:`${liveDay(activeStart)/(domainLast+1)*100}%`,width:`${(liveDay(activeEnd)-liveDay(activeStart)+1)/(domainLast+1)*100}%`}} onKeyDown={(event) => liveKey('move',event)}><span className="fw-range-caption">{readableDate(activeStart).replace(/, \d{4}/,'')} – {readableDate(activeEnd).replace(/, \d{4}/,'')}</span></button>
-          {(['start','end'] as const).map((kind) => <input key={kind} type="range" className="fw-native-range" aria-label={`Resize window ${kind}`} min={0} max={domainLast} step={1} value={liveDay(kind === 'start' ? activeStart : activeEnd)} onChange={(event) => {const value=Number(event.target.value);changeLiveWindow(kind,value-liveDay(kind === 'start' ? activeStart : activeEnd));}} onKeyDown={(event) => liveKey(kind,event)} />)}
-        </div>
-      </div></div>
-    </>
-  ) : null;
+  const dateControls = domainStart ? <FinancePeriodControls accounts={data.accounts} accountId={accountId} range={{ start: activeStart, end: activeEnd }} draft={{ start: draftStart, end: draftEnd }} domainStart={domainStart} domainEnd={domainEnd} months={timelineMonths} filtersOpen={filtersOpen} datesOpen={datesOpen} error={dateError} onAccountIdChange={(next) => { setAccountId(next); setSelectedFact(null); }} onDraftChange={(next) => { setDraftStart(next.start); setDraftEnd(next.end); setDateError(''); }} onRangeChange={(next) => { if (!validTimelineWindow(next.start, next.end, domainStart, domainEnd)) { setDateError(`Choose valid dates between ${domainStart} and ${domainEnd}.`); return; } setRange(next); setDraftStart(next.start); setDraftEnd(next.end); setDateError(''); setSelectedFact(null); }} onFiltersOpenChange={setFiltersOpen} onDatesOpenChange={setDatesOpen} /> : null;
 
   const factTable = (
     <div className="fw-table-wrap">

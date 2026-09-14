@@ -652,3 +652,21 @@ installed Remote DOM behavior. No App apply/install, deployment, provider or
 live-data operation, credential action, merge, or push occurred in this
 increment. Installed pointer behavior and host support remain explicit runtime
 acceptance gaps for the coordinator.
+
+## 2026-09-15 Milestone 1 correction — shared Overview controls only
+
+Commit `cbed4b05e99744be92e2343e7e0713543e09281f` was rejected for review: it
+left a second control implementation in `finance-workspace.tsx`, rendered a
+different live-only control, and replaced the reference drag calculation. It
+is retained as failed-review evidence and is not an acceptance receipt.
+
+The successor source change extracts the approved toolbar, filter/date
+popovers, calendar ruler, range label, pointer drag, and keyboard behavior into
+`src/components/finance-ui/finance-period-controls.tsx`. Both synthetic and
+current-Workspace Overview now invoke that one component; Accounts,
+Transactions, and Statements invoke it too, replacing their duplicate native
+range controls. The controller uses the original direct browser pointer capture
+and measured-width calculation rather than a guarded or hard-coded substitute.
+That restores local-browser semantics but leaves Twenty Remote DOM support an
+explicit, unproved host-runtime gap. This correction is restricted to Milestone
+1 and does not claim the remaining page-layout rebuild is accepted.

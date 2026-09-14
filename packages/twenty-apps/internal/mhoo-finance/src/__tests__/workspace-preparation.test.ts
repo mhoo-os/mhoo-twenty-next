@@ -35,6 +35,10 @@ const insightsSource = readFileSync(
   new URL('../components/finance-insights.tsx', import.meta.url),
   'utf8',
 );
+const periodControlsSource = readFileSync(
+  new URL('../components/finance-ui/finance-period-controls.tsx', import.meta.url),
+  'utf8',
+);
 
 const frontComponentId = (layout: typeof overviewLayout) => {
   const configuration = layout.config?.tabs?.[0]?.widgets?.[0]?.configuration;
@@ -136,13 +140,15 @@ describe('native Finance workspace', () => {
     expect(workspaceSource).not.toContain('No statement source artifacts are visible to your role.');
   });
 
-  it('uses Remote DOM-safe drawer and timeline interactions', () => {
-    expect(insightsSource).not.toContain('.setPointerCapture(');
-    expect(insightsSource).not.toContain('.getBoundingClientRect(');
+  it('keeps the exact browser timeline controller isolated from the host gap', () => {
+    expect(insightsSource).toContain('<FinancePeriodControls');
+    expect(workspaceSource).toContain('<FinancePeriodControls');
+    expect(periodControlsSource).toContain('.setPointerCapture(');
+    expect(periodControlsSource).toContain('.getBoundingClientRect()');
     expect(workspaceSource).not.toContain('.focus()');
     expect(workspaceSource).not.toContain('document.addEventListener');
-    expect(insightsSource).toContain('onPointerMove={moveDrag}');
-    expect(insightsSource).toContain('onPointerCancel={()=>drag.current=null}');
+    expect(periodControlsSource).toContain('onPointerMove={moveDrag}');
+    expect(periodControlsSource).toContain('onPointerCancel={() => { drag.current = null; }}');
     expect(workspaceSource).toContain("isSynthetic ? 'SYNTHETIC TEST RECORD' : 'WORKSPACE RECORD'");
     expect(workspaceSource).toContain('This drawer shows sample fields only.');
   });

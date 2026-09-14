@@ -1,39 +1,32 @@
+import { useRef } from 'react';
+
 import type { WorkspaceFinanceData } from '../../investigation/workspace-finance-data';
+import { FinanceButton } from './finance-insights-primitives';
+
+type Month = Readonly<{ key: string; label: string; start: string; end: string }>;
+type Range = Readonly<{ start: string; end: string }>;
+
+const DAY = 86_400_000;
+const day = (date: string) => Math.floor(Date.parse(`${date}T00:00:00Z`) / DAY);
+const date = (value: number) => new Date(value * DAY).toISOString().slice(0, 10);
+const shortDate = (value: string) => new Date(`${value}T00:00:00Z`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
 
 export type FinancePeriodControlsProps = Readonly<{
-  accounts: WorkspaceFinanceData['accounts'];
-  accountId: string;
-  start: string;
-  end: string;
-  domainStart: string;
-  domainEnd: string;
-  onAccountIdChange: (accountId: string) => void;
-  onRangeChange: (range: Readonly<{ start: string; end: string }>) => void;
+  accounts: WorkspaceFinanceData['accounts']; accountId: string; range: Range; draft: Range; domainStart: string; domainEnd: string; months: readonly Month[]; filtersOpen: boolean; datesOpen: boolean; compare?: boolean; error?: string;
+  onAccountIdChange: (accountId: string) => void; onDraftChange: (range: Range) => void; onRangeChange: (range: Range) => void; onFiltersOpenChange: (open: boolean) => void; onDatesOpenChange: (open: boolean) => void; onCompareChange?: (compare: boolean) => void;
 }>;
 
-const readableDate = (value: string) =>
-  new Date(`${value}T00:00:00Z`).toLocaleDateString('en-US', {
-    month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC',
-  });
-
-export const FinancePeriodControls = ({
-  accounts, accountId, start, end, domainStart, domainEnd, onAccountIdChange, onRangeChange,
-}: FinancePeriodControlsProps) => {
-  const months: Array<{ key: string; label: string; end: string }> = [];
-  if (domainStart && domainEnd) {
-    const cursor = new Date(`${domainStart.slice(0, 7)}-01T00:00:00Z`);
-    while (cursor.toISOString().slice(0, 7) <= domainEnd.slice(0, 7)) {
-      const key = cursor.toISOString().slice(0, 7);
-      const last = new Date(cursor); last.setUTCMonth(last.getUTCMonth() + 1, 0);
-      months.push({ key, label: cursor.toLocaleDateString('en-US', { month: 'short', timeZone: 'UTC' }), end: key === domainEnd.slice(0, 7) ? domainEnd : last.toISOString().slice(0, 10) });
-      cursor.setUTCMonth(cursor.getUTCMonth() + 1);
-    }
-  }
-  return <div className="hi-period-controls" aria-label="Finance period controls">
-    <label className="hi-period-account">Account<select aria-label="Filter account" value={accountId} onChange={(event) => onAccountIdChange(event.target.value)}><option value="all">All accounts</option>{accounts.map((account) => <option key={account.id} value={account.id}>{account.label}</option>)}</select></label>
-    <label className="hi-period-date">From<input type="date" min={domainStart} max={domainEnd} value={start} onChange={(event) => onRangeChange({ start: event.target.value, end })} /></label>
-    <label className="hi-period-date">To<input type="date" min={domainStart} max={domainEnd} value={end} onChange={(event) => onRangeChange({ start, end: event.target.value })} /></label>
-    <span className="hi-period-summary">{start && end ? `${readableDate(start)} – ${readableDate(end)}` : 'No date range'}</span>
-    <div className="hi-period-months" aria-label="Select month">{months.map((month) => <button type="button" className="hi-month" key={month.key} aria-pressed={start === `${month.key}-01` && end === month.end} onClick={() => onRangeChange({ start: month.key === domainStart.slice(0, 7) ? domainStart : `${month.key}-01`, end: month.end })}>{month.label}</button>)}</div>
-  </div>;
+/** Exact approved Overview toolbar, popovers, and brush shared by every Finance data view. */
+export const FinancePeriodControls = ({ accounts, accountId, range, draft, domainStart, domainEnd, months, filtersOpen, datesOpen, compare = false, error = '', onAccountIdChange, onDraftChange, onRangeChange, onFiltersOpenChange, onDatesOpenChange, onCompareChange }: FinancePeriodControlsProps) => {
+  const ruler = useRef<HTMLDivElement>(null);
+  const drag = useRef<null | { kind: 'move' | 'start' | 'end'; x: number; width: number; start: number; end: number }>(null);
+  const origin = day(domainStart); const last = day(domainEnd); const span = Math.max(1, last - origin + 1); const start = day(range.start); const end = day(range.end);
+  const update = (nextStart: number, nextEnd: number) => onRangeChange({ start: date(nextStart), end: date(nextEnd) });
+  const beginDrag = (event: React.PointerEvent<HTMLButtonElement>, kind: 'move' | 'start' | 'end') => { event.preventDefault(); event.stopPropagation(); event.currentTarget.setPointerCapture(event.pointerId); drag.current = { kind, x: event.clientX, width: ruler.current!.getBoundingClientRect().width, start, end }; };
+  const moveDrag = (event: React.PointerEvent<HTMLButtonElement>) => { const current = drag.current; if (!current) return; const delta = Math.round((event.clientX - current.x) / current.width * span); if (current.kind === 'move') { const step = Math.max(origin - current.start, Math.min(last - current.end, delta)); update(current.start + step, current.end + step); } else if (current.kind === 'start') update(Math.max(origin, Math.min(current.end, current.start + delta)), current.end); else update(current.start, Math.min(last, Math.max(current.start, current.end + delta))); };
+  const keyboard = (event: React.KeyboardEvent<HTMLButtonElement>, kind: 'move' | 'start' | 'end') => { if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return; event.preventDefault(); const step = (event.key === 'ArrowLeft' ? -1 : 1) * (event.shiftKey ? 7 : 1); if (kind === 'move') { const delta = Math.max(origin - start, Math.min(last - end, step)); update(start + delta, end + delta); } else if (kind === 'start') update(Math.max(origin, Math.min(end, start + step)), end); else update(start, Math.min(last, Math.max(start, end + step))); };
+  return <>
+    <div className="hi-toolbar"><div className="hi-anchor"><FinanceButton aria-expanded={filtersOpen} onClick={() => { onFiltersOpenChange(!filtersOpen); onDatesOpenChange(false); }}>☷ &nbsp; Filters {accountId !== 'all' ? '· 1' : ''} <span>⌄</span></FinanceButton>{filtersOpen && <div className="hi-popover"><label>Account<select aria-label="Filter account" value={accountId} onChange={(event) => onAccountIdChange(event.target.value)}><option value="all">All accounts</option>{accounts.map((account) => <option key={account.id} value={account.id}>{account.label}</option>)}</select></label><p>Internal transfers stay outside cash-flow totals.</p><FinanceButton onClick={() => onFiltersOpenChange(false)}>Done</FinanceButton></div>}</div><div className="hi-toolbar-right"><div className="hi-anchor"><FinanceButton aria-expanded={datesOpen} onClick={() => { onDatesOpenChange(!datesOpen); onFiltersOpenChange(false); }}>▦ &nbsp; {shortDate(range.start)} – {shortDate(range.end)}, {domainEnd.slice(0, 4)} <span>⌄</span></FinanceButton>{datesOpen && <form className="hi-popover hi-date-popover" onSubmit={(event) => { event.preventDefault(); if (!draft.start || !draft.end || draft.start > draft.end || draft.start < domainStart || draft.end > domainEnd) return; onRangeChange(draft); onDatesOpenChange(false); }}><label>From<input type="date" min={domainStart} max={domainEnd} value={draft.start} onChange={(event) => onDraftChange({ ...draft, start: event.target.value })} /></label><label>To<input type="date" min={domainStart} max={domainEnd} value={draft.end} onChange={(event) => onDraftChange({ ...draft, end: event.target.value })} /></label>{error && <p role="alert">{error}</p>}<div className="hi-date-actions"><FinanceButton onClick={() => { onRangeChange({ start: domainStart, end: domainEnd }); onDatesOpenChange(false); }}>Reset</FinanceButton><FinanceButton className="hi-primary">Apply</FinanceButton></div></form>}</div>{onCompareChange ? <FinanceButton className={compare ? 'hi-selected' : ''} aria-pressed={compare} onClick={() => onCompareChange(!compare)}>▣ &nbsp; Compare {compare ? 'on' : 'to'}</FinanceButton> : null}</div></div>
+    <div className="hi-ruler-scroll" aria-label="Scrollable finance month timeline"><div className="hi-ruler" ref={ruler}><span className="hi-year">{domainStart.slice(0, 4)}</span>{months.map((month) => <button className="hi-month" key={month.key} style={{ left: `${(day(month.start) - origin) / span * 100}%`, width: `${(day(month.end) - day(month.start) + 1) / span * 100}%` }} aria-label={`Select ${month.label} ${month.key.slice(0, 4)}`} onClick={(event) => update(event.shiftKey ? Math.min(start, day(month.start)) : day(month.start), event.shiftKey ? Math.max(end, day(month.end)) : day(month.end))}>{month.label}</button>)}<div className="hi-selection" style={{ left: `${(start - origin) / span * 100}%`, width: `${(end - start + 1) / span * 100}%` }}><span className="hi-range-label">{shortDate(range.start)} – {shortDate(range.end)}</span><button className="hi-range-move" aria-label="Move selected time range" title="Drag range · arrow keys move one day · Shift moves seven" onPointerDown={(event) => beginDrag(event, 'move')} onPointerMove={moveDrag} onPointerUp={() => { drag.current = null; }} onPointerCancel={() => { drag.current = null; }} onKeyDown={(event) => keyboard(event, 'move')} />{(['start', 'end'] as const).map((kind) => <button key={kind} className={`hi-handle hi-handle-${kind}`} aria-label={`Resize range ${kind}`} title={`Drag ${kind} · use arrow keys`} onPointerDown={(event) => beginDrag(event, kind)} onPointerMove={moveDrag} onPointerUp={() => { drag.current = null; }} onPointerCancel={() => { drag.current = null; }} onKeyDown={(event) => keyboard(event, kind)} />)}</div></div></div>
+  </>;
 };
