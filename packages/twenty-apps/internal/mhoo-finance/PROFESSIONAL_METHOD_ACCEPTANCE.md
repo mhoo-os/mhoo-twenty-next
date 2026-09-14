@@ -713,3 +713,27 @@ Twenty Remote DOM proof. Direct pointer capture and geometry still require a
 separate installed-host acceptance. No App install/apply, deployment,
 provider/live-data operation, credential action, merge, push, or release
 acceptance occurred.
+
+## 2026-09-15 responsive primitive correction — source-only receipt
+
+Commit `51199dd909361af2fca27232d7a178b3d5cafed8` restores the approved mobile
+rules through the same responsive primitive sheet consumed by both the
+Overview and the record-backed Workspace. In particular, it restores the
+stacked date/compare controls, compact button treatment, timeline scroller and
+hint, table/chart spacing, single-column breakdowns, and narrow drill-in
+spacing; it does not create another page-specific mobile style implementation.
+
+At a 390px local source-preview viewport, the document remained 390px wide;
+the visible timeline hint was present and its internal ruler remained
+horizontally scrollable (600px content in a 364px viewport). Accounts Filters
+opened its account disclosure, Transactions Search filtered to 37 Clover test
+records, Statements rendered its exact minor-unit/no-inferred-currency
+disclosure and sideways-table guidance, and a Follow-up opened and returned
+through the Back action. The Statements page has no interactive disclosure
+control to test in this source preview. Lint, typecheck/build, and
+`git diff --check` passed; provenance and the exact-head fixture passed against
+base `724b83a993857644c9bdf81bca95bbd1c07c8610`.
+
+This is local synthetic source-preview evidence only. It is not installed
+Twenty Remote DOM, live-provider, deployment, push, merge, or release
+acceptance; the direct pointer-capture host gap remains explicit.
