@@ -18,7 +18,7 @@ export default defineObject({
     { universalIdentifier: I.FINANCE_MATCH_GROUP_RUN_FIELD_UNIVERSAL_IDENTIFIER, type: FieldType.TEXT, name: 'runReference', label: 'Investigation run', icon: 'IconFileSearch' },
     { universalIdentifier: I.FINANCE_MATCH_GROUP_TYPE_FIELD_UNIVERSAL_IDENTIFIER, type: FieldType.TEXT, name: 'groupType', label: 'Group type', icon: 'IconCategory' },
     { universalIdentifier: I.FINANCE_MATCH_GROUP_BRIDGE_FIELD_UNIVERSAL_IDENTIFIER, type: FieldType.TEXT, name: 'bridgeKind', label: 'Bridge kind', icon: 'IconBridge' },
-    { universalIdentifier: I.FINANCE_MATCH_GROUP_CURRENCY_FIELD_UNIVERSAL_IDENTIFIER, type: FieldType.TEXT, name: 'currency', label: 'Currency', icon: 'IconCurrencyDollar' },
+    { universalIdentifier: I.FINANCE_MATCH_GROUP_CURRENCY_FIELD_UNIVERSAL_IDENTIFIER, type: FieldType.TEXT, name: 'currencyCode', label: 'Currency', icon: 'IconCurrencyDollar' },
     { universalIdentifier: I.FINANCE_MATCH_GROUP_EXPECTED_FIELD_UNIVERSAL_IDENTIFIER, type: FieldType.TEXT, name: 'expectedMinor', label: 'Expected minor units', icon: 'IconCalculator' },
     { universalIdentifier: I.FINANCE_MATCH_GROUP_OBSERVED_FIELD_UNIVERSAL_IDENTIFIER, type: FieldType.TEXT, name: 'observedMinor', label: 'Observed minor units', icon: 'IconCalculator' },
     { universalIdentifier: I.FINANCE_MATCH_GROUP_RESIDUAL_FIELD_UNIVERSAL_IDENTIFIER, type: FieldType.TEXT, name: 'residualMinor', label: 'Residual minor units', icon: 'IconDelta' },

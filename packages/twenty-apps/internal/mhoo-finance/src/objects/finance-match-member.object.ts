@@ -21,7 +21,7 @@ export default defineObject({
     { universalIdentifier: I.FINANCE_MATCH_MEMBER_SIDE_FIELD_UNIVERSAL_IDENTIFIER, type: FieldType.TEXT, name: 'side', label: 'Side', icon: 'IconArrowsExchange' },
     { universalIdentifier: I.FINANCE_MATCH_MEMBER_COMPONENT_FIELD_UNIVERSAL_IDENTIFIER, type: FieldType.TEXT, name: 'component', label: 'Component', icon: 'IconComponents' },
     { universalIdentifier: I.FINANCE_MATCH_MEMBER_AMOUNT_FIELD_UNIVERSAL_IDENTIFIER, type: FieldType.TEXT, name: 'allocatedSignedMinor', label: 'Allocated signed minor units', icon: 'IconCalculator', isNullable: true },
-    { universalIdentifier: I.FINANCE_MATCH_MEMBER_CURRENCY_FIELD_UNIVERSAL_IDENTIFIER, type: FieldType.TEXT, name: 'currency', label: 'Currency', icon: 'IconCurrencyDollar' },
+    { universalIdentifier: I.FINANCE_MATCH_MEMBER_CURRENCY_FIELD_UNIVERSAL_IDENTIFIER, type: FieldType.TEXT, name: 'currencyCode', label: 'Currency', icon: 'IconCurrencyDollar' },
     { universalIdentifier: I.FINANCE_MATCH_MEMBER_ORDINAL_FIELD_UNIVERSAL_IDENTIFIER, type: FieldType.NUMBER, name: 'ordinal', label: 'Ordinal', icon: 'IconListNumbers' },
     { universalIdentifier: I.FINANCE_MATCH_MEMBER_REASON_FIELD_UNIVERSAL_IDENTIFIER, type: FieldType.TEXT, name: 'reasonCode', label: 'Reason code', icon: 'IconInfoCircle' },
     { universalIdentifier: I.FINANCE_MATCH_MEMBER_COUNTED_FIELD_UNIVERSAL_IDENTIFIER, type: FieldType.BOOLEAN, name: 'countedInEconomicMovement', label: 'Counted once', icon: 'IconCheck' },

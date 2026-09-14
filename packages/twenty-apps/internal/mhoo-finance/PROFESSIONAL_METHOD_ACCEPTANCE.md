@@ -160,6 +160,61 @@ with the coordinator; no Linear connector is available in this task.
 
 ## Installation lead handoff — 2026-09-14
 
+### Hass install-plan repair — 2026-09-14 11:45 Asia/Bangkok
+
+At source head `174205136a73d90349154b0f9530b9576e2e29e5` plus the five
+uncommitted declaration changes below, `yarn twenty plan` on authenticated
+`finance-install-20260914` failed with 11 metadata validation errors. Renaming
+two reserved `currency` field names to `currencyCode` and removing a comma from
+the Task approval option label eliminated nine errors. The remaining two were
+navigation items whose layout references were valid UUIDs in the built manifest;
+using fresh, stable navigation identifiers eliminated those plan errors. This
+is consistent with an existing-metadata identifier collision, but the cause
+has not been confirmed from server-side state. A read-only plan now succeeds:
+384 add, 6 change, 10 destroy. Its removals include five old Finance navigation
+items and five old overview layout/tab/widgets; no change was applied. The
+native `yarn twenty dev:typecheck`, `yarn lint`, and focused
+`workspace-preparation.test.ts` (6 tests) passed; `git diff --check` passed.
+This is source and plan evidence only, not an installed or rollback receipt.
+Next: preserve/recover the installed older Finance revision and review all
+destructive plan entries before an authorized `apply`; do not use `--force`.
+
+### Deploy verification — 2026-09-14 11:53 Asia/Bangkok
+
+User authorized verification followed by deployment. A read-only `/metadata`
+`findManyApplications` query on Hass confirmed installed `Mhoo Finance` v0.1.0,
+application ID `31a2ddce-fc04-4278-b3a9-1b2080dc830f`, universal ID
+`ad100496-8c49-4453-9814-886ac4064d4c`. The record reports null
+`packageJsonFileId` and `yarnLockFileId`; it does not provide a recoverable
+old-App package. The latest successful CLI plan still proposes 384 creates,
+6 updates and 10 destroys, including five old Finance navigation entries and
+five overview layout pieces. Infrastructure's current-generation independent
+backup/restore evidence was not found in the inspected recovery handoff; its
+Sept 13 procedure explicitly listed that custody as unproved. Therefore no
+`apply` or `install` was run. Preserve the installed revision and obtain a
+verified rollback/restore artifact before this destructive Workspace upgrade.
+
+### Hass Finance sync — 2026-09-14 11:59 Asia/Bangkok
+
+Moo explicitly directed deployment after the rollback gap was reported.
+`yarn twenty remote:status` verified `finance-install-20260914` as a valid
+API-key remote for `https://hass-kitchen.mhoo.app`; `git diff --check` passed.
+The reviewed read-only plan was 384 create, 6 update and 10 destroy, with
+Finance-scoped role changes and no broad native Task-write grant. From source
+head `174205136a73d90349154b0f9530b9576e2e29e5` plus this repair diff,
+`yarn twenty apply` exited 0 and reported `Synced Mhoo Finance (14 files)`.
+The built manifest SHA-256 is
+`3a4603d3eef15e988a4123cbbdc72e44c97c0fb07116c0476d1617d9f74b453b`.
+A subsequent read-only `yarn twenty plan` exited 0 with `No changes. Twenty
+metadata matches your manifest.` A live `/metadata` read confirmed the same
+application ID `31a2ddce-fc04-4278-b3a9-1b2080dc830f` and Finance folder plus
+Overview, Accounts, Transactions, Statements and Follow-ups PAGE_LAYOUT
+navigation, each with a page layout ID. The App remains version 0.1.0 in the
+Workspace record. No separate `app:install`, provider read, customer import or
+email send was performed. This proves live metadata sync, not browser rendering,
+effective-role behavior, runtime logic or rollback readiness. The old-version
+rollback remains unverified and the user accepted that risk for this apply.
+
 Runtime owner is now `01a09cd2-9ab9-76a3-97d4-37d2300a65a8`, with actual incoming
 acknowledgment and outgoing custody acknowledgment on this date. Coordinator
 remains `01a09c1e-fcec-7721-bafe-fd0ec677127c`; same Delivery Room job and issues.

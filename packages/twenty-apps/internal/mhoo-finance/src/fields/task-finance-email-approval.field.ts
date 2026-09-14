@@ -35,7 +35,7 @@ export default defineField({
     {
       id: '7e17b930-5f94-4f98-9084-61aa5a84bc88',
       value: 'APPROVED_NOT_SENT',
-      label: 'Approved, not sent',
+      label: 'Approved but not sent',
       position: 2,
       color: 'blue',
     },
