@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { financeInsightsTokens } from './finance-insights-styles';
+import { financeInsightsPrimitiveStyles, financeInsightsTokens } from './finance-insights-styles';
 
 // Page-specific layouts; shared Overview primitives own their visual styles.
 export const Workspace = styled.section({
@@ -26,7 +26,7 @@ export const Workspace = styled.section({
   isolation: 'isolate',
   fontFamily: financeInsightsTokens.fontFamily,
   fontSize: '14px',
-  lineHeight: 1.45,
+  lineHeight: 1.5,
   boxSizing: 'border-box',
   '& *': { boxSizing: 'border-box' },
   '& .fw-select, & .fi-search-input': { font: 'inherit' },
@@ -882,7 +882,7 @@ export const Workspace = styled.section({
     fontSize: '9px',
     lineHeight: 1.5,
   },
-}, {
+}, financeInsightsPrimitiveStyles, {
   fontFamily: financeInsightsTokens.fontFamily,
   '--fw-text': financeInsightsTokens.ink, '--fw-muted': financeInsightsTokens.muted, '--fw-line': financeInsightsTokens.line,
   '--fi-frame-inline': financeInsightsTokens.frameInline,
@@ -892,36 +892,6 @@ export const Workspace = styled.section({
   '&[data-view=overview] .fw-main': {padding: 0},
   '&[data-view=overview] .fw-bottom': {padding: '0 0 15px'},
   '& .fw-main': { padding: '0 0 24px' },
-  '& .hi-title': { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', padding: `${financeInsightsTokens.titleBlockStart} var(--fi-frame-inline) ${financeInsightsTokens.titleBlockEnd}` },
-  '& .hi-title h1': { margin: 0, color: 'var(--fw-text)', fontSize: financeInsightsTokens.titleSize, fontWeight: 500, letterSpacing: '-.8px', lineHeight: 1.2 },
-  '& .hi-title h1 span': { marginLeft: '12px', color: 'var(--fw-muted)', fontSize: financeInsightsTokens.titleDetailSize, fontWeight: 400, letterSpacing: '-.2px' },
-  '& .hi-demo': { color: financeInsightsTokens.demoText, fontSize: financeInsightsTokens.detailSize },
-  '& .hi-page-actions': { display: 'flex', alignItems: 'center', justifyContent: 'flex-end', flexWrap: 'wrap', gap: '8px' },
-  '& .hi-button': { minHeight: '34px', display: 'inline-flex', alignItems: 'center', gap: '12px', padding: '8px 12px', border: `1px solid ${financeInsightsTokens.controlLine}`, borderRadius: financeInsightsTokens.controlRadius, color: 'var(--fw-text)', background: 'var(--fw-surface)', cursor: 'pointer', fontSize: `${financeInsightsTokens.controlSize} !important`, whiteSpace: 'nowrap' },
-  '& .hi-button:hover': { background: '#f8f8fc' },
-  '& .hi-toolbar': { display: 'flex', justifyContent: 'space-between', gap: '12px', padding: `0 var(--fi-frame-inline) ${financeInsightsTokens.toolbarBlockEnd}` },
-  '& .hi-toolbar-right': { display: 'flex', gap: '8px' },
-  '& .hi-anchor': { position: 'relative' },
-  '& .hi-popover': { position: 'absolute', zIndex: 20, top: 'calc(100% + 8px)', left: 0, width: '265px', padding: '18px', border: `1px solid ${financeInsightsTokens.popoverLine}`, borderRadius: financeInsightsTokens.popoverRadius, boxShadow: '0 8px 30px #26263d14', background: financeInsightsTokens.canvas },
-  '& .hi-date-popover': { left: 'auto', right: 0 },
-  '& .hi-popover label': { display: 'grid', gap: '6px', marginBottom: '12px', fontSize: financeInsightsTokens.controlSize },
-  '& .hi-popover input, & .hi-popover select': { width: '100%', padding: '8px', border: `1px solid ${financeInsightsTokens.inputLine}`, borderRadius: '5px', color: 'var(--fw-text)', background: financeInsightsTokens.canvas },
-  '& .hi-popover p': { margin: '8px 0 14px', color: 'var(--fw-muted)', fontSize: financeInsightsTokens.detailSize },
-  '& .hi-date-actions': { display: 'flex', justifyContent: 'space-between' },
-  '& .hi-ruler-scroll': { padding: '0 var(--fi-frame-inline)', borderBottom: '1px solid var(--fw-line)' },
-  '& .hi-ruler': { position: 'relative', height: '70px', marginTop: '3px' },
-  '& .hi-year': { position: 'absolute', top: 0, color: 'var(--fw-muted)', fontSize: '10px' },
-  '& .hi-month': { position: 'absolute', bottom: 0, height: '34px', paddingLeft: '10px', border: 0, color: 'var(--fw-muted)', background: 'transparent', cursor: 'pointer', fontSize: `${financeInsightsTokens.detailSize} !important`, textAlign: 'left' },
-  '& .hi-month::after': { position: 'absolute', bottom: 0, left: '10px', width: '1px', height: '4px', content: "''", background: financeInsightsTokens.monthTick },
-  '& .hi-month:hover': { color: '#535bdf', background: '#f6f6ff' },
-  '& .hi-selection': { position: 'absolute', bottom: 0, height: '37px', border: `1px solid ${financeInsightsTokens.selection}`, borderRadius: '4px', background: financeInsightsTokens.selectionFill, pointerEvents: 'none' },
-  '& .hi-range-label': { position: 'absolute', top: '-13px', left: '3px', padding: '1px 7px', borderRadius: '4px', color: 'white', background: financeInsightsTokens.selectionLabel, boxShadow: '0 1px 3px #595fff22', fontSize: '10px', lineHeight: '19px', whiteSpace: 'nowrap' },
-  '& .hi-range-move': { position: 'absolute', inset: 0, border: 0, cursor: 'grab !important', background: 'transparent', pointerEvents: 'auto', touchAction: 'none' },
-  '& .hi-range-move:active': { cursor: 'grabbing !important' },
-  '& .hi-handle': { position: 'absolute', top: '10px', width: '6px', height: '20px', padding: 0, border: `1px solid ${financeInsightsTokens.selection}`, borderRadius: '2px', cursor: 'ew-resize !important', background: financeInsightsTokens.canvas, pointerEvents: 'auto', touchAction: 'none' },
-  '& .hi-handle::before': { position: 'absolute', inset: '-10px', content: "''" },
-  '& .hi-handle-start': { left: '-4px' },
-  '& .hi-handle-end': { right: '-4px' },
   '& .fw-title': {fontWeight: 500, fontSize: financeInsightsTokens.titleSize},
   '& .fw-selected-money': {fontWeight: 400, fontSize: '36px', letterSpacing: '-1.3px'},
   '& .fw-chart-stat strong': {fontWeight: 400, fontSize: '21px'},
