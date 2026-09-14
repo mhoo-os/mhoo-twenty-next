@@ -19,7 +19,12 @@ describe('Clover controller boundary', () => {
   const createInvitation = jest.fn();
   const controller = new CloverTokenController(
     { status: nativeStatus } as unknown as CloverTokenService,
-    { get: () => 'invitee@example.test' } as unknown as TwentyConfigService,
+    {
+      get: (key: string) =>
+        key === 'CLOVER_TOKEN_WORKSPACE_ID'
+          ? 'native-workspace'
+          : 'invitee@example.test',
+    } as unknown as TwentyConfigService,
     {
       getOneWorkspaceInvitation: existingInvitation,
       createWorkspaceInvitation: createInvitation,
@@ -68,6 +73,17 @@ describe('Clover controller boundary', () => {
   it('does not create an invitation in another Workspace', async () => {
     nativeStatus.mockResolvedValue({ enabled: false, receipt: null });
     await expect(controller.prepareInvitation(request())).rejects.toThrow();
+    expect(createInvitation).not.toHaveBeenCalled();
+  });
+
+  it('does not offer the Hass invitation in another enabled Workspace', async () => {
+    const req = request();
+    req.workspace!.id = 'another-enabled-workspace';
+    await expect(controller.status(req)).resolves.toMatchObject({
+      enabled: true,
+      canPrepareInvitation: false,
+    });
+    await expect(controller.prepareInvitation(req)).rejects.toThrow();
     expect(createInvitation).not.toHaveBeenCalled();
   });
 

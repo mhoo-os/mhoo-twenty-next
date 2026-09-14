@@ -143,7 +143,7 @@ describe('SettingsApplicationConnectionsSection', () => {
 
     expect(
       screen.getByRole('link', { name: 'Connect Clover in Account settings' }),
-    ).toHaveAttribute('href', '/settings/accounts');
+    ).toHaveAttribute('href', '/settings/accounts?connect=clover');
     expect(
       screen.queryByRole('button', { name: 'Add connection' }),
     ).not.toBeInTheDocument();
