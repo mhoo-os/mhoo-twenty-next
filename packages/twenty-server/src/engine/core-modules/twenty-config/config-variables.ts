@@ -82,6 +82,16 @@ export class ConfigVariables {
   @ConfigVariablesMetadata({
     group: ConfigVariablesGroup.ADVANCED_SETTINGS,
     description:
+      'Comma-separated native Workspace UUIDs allowed to accept independent Clover merchant tokens. Empty adds no Workspaces.',
+    type: ConfigVariableType.STRING,
+    isEnvOnly: true,
+  })
+  @IsOptional()
+  CLOVER_TOKEN_WORKSPACE_IDS = '';
+
+  @ConfigVariablesMetadata({
+    group: ConfigVariablesGroup.ADVANCED_SETTINGS,
+    description:
       'Email for the native Clover onboarding invitation. Empty disables invitation preparation. No email is sent by this action.',
     type: ConfigVariableType.STRING,
     isEnvOnly: true,
