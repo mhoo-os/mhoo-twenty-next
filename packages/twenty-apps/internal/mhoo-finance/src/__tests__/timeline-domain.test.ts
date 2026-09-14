@@ -6,6 +6,7 @@ import {
   timelineDateAt,
   timelineDayOffset,
   timelineMonthSpan,
+  validTimelineWindow,
 } from '../investigation/timeline-domain';
 
 describe('multi-year timeline domain', () => {
@@ -32,6 +33,18 @@ describe('multi-year timeline domain', () => {
         (row) => row.id,
       ),
     ).toEqual(['start', 'end']);
+  });
+
+  it('accepts only real, ordered ISO dates within the fact domain', () => {
+    const valid = (start: string, end: string) =>
+      validTimelineWindow(start, end, '2024-02-28', '2025-03-02');
+    expect(valid('2024-02-29', '2025-03-02')).toBe(true);
+    expect(valid('2024-02-28', '2024-02-28')).toBe(true);
+    expect(valid('2024-02-30', '2025-03-02')).toBe(false);
+    expect(valid('2024-2-29', '2025-03-02')).toBe(false);
+    expect(valid('2025-03-02', '2024-02-28')).toBe(false);
+    expect(valid('2024-02-27', '2025-03-02')).toBe(false);
+    expect(valid('2024-02-28', '2025-03-03')).toBe(false);
   });
 
   it('marks sparse coverage as a gap instead of silently drawing zero activity', () => {

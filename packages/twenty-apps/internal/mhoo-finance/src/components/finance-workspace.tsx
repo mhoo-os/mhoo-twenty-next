@@ -39,6 +39,7 @@ import {
   timelineDateAt,
   timelineDayOffset,
   timelineMonthSpan,
+  validTimelineWindow,
 } from '../investigation/timeline-domain';
 import { SYNTHETIC_WORKSPACE_FINANCE_DATA } from '../investigation/synthetic-workspace-data';
 import {
@@ -629,7 +630,12 @@ const Workspace = styled.section({
     flexWrap: 'wrap',
     marginBottom: '10px',
   },
-  '& .fw-date-fields': { display: 'flex', alignItems: 'center', gap: '8px' },
+  '& .fw-date-fields': {
+    display: 'flex',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: '8px',
+  },
   '& .fw-date-field': {
     display: 'flex',
     alignItems: 'center',
@@ -646,6 +652,7 @@ const Workspace = styled.section({
     background: 'var(--fw-surface)',
     fontSize: '10px',
   },
+  '& .fw-date-fields .fw-date-input': { width: '96px' },
   '& .fw-timeline-tools': {
     display: 'flex',
     alignItems: 'center',
@@ -1202,8 +1209,10 @@ const WorkspaceFinanceScreen = ({
   const [refresh, setRefresh] = useState(0);
   const [view, setView] = useState<FinanceView>(initialView);
   const [accountId, setAccountId] = useState('all');
-  const [rangeStart, setRangeStart] = useState('');
-  const [rangeEnd, setRangeEnd] = useState('');
+  const [range, setRange] = useState({ start: '', end: '' });
+  const [draftStart, setDraftStart] = useState('');
+  const [draftEnd, setDraftEnd] = useState('');
+  const [dateError, setDateError] = useState('');
   const [timelineZoom, setTimelineZoom] = useState<'month' | 'year' | 'all'>(
     'year',
   );
@@ -1243,8 +1252,12 @@ const WorkspaceFinanceScreen = ({
       const dates = validWorkspaceFacts(dataOverride)
         .map((fact) => fact.date)
         .sort();
-      setRangeStart(dates[0] ?? '');
-      setRangeEnd(dates.at(-1) ?? '');
+      const start = dates[0] ?? '';
+      const end = dates.at(-1) ?? '';
+      setRange({ start, end });
+      setDraftStart(start);
+      setDraftEnd(end);
+      setDateError('');
       return () => {
         cancelled = true;
       };
@@ -1257,8 +1270,12 @@ const WorkspaceFinanceScreen = ({
         const dates = validWorkspaceFacts(data)
           .map((fact) => fact.date)
           .sort();
-        setRangeStart((current) => current || dates[0] || '');
-        setRangeEnd((current) => current || dates.at(-1) || '');
+        setRange((current) => ({
+          start: current.start || dates[0] || '',
+          end: current.end || dates.at(-1) || '',
+        }));
+        setDraftStart((current) => current || dates[0] || '');
+        setDraftEnd((current) => current || dates.at(-1) || '');
       })
       .catch((error: unknown) => {
         if (!cancelled) setLoadState({ kind: workspaceReadFailure(error) });
@@ -1341,8 +1358,8 @@ const WorkspaceFinanceScreen = ({
     : 0;
   const liveDay = (date: string) => timelineDayOffset(domainStart, date);
   const liveDate = (day: number) => timelineDateAt(domainStart, day);
-  const activeStart = rangeStart || domainStart;
-  const activeEnd = rangeEnd || domainEnd;
+  const activeStart = range.start || domainStart;
+  const activeEnd = range.end || domainEnd;
   const scopedFacts = allFacts.filter(
     (fact) =>
       (accountId === 'all' || fact.accountId === accountId) &&
@@ -1469,8 +1486,12 @@ const WorkspaceFinanceScreen = ({
     } else {
       end = Math.max(start, Math.min(domainLast, end + delta));
     }
-    setRangeStart(liveDate(start));
-    setRangeEnd(liveDate(end));
+    const nextStart = liveDate(start);
+    const nextEnd = liveDate(end);
+    setRange({ start: nextStart, end: nextEnd });
+    setDraftStart(nextStart);
+    setDraftEnd(nextEnd);
+    setDateError('');
     setSelectedFact(null);
   };
   const startLiveDrag = (
@@ -1614,14 +1635,13 @@ const WorkspaceFinanceScreen = ({
             From
             <input
               className="fw-date-input"
-              type="date"
+              type="text"
               aria-label="Window start"
-              min={domainStart}
-              max={activeEnd}
-              value={activeStart}
+              placeholder="YYYY-MM-DD"
+              value={draftStart}
               onChange={(event) => {
-                setRangeStart(event.target.value);
-                setSelectedFact(null);
+                setDraftStart(event.target.value);
+                setDateError('');
               }}
             />
           </label>
@@ -1629,18 +1649,46 @@ const WorkspaceFinanceScreen = ({
             To
             <input
               className="fw-date-input"
-              type="date"
+              type="text"
               aria-label="Window end"
-              min={activeStart}
-              max={domainEnd}
-              value={activeEnd}
+              placeholder="YYYY-MM-DD"
+              value={draftEnd}
               onChange={(event) => {
-                setRangeEnd(event.target.value);
-                setSelectedFact(null);
+                setDraftEnd(event.target.value);
+                setDateError('');
               }}
             />
           </label>
+          <button
+            type="button"
+            className="fw-button"
+            onClick={() => {
+              if (!validTimelineWindow(draftStart, draftEnd, domainStart, domainEnd)) {
+                setDateError(`Use valid YYYY-MM-DD dates from ${domainStart} to ${domainEnd}, with From on or before To.`);
+                return;
+              }
+              setRange({ start: draftStart, end: draftEnd });
+              setSelectedFact(null);
+              setDateError('');
+            }}
+          >
+            Apply dates
+          </button>
+          <button
+            type="button"
+            className="fw-button"
+            onClick={() => {
+              setRange({ start: domainStart, end: domainEnd });
+              setDraftStart(domainStart);
+              setDraftEnd(domainEnd);
+              setSelectedFact(null);
+              setDateError('');
+            }}
+          >
+            Reset dates
+          </button>
         </div>
+        {dateError ? <span role="alert" className="fw-label">{dateError}</span> : null}
         <span className="fw-label">
           Inclusive · {isSynthetic ? 'synthetic test' : 'authorized'} records
         </span>

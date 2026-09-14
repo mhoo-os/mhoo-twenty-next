@@ -18,6 +18,21 @@ export const timelineDayOffset = (domainStart: string, date: string) =>
 export const timelineDateAt = (domainStart: string, day: number) =>
   new Date(parse(domainStart) + day * DAY_MS).toISOString().slice(0, 10);
 
+export const validTimelineWindow = (
+  start: string,
+  end: string,
+  domainStart: string,
+  domainEnd: string,
+) => {
+  try {
+    parse(start);
+    parse(end);
+    return domainStart <= start && start <= end && end <= domainEnd;
+  } catch {
+    return false;
+  }
+};
+
 export const timelineMonthSpan = (domainStart: string, domainEnd: string) =>
   (Number(domainEnd.slice(0, 4)) - Number(domainStart.slice(0, 4))) * 12 +
   Number(domainEnd.slice(5, 7)) -

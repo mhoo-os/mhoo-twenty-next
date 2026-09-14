@@ -569,3 +569,27 @@ storage-state file exists; the current browser session was not exported.
 This visual audit does not prove live bank data, customer import, Clover
 connection, other roles, recovery, or financial correctness. Those remain
 separate gated acceptance work.
+
+## 2026-09-14 date-control repair and installed readback
+
+At 06:24 UTC, the installed native `type=date` control was found to focus
+without opening a picker in Twenty Remote DOM; the earlier tab crash was not
+reproduced. The Finance date controls now use ISO text drafts, strict real-date
+and domain/order validation, and explicit Apply/Reset. The active timeline
+window changes atomically only on valid Apply, so a malformed draft cannot
+reach timeline arithmetic. Five focused timeline tests, App lint, App build
+(14 files), and `git diff --check` passed on the scoped source diff. The
+read-only remote plan showed five front-component checksum updates, zero
+additions and zero destructions; `yarn twenty apply --remote
+finance-install-20260914` synced 14 files.
+
+Installed Transactions synthetic preview was then exercised in the live Hass
+Workspace: narrowing 2024-11-29..2026-03-02 to 2025-01-01..2025-01-31 changed
+the visible count from 30 to four January test records and narrowed the brush.
+An impossible 2025-02-30 showed the validation alert and preserved the four
+records. Reset restored the full domain and 30 records, without a tab crash.
+The page was returned to Workspace records: zero authorized records and no
+synthetic fallback active. This proves the installed date-control interaction
+for the current signed-in account only; it is invalidated by the next App
+deployment, host change, or browser behavior change. It does not prove real
+bank import, role isolation, or release acceptance.
