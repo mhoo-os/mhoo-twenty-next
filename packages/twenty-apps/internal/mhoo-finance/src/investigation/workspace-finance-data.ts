@@ -85,6 +85,63 @@ export type WorkspaceFinanceData = Readonly<{
   truncated: boolean;
 }>;
 
+type WorkspaceConnection<TNode> = Readonly<{
+  pageInfo: Readonly<{ hasNextPage: boolean }>;
+  edges: readonly Readonly<{ node: TNode }>[];
+}>;
+
+type WorkspaceFinanceQueryResult = Readonly<{
+  financialAccounts?: WorkspaceConnection<Readonly<{
+    id: string;
+    accountLabel?: string | null;
+    sourceKind?: string | null;
+  }>>;
+  financeFacts?: WorkspaceConnection<Readonly<{
+    id: string;
+    factKey?: string | null;
+    description?: string | null;
+    exactAmountMinor?: string | null;
+    sourceCurrency?: string | null;
+    transactionDate?: string | null;
+    postedDate?: string | null;
+    status?: string | null;
+    classification?: string | null;
+    includedInTotals?: boolean | null;
+    sourceLocation?: string | null;
+    financialAccount?: Readonly<{ id: string; accountLabel?: string | null }> | null;
+    artifact?: Readonly<{ id: string; artifactKey?: string | null }> | null;
+  }>>;
+  sourceArtifacts?: WorkspaceConnection<Readonly<{
+    id: string;
+    artifactKey?: string | null;
+    accountKey?: string | null;
+    sourceKind?: string | null;
+    period?: string | null;
+    status?: string | null;
+    originalFileName?: string | null;
+    statementControls?: string | null;
+  }>>;
+  tasks?: WorkspaceConnection<Readonly<{
+    id: string;
+    title?: string | null;
+    status?: string | null;
+    dueAt?: string | null;
+    updatedAt?: string | null;
+    assignee?: Readonly<{ name?: Readonly<{ firstName?: string | null; lastName?: string | null }> | null }> | null;
+    financeFollowUpState?: string | null;
+    financeSubjectReferences?: string | null;
+    financePeopleContext?: string | null;
+    financeFindings?: string | null;
+    financeEvidenceReferences?: string | null;
+    financeDraftEmail?: string | null;
+    financeEmailApproval?: string | null;
+    financeScope?: string | null;
+    financeCorrelationKey?: string | null;
+    financeProvenanceHistory?: string | null;
+    financeRevision?: number | null;
+  }>>;
+}>;
+
 const EXACT_MINOR = /^-?(0|[1-9]\d*)$/;
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const optionalString = (value: unknown) =>
@@ -124,7 +181,7 @@ export const normalizeWorkspaceAmount = (
 export const readWorkspaceFinance = async (
   client = new CoreApiClient(),
 ): Promise<WorkspaceFinanceData> => {
-  const result = await client.query({
+  const result: WorkspaceFinanceQueryResult = await client.query({
     financialAccounts: {
       __args: { first: 200 },
       pageInfo: { hasNextPage: true },

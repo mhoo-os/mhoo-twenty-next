@@ -428,6 +428,19 @@ those exact-head checks without rerunning unchanged tests.
 
 ARCHITECTURE IMPACT: LOCAL
 
+### Workspace read query type completion — 2026-09-14 13:27 Bangkok
+
+The package's generated `CoreApiClient.query` declaration is `any`, leaving the
+four result-edge callbacks in `workspace-finance-data.ts` implicitly untyped.
+The query, selected fields, fallback behavior, and role/row filters were left
+unchanged. A private response type now mirrors exactly the already-selected
+account, fact, statement, and Finance-scoped Task fields before the existing
+mapping executes. Focused `workspace-finance-data.test.ts` passed 9 tests;
+package `yarn typecheck` now completed after the existing manifest build; lint
+and `git diff --check` passed. This is source typing proof only, with no live
+Workspace request, data write, authorization change, install, deployment,
+merge, or provider action.
+
 This checkpoint maps the professional-method research into the transitional
 native Twenty Finance source. It is implementation evidence, not an audit, AUP,
 tax opinion, forensic conclusion, provider authorization, or installed/runtime
