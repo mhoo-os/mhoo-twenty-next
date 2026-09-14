@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { financeInsightsPrimitiveStyles, financeInsightsTokens } from './finance-insights-styles';
+import { financeInsightsPrimitiveStyles, financeInsightsResponsiveStyles, financeInsightsTokens } from './finance-insights-styles';
 
 // Page-specific layouts; shared Overview primitives own their visual styles.
 export const Workspace = styled.section({
@@ -882,7 +882,7 @@ export const Workspace = styled.section({
     fontSize: '9px',
     lineHeight: 1.5,
   },
-}, financeInsightsPrimitiveStyles, {
+}, financeInsightsPrimitiveStyles, financeInsightsResponsiveStyles, {
   fontFamily: financeInsightsTokens.fontFamily,
   '--fw-text': financeInsightsTokens.ink, '--fw-muted': financeInsightsTokens.muted, '--fw-line': financeInsightsTokens.line,
   '--fi-frame-inline': financeInsightsTokens.frameInline,
