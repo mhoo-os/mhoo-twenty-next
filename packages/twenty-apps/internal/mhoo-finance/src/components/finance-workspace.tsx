@@ -508,7 +508,7 @@ const WorkspaceFinanceScreen = ({
   const pageSpecificActions = selectedFollowUp ? <FinanceButton onClick={() => { setSelectedFollowUp(null); setFollowUpDetailSection('summary'); setFollowUpMutation('idle'); }}>← Back to Follow-ups</FinanceButton>
     : view === 'sources' ? <FinanceButton onClick={() => setView(initialView)}>← Back to {PAGE_TITLES[initialView]}</FinanceButton>
       : view === 'followups' ? null
-        : <><FinanceButton onClick={() => setView('sources')}>+ Add source</FinanceButton>{view === 'transactions' ? <FinanceButton onClick={() => setView('followups')}>Follow-ups</FinanceButton> : null}</>;
+        : <><FinanceButton onClick={() => { setSourceHandoff(null); setView('sources'); }}>+ Add source</FinanceButton>{view === 'transactions' ? <FinanceButton onClick={() => setView('followups')}>Follow-ups</FinanceButton> : null}</>;
   const pageHeaderActions = previewAction || pageSpecificActions ? <>{previewAction}{pageSpecificActions}</> : undefined;
 
   return (
@@ -1129,23 +1129,25 @@ const WorkspaceFinanceScreen = ({
             <div className="fw-source-grid">
               {SOURCE_ROUTES.map((route) => (
                 <article className="fw-source-card" key={route.id}>
-                  <span className="fw-kicker">{route.type}</span>
-                  <h2>{route.title}</h2>
-                  <p>{route.description}</p>
-                  <button
-                    type="button"
-                    className="fw-button"
-                    onClick={() => void openSource(route.id)}
-                  >
-                    {route.action}
-                  </button>
-                  <p className="fw-local">{route.boundary}</p>
+                  <div className="fw-source-copy">
+                    <div className="fw-source-heading">
+                      <h2>{route.title}</h2>
+                      <span className="fw-source-type">{route.type}</span>
+                    </div>
+                    <p>{route.description}</p>
+                  </div>
+                  <div className="fw-source-action">
+                    <FinanceButton onClick={() => void openSource(route.id)}>
+                      {route.action}
+                    </FinanceButton>
+                    <p className="fw-local">{route.boundary}</p>
+                  </div>
                 </article>
               ))}
             </div>
             {sourceHandoff ? (
               <div className="fw-empty" role="status">
-                {sourceHandoff.result.ok
+                {sourceHandoff.result === 'handed-off'
                   ? `${SOURCE_ROUTES.find((route) => route.id === sourceHandoff.route)?.title ?? 'Source'} handoff opened.`
                   : 'Twenty could not open that source surface. No connection was changed.'}
               </div>
