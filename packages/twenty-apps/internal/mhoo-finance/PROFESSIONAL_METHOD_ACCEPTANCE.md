@@ -737,3 +737,39 @@ base `724b83a993857644c9bdf81bca95bbd1c07c8610`.
 This is local synthetic source-preview evidence only. It is not installed
 Twenty Remote DOM, live-provider, deployment, push, merge, or release
 acceptance; the direct pointer-capture host gap remains explicit.
+
+## 2026-09-15 installed readback and Add a source correction — source-only receipt
+
+The authorized Hass Kitchen session was inspected read-only at the five installed
+Finance page URLs. It renders the earlier permission-checked Workspace surface,
+not this candidate: Overview, Statements, and Follow-ups completed their reads,
+while Accounts and Transactions remained at their loading copy during the
+bounded inspection. No provider setup prompt was followed, and no Finance
+record, connection, role, credential, or Workspace metadata was changed.
+
+The official `finance-install-20260914` remote authenticated successfully, but
+the exact plan for candidate `03a9de84d09c417e481839db7b263219542c1a81`
+reported five front-component updates **and eight destroys**, including the
+installed legacy SourceArtifact/FinancialAccount relation pair and its view
+projections. The plan warns that two of those destroys drop relation-column
+data. It was not applied. The current sole preparation logic function does not
+reference either legacy relation; this is schema drift, not a missing function
+fix. A separately reviewed compatibility schema or data-migration/rollback plan
+is required before any UI-only sync can proceed.
+
+The candidate now includes Add a source in the same approved Finance library:
+four existing handoff routes (Bank, POS Clover, Uploaded statements, and Email
+evidence) render as a two-column editorial grid at desktop and a one-column
+sequence at 390px. It reuses the shared Finance button and responsive token
+layer, preserves every existing boundary statement and route action, clears a
+stale failed-handoff notice when re-entering, and correctly distinguishes
+`handed-off` from a host failure. In the local synthetic host, an Apps handoff
+returned the explicit failure/no-connection-changed message; unit tests cover
+all four Apps and Source-artifacts navigation mappings plus unsupported CSV.
+Back to Accounts was visibly exercised. Lint, typecheck/build, seven focused
+handoff tests, `git diff --check`, provenance, and the exact-head fixture passed.
+
+This remains source-preview evidence. It does not prove an installed handoff,
+provider connection, file import, customer financial data behavior, or release
+acceptance. No apply, deploy, push, merge, credential change, or provider action
+occurred.
