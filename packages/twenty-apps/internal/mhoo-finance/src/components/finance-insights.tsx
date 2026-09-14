@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import styled from '@emotion/styled';
-import { financeInsightsPrimitiveStyles, financeInsightsStyles } from './finance-insights-styles';
+import { financeInsightsPrimitiveStyles, financeInsightsResponsiveStyles, financeInsightsStyles } from './finance-insights-styles';
 import { dateDay, dayDate, monthly, scopeFacts, summarize } from './finance-insights-model.mjs';
 import type { WorkspaceFinanceData, WorkspaceFinanceFact, WorkspaceFinanceFollowUp } from '../investigation/workspace-finance-data';
 import { FinanceButton, FinanceHeader, FinanceSourceRow } from './finance-ui/finance-insights-primitives';
 import { FinancePeriodControls } from './finance-ui/finance-period-controls';
 import { formatMoney, minor } from '../contracts/money';
 
-const InsightsFrame = styled.div(financeInsightsStyles, financeInsightsPrimitiveStyles);
+const InsightsFrame = styled.div(financeInsightsStyles, financeInsightsPrimitiveStyles, financeInsightsResponsiveStyles);
 
 const money = (value: number, code = 'USD') => {
   if (!Number.isSafeInteger(Math.round(value * 100))) return '—';
