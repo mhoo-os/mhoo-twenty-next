@@ -27,6 +27,7 @@ export type ConfirmationModalProps = {
   confirmButtonAccent?: ButtonAccent;
   AdditionalButtons?: React.ReactNode;
   hideCancelButton?: boolean;
+  isClosable?: boolean;
   overlay?: ModalOverlay;
 };
 
@@ -91,6 +92,7 @@ export const ConfirmationModal = ({
   confirmButtonAccent = 'danger',
   AdditionalButtons,
   hideCancelButton = false,
+  isClosable = true,
   overlay = 'dark',
 }: ConfirmationModalProps) => {
   const { i18n, t } = useLingui();
@@ -137,7 +139,7 @@ export const ConfirmationModal = ({
         onClose?.();
       }}
       onEnter={handleEnter}
-      isClosable={true}
+      isClosable={isClosable}
       padding="large"
       overlay={overlay}
       dataGloballyPreventClickOutside
