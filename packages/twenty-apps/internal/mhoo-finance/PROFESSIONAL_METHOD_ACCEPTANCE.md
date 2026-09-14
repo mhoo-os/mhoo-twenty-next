@@ -1,5 +1,32 @@
 # Professional investigation method acceptance map
 
+## Approved Finance investigation UI source update — 2026-09-15 Asia/Bangkok
+
+Scoped source-only UI receipt for Delivery Room job
+`finance-investigation-ui-release-20260914` / MHO-7. The clean isolated
+baseline is `724b83a993857644c9bdf81bca95bbd1c07c8610`. The approved visual
+references were reviewed from `finance-demo/insights.tsx`
+(`90c90de071a8dbdef434580439cc744ae74d03b50c7eb6376dd1635f0bfba6a8`) and
+`finance-demo/insights.css`
+(`eb76d7c144d73b7084b91342188508ae1d041296a0e8cb49272d02f6288e9a55`).
+
+- `src/components/finance-workspace.tsx` now uses the approved spacious
+  white/lavender investigation treatment across the record-backed Overview,
+  Accounts, Transactions, Statements and Follow-ups screens. Overview keeps
+  the supported timeline controls, compact date disclosure, selectable month
+  columns, narrative net panel, in/out bars and exact-money display helpers.
+- Totals continue to use the existing eligible-record rule
+  (`includedInTotals` with only `SUPERSEDED` withheld), aggregate currency and
+  bigint money guards. The visual chart never changes inclusion, status,
+  truncation, currency or source-evidence behavior.
+- Synthetic data overrides now leave evidence history idle and do not issue a
+  Workspace evidence-history request. Workspace reads remain the only live
+  path; synthetic follow-up and evidence actions remain read-only.
+- Checks rerun because this source changed: `yarn typecheck`, `yarn lint`, and
+  `yarn test:unit src/__tests__/finance-workspace.test.ts` passed on
+  2026-09-15 (9 focused tests). No App sync, install, provider operation,
+  send, deploy, merge or production mutation occurred.
+
 ## Installation attempt cancelled; credential cleanup verified — 2026-09-14
 
 Guide owner requested cancellation in favor of the automatic popup deployment;
@@ -593,3 +620,35 @@ synthetic fallback active. This proves the installed date-control interaction
 for the current signed-in account only; it is invalidated by the next App
 deployment, host change, or browser behavior change. It does not prove real
 bank import, role isolation, or release acceptance.
+
+## 2026-09-15 approved Overview library extraction — source-only receipt
+
+Delivery Room `finance-investigation-ui-release-20260914` / MHO-7 continues
+from clean base `724b83a993857644c9bdf81bca95bbd1c07c8610` in the retained
+`codex/finance-approved-insights` checkout. The approved Overview was ported
+into `finance-insights.tsx`, with its tokens/styles and shared header, button,
+source-row, page-header, and period-control primitives under `src/components`.
+Overview consumes those primitives before the record-backed Accounts,
+Transactions, Statements, and Follow-ups surfaces consume the shared page
+header treatment. No duplicate navigation shell or synthetic Workspace fallback
+was added.
+
+The source preview at `http://127.0.0.1:61944/#overview` was inspected with the
+immutable synthetic fixture: the Jun–Aug 2026 frame, date/filter controls,
+compare disclosure, month drill-in, and linked source rows all rendered and
+responded. The other four source-preview routes rendered their existing
+permission-aware data, exact money/table guards, and Follow-ups workflow
+controls. Focused source checks passed: App typecheck/build, lint, 19 tests
+across workspace preparation, workspace behavior, and monthly cash movement,
+plus `git diff --check`.
+
+The Overview now derives its real-data domain from valid record dates and
+withholds chart totals when a result is truncated, mixed, unsupported, or
+outside safe plot precision; it preserves the fixed synthetic reference output.
+The raw money contracts still own display and aggregation. Pointer capture and
+geometry fallbacks were removed from the new Overview surface after inspection
+of the existing Remote DOM constraints. Local browser preview is not proof of
+installed Remote DOM behavior. No App apply/install, deployment, provider or
+live-data operation, credential action, merge, or push occurred in this
+increment. Installed pointer behavior and host support remain explicit runtime
+acceptance gaps for the coordinator.

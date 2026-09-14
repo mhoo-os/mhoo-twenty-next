@@ -1,11 +1,11 @@
-import styled from '@emotion/styled';
+import { Workspace } from './finance-workspace-styles';
 import type { RestApiClient } from 'twenty-client-sdk/rest';
-import { scaleLinear } from '@visx/scale';
-import { LinePath } from '@visx/shape';
 import { FinanceFollowUpActions } from './finance-follow-up-actions';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { FinanceInsights } from './finance-insights';
+import { FinancePageHeader } from './finance-ui/finance-insights-primitives';
 
-import { currency, formatMoney, minor } from '../contracts/money';
+import { currency, formatMoney } from '../contracts/money';
 import {
   financeFollowUpNextAction,
   financeFollowUpStateLabel,
@@ -37,7 +37,6 @@ import {
   updateWorkspaceFinanceFollowUpState,
 } from '../investigation/workspace-finance-follow-ups';
 import {
-  isSparseCoverageGap,
   timelineDateAt,
   timelineDayOffset,
   timelineMonthSpan,
@@ -45,7 +44,6 @@ import {
 } from '../investigation/timeline-domain';
 import { SYNTHETIC_WORKSPACE_FINANCE_DATA } from '../investigation/synthetic-workspace-data';
 import {
-  netMovementMinor,
   workspaceAggregateCurrency,
 } from '../investigation/workspace-aggregate';
 
@@ -69,14 +67,6 @@ const PAGE_TITLES: Readonly<Record<FinanceView, string>> = {
 // Financial link-decision writes remain disabled. Native Task follow-ups use
 // their separate caller-scoped REST workflow and do not enable this route.
 const WORKSPACE_REVIEW_MUTATIONS_ENABLED = false;
-
-const ACCOUNT_SERIES_COLORS = [
-  '#19a99b',
-  '#6273d6',
-  '#c4754d',
-  '#9172bd',
-  '#5b9e67',
-] as const;
 
 type BrushKind = 'move' | 'start' | 'end';
 
@@ -132,1074 +122,7 @@ const readableDate = (date: string) =>
     timeZone: 'UTC',
   });
 
-const Workspace = styled.section({
-  '--fw-canvas': 'var(--t-background-primary)',
-  '--fw-surface': 'var(--t-background-primary)',
-  '--fw-nav': 'var(--t-background-secondary)',
-  '--fw-text': 'var(--t-font-color-primary)',
-  '--fw-muted': 'var(--t-font-color-secondary)',
-  '--fw-line': 'var(--t-border-color-light)',
-  '--fw-accent': 'var(--t-accent-primary)',
-  '--fw-soft': 'var(--t-background-transparent-blue)',
-  '--fw-warn': 'var(--t-color-orange9)',
-  '--fw-warn-bg': 'var(--t-background-transparent-orange)',
-  '--fw-success': 'var(--t-color-green9)',
-  color: 'var(--fw-text)',
-  background: 'var(--fw-canvas)',
-  border: 0,
-  borderRadius: 0,
-  overflow: 'hidden',
-  minHeight: '640px',
-  width: '100%',
-  position: 'relative',
-  isolation: 'isolate',
-  fontFamily: 'var(--t-font-family)',
-  fontSize: '13px',
-  lineHeight: 1.45,
-  boxSizing: 'border-box',
-  '& *': { boxSizing: 'border-box' },
-  '& button, & select, & input': { font: 'inherit' },
-  '& button:disabled': { cursor: 'default', opacity: 0.5 },
-  '& button:focus-visible, & select:focus-visible, & input:focus-visible, & summary:focus-visible':
-    {
-      outline:
-        '3px solid color-mix(in srgb, var(--fw-accent) 42%, transparent)',
-      outlineOffset: '2px',
-    },
-  '& .fw-table-action': {
-    border: 0,
-    padding: 0,
-    color: 'var(--fw-text)',
-    background: 'transparent',
-    cursor: 'pointer',
-    fontWeight: 650,
-    textAlign: 'left',
-  },
-  '& .fw-table-action:hover': { color: 'var(--fw-accent)' },
-  '& .fw-chrome': {
-    minHeight: '54px',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '13px',
-    padding: '10px 18px',
-    background: 'var(--fw-surface)',
-    borderBottom: '1px solid var(--fw-line)',
-  },
-  '& .fw-logo': {
-    color: 'var(--fw-accent)',
-    fontSize: '22px',
-    fontWeight: 750,
-    letterSpacing: '-1.1px',
-  },
-  '& .fw-divider': {
-    width: '1px',
-    height: '19px',
-    background: 'var(--fw-line)',
-  },
-  '& .fw-product': { fontSize: '12px', fontWeight: 650 },
-  '& .fw-demo': {
-    marginLeft: 'auto',
-    border: '1px solid var(--fw-line)',
-    borderRadius: '5px',
-    padding: '4px 8px',
-    color: 'var(--fw-muted)',
-    fontSize: '10px',
-    letterSpacing: '.2px',
-  },
-  '& .fw-layout': {
-    display: 'grid',
-    gridTemplateColumns: '166px minmax(0, 1fr)',
-  },
-  '& .fw-nav': {
-    minWidth: 0,
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '4px',
-    padding: '22px 10px',
-    background: 'var(--fw-nav)',
-    borderRight: '1px solid var(--fw-line)',
-  },
-  '& .fw-nav-label': {
-    margin: '2px 11px 11px',
-    color: 'var(--fw-muted)',
-    fontSize: '9px',
-    fontWeight: 650,
-    letterSpacing: '1px',
-    textTransform: 'uppercase',
-  },
-  '& .fw-nav-button': {
-    minHeight: '39px',
-    width: '100%',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '9px',
-    padding: '9px 11px',
-    border: 0,
-    borderRadius: '6px',
-    color: 'var(--fw-text)',
-    background: 'transparent',
-    cursor: 'pointer',
-    textAlign: 'left',
-    fontSize: '11px',
-  },
-  '& .fw-nav-button:hover': { background: 'var(--fw-surface)' },
-  '& .fw-nav-button[aria-current="page"]': {
-    color: 'var(--fw-accent)',
-    background: 'var(--fw-surface)',
-    boxShadow: 'var(--t-box-shadow-light)',
-  },
-  '& .fw-nav-glyph': { width: '15px', textAlign: 'center', fontSize: '14px' },
-  '& .fw-nav-meta': {
-    margin: '28px 11px 0',
-    color: 'var(--fw-muted)',
-    fontSize: '9px',
-    lineHeight: 1.55,
-  },
-  '& .fw-main': { minWidth: 0, padding: '8px 4px 16px' },
-  '& .fw-top': {
-    minHeight: '38px',
-    display: 'flex',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
-    gap: '14px',
-    flexWrap: 'wrap',
-    marginBottom: '19px',
-  },
-  '& .fw-top-title': { minWidth: '170px', flex: '1 1 170px' },
-  '& .fw-title': {
-    margin: 0,
-    color: 'var(--fw-text)',
-    fontSize: '25px',
-    fontWeight: 600,
-    letterSpacing: '-.8px',
-    lineHeight: 1.2,
-  },
-  '& .fw-controls': {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    flexWrap: 'wrap',
-    gap: '7px',
-    maxWidth: '100%',
-  },
-  '& .fw-select': {
-    maxWidth: '190px',
-    border: '1px solid var(--fw-line)',
-    borderRadius: '6px',
-    padding: '7px 9px',
-    color: 'var(--fw-text)',
-    background: 'var(--fw-surface)',
-    fontSize: '11px',
-  },
-  '& .fw-metrics': {
-    display: 'grid',
-    gridTemplateColumns: '1.25fr 1fr 1fr',
-    gap: '18px',
-    paddingBottom: '21px',
-    borderBottom: '1px solid var(--fw-line)',
-  },
-  '& .fw-label': { color: 'var(--fw-muted)', fontSize: '10px' },
-  '& .fw-value': {
-    margin: '4px 0 2px',
-    fontSize: '30px',
-    fontWeight: 560,
-    letterSpacing: '-1px',
-    lineHeight: 1.25,
-    fontVariantNumeric: 'tabular-nums',
-  },
-  '& .fw-value small': {
-    color: 'var(--fw-muted)',
-    fontSize: '14px',
-    fontWeight: 450,
-    letterSpacing: 0,
-  },
-  '& .fw-sub': { color: 'var(--fw-muted)', fontSize: '9px' },
-  '& .fw-warning': { color: 'var(--fw-warn)' },
-  '& .fw-overview': {
-    display: 'grid',
-    gridTemplateColumns: 'minmax(0, 1.45fr) minmax(240px, 1fr)',
-    gap: '24px',
-    padding: '21px 0',
-    borderBottom: '1px solid var(--fw-line)',
-  },
-  '& .fw-section-head': {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: '10px',
-    marginBottom: '14px',
-  },
-  '& .fw-heading': { margin: 0, fontSize: '13px', fontWeight: 600 },
-  '& .fw-mini': {
-    border: '1px solid var(--fw-line)',
-    borderRadius: '4px',
-    padding: '3px 6px',
-    color: 'var(--fw-muted)',
-    fontSize: '9px',
-  },
-  '& .fw-chart': {
-    height: '158px',
-    display: 'grid',
-    gridTemplateColumns: '32px repeat(2, minmax(75px, 1fr))',
-    gap: '16px',
-    paddingTop: '4px',
-  },
-  '& .fw-axis': {
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-    padding: '11px 0 25px',
-    color: 'var(--fw-muted)',
-    fontSize: '9px',
-    textAlign: 'right',
-  },
-  '& .fw-month': {
-    height: '100%',
-    minWidth: 0,
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    padding: '0 10px',
-    border: 0,
-    borderRadius: '5px',
-    color: 'var(--fw-text)',
-    background: 'transparent',
-    cursor: 'pointer',
-  },
-  '& .fw-month:hover, & .fw-month[aria-pressed="true"]': {
-    background: 'var(--fw-soft)',
-  },
-  '& .fw-month-value': {
-    marginBottom: '6px',
-    fontSize: '11px',
-    fontWeight: 600,
-  },
-  '& .fw-column': {
-    width: '72%',
-    maxWidth: '92px',
-    minHeight: '2px',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'flex-end',
-    overflow: 'hidden',
-    borderRadius: '4px 4px 0 0',
-    background: 'var(--fw-accent)',
-    transition: 'height 180ms ease',
-  },
-  '& .fw-segment': {
-    display: 'block',
-    width: '100%',
-    minHeight: '1px',
-    borderBottom: '1px solid var(--fw-surface)',
-  },
-  '& .fw-segment:nth-of-type(even)': { opacity: 0.72 },
-  '& .fw-segment[data-missing="true"]': {
-    opacity: 1,
-    background: 'var(--fw-warn-bg)',
-  },
-  '& .fw-month-label': {
-    paddingTop: '7px',
-    color: 'var(--fw-muted)',
-    fontSize: '9px',
-  },
-  '& .fw-chart-key': {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '6px',
-    marginTop: '12px',
-    color: 'var(--fw-muted)',
-    fontSize: '9px',
-  },
-  '& .fw-hatch': {
-    width: '12px',
-    height: '8px',
-    border: '1px solid var(--fw-warn)',
-    background: 'var(--fw-warn-bg)',
-  },
-  '& .fw-insight': {
-    width: '100%',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '7px',
-    marginTop: '13px',
-    padding: '10px 11px',
-    border: 0,
-    borderRadius: '6px',
-    color: 'var(--fw-accent)',
-    background: 'var(--fw-soft)',
-    cursor: 'pointer',
-    textAlign: 'left',
-    fontSize: '10px',
-  },
-  '& .fw-attention': {
-    paddingLeft: '22px',
-    borderLeft: '1px solid var(--fw-line)',
-  },
-  '& .fw-queue': { display: 'grid' },
-  '& .fw-queue-row': {
-    width: '100%',
-    display: 'grid',
-    gridTemplateColumns: 'minmax(0, 1fr) auto',
-    gap: '4px 8px',
-    padding: '11px 0',
-    border: 0,
-    borderTop: '1px solid var(--fw-line)',
-    color: 'var(--fw-text)',
-    background: 'transparent',
-    cursor: 'pointer',
-    textAlign: 'left',
-  },
-  '& .fw-queue-row:hover': { color: 'var(--fw-accent)' },
-  '& .fw-queue-title': { minWidth: 0, fontSize: '10px', fontWeight: 600 },
-  '& .fw-amount': { whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' },
-  '& .fw-queue-reason': {
-    gridColumn: '1 / -1',
-    color: 'var(--fw-warn)',
-    fontSize: '9px',
-  },
-  '& .fw-queue-foot': {
-    paddingTop: '9px',
-    color: 'var(--fw-muted)',
-    fontSize: '9px',
-  },
-  '& .fw-table-head': {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: '12px',
-    padding: '17px 0 10px',
-  },
-  '& .fw-link': {
-    padding: '4px',
-    border: 0,
-    color: 'var(--fw-accent)',
-    background: 'transparent',
-    cursor: 'pointer',
-    fontSize: '9px',
-  },
-  '& .fw-table-wrap': { minWidth: 0, overflowX: 'auto' },
-  '& .fw-table': {
-    width: '100%',
-    borderCollapse: 'collapse',
-    tableLayout: 'fixed',
-    background: 'var(--fw-surface)',
-    fontSize: '10px',
-  },
-  '& .fw-table th': {
-    padding: '8px 9px',
-    borderTop: '1px solid var(--fw-line)',
-    borderBottom: '1px solid var(--fw-line)',
-    color: 'var(--fw-muted)',
-    background: 'var(--fw-nav)',
-    fontSize: '9px',
-    fontWeight: 550,
-    textAlign: 'left',
-  },
-  '& .fw-table td': {
-    height: '42px',
-    padding: '8px 9px',
-    borderBottom: '1px solid var(--fw-line)',
-    verticalAlign: 'middle',
-    overflowWrap: 'anywhere',
-  },
-  '& .fw-statement-table': { minWidth: '960px', tableLayout: 'auto' },
-  '& .fw-statement-table .fw-money-col': { width: 'auto' },
-  '& .fw-statement-table .fw-control-value': {
-    whiteSpace: 'nowrap',
-    fontVariantNumeric: 'tabular-nums',
-  },
-  '& .fw-table tbody tr[tabindex]': { cursor: 'pointer' },
-  '& .fw-table tbody tr[tabindex]:hover td': {
-    background: 'var(--fw-soft)',
-  },
-  '& .fw-check-col': { width: '34px' },
-  '& .fw-date-col': { width: '13%' },
-  '& .fw-account-col': { width: '16%' },
-  '& .fw-evidence-col': { width: '19%' },
-  '& .fw-money-col': { width: '14%', textAlign: 'right !important' },
-  '& .fw-checkbox': {
-    width: '14px',
-    height: '14px',
-    display: 'inline-block',
-    border: '1px solid var(--fw-line)',
-    borderRadius: '3px',
-    background: 'var(--fw-surface)',
-  },
-  '& .fw-status': {
-    display: 'inline-flex',
-    padding: '3px 6px',
-    borderRadius: '4px',
-    color: 'var(--fw-muted)',
-    background: 'var(--fw-nav)',
-    fontSize: '8px',
-    lineHeight: 1.35,
-  },
-  '& .fw-status[data-tone="warn"]': {
-    color: 'var(--fw-warn)',
-    background: 'var(--fw-warn-bg)',
-  },
-  '& .fw-actions': {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '7px',
-    marginBottom: '13px',
-  },
-  '& .fw-button': {
-    minHeight: '33px',
-    padding: '7px 10px',
-    border: '1px solid var(--fw-line)',
-    borderRadius: '6px',
-    color: 'var(--fw-text)',
-    background: 'var(--fw-surface)',
-    cursor: 'pointer',
-    fontSize: '10px',
-    fontWeight: 550,
-    whiteSpace: 'nowrap',
-  },
-  '& .fw-button:hover': { background: 'var(--fw-soft)' },
-  '& .fw-button[aria-pressed="true"]': {
-    color: 'var(--fw-accent)',
-    borderColor: 'var(--fw-accent)',
-  },
-  '& .fw-primary': {
-    color: 'var(--t-font-color-inverted)',
-    borderColor: 'var(--fw-accent)',
-    background: 'var(--fw-accent)',
-  },
-  '& .fw-primary:hover': {
-    filter: 'brightness(.96)',
-    background: 'var(--fw-accent)',
-  },
-  '& .fw-account-picker': { marginLeft: 'auto', minWidth: '240px' },
-  '& .fw-page-note': {
-    margin: '-8px 0 17px',
-    color: 'var(--fw-muted)',
-    fontSize: '10px',
-  },
-  '& .fw-panels': {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-    gap: '12px',
-  },
-  '& .fw-panel': {
-    minWidth: 0,
-    padding: '16px',
-    border: '1px solid var(--fw-line)',
-    borderRadius: '7px',
-    background: 'var(--fw-surface)',
-  },
-  '& .fw-panel-top': {
-    display: 'flex',
-    justifyContent: 'space-between',
-    gap: '10px',
-    alignItems: 'flex-start',
-    marginBottom: '13px',
-  },
-  '& .fw-panel-title': { margin: 0, fontSize: '12px', fontWeight: 600 },
-  '& .fw-definition': {
-    display: 'grid',
-    gridTemplateColumns: '100px minmax(0, 1fr)',
-    gap: '8px 12px',
-    margin: 0,
-    paddingTop: '12px',
-    borderTop: '1px solid var(--fw-line)',
-    fontSize: '10px',
-  },
-  '& .fw-definition dt': { color: 'var(--fw-muted)' },
-  '& .fw-definition dd': { margin: 0 },
-  '& .fw-empty': {
-    padding: '38px 16px',
-    color: 'var(--fw-muted)',
-    textAlign: 'center',
-    fontSize: '11px',
-  },
-  '& .fw-bottom': {
-    display: 'flex',
-    justifyContent: 'space-between',
-    gap: '12px',
-    alignItems: 'center',
-    paddingTop: '15px',
-    color: 'var(--fw-muted)',
-    fontSize: '8px',
-  },
-  '& .fw-details': {
-    marginTop: '13px',
-    paddingTop: '11px',
-    borderTop: '1px solid var(--fw-line)',
-    color: 'var(--fw-muted)',
-    fontSize: '9px',
-  },
-  '& .fw-details summary': { cursor: 'pointer', fontWeight: 600 },
-  '& .fw-details p': { margin: '8px 0 0', lineHeight: 1.55 },
-  '& .fw-window-tools': {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: '12px',
-    flexWrap: 'wrap',
-    marginBottom: '10px',
-  },
-  '& .fw-date-fields': {
-    display: 'flex',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    gap: '8px',
-  },
-  '& .fw-date-field': {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '6px',
-    color: 'var(--fw-muted)',
-    fontSize: '9px',
-  },
-  '& .fw-date-input': {
-    minHeight: '31px',
-    border: '1px solid var(--fw-line)',
-    borderRadius: '5px',
-    padding: '5px 7px',
-    color: 'var(--fw-text)',
-    background: 'var(--fw-surface)',
-    fontSize: '10px',
-  },
-  '& .fw-date-fields .fw-date-input': { width: '96px' },
-  '& .fw-timeline-tools': {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    flexWrap: 'wrap',
-    margin: '12px 0 8px',
-  },
-  '& .fw-timeline-scroll': {
-    width: '100%',
-    overflowX: 'auto',
-    padding: '2px 0 7px',
-    scrollbarColor: 'var(--fw-line) transparent',
-  },
-  '& .fw-timeline-canvas': {
-    minWidth: '100%',
-  },
-  '& .fw-year-labels': {
-    position: 'relative',
-    height: '18px',
-    margin: '5px 13px 0',
-    color: 'var(--fw-muted)',
-    fontSize: '10px',
-  },
-  '& .fw-year-labels span': {
-    position: 'absolute',
-    transform: 'translateX(-50%)',
-    fontVariantNumeric: 'tabular-nums',
-  },
-  '& .fw-brush': {
-    height: '47px',
-    position: 'relative',
-    margin: '0 13px',
-    border: '1px solid var(--fw-line)',
-    borderRadius: '5px',
-    background: 'var(--fw-nav)',
-    touchAction: 'none',
-    userSelect: 'none',
-  },
-  '& .fw-brush-bars': {
-    position: 'absolute',
-    inset: '7px 0',
-    display: 'flex',
-    alignItems: 'end',
-    pointerEvents: 'none',
-  },
-  '& .fw-brush-bar': {
-    flex: 1,
-    minHeight: '1px',
-    margin: '0 2%',
-    background: 'var(--fw-line)',
-  },
-  '& .fw-window-selection': {
-    position: 'absolute',
-    insetBlock: '-1px',
-    zIndex: 1,
-    padding: 0,
-    border: '1px solid var(--fw-accent)',
-    borderRadius: '4px',
-    background: 'var(--fw-soft)',
-    opacity: 0.78,
-    cursor: 'grab',
-  },
-  '& .fw-window-selection:active': { cursor: 'grabbing' },
-  '& .fw-window-handle': {
-    position: 'absolute',
-    insetBlock: '-1px',
-    zIndex: 2,
-    width: '26px',
-    marginLeft: '-13px',
-    padding: 0,
-    border: '1px solid var(--fw-accent)',
-    borderRadius: '4px',
-    color: 'var(--fw-accent)',
-    background: 'var(--fw-surface)',
-    cursor: 'ew-resize',
-    textAlign: 'center',
-    fontSize: '16px',
-  },
-  '& .fw-month-labels': {
-    display: 'flex',
-    justifyContent: 'space-around',
-    margin: '6px 0 3px',
-    color: 'var(--fw-muted)',
-    fontSize: '9px',
-  },
-  '& .fw-brush-note': {
-    display: 'flex',
-    justifyContent: 'space-between',
-    gap: '10px',
-    flexWrap: 'wrap',
-    margin: '8px 0 22px',
-    color: 'var(--fw-muted)',
-    fontSize: '9px',
-  },
-  '& .fw-insights-layout': {
-    display: 'block',
-    minWidth: 0,
-  },
-  '& .fw-selected-money': {
-    margin: '4px 0 5px',
-    fontSize: '34px',
-    fontWeight: 520,
-    letterSpacing: '-1.1px',
-    lineHeight: 1.25,
-    fontVariantNumeric: 'tabular-nums',
-  },
-  '& .fw-recap': { display: 'grid', gap: '21px', marginTop: '25px' },
-  '& .fw-recap-button': {
-    width: '100%',
-    display: 'grid',
-    gridTemplateColumns: '13px minmax(0, 1fr)',
-    gap: '7px',
-    padding: 0,
-    border: 0,
-    color: 'var(--fw-text)',
-    background: 'transparent',
-    cursor: 'pointer',
-    textAlign: 'left',
-    fontSize: '10px',
-    lineHeight: 1.5,
-  },
-  '& .fw-recap-button strong': {
-    display: 'block',
-    marginBottom: '3px',
-    fontWeight: 600,
-  },
-  '& .fw-chart-stats': {
-    display: 'flex',
-    gap: '28px',
-    flexWrap: 'wrap',
-    marginBottom: '14px',
-  },
-  '& .fw-chart-stat strong': {
-    display: 'block',
-    marginTop: '3px',
-    fontSize: '17px',
-    fontWeight: 520,
-  },
-  '& .fw-line-chart': {
-    display: 'block',
-    width: '100%',
-    height: '250px',
-    overflow: 'visible',
-  },
-  '& .fw-line-chart text': {
-    fill: 'var(--fw-muted)',
-    fontFamily: 'var(--t-font-family)',
-    fontSize: '11px',
-  },
-  '& .fw-line-chart-grid': {
-    stroke: 'var(--fw-line)',
-    strokeWidth: 1,
-    strokeDasharray: '2 4',
-  },
-  '& .fw-line-chart-path': {
-    fill: 'none',
-    stroke: 'var(--fw-accent)',
-    strokeWidth: 2.2,
-  },
-  '& .fw-line-chart-path[data-direction="in"]': {
-    stroke: 'var(--fw-success)',
-  },
-  '& .fw-line-chart-dot': {
-    fill: 'var(--fw-accent)',
-    stroke: 'var(--fw-surface)',
-    strokeWidth: 2,
-  },
-  '& .fw-line-chart-dot[data-direction="in"]': {
-    fill: 'var(--fw-success)',
-  },
-  '& .fw-movement-hero': {
-    margin: '2px 0 18px',
-    padding: '20px 4px 16px',
-    background: 'transparent',
-  },
-  '& .fw-movement-head': {
-    display: 'flex',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
-    gap: '18px',
-    marginBottom: '14px',
-  },
-  '& .fw-movement-head .fw-heading': {
-    marginBottom: '4px',
-    fontSize: '16px',
-    letterSpacing: '-.01em',
-  },
-  '& .fw-overlay-chart': {
-    display: 'block',
-    width: '100%',
-    height: 'auto',
-    overflow: 'visible',
-  },
-  '& .fw-chart-viewport': { overflowX: 'auto', overscrollBehaviorInline: 'contain' },
-  '& .fw-overlay-chart text': {
-    fill: 'var(--fw-muted)',
-    fontFamily: 'var(--t-font-family)',
-    fontSize: '12px',
-  },
-  '& .fw-chart-grid': {
-    stroke: 'color-mix(in srgb, var(--fw-line) 65%, transparent)',
-    strokeWidth: 1,
-  },
-  '& .fw-chart-zero': { stroke: 'var(--fw-muted)', strokeWidth: 1, strokeDasharray: '4 5', opacity: .55 },
-  '& .fw-chart-candle': { opacity: .22, pointerEvents: 'none' },
-  '& .fw-chart-candle-wick': { strokeWidth: 2 },
-  '& .fw-chart-candle-body': { strokeWidth: 1.5 },
-  '& .fw-series-area': { opacity: 0, pointerEvents: 'none', transition: 'opacity 160ms ease' },
-  '& .fw-series-glass': { fill: 'none', strokeWidth: 13, opacity: 0, pointerEvents: 'none', transition: 'opacity 160ms ease' },
-  '& .fw-series-path': { fill: 'none', strokeWidth: 2.8, transition: 'opacity 160ms ease, stroke-width 160ms ease' },
-  '& .fw-series-group': { transition: 'opacity 160ms ease' },
-  '& .fw-series-group:hover .fw-series-area, & .fw-series-group:focus-within .fw-series-area': { opacity: .1 },
-  '& .fw-series-group:hover .fw-series-glass, & .fw-series-group:focus-within .fw-series-glass': { opacity: .13 },
-  '& .fw-series-group:hover .fw-series-path, & .fw-series-group:focus-within .fw-series-path': { strokeWidth: 4, filter: 'drop-shadow(0px 7px 5px rgba(18, 37, 64, .22))' },
-  '& .fw-overlay-chart:has(.fw-series-group:hover) .fw-series-group:not(:hover), & .fw-overlay-chart:has(.fw-series-group:focus-within) .fw-series-group:not(:focus-within)': { opacity: .28 },
-  '& .fw-series-hit': { fill: 'none', stroke: 'transparent', strokeWidth: 20, cursor: 'pointer' },
-  '& .fw-series-dot': { stroke: 'var(--fw-surface)', strokeWidth: 2 },
-  '& .fw-series-point-hit': { fill: 'transparent', cursor: 'pointer' },
-  '& .fw-series-legend': {
-    display: 'flex',
-    flexWrap: 'wrap',
-    gap: '8px 16px',
-    marginTop: '2px',
-    color: 'var(--fw-muted)',
-    fontSize: '11px',
-  },
-  '& .fw-series-legend span': { display: 'inline-flex', alignItems: 'center', gap: '7px', padding: '5px 0', color: 'inherit' },
-  '& .fw-series-swatch': { width: '14px', height: '3px', borderRadius: '2px' },
-  '& .fw-overview-foot': {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    gap: '12px',
-    marginTop: '24px',
-    paddingTop: '15px',
-    borderTop: '1px solid var(--fw-line)',
-  },
-  '& .fw-workflow-actions form': {
-    display: 'grid',
-    gap: '12px',
-    maxWidth: '700px',
-    marginBottom: '24px',
-  },
-  '& .fw-workflow-actions label': { display: 'grid', gap: '6px' },
-  '& .fw-workflow-actions input, & .fw-workflow-actions textarea, & .fw-workflow-actions select':
-    {
-      boxSizing: 'border-box',
-      maxWidth: '100%',
-      padding: '10px',
-      border: '1px solid var(--fw-line)',
-      borderRadius: '6px',
-      background: 'var(--fw-surface)',
-      color: 'var(--fw-text)',
-      font: 'inherit',
-    },
-  '& .fw-workflow-actions textarea': { minHeight: '110px' },
-  '& .fw-followup-list': {
-    display: 'grid',
-    marginTop: '8px',
-    borderTop: '1px solid var(--fw-line)',
-  },
-  '& .fw-followup-row': {
-    minHeight: '78px',
-    display: 'grid',
-    gridTemplateColumns:
-      'minmax(260px, 1.7fr) minmax(120px, .7fr) minmax(120px, .7fr) minmax(220px, 1fr)',
-    alignItems: 'center',
-    gap: '24px',
-    padding: '18px 4px',
-    border: 0,
-    borderBottom: '1px solid var(--fw-line)',
-    color: 'var(--fw-text)',
-    background: 'var(--fw-surface)',
-    cursor: 'pointer',
-    textAlign: 'left',
-    transition: 'background calc(var(--t-animation-duration-fast) * 1s) ease',
-  },
-  '& .fw-followup-row:hover': { background: 'var(--fw-soft)' },
-  '& .fw-followup-question': {
-    display: 'block',
-    marginBottom: '4px',
-    fontSize: '14px',
-    fontWeight: 600,
-  },
-  '& .fw-followup-meta': { color: 'var(--fw-muted)', fontSize: '10px' },
-  '& .fw-followup-status': {
-    display: 'inline-flex',
-    width: 'fit-content',
-    padding: '4px 7px',
-    borderRadius: '999px',
-    color: 'var(--fw-text)',
-    background: 'var(--fw-nav)',
-    fontSize: '10px',
-  },
-  '& .fw-detail-back': { marginBottom: '18px' },
-  '& .fw-detail-heading': {
-    maxWidth: '900px',
-    marginBottom: '22px',
-    paddingBottom: '20px',
-    borderBottom: '1px solid var(--fw-line)',
-  },
-  '& .fw-detail-heading h2': {
-    maxWidth: '720px',
-    margin: '8px 0 12px',
-    fontSize: '24px',
-    fontWeight: 600,
-    letterSpacing: '-.6px',
-  },
-  '& .fw-detail-heading .fw-page-note': { margin: '8px 0 0' },
-  '& .fw-detail-tabs': {
-    display: 'flex',
-    gap: '5px',
-    overflowX: 'auto',
-    marginBottom: '24px',
-    borderBottom: '1px solid var(--fw-line)',
-  },
-  '& .fw-detail-tab': {
-    minHeight: '42px',
-    flex: '0 0 auto',
-    padding: '8px 12px',
-    border: 0,
-    borderBottom: '2px solid transparent',
-    color: 'var(--fw-muted)',
-    background: 'transparent',
-    cursor: 'pointer',
-  },
-  '& .fw-detail-tab[aria-selected="true"]': {
-    color: 'var(--fw-text)',
-    borderBottomColor: 'var(--fw-accent)',
-  },
-  '& .fw-detail-section': { maxWidth: '900px' },
-  '& .fw-detail-section h3': {
-    margin: '26px 0 8px',
-    fontSize: '13px',
-    fontWeight: 650,
-  },
-  '& .fw-detail-list': {
-    display: 'grid',
-    gap: '9px',
-    margin: 0,
-    padding: 0,
-    listStyle: 'none',
-  },
-  '& .fw-detail-item': {
-    padding: '12px 0',
-    borderBottom: '1px solid var(--fw-line)',
-  },
-  '& .fw-detail-item strong': { display: 'block', marginBottom: '3px' },
-  '& .fw-detail-actions': {
-    display: 'flex',
-    gap: '8px',
-    flexWrap: 'wrap',
-    marginTop: '24px',
-  },
-  '& .fw-email-preview': {
-    marginTop: '15px',
-    padding: '20px',
-    border: '1px solid var(--fw-line)',
-    borderRadius: '8px',
-    background: 'var(--fw-surface)',
-  },
-  '& .fw-email-body': {
-    marginTop: '16px',
-    paddingTop: '16px',
-    borderTop: '1px solid var(--fw-line)',
-    whiteSpace: 'pre-wrap',
-  },
-  '& .fw-shade': {
-    position: 'absolute',
-    inset: 0,
-    zIndex: 3,
-    background: 'var(--t-background-transparent-strong)',
-  },
-  '& .fw-drawer': {
-    position: 'absolute',
-    inset: '0 0 0 auto',
-    zIndex: 4,
-    width: 'min(430px, 100%)',
-    overflowY: 'auto',
-    padding: '23px',
-    borderLeft: '1px solid var(--fw-line)',
-    background: 'var(--fw-surface)',
-    boxShadow: 'var(--t-box-shadow-strong)',
-  },
-  '& .fw-drawer-top': {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: '12px',
-    marginBottom: '23px',
-    color: 'var(--fw-muted)',
-    fontSize: '9px',
-  },
-  '& .fw-close': {
-    border: 0,
-    color: 'var(--fw-muted)',
-    background: 'transparent',
-    cursor: 'pointer',
-    fontSize: '20px',
-  },
-  '& .fw-drawer-title': {
-    margin: '9px 0 0',
-    fontSize: '20px',
-    fontWeight: 600,
-    letterSpacing: '-.5px',
-  },
-  '& .fw-drawer-value': {
-    margin: '10px 0 3px',
-    fontSize: '34px',
-    letterSpacing: '-1px',
-    fontVariantNumeric: 'tabular-nums',
-  },
-  '& .fw-reason': {
-    margin: '19px 0',
-    padding: '12px',
-    borderRadius: '6px',
-    color: 'var(--fw-warn)',
-    background: 'var(--fw-warn-bg)',
-    fontSize: '10px',
-    lineHeight: 1.5,
-  },
-  '& .fw-raw': {
-    margin: '12px 0',
-    padding: '11px',
-    border: '1px solid var(--fw-line)',
-    borderRadius: '5px',
-    background: 'var(--fw-canvas)',
-    whiteSpace: 'pre-wrap',
-    overflowWrap: 'anywhere',
-    font: '9px/1.7 ui-monospace, SFMono-Regular, Menlo, monospace',
-  },
-  '& .fw-drawer-actions': { display: 'grid', gap: '7px', marginTop: '18px' },
-  '& .fw-drawer-actions .fw-button': { width: '100%', textAlign: 'center' },
-  '& .fw-local': {
-    marginTop: '9px',
-    color: 'var(--fw-muted)',
-    fontSize: '9px',
-    lineHeight: 1.5,
-  },
-  '@media (max-width: 850px)': {
-    '& .fw-layout': { gridTemplateColumns: '136px minmax(0, 1fr)' },
-    '& .fw-main': { padding: '20px 17px' },
-    '& .fw-overview': { gridTemplateColumns: '1fr' },
-    '& .fw-attention': { paddingLeft: 0, borderLeft: 0 },
-    '& .fw-value': { fontSize: '25px' },
-    '& .fw-account-col': { display: 'none' },
-    '& .fw-insights-layout': {
-      display: 'block',
-    },
-    '& .fw-followup-row': {
-      gridTemplateColumns:
-        'minmax(220px, 1.5fr) minmax(110px, .7fr) minmax(180px, 1fr)',
-    },
-    '& .fw-followup-owner': { display: 'none' },
-  },
-  '@media (max-width: 580px)': {
-    minHeight: 0,
-    '& .fw-layout': { display: 'block' },
-    '& .fw-nav': {
-      flexDirection: 'row',
-      overflowX: 'auto',
-      padding: '7px',
-      borderRight: 0,
-      borderBottom: '1px solid var(--fw-line)',
-    },
-    '& .fw-nav-label, & .fw-nav-meta, & .fw-nav-glyph': { display: 'none' },
-    '& .fw-nav-button': {
-      width: 'auto',
-      flex: '0 0 auto',
-      minHeight: '44px',
-      padding: '9px',
-    },
-    '& .fw-main': { padding: '17px 14px' },
-    '& .fw-top': { alignItems: 'flex-start', flexWrap: 'wrap' },
-    '& .fw-controls': { width: '100%' },
-    '& .fw-select': {
-      minHeight: '44px',
-      flex: 1,
-      minWidth: 0,
-      maxWidth: 'none',
-      fontSize: '16px',
-    },
-    '& .fw-metrics': { gridTemplateColumns: '1.15fr .85fr 1fr', gap: '9px' },
-    '& .fw-value': { fontSize: '21px' },
-    '& .fw-value small': { display: 'block', fontSize: '9px' },
-    '& .fw-chart': {
-      gridTemplateColumns: '28px repeat(2, minmax(62px, 1fr))',
-      gap: '7px',
-    },
-    '& .fw-panels': { gridTemplateColumns: '1fr' },
-    '& .fw-date-col, & .fw-date-cell, & .fw-account-col, & .fw-account-cell': {
-      display: 'none',
-    },
-    '& .fw-evidence-col': { width: '28%' },
-    '& .fw-money-col': { width: '22%' },
-    '& .fw-actions': { flexWrap: 'wrap' },
-    '& .fw-account-picker': { marginLeft: 0, minWidth: 0, width: '100%' },
-    '& .fw-bottom': { flexWrap: 'wrap' },
-    '& .fw-drawer': { padding: '19px' },
-    '& .fw-date-fields': { width: '100%' },
-    '& .fw-date-field': { flex: 1 },
-    '& .fw-date-input': {
-      minHeight: '44px',
-      minWidth: 0,
-      width: '100%',
-      fontSize: '16px',
-    },
-    '& .fw-brush': { marginInline: '22px' },
-    '& .fw-window-handle': { width: '44px', marginLeft: '-22px' },
-    '& .fw-month-labels span:nth-of-type(even)': { visibility: 'hidden' },
-    '& .fw-insights-layout': { display: 'flex', flexDirection: 'column' },
-    '& .fw-recap': {
-      gridTemplateColumns: '1fr',
-      gap: '14px',
-      marginTop: '15px',
-    },
-    '& .fw-line-chart': { height: '230px' },
-    '& .fw-movement-hero': { padding: '16px 0 13px' },
-    '& .fw-movement-head': { display: 'block' },
-    '& .fw-chart-viewport .fw-overlay-chart': { minWidth: '720px' },
-    '& .fw-followup-row': {
-      minHeight: 'auto',
-      gridTemplateColumns: '1fr',
-      gap: '8px',
-      padding: '17px 2px',
-    },
-    '& .fw-followup-owner': { display: 'block' },
-    '& .fw-email-preview': { padding: '15px' },
-  },
-  '@media (pointer: coarse)': {
-    '& .fw-window-handle': { width: '44px', marginLeft: '-22px' },
-    '& .fw-brush': { marginInline: '22px' },
-  },
-  '@media (prefers-reduced-motion: reduce)': {
-    '& *': { transition: 'none !important' },
-  },
-});
+
 
 type WorkspaceLoadState =
   | { kind: 'loading' }
@@ -1282,9 +205,13 @@ const WorkspaceFinanceScreen = ({
   const [draftStart, setDraftStart] = useState('');
   const [draftEnd, setDraftEnd] = useState('');
   const [dateError, setDateError] = useState('');
+  const [datesOpen, setDatesOpen] = useState(false);
+
   const [timelineZoom, setTimelineZoom] = useState<'month' | 'year' | 'all'>(
     'year',
   );
+
+  const [createFollowUpOpen, setCreateFollowUpOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [selectedFact, setSelectedFact] = useState<WorkspaceFinanceFact | null>(
     null,
@@ -1306,13 +233,7 @@ const WorkspaceFinanceScreen = ({
     route: SourceEntry;
     result: HandoffResult;
   } | null>(null);
-  const liveDrag = useRef<{
-    kind: BrushKind;
-    x: number;
-    width: number;
-    start: number;
-    end: number;
-  } | null>(null);
+
 
   useEffect(() => {
     let cancelled = false;
@@ -1356,7 +277,7 @@ const WorkspaceFinanceScreen = ({
 
   useEffect(() => {
     let cancelled = false;
-    if (!selectedFact?.artifactId) {
+    if (dataOverride || !selectedFact?.artifactId) {
       setEvidenceHistory({ kind: 'idle' });
       return () => {
         cancelled = true;
@@ -1375,7 +296,7 @@ const WorkspaceFinanceScreen = ({
     return () => {
       cancelled = true;
     };
-  }, [selectedFact?.artifactId, selectedFact?.id]);
+  }, [dataOverride, selectedFact?.artifactId, selectedFact?.id]);
 
   if (loadState.kind !== 'ready') {
     return (
@@ -1416,12 +337,10 @@ const WorkspaceFinanceScreen = ({
     : [];
   const allFacts = validWorkspaceFacts(data);
   const invalidFactCount = data.facts.length - allFacts.length;
-  const domainStart = allFacts.map((fact) => fact.date).sort()[0] ?? '';
-  const domainEnd =
-    allFacts
-      .map((fact) => fact.date)
-      .sort()
-      .at(-1) ?? '';
+  const firstFactDate = allFacts.map((fact) => fact.date).sort()[0] ?? '';
+  const lastFactDate = allFacts.map((fact) => fact.date).sort().at(-1) ?? '';
+  const domainStart = firstFactDate ? `${firstFactDate.slice(0, 4)}-01-01` : '';
+  const domainEnd = lastFactDate ? `${lastFactDate.slice(0, 4)}-12-31` : '';
   const domainLast = domainEnd
     ? Math.max(0, timelineDayOffset(domainStart, domainEnd))
     : 0;
@@ -1440,34 +359,6 @@ const WorkspaceFinanceScreen = ({
       view !== 'transactions' ||
       fact.description.toLowerCase().includes(search.toLowerCase()),
   );
-  const eligibleFacts = scopedFacts.filter(
-    (fact) => fact.includedInTotals && fact.status !== 'SUPERSEDED',
-  );
-  const aggregateCurrency = workspaceAggregateCurrency(
-    eligibleFacts,
-    data.truncated,
-  );
-  const aggregateAvailable = aggregateCurrency.kind === 'available';
-  const noEligibleFacts = facts.length > 0 && !eligibleFacts.length;
-  const aggregateUnavailableReason =
-    aggregateCurrency.kind === 'available' || !facts.length
-      ? null
-      : noEligibleFacts
-        ? 'No transactions are included in totals · review the inclusion state before cash movement can be calculated'
-      : aggregateCurrency.kind === 'truncated'
-        ? 'Result limit reached · totals and chart withheld'
-        : aggregateCurrency.kind === 'mixed'
-          ? 'Mixed currencies · totals and chart withheld'
-          : aggregateCurrency.kind === 'currency-unavailable'
-            ? 'Currency unavailable · totals and chart withheld'
-            : 'Money exceeds the exact supported range · totals and chart withheld';
-  const aggregateMoney = (value: string | bigint) =>
-    aggregateCurrency.kind === 'available'
-      ? formatMoney({
-          currency: aggregateCurrency.currency,
-          minor: minor(value.toString()).toString(),
-        })
-      : '—';
   const selectedAccountLabel =
     data.accounts.find((account) => account.id === accountId)?.label ?? null;
   const visibleStatements = data.statements.filter(
@@ -1476,85 +367,6 @@ const WorkspaceFinanceScreen = ({
       (!activeEnd || statement.period <= activeEnd.slice(0, 7)) &&
       (accountId === 'all' || statement.accountKey === selectedAccountLabel),
   );
-  const moneyInMinor =
-    aggregateCurrency.kind === 'available'
-      ? aggregateCurrency.moneyInMinor
-      : '0';
-  const moneyOutMinor =
-    aggregateCurrency.kind === 'available'
-      ? aggregateCurrency.moneyOutMinor
-      : '0';
-  const chartFacts = aggregateAvailable
-    ? [...eligibleFacts].sort((left, right) =>
-        left.date.localeCompare(right.date),
-      )
-    : [];
-  const chartAccountSeries = aggregateAvailable
-    ? data.accounts
-        .map((account) => {
-          let cumulative = 0n;
-          const points = chartFacts
-            .filter((fact) => fact.accountId === account.id)
-            .map((fact) => {
-              const amount = BigInt(fact.amountMinor ?? '0');
-              cumulative += fact.direction === 'in' ? amount : -amount;
-              return { fact, cumulative };
-            });
-          return { account, points };
-        })
-        .filter((lane) => lane.points.length > 0)
-        .slice(0, 5)
-    : [];
-  const chartDaySpan = Math.max(1, liveDay(activeEnd) - liveDay(activeStart) + 1);
-  const candleBucket = (date: string) =>
-    chartDaySpan > 120
-      ? date.slice(0, 7)
-      : chartDaySpan > 42
-        ? `week-${Math.floor(liveDay(date) / 7)}`
-        : date;
-  const dailyMovement = new Map<string, bigint>();
-  for (const fact of chartFacts) {
-    const delta = BigInt(fact.amountMinor ?? '0') * (fact.direction === 'in' ? 1n : -1n);
-    dailyMovement.set(fact.date, (dailyMovement.get(fact.date) ?? 0n) + delta);
-  }
-  const chartCandles: Array<{ key: string; date: string; open: bigint; high: bigint; low: bigint; close: bigint }> = [];
-  let combinedClose = 0n;
-  for (const [date, delta] of dailyMovement) {
-    const key = candleBucket(date);
-    let candle = chartCandles.at(-1);
-    if (!candle || candle.key !== key) {
-      candle = { key, date, open: combinedClose, high: combinedClose, low: combinedClose, close: combinedClose };
-      chartCandles.push(candle);
-    }
-    combinedClose += delta;
-    candle.close = combinedClose;
-    if (combinedClose > candle.high) candle.high = combinedClose;
-    if (combinedClose < candle.low) candle.low = combinedClose;
-  }
-  const chartValues = [0, ...chartAccountSeries.flatMap((series) => series.points.map((point) => Number(point.cumulative))), ...chartCandles.flatMap((candle) => [Number(candle.high), Number(candle.low)])];
-  const chartMinimum = Math.min(...chartValues);
-  const chartMaximum = Math.max(...chartValues);
-  const chartPadding = Math.max(100, (chartMaximum - chartMinimum) * .12);
-  const chartX = scaleLinear({ domain: [liveDay(activeStart), Math.max(liveDay(activeStart) + 1, liveDay(activeEnd))], range: [92, 948] });
-  const chartY = scaleLinear({ domain: [chartMinimum - chartPadding, chartMaximum + chartPadding], range: [338, 44] });
-  const chartSegments = <T extends { fact: WorkspaceFinanceFact }>(
-    points: readonly T[],
-  ) => {
-    const segments: T[][] = [];
-    for (const point of points) {
-      const segment = segments.at(-1);
-      const previous = segment?.at(-1);
-      if (
-        !segment ||
-        (previous && isSparseCoverageGap(previous.fact.date, point.fact.date))
-      ) {
-        segments.push([point]);
-      } else {
-        segment.push(point);
-      }
-    }
-    return segments;
-  };
   const domainMonths =
     domainStart && domainEnd ? timelineMonthSpan(domainStart, domainEnd) : 1;
   const timelineWidth =
@@ -1573,6 +385,25 @@ const WorkspaceFinanceScreen = ({
           (_, index) => Number(domainStart.slice(0, 4)) + index,
         )
       : [];
+  const timelineMonths = (() => {
+    if (!domainStart || !domainEnd) return [];
+    const months: Array<{ key: string; label: string; start: string; end: string }> = [];
+    const cursor = new Date(`${domainStart.slice(0, 7)}-01T00:00:00Z`);
+    const finalMonth = domainEnd.slice(0, 7);
+    while (cursor.toISOString().slice(0, 7) <= finalMonth) {
+      const key = cursor.toISOString().slice(0, 7);
+      const last = new Date(cursor);
+      last.setUTCMonth(last.getUTCMonth() + 1, 0);
+      months.push({
+        key,
+        label: cursor.toLocaleDateString('en-US', { month: 'short', timeZone: 'UTC' }),
+        start: key === domainStart.slice(0, 7) ? domainStart : `${key}-01`,
+        end: key === domainEnd.slice(0, 7) ? domainEnd : last.toISOString().slice(0, 10),
+      });
+      cursor.setUTCMonth(cursor.getUTCMonth() + 1);
+    }
+    return months;
+  })();
 
   const changeLiveWindow = (
     kind: BrushKind,
@@ -1599,36 +430,6 @@ const WorkspaceFinanceScreen = ({
     setDraftEnd(nextEnd);
     setDateError('');
     setSelectedFact(null);
-  };
-  const startLiveDrag = (
-    kind: BrushKind,
-    event: React.PointerEvent<HTMLButtonElement>,
-  ) => {
-    if (!activeStart || !activeEnd) return;
-    event.preventDefault();
-    // Remote DOM buttons do not expose setPointerCapture or layout methods.
-    // Month/year have a known width; fit-all uses a 640px estimate when
-    // Remote DOM cannot report the rendered container width.
-    const canvasWidth = timelineWidth.endsWith('px')
-      ? Number.parseInt(timelineWidth, 10)
-      : 640;
-    liveDrag.current = {
-      kind,
-      x: event.clientX,
-      width: Math.max(1, Number.isFinite(canvasWidth) ? canvasWidth - 26 : 614),
-      start: liveDay(activeStart),
-      end: liveDay(activeEnd),
-    };
-  };
-  const moveLiveDrag = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (!liveDrag.current) return;
-    const drag = liveDrag.current;
-    changeLiveWindow(
-      drag.kind,
-      Math.round(((event.clientX - drag.x) / drag.width) * (domainLast + 1)),
-      drag.start,
-      drag.end,
-    );
   };
   const liveKey = (
     kind: BrushKind,
@@ -1735,143 +536,28 @@ const WorkspaceFinanceScreen = ({
 
   const dateControls = domainStart ? (
     <>
-      <div className="fw-window-tools">
-        <div className="fw-date-fields">
-          <label className="fw-date-field">
-            From
-            <input
-              className="fw-date-input"
-              type="text"
-              aria-label="Window start"
-              placeholder="YYYY-MM-DD"
-              value={draftStart}
-              onChange={(event) => {
-                setDraftStart(event.target.value);
-                setDateError('');
-              }}
-            />
-          </label>
-          <label className="fw-date-field">
-            To
-            <input
-              className="fw-date-input"
-              type="text"
-              aria-label="Window end"
-              placeholder="YYYY-MM-DD"
-              value={draftEnd}
-              onChange={(event) => {
-                setDraftEnd(event.target.value);
-                setDateError('');
-              }}
-            />
-          </label>
-          <button
-            type="button"
-            className="fw-button"
-            onClick={() => {
-              if (!validTimelineWindow(draftStart, draftEnd, domainStart, domainEnd)) {
-                setDateError(`Use valid YYYY-MM-DD dates from ${domainStart} to ${domainEnd}, with From on or before To.`);
-                return;
-              }
-              setRange({ start: draftStart, end: draftEnd });
-              setSelectedFact(null);
-              setDateError('');
-            }}
-          >
-            Apply dates
-          </button>
-          <button
-            type="button"
-            className="fw-button"
-            onClick={() => {
-              setRange({ start: domainStart, end: domainEnd });
-              setDraftStart(domainStart);
-              setDraftEnd(domainEnd);
-              setSelectedFact(null);
-              setDateError('');
-            }}
-          >
-            Reset dates
-          </button>
-        </div>
-        {dateError ? <span role="alert" className="fw-label">{dateError}</span> : null}
-        <span className="fw-label">
-          Inclusive · {isSynthetic ? 'synthetic test' : 'authorized'} records
-        </span>
-      </div>
-      <div className="fw-timeline-tools">
-        <span className="fw-label">Visible timeline</span>
-        <select
-          className="fw-select"
-          aria-label="Timeline zoom"
-          value={timelineZoom}
-          onChange={(event) =>
-            setTimelineZoom(event.target.value as 'month' | 'year' | 'all')
-          }
-        >
-          <option value="month">Month detail</option>
-          <option value="year">Year overview</option>
-          <option value="all">Fit all history</option>
-        </select>
-        <span className="fw-label">
-          Scroll horizontally to continue across years
-        </span>
-      </div>
-      <div className="fw-timeline-scroll">
-        <div className="fw-timeline-canvas" style={{ width: timelineWidth }}>
-          <div
-            className="fw-brush"
-            aria-label="Selected date window"
-            onPointerMove={moveLiveDrag}
-            onPointerUp={() => (liveDrag.current = null)}
-            onPointerCancel={() => (liveDrag.current = null)}
-            onPointerLeave={() => (liveDrag.current = null)}
-          >
-            <button
-              type="button"
-              className="fw-window-selection"
-              aria-label="Move selected date window. Left or right arrow moves seven days."
-              style={{
-                left: `${(liveDay(activeStart) / Math.max(1, domainLast + 1)) * 100}%`,
-                width: `${((liveDay(activeEnd) - liveDay(activeStart) + 1) / Math.max(1, domainLast + 1)) * 100}%`,
-              }}
-              onPointerDown={(event) => startLiveDrag('move', event)}
-              onKeyDown={(event) => liveKey('move', event)}
-            />
-            {(['start', 'end'] as const).map((kind) => (
-              <button
-                type="button"
-                className="fw-window-handle"
-                key={kind}
-                aria-label={`Resize window ${kind}. Arrow keys change one day, Shift changes seven days.`}
-                style={{
-                  left: `${((liveDay(kind === 'start' ? activeStart : activeEnd) + (kind === 'end' ? 1 : 0)) / Math.max(1, domainLast + 1)) * 100}%`,
-                }}
-                onPointerDown={(event) => startLiveDrag(kind, event)}
-                onKeyDown={(event) => liveKey(kind, event)}
-              >
-                ‖
-              </button>
-            ))}
-          </div>
-          <div className="fw-year-labels" aria-hidden="true">
-            {timelineYears.map((year) => (
-              <span
-                key={year}
-                style={{
-                  left: `${(Math.max(0, liveDay(`${year}-01-01`)) / Math.max(1, domainLast + 1)) * 100}%`,
-                }}
-              >
-                {year}
-              </span>
-            ))}
-          </div>
+      <div className="fw-scope-toolbar">
+        <details className="fw-filter-popover"><summary className="fw-button">Filters {accountId !== 'all' ? '· 1' : ''} <span>⌄</span></summary><div className="fw-filter-body"><label>Account<select className="fw-select" aria-label="Account" value={accountId} onChange={(event) => {setAccountId(event.target.value);setSelectedFact(null);}}><option value="all">All accounts</option>{data.accounts.map((account) => <option key={account.id} value={account.id}>{account.label}</option>)}</select></label></div></details>
+        <div className="fw-window-tools">
+          <button type="button" className="fw-button" aria-expanded={datesOpen} onClick={() => setDatesOpen(!datesOpen)}>{readableDate(activeStart)} – {readableDate(activeEnd)} <span>⌄</span></button>
+
+          {datesOpen ? <div className="fw-date-popover"><div className="fw-date-fields">
+            <label className="fw-date-field">From<input className="fw-date-input" type="text" aria-label="Window start" placeholder="YYYY-MM-DD" value={draftStart} onChange={(event) => {setDraftStart(event.target.value);setDateError('');}} /></label>
+            <label className="fw-date-field">To<input className="fw-date-input" type="text" aria-label="Window end" placeholder="YYYY-MM-DD" value={draftEnd} onChange={(event) => {setDraftEnd(event.target.value);setDateError('');}} /></label>
+            <button type="button" className="fw-button" onClick={() => {if (!validTimelineWindow(draftStart,draftEnd,domainStart,domainEnd)) {setDateError(`Choose valid YYYY-MM-DD dates between ${domainStart} and ${domainEnd}, with From before To.`);return;}setRange({start:draftStart,end:draftEnd});setSelectedFact(null);setDateError('');setDatesOpen(false);}}>Apply dates</button>
+            <button type="button" className="fw-button" onClick={() => {setRange({start:domainStart,end:domainEnd});setDraftStart(domainStart);setDraftEnd(domainEnd);setSelectedFact(null);setDateError('');setDatesOpen(false);}}>All history</button>
+            <label className="fw-date-field">Timeline<select className="fw-select" aria-label="Timeline zoom" value={timelineZoom} onChange={(event) => setTimelineZoom(event.target.value as 'month' | 'year' | 'all')}><option value="month">Month detail</option><option value="year">Year overview</option><option value="all">Fit all history</option></select></label>
+          </div>{dateError ? <p role="alert" className="fw-sub">{dateError}</p> : null}</div> : null}
         </div>
       </div>
-      <div className="fw-month-labels" aria-hidden="true">
-        <span>{readableDate(domainStart)}</span>
-        <span>{readableDate(domainEnd)}</span>
-      </div>
+      <div className="fw-timeline-scroll"><div className="fw-timeline-canvas" style={{width:timelineWidth}}>
+        <div className="fw-year-labels" aria-hidden="true">{timelineYears.map((year) => <span key={year} style={{left:`${Math.max(0,liveDay(`${year}-01-01`))/(domainLast+1)*100}%`}}>{year}</span>)}</div>
+        <div className="fw-brush" aria-label="Selected date window">
+          {timelineMonths.map((month) => <button type="button" className="fw-month-choice" key={month.key} aria-label={`Select ${month.label} ${month.key.slice(0,4)}`} aria-pressed={activeStart <= month.start && activeEnd >= month.end} style={{left:`${liveDay(month.start)/(domainLast+1)*100}%`,width:`${(liveDay(month.end)-liveDay(month.start)+1)/(domainLast+1)*100}%`}} onClick={(event) => {const next={start:event.shiftKey && activeStart < month.start ? activeStart : month.start,end:event.shiftKey && activeEnd > month.end ? activeEnd : month.end};setRange(next);setDraftStart(next.start);setDraftEnd(next.end);setDateError('');setSelectedFact(null);}}>{month.label}</button>)}
+          <button type="button" className="fw-window-selection" aria-label="Move selected date window. Left or right arrow moves seven days." title="Use arrow keys to move the range; drag the edges to resize" style={{left:`${liveDay(activeStart)/(domainLast+1)*100}%`,width:`${(liveDay(activeEnd)-liveDay(activeStart)+1)/(domainLast+1)*100}%`}} onKeyDown={(event) => liveKey('move',event)}><span className="fw-range-caption">{readableDate(activeStart).replace(/, \d{4}/,'')} – {readableDate(activeEnd).replace(/, \d{4}/,'')}</span></button>
+          {(['start','end'] as const).map((kind) => <input key={kind} type="range" className="fw-native-range" aria-label={`Resize window ${kind}`} min={0} max={domainLast} step={1} value={liveDay(kind === 'start' ? activeStart : activeEnd)} onChange={(event) => {const value=Number(event.target.value);changeLiveWindow(kind,value-liveDay(kind === 'start' ? activeStart : activeEnd));}} onKeyDown={(event) => liveKey(kind,event)} />)}
+        </div>
+      </div></div>
     </>
   ) : null;
 
@@ -1919,18 +605,14 @@ const WorkspaceFinanceScreen = ({
   );
 
   return (
-    <Workspace aria-label={`${PAGE_TITLES[view]} Finance content`}>
+    <Workspace data-view={view} aria-label={`${PAGE_TITLES[view]} Finance content`}>
       <main className="fw-main">
-        <div className="fw-top">
+        {view !== 'overview' || selectedFollowUp ? <div className="fw-top">
           <div className="fw-top-title">
-            <h1 className="fw-title">
-              {selectedFollowUp ? 'Follow-up detail' : PAGE_TITLES[view]}
-            </h1>
-            <span className="fw-sub">
-              {isSynthetic
-                ? 'Synthetic test records · removable adapter'
-                : 'Current Workspace records'}
-            </span>
+            <FinancePageHeader
+              title={selectedFollowUp ? 'Follow-up detail' : PAGE_TITLES[view]}
+              detail={isSynthetic ? 'Sample data' : 'Workspace records'}
+            />
           </div>
           <div className="fw-controls">
             {onTogglePreview ? (
@@ -1965,22 +647,6 @@ const WorkspaceFinanceScreen = ({
               </button>
             ) : view === 'followups' ? null : (
               <>
-                <select
-                  className="fw-select"
-                  aria-label="Account"
-                  value={accountId}
-                  onChange={(event) => {
-                    setAccountId(event.target.value);
-                    setSelectedFact(null);
-                  }}
-                >
-                  <option value="all">All accounts</option>
-                  {data.accounts.map((account) => (
-                    <option key={account.id} value={account.id}>
-                      {account.label}
-                    </option>
-                  ))}
-                </select>
                 <button
                   type="button"
                   className="fw-button"
@@ -2000,130 +666,9 @@ const WorkspaceFinanceScreen = ({
               </>
             )}
           </div>
-        </div>
+        </div> : null}
 
-        {view === 'overview' && !selectedFollowUp ? (
-          <>
-            {dateControls}
-            <div className="fw-metrics" aria-label="Qualified cash movement">
-              <div>
-                <span className="fw-label">Money in</span>
-                <div className="fw-value">{aggregateMoney(moneyInMinor)}</div>
-              </div>
-              <div>
-                <span className="fw-label">Money out</span>
-                <div className="fw-value">{aggregateMoney(moneyOutMinor)}</div>
-              </div>
-              <div>
-                <span className="fw-label">Net movement</span>
-                <div className="fw-value">
-                  {aggregateMoney(
-                    netMovementMinor(moneyInMinor, moneyOutMinor),
-                  )}
-                </div>
-              </div>
-            </div>
-            <section className="fw-insights-layout">
-              <div className="fw-movement-hero">
-                <div className="fw-movement-head">
-                  <div>
-                    <h2 className="fw-heading">Cash movement by account</h2>
-                    <p className="fw-sub">
-                      {eligibleFacts.length} included · {facts.length} visible ·
-                      excluded and superseded records remain outside this view
-                    </p>
-                  </div>
-                </div>
-                {aggregateAvailable ? (
-                  <div className="fw-chart-viewport">
-                    <svg className="fw-overlay-chart" viewBox="0 0 980 400" role="img" aria-label={`Qualified cumulative cash movement for ${chartAccountSeries.length} accounts on one shared ${aggregateCurrency.kind === 'available' ? aggregateCurrency.currency : ''} scale; faint candles show combined period movement`}>
-                      {[0, .25, .5, .75, 1].map((fraction) => {
-                        const y = 44 + fraction * 294;
-                        const amountMinor = chartMaximum + chartPadding - fraction * (chartMaximum - chartMinimum + chartPadding * 2);
-                        const tick = aggregateCurrency.kind === 'available'
-                          ? new Intl.NumberFormat('en-US', { style: 'currency', currency: aggregateCurrency.currency, notation: 'compact', maximumFractionDigits: 1 }).format(amountMinor / 100)
-                          : '';
-                        return <g key={fraction}><line className="fw-chart-grid" x1="92" x2="948" y1={y} y2={y} /><text x="82" y={y + 4} textAnchor="end">{tick}</text></g>;
-                      })}
-                      <line className="fw-chart-zero" x1="92" x2="948" y1={chartY(0) ?? 338} y2={chartY(0) ?? 338} />
-                      {chartCandles.map((candle) => {
-                        const x = chartX(liveDay(candle.date)) ?? 92;
-                        const openY = chartY(Number(candle.open)) ?? 338;
-                        const closeY = chartY(Number(candle.close)) ?? 338;
-                        const color = candle.close >= candle.open ? '#19a99b' : '#c4754d';
-                        return (
-                          <g className="fw-chart-candle" key={candle.key}>
-                            <line className="fw-chart-candle-wick" x1={x} x2={x} y1={chartY(Number(candle.high)) ?? 338} y2={chartY(Number(candle.low)) ?? 338} stroke={color} />
-                            <rect className="fw-chart-candle-body" x={x - 5} y={Math.min(openY, closeY)} width="10" height={Math.max(3, Math.abs(closeY - openY))} rx="2" fill={color} stroke={color} />
-                          </g>
-                        );
-                      })}
-                      {chartAccountSeries.map((series, seriesIndex) => {
-                        const color = ACCOUNT_SERIES_COLORS[seriesIndex];
-                        const zeroY = chartY(0) ?? 338;
-                        return (
-                          <g className="fw-series-group" key={series.account.id}>
-                            {chartSegments(series.points).map((segment, index) => {
-                              const first = segment[0];
-                              const last = segment.at(-1);
-                              if (!first || !last) return null;
-                              const upperEdge = segment.map((point, pointIndex) => `${pointIndex === 0 ? 'M' : 'L'}${chartX(liveDay(point.fact.date)) ?? 92},${chartY(Number(point.cumulative)) ?? zeroY}`).join(' ');
-                              const area = `${upperEdge} L${chartX(liveDay(last.fact.date)) ?? 92},${zeroY} L${chartX(liveDay(first.fact.date)) ?? 92},${zeroY} Z`;
-                              return <path key={`${series.account.id}-shade-${index}`} className="fw-series-area" d={area} fill={color} />;
-                            })}
-                            {chartSegments(series.points).map((segment, index) => (
-                              <g key={`${series.account.id}-${index}`}>
-                                <LinePath className="fw-series-glass" data={segment} x={(point) => chartX(liveDay(point.fact.date)) ?? 92} y={(point) => chartY(Number(point.cumulative)) ?? 338} stroke={color} />
-                                <LinePath className="fw-series-path" data={segment} x={(point) => chartX(liveDay(point.fact.date)) ?? 92} y={(point) => chartY(Number(point.cumulative)) ?? 338} stroke={color} />
-                                <LinePath className="fw-series-hit" data={segment} x={(point) => chartX(liveDay(point.fact.date)) ?? 92} y={(point) => chartY(Number(point.cumulative)) ?? 338} stroke="transparent" />
-                              </g>
-                            ))}
-                            {series.points.map((point) => (
-                              <g key={point.fact.id}>
-                                <circle className="fw-series-dot" cx={chartX(liveDay(point.fact.date)) ?? 92} cy={chartY(Number(point.cumulative)) ?? 338} r="3" fill={color} />
-                                <circle className="fw-series-point-hit" cx={chartX(liveDay(point.fact.date)) ?? 92} cy={chartY(Number(point.cumulative)) ?? 338} r="12" role="button" tabIndex={0} aria-label={`Open ${point.fact.description} in ${series.account.label}`} onClick={() => setSelectedFact(point.fact)} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); setSelectedFact(point.fact); } }}>
-                                  <title>{`${point.fact.date} · ${series.account.label} · ${workspaceFactMoney(point.fact)}`}</title>
-                                </circle>
-                              </g>
-                            ))}
-                          </g>
-                        );
-                      })}
-                      <text x="92" y="384">{readableDate(activeStart)}</text>
-                      <text x="948" y="384" textAnchor="end">{readableDate(activeEnd)}</text>
-                    </svg>
-                  </div>
-                ) : (
-                  <div className="fw-empty" role="status">
-                    {aggregateUnavailableReason ??
-                      'No cash movement to chart in this window.'}
-                  </div>
-                )}
-                {aggregateAvailable ? (
-                  <div className="fw-series-legend">
-                    {chartAccountSeries.map((series, index) => (
-                      <span key={series.account.id}>
-                        <i
-                          className="fw-series-swatch"
-                          style={{ background: ACCOUNT_SERIES_COLORS[index] }}
-                        />
-                        {series.account.label}
-                      </span>
-                    ))}
-                    <span>Shared currency scale · faint candles: combined period movement · gaps preserve sparse coverage</span>
-                  </div>
-                ) : null}
-              </div>
-            </section>
-            {facts.length ? (
-              factTable
-            ) : (
-              <div className="fw-empty">
-                No matching Finance facts in this window.
-              </div>
-            )}
-          </>
-        ) : null}
+        {view === 'overview' && !selectedFollowUp ? <FinanceInsights data={data} isSynthetic={isSynthetic} onOpenFact={setSelectedFact} onOpenFollowUp={(task) => {setView('followups');setSelectedFollowUp(task);setFollowUpDetailSection('summary');}} /> : null}
 
         {view === 'transactions' && !selectedFollowUp ? (
           <>
@@ -2158,13 +703,15 @@ const WorkspaceFinanceScreen = ({
                   <tr>
                     <th>Account</th>
                     <th>Type</th>
-                    <th>Observed records</th>
+                    <th>Included records</th>
                     <th className="fw-money-col">Money in</th>
                     <th className="fw-money-col">Money out</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {data.accounts.map((account) => {
+                  {data.accounts
+                    .filter((account) => accountId === 'all' || account.id === accountId)
+                    .map((account) => {
                     const accountFacts = allFacts.filter(
                       (fact) =>
                         fact.accountId === account.id &&
@@ -2309,17 +856,17 @@ const WorkspaceFinanceScreen = ({
 
         {view === 'followups' && !selectedFollowUp ? (
           <>
-            <p className="fw-page-note">
-              Finance follow-ups are native Twenty Tasks with bounded Finance
-              context. A reply or checked task is not proof of reconciliation.
-            </p>
-            <FinanceFollowUpActions
+            <div className="fw-followup-toolbar">
+              <p className="fw-page-note">Track missing evidence and the next action for each review.</p>
+              <button type="button" className="fw-button" aria-expanded={createFollowUpOpen} onClick={() => setCreateFollowUpOpen((open) => !open)}>New follow-up</button>
+            </div>
+            {createFollowUpOpen ? <FinanceFollowUpActions
               section="create"
               data={data}
               disabled={isSynthetic}
               client={services?.client}
               onSaved={reloadFollowUp}
-            />
+            /> : null}
             <div className="fw-followup-list" aria-label="Finance follow-ups">
               {data.followUps.map((followUp) => (
                 <button

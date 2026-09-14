@@ -27,6 +27,14 @@ const workspaceSource = readFileSync(
   new URL('../components/finance-workspace.tsx', import.meta.url),
   'utf8',
 );
+const workspaceStyles = readFileSync(
+  new URL('../components/finance-workspace-styles.ts', import.meta.url),
+  'utf8',
+);
+const insightsSource = readFileSync(
+  new URL('../components/finance-insights.tsx', import.meta.url),
+  'utf8',
+);
 
 const frontComponentId = (layout: typeof overviewLayout) => {
   const configuration = layout.config?.tabs?.[0]?.widgets?.[0]?.configuration;
@@ -98,10 +106,10 @@ describe('native Finance workspace', () => {
   });
 
   it('uses Twenty theme tokens and no duplicate embedded shell navigation', () => {
-    expect(workspaceSource).toContain(
+    expect(workspaceStyles).toContain(
       "'--fw-text': 'var(--t-font-color-primary)'",
     );
-    expect(workspaceSource).toContain("fontFamily: 'var(--t-font-family)'");
+    expect(workspaceStyles).toContain("fontFamily: 'var(--t-font-family)'");
     expect(workspaceSource).not.toContain('<header className="fw-chrome">');
     expect(workspaceSource).not.toContain('<nav className="fw-nav"');
     expect(workspaceSource).toContain("dataSource = 'workspace'");
@@ -116,11 +124,11 @@ describe('native Finance workspace', () => {
   });
 
   it('keeps narrow headers readable and statement control values scannable', () => {
-    expect(workspaceSource).toContain('flexWrap: \'wrap\'');
+    expect(workspaceStyles).toContain('flexWrap: \'wrap\'');
     expect(workspaceSource).toContain('className="fw-top-title"');
     expect(workspaceSource).toContain('className="fw-table fw-statement-table"');
     expect(workspaceSource).toContain('Scroll the table sideways to see opening, closing, and status.');
-    expect(workspaceSource).toContain("'& .fw-statement-table': { minWidth: '960px', tableLayout: 'auto' }");
+    expect(workspaceStyles).toContain("'& .fw-statement-table': { minWidth: '960px', tableLayout: 'auto' }");
     expect(workspaceSource).toContain('No financial accounts are available in this Workspace.');
     expect(workspaceSource).toContain('No statement source artifacts are available in this Workspace.');
     expect(workspaceSource).toContain('No statement source artifacts match this window and account.');
@@ -129,12 +137,12 @@ describe('native Finance workspace', () => {
   });
 
   it('uses Remote DOM-safe drawer and timeline interactions', () => {
-    expect(workspaceSource).not.toContain('.setPointerCapture(');
-    expect(workspaceSource).not.toContain('.getBoundingClientRect(');
+    expect(insightsSource).not.toContain('.setPointerCapture(');
+    expect(insightsSource).not.toContain('.getBoundingClientRect(');
     expect(workspaceSource).not.toContain('.focus()');
     expect(workspaceSource).not.toContain('document.addEventListener');
-    expect(workspaceSource).toContain('onPointerMove={moveLiveDrag}');
-    expect(workspaceSource).toContain('onPointerCancel={() => (liveDrag.current = null)}');
+    expect(insightsSource).toContain('onPointerMove={moveDrag}');
+    expect(insightsSource).toContain('onPointerCancel={()=>drag.current=null}');
     expect(workspaceSource).toContain("isSynthetic ? 'SYNTHETIC TEST RECORD' : 'WORKSPACE RECORD'");
     expect(workspaceSource).toContain('This drawer shows sample fields only.');
   });
