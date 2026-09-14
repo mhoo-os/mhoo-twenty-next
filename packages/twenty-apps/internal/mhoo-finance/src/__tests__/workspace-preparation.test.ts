@@ -3,7 +3,10 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import account from '../objects/financial-account.object';
 import fact from '../objects/finance-fact.object';
+import artifact from '../objects/source-artifact.object';
 import coverage from '../objects/coverage-period.object';
+import financeFactKeyIndex from '../indexes/finance-fact-key.index';
+import importReceiptKeyIndex from '../indexes/import-receipt-key.index';
 import overviewNavigation from '../navigation-menu-items/finance-audit-dashboard.navigation-menu-item';
 import accountNavigation from '../navigation-menu-items/financial-accounts.navigation-menu-item';
 import transactionNavigation from '../navigation-menu-items/finance-facts.navigation-menu-item';
@@ -114,7 +117,9 @@ describe('native Finance workspace', () => {
   });
 
   it('uses the approved Overview token system and no duplicate embedded shell navigation', () => {
-    expect(workspaceStyles).toContain("import { financeInsightsTokens } from './finance-insights-styles'");
+    expect(workspaceStyles).toContain(
+      "import { financeInsightsPrimitiveStyles, financeInsightsResponsiveStyles, financeInsightsTokens } from './finance-insights-styles'",
+    );
     expect(workspaceStyles).toContain('fontFamily: financeInsightsTokens.fontFamily');
     expect(workspaceStyles).toContain("'--fi-frame-inline': financeInsightsTokens.frameInline");
     expect(workspaceStyles).toContain('fontSize: financeInsightsTokens.titleSize');
@@ -179,6 +184,44 @@ describe('native Finance workspace', () => {
     ).toMatchObject({
       relationTargetFieldMetadataUniversalIdentifier:
         I.FINANCIAL_ACCOUNT_FACTS_FIELD_UNIVERSAL_IDENTIFIER,
+    });
+  });
+
+  it('preserves installed source-account metadata and unique keys without changing current source scope', () => {
+    expect(
+      artifact.config?.fields?.find((field) => field.name === 'financialAccount'),
+    ).toMatchObject({
+      universalIdentifier:
+        I.SOURCE_ARTIFACT_FINANCIAL_ACCOUNT_FIELD_UNIVERSAL_IDENTIFIER,
+      relationTargetFieldMetadataUniversalIdentifier:
+        I.FINANCIAL_ACCOUNT_SOURCE_ARTIFACTS_FIELD_UNIVERSAL_IDENTIFIER,
+      universalSettings: { joinColumnName: 'financialAccountId' },
+    });
+    expect(
+      account.config?.fields?.find((field) => field.name === 'sourceArtifacts'),
+    ).toMatchObject({
+      universalIdentifier:
+        I.FINANCIAL_ACCOUNT_SOURCE_ARTIFACTS_FIELD_UNIVERSAL_IDENTIFIER,
+      relationTargetFieldMetadataUniversalIdentifier:
+        I.SOURCE_ARTIFACT_FINANCIAL_ACCOUNT_FIELD_UNIVERSAL_IDENTIFIER,
+    });
+    expect(financeFactKeyIndex.config).toMatchObject({
+      universalIdentifier: I.FINANCE_FACT_KEY_INDEX_UNIVERSAL_IDENTIFIER,
+      isUnique: true,
+      fields: [
+        expect.objectContaining({
+          fieldUniversalIdentifier: I.FINANCE_FACT_KEY_FIELD_UNIVERSAL_IDENTIFIER,
+        }),
+      ],
+    });
+    expect(importReceiptKeyIndex.config).toMatchObject({
+      universalIdentifier: I.IMPORT_RECEIPT_KEY_INDEX_UNIVERSAL_IDENTIFIER,
+      isUnique: true,
+      fields: [
+        expect.objectContaining({
+          fieldUniversalIdentifier: I.IMPORT_RECEIPT_KEY_FIELD_UNIVERSAL_IDENTIFIER,
+        }),
+      ],
     });
   });
 

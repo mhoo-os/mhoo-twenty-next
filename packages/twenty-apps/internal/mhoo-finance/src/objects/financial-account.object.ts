@@ -55,5 +55,19 @@ export default defineObject({
         I.FINANCE_FACT_ACCOUNT_FIELD_UNIVERSAL_IDENTIFIER,
       universalSettings: { relationType: RelationType.ONE_TO_MANY },
     },
+    {
+      universalIdentifier:
+        I.FINANCIAL_ACCOUNT_SOURCE_ARTIFACTS_FIELD_UNIVERSAL_IDENTIFIER,
+      type: FieldType.RELATION,
+      name: 'sourceArtifacts',
+      label: 'Source artifacts',
+      icon: 'IconFileDescription',
+      isNullable: true,
+      relationTargetObjectMetadataUniversalIdentifier:
+        I.SOURCE_ARTIFACT_OBJECT_UNIVERSAL_IDENTIFIER,
+      relationTargetFieldMetadataUniversalIdentifier:
+        I.SOURCE_ARTIFACT_FINANCIAL_ACCOUNT_FIELD_UNIVERSAL_IDENTIFIER,
+      universalSettings: { relationType: RelationType.ONE_TO_MANY },
+    },
   ],
 });

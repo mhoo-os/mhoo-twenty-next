@@ -1,6 +1,7 @@
 import {
   defineObject,
   FieldType,
+  OnDeleteAction,
   RelationType,
 } from 'twenty-sdk/define';
 
@@ -27,6 +28,9 @@ import {
   SOURCE_ARTIFACT_ACQUIRED_BY_FIELD_UNIVERSAL_IDENTIFIER,
   SOURCE_ARTIFACT_SUPERSEDES_FIELD_UNIVERSAL_IDENTIFIER,
   SOURCE_ARTIFACT_ACCOUNT_FIELD_UNIVERSAL_IDENTIFIER,
+  SOURCE_ARTIFACT_FINANCIAL_ACCOUNT_FIELD_UNIVERSAL_IDENTIFIER,
+  FINANCIAL_ACCOUNT_OBJECT_UNIVERSAL_IDENTIFIER,
+  FINANCIAL_ACCOUNT_SOURCE_ARTIFACTS_FIELD_UNIVERSAL_IDENTIFIER,
   SOURCE_ARTIFACT_FILES_FIELD_UNIVERSAL_IDENTIFIER,
   SOURCE_ARTIFACT_STATEMENT_CONTROLS_FIELD_UNIVERSAL_IDENTIFIER,
   SOURCE_ARTIFACT_ROW_COUNT_FIELD_UNIVERSAL_IDENTIFIER,
@@ -79,6 +83,25 @@ export default defineObject({
       label: 'Account key',
       description: 'Scoped account identity; normal presentation must use an approved masked label.',
       icon: 'IconBuildingBank',
+    },
+    {
+      universalIdentifier:
+        SOURCE_ARTIFACT_FINANCIAL_ACCOUNT_FIELD_UNIVERSAL_IDENTIFIER,
+      type: FieldType.RELATION,
+      name: 'financialAccount',
+      label: 'Financial account',
+      description: 'Required binding before a statement source can be imported.',
+      icon: 'IconBuildingBank',
+      isNullable: true,
+      relationTargetObjectMetadataUniversalIdentifier:
+        FINANCIAL_ACCOUNT_OBJECT_UNIVERSAL_IDENTIFIER,
+      relationTargetFieldMetadataUniversalIdentifier:
+        FINANCIAL_ACCOUNT_SOURCE_ARTIFACTS_FIELD_UNIVERSAL_IDENTIFIER,
+      universalSettings: {
+        relationType: RelationType.MANY_TO_ONE,
+        onDelete: OnDeleteAction.SET_NULL,
+        joinColumnName: 'financialAccountId',
+      },
     },
     {
       universalIdentifier: SOURCE_ARTIFACT_KIND_FIELD_UNIVERSAL_IDENTIFIER,
