@@ -4,11 +4,12 @@ import manualProvider from '../connection-providers/clover-manual.connection-pro
 import sandboxProvider from '../connection-providers/clover-sandbox.connection-provider';
 import cloverReaderRole from '../roles/clover-reader.role';
 import merchantRead from '../logic-functions/clover-merchant-read.logic-function';
+import dataRead from '../logic-functions/clover-data-read.logic-function';
 import paymentImport from '../logic-functions/clover-payment-import.logic-function';
 import history from '../logic-functions/clover-payment-history.logic-function';
 import recovery from '../logic-functions/clover-payment-recover.logic-function';
 
-it('binds the manual provider and exposes only the bounded merchant identity read as a tool', () => {
+it('binds the manual provider and exposes bounded Clover reads as tools', () => {
   expect(manualProvider.success).toBe(true);
   expect(manualProvider.config?.type).toBe('manualToken');
   expect(sandboxProvider.success).toBe(true);
@@ -35,6 +36,15 @@ it('binds the manual provider and exposes only the bounded merchant identity rea
     },
   });
   expect(merchantRead.config?.cronTriggerSettings).toBeUndefined();
+  expect(dataRead.success).toBe(true);
+  expect(dataRead.config?.name).toBe('clover-data-read');
+  expect(dataRead.config?.toolTriggerSettings?.inputSchema).toMatchObject({
+    type: 'object',
+    required: ['operation'],
+    additionalProperties: false,
+  });
+  expect(dataRead.config?.httpRouteTriggerSettings).toBeUndefined();
+  expect(dataRead.config?.cronTriggerSettings).toBeUndefined();
 });
 
 it('keeps payment import private and rejects interactive invocation', async () => {
