@@ -3,7 +3,7 @@ import type { RestApiClient } from 'twenty-client-sdk/rest';
 import { FinanceFollowUpActions } from './finance-follow-up-actions';
 import { useEffect, useState } from 'react';
 import { FinanceInsights } from './finance-insights';
-import { FinancePageHeader } from './finance-ui/finance-insights-primitives';
+import { FinanceButton, FinancePageHeader } from './finance-ui/finance-insights-primitives';
 import { FinancePeriodControls } from './finance-ui/finance-period-controls';
 
 import { currency, formatMoney } from '../contracts/money';
@@ -504,69 +504,17 @@ const WorkspaceFinanceScreen = ({
     </div>
   );
 
+  const previewAction = onTogglePreview ? <FinanceButton aria-pressed={isSynthetic} onClick={onTogglePreview}>{isSynthetic ? 'Return to Workspace records' : 'Preview sample data'}</FinanceButton> : null;
+  const pageSpecificActions = selectedFollowUp ? <FinanceButton onClick={() => { setSelectedFollowUp(null); setFollowUpDetailSection('summary'); setFollowUpMutation('idle'); }}>← Back to Follow-ups</FinanceButton>
+    : view === 'sources' ? <FinanceButton onClick={() => setView(initialView)}>← Back to {PAGE_TITLES[initialView]}</FinanceButton>
+      : view === 'followups' ? null
+        : <><FinanceButton onClick={() => setView('sources')}>+ Add source</FinanceButton>{view === 'transactions' ? <FinanceButton onClick={() => setView('followups')}>Follow-ups</FinanceButton> : null}</>;
+  const pageHeaderActions = previewAction || pageSpecificActions ? <>{previewAction}{pageSpecificActions}</> : undefined;
+
   return (
     <Workspace data-view={view} aria-label={`${PAGE_TITLES[view]} Finance content`}>
       <main className="fw-main">
-        {view !== 'overview' || selectedFollowUp ? <div className="fw-top">
-          <div className="fw-top-title">
-            <FinancePageHeader
-              title={selectedFollowUp ? 'Follow-up detail' : PAGE_TITLES[view]}
-              detail={isSynthetic ? 'Sample data' : 'Workspace records'}
-            />
-          </div>
-          <div className="fw-controls">
-            {onTogglePreview ? (
-              <button
-                type="button"
-                className="fw-button"
-                aria-pressed={isSynthetic}
-                onClick={onTogglePreview}
-              >
-                {isSynthetic ? 'Return to Workspace records' : 'Preview sample data'}
-              </button>
-            ) : null}
-            {selectedFollowUp ? (
-              <button
-                type="button"
-                className="fw-button"
-                onClick={() => {
-                  setSelectedFollowUp(null);
-                  setFollowUpDetailSection('summary');
-                  setFollowUpMutation('idle');
-                }}
-              >
-                ← Back to Follow-ups
-              </button>
-            ) : view === 'sources' ? (
-              <button
-                type="button"
-                className="fw-button"
-                onClick={() => setView(initialView)}
-              >
-                ← Back to {PAGE_TITLES[initialView]}
-              </button>
-            ) : view === 'followups' ? null : (
-              <>
-                <button
-                  type="button"
-                  className="fw-button"
-                  onClick={() => setView('sources')}
-                >
-                  + Add source
-                </button>
-                {view === 'transactions' ? (
-                  <button
-                    type="button"
-                    className="fw-button"
-                    onClick={() => setView('followups')}
-                  >
-                    Follow-ups
-                  </button>
-                ) : null}
-              </>
-            )}
-          </div>
-        </div> : null}
+        {view !== 'overview' || selectedFollowUp ? <FinancePageHeader title={selectedFollowUp ? 'Follow-up detail' : PAGE_TITLES[view]} detail={isSynthetic ? 'Hass Kitchen' : 'Workspace'} actions={pageHeaderActions} /> : null}
 
         {view === 'overview' && !selectedFollowUp ? <FinanceInsights data={data} isSynthetic={isSynthetic} onOpenFact={setSelectedFact} onOpenFollowUp={(task) => {setView('followups');setSelectedFollowUp(task);setFollowUpDetailSection('summary');}} /> : null}
 
@@ -575,7 +523,7 @@ const WorkspaceFinanceScreen = ({
             {dateControls}
             <div className="fw-actions">
               <input
-                className="fw-date-input"
+                className="fi-search-input"
                 aria-label="Search transactions"
                 placeholder="Search transactions"
                 value={search}

@@ -691,3 +691,25 @@ geometry remain deliberately unadapted and are **not release-ready** until the
 installed Twenty Remote DOM host is independently accepted. No App apply or
 install, deployment, provider/live-data operation, credential action, merge,
 push, or release acceptance occurred.
+
+## 2026-09-15 remaining Finance page layout rebuild — source-only receipt
+
+Accounts, Transactions, Statements, and Follow-ups now render through the
+approved Overview title structure, shared button treatment, toolbar, and exact
+calendar ruler instead of the previous secondary page-header and native-range
+style system. The reference semantic tokens now include exact type scale,
+spacing, border radii, and frame dimensions; the record-backed workspace
+imports and consumes them for its page shell, headers, controls, and tables.
+The older `fw-*` range, brush, and duplicate header styling was removed. The
+data, money guards, permissions, drawer, and native Follow-up workflow remain
+unchanged.
+
+At the same 1280px source-preview viewport, Overview, Accounts, Transactions,
+Statements, and Follow-ups were each visually inspected. The shared range
+controller was present on the three record-list pages; a synthetic Follow-up
+opened its detail view and returned through the shared title action. This is
+local browser preview evidence only, not pixel-perfect acceptance or installed
+Twenty Remote DOM proof. Direct pointer capture and geometry still require a
+separate installed-host acceptance. No App install/apply, deployment,
+provider/live-data operation, credential action, merge, push, or release
+acceptance occurred.

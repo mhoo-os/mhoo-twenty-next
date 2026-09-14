@@ -39,6 +39,10 @@ const periodControlsSource = readFileSync(
   new URL('../components/finance-ui/finance-period-controls.tsx', import.meta.url),
   'utf8',
 );
+const primitivesSource = readFileSync(
+  new URL('../components/finance-ui/finance-insights-primitives.tsx', import.meta.url),
+  'utf8',
+);
 
 const frontComponentId = (layout: typeof overviewLayout) => {
   const configuration = layout.config?.tabs?.[0]?.widgets?.[0]?.configuration;
@@ -109,11 +113,12 @@ describe('native Finance workspace', () => {
     );
   });
 
-  it('uses Twenty theme tokens and no duplicate embedded shell navigation', () => {
-    expect(workspaceStyles).toContain(
-      "'--fw-text': 'var(--t-font-color-primary)'",
-    );
-    expect(workspaceStyles).toContain("fontFamily: 'var(--t-font-family)'");
+  it('uses the approved Overview token system and no duplicate embedded shell navigation', () => {
+    expect(workspaceStyles).toContain("import { financeInsightsTokens } from './finance-insights-styles'");
+    expect(workspaceStyles).toContain('fontFamily: financeInsightsTokens.fontFamily');
+    expect(workspaceStyles).toContain("'--fi-frame-inline': financeInsightsTokens.frameInline");
+    expect(workspaceStyles).toContain('fontSize: financeInsightsTokens.titleSize');
+    expect(workspaceStyles).toContain('borderRadius: financeInsightsTokens.controlRadius');
     expect(workspaceSource).not.toContain('<header className="fw-chrome">');
     expect(workspaceSource).not.toContain('<nav className="fw-nav"');
     expect(workspaceSource).toContain("dataSource = 'workspace'");
@@ -129,7 +134,9 @@ describe('native Finance workspace', () => {
 
   it('keeps narrow headers readable and statement control values scannable', () => {
     expect(workspaceStyles).toContain('flexWrap: \'wrap\'');
-    expect(workspaceSource).toContain('className="fw-top-title"');
+    expect(workspaceSource).toContain('<FinancePageHeader title={selectedFollowUp');
+    expect(primitivesSource).toContain('className="hi-title"');
+    expect(primitivesSource).not.toContain('fi-page-header');
     expect(workspaceSource).toContain('className="fw-table fw-statement-table"');
     expect(workspaceSource).toContain('Scroll the table sideways to see opening, closing, and status.');
     expect(workspaceStyles).toContain("'& .fw-statement-table': { minWidth: '960px', tableLayout: 'auto' }");
@@ -153,6 +160,9 @@ describe('native Finance workspace', () => {
     expect(insightsSource).toContain('resetRange={defaultRange}');
     expect(workspaceSource).toContain("isSynthetic ? 'SYNTHETIC TEST RECORD' : 'WORKSPACE RECORD'");
     expect(workspaceSource).toContain('This drawer shows sample fields only.');
+    expect(workspaceStyles).not.toContain('fw-native-range');
+    expect(workspaceStyles).not.toContain('fw-window-selection');
+    expect(workspaceStyles).not.toContain('fw-month-choice');
   });
 
   it('retains both account/fact relation directions without exposing raw tables as primary navigation', () => {

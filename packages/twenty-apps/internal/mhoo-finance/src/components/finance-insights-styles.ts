@@ -6,6 +6,10 @@ export const financeInsightsTokens = {
   monthTick: '#e6e6ef', narrativeLabel: '#62657e', noteMeta: '#74778c', disclosure: '#9092a4',
   chartGrid: '#e1e2ed', chartZero: '#e0e1eb', chartLabel: '#85879b', tooltipLine: '#e5e6ef',
   incoming: '#b9bdf6', outgoing: '#dadae2', net: '#5961ff',
+  fontFamily: 'Arial, sans-serif', font: '14px/1.5 Arial, sans-serif',
+  titleSize: '25px', titleDetailSize: '17px', sectionTitleSize: '15px', controlSize: '12px', detailSize: '11px',
+  frameRadius: '14px', controlRadius: '6px', popoverRadius: '9px',
+  frameInline: '30px', titleBlockStart: '27px', titleBlockEnd: '12px', toolbarBlockEnd: '16px', contentBlock: '30px',
 } as const;
 
 export const financeInsightsStyles = String.raw`.hi{--hi-ink:${financeInsightsTokens.ink};--hi-muted:${financeInsightsTokens.muted};--hi-line:${financeInsightsTokens.line};color:var(--hi-ink);background:${financeInsightsTokens.canvas};font:14px/1.5 Arial,sans-serif;border:1px solid ${financeInsightsTokens.frame};border-radius:14px;max-width:1450px;margin:20px auto;overflow:visible;box-shadow:0 4px 30px #22223a02}
