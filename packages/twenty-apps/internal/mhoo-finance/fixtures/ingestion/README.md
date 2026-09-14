@@ -14,6 +14,14 @@ make no claim about a real institution's CSV layout or statement pagination.
   It intentionally declares observed pages 1 and 3 out of 3, so source coverage
   stays incomplete. PDF text extraction/OCR is not part of this implementation.
 
+`chase-pdf-controls.test.ts` exercises a separate, synthetic-only Chase Business
+Complete Checking summary-text profile. It fails closed on missing pages,
+unknown categories, and count/balance differences. It does not extract PDF
+bytes, retain originals, parse transaction rows, bind an account, or authorize
+a live import. A real statement still needs immutable Files custody and a
+separately proved machine-readable transaction source before coverage can be
+promoted.
+
 Run `yarn fixtures:validate-ingestion` to parse the CSV/QFX fixtures, verify
 exact arithmetic, and produce a deterministic custody summary. Missing-page
 status is input metadata for the synthetic fixture; it is not a PDF extraction
