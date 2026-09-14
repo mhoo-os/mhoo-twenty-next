@@ -1,24 +1,50 @@
 import { expect, it } from 'vitest';
 import application from '../application.config';
 import manualProvider from '../connection-providers/clover-manual.connection-provider';
+import sandboxProvider from '../connection-providers/clover-sandbox.connection-provider';
 import cloverReaderRole from '../roles/clover-reader.role';
 import merchantRead from '../logic-functions/clover-merchant-read.logic-function';
+import dataRead from '../logic-functions/clover-data-read.logic-function';
 import paymentImport from '../logic-functions/clover-payment-import.logic-function';
 import history from '../logic-functions/clover-payment-history.logic-function';
 import recovery from '../logic-functions/clover-payment-recover.logic-function';
 
-it('binds the manual provider and least-privilege App ceiling without public triggers', () => {
+it('binds the manual provider and exposes bounded Clover reads as tools', () => {
   expect(manualProvider.success).toBe(true);
   expect(manualProvider.config?.type).toBe('manualToken');
+  expect(sandboxProvider.success).toBe(true);
+  expect(sandboxProvider.config?.name).toBe('clover-manual-sandbox');
   expect(cloverReaderRole.success).toBe(true);
   expect(application.config?.defaultRoleUniversalIdentifier).toBe(
     cloverReaderRole.config?.universalIdentifier,
   );
-  expect(cloverReaderRole.config?.canAccessAllTools).toBe(false);
+  expect(cloverReaderRole.config?.canAccessAllTools).toBe(true);
+  expect(cloverReaderRole.config?.canBeAssignedToAgents).toBe(true);
   expect(merchantRead.success).toBe(true);
   expect(merchantRead.config?.httpRouteTriggerSettings).toBeUndefined();
-  expect(merchantRead.config?.toolTriggerSettings).toBeUndefined();
+  expect(merchantRead.config?.toolTriggerSettings).toEqual({
+    inputSchema: {
+      type: 'object',
+      properties: {
+        connectionId: {
+          type: 'string',
+          description:
+            'Optional Clover connection ID. Omit only when exactly one authorized Clover connection is available.',
+        },
+      },
+      additionalProperties: false,
+    },
+  });
   expect(merchantRead.config?.cronTriggerSettings).toBeUndefined();
+  expect(dataRead.success).toBe(true);
+  expect(dataRead.config?.name).toBe('clover-data-read');
+  expect(dataRead.config?.toolTriggerSettings?.inputSchema).toMatchObject({
+    type: 'object',
+    required: ['operation'],
+    additionalProperties: false,
+  });
+  expect(dataRead.config?.httpRouteTriggerSettings).toBeUndefined();
+  expect(dataRead.config?.cronTriggerSettings).toBeUndefined();
 });
 
 it('keeps payment import private and rejects interactive invocation', async () => {

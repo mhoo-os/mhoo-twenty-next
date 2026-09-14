@@ -127,3 +127,35 @@ rollback does not undo Workspace creation, invitations or stored grants.
 An older image does not know the new provider value; compatibility with new
 rows must be proved before rollback. Do not delete credentials or Workspaces
 to make an unproved rollback appear successful.
+
+## Independent Workspace connection source amendment (2026-09-14)
+
+This later source change lets the same native Clover intake serve more than one
+explicitly configured Workspace. `CLOVER_TOKEN_WORKSPACE_ID` remains the legacy
+single-Workspace setting. `CLOVER_TOKEN_WORKSPACE_IDS` adds a comma-separated
+list of Workspace UUIDs. An empty list adds no access. Neither setting grants
+membership or connection-management permission; every request still checks the
+active native Workspace, interactive member, installed Clover manual-token
+provider, and native permission. Tokens remain encrypted and scoped to the
+Workspace that submitted them.
+
+The existing configured onboarding invitee remains limited to the legacy
+single Workspace ID. Adding another Workspace to the intake list does not
+make the Hass invitation preparable there.
+
+The Clover App's production manual-token provider now shows the existing native
+merchant ID and token form directly in App connection settings. The host renders
+this form with the interactive member's bearer session because the App runtime
+cannot call the native intake endpoint as an interactive user. Twenty keeps
+Workspace authorization and encrypted credential custody; the tarball never
+receives the token. The sandbox provider is unchanged. The older Account
+settings route remains available for the existing guide link. Source checks: focused Clover
+service and Workspace-availability tests, App settings UI test, source-custody
+verification, focused lint, formatting, and front typecheck passed locally.
+This does not prove either Workspace has the new image or configuration.
+
+To activate, Infrastructure must separately review the exact immutable image,
+set the intended Workspace UUIDs through its governed configuration path, and
+verify the enabled/denied UI and credential custody in each Workspace. Do not
+reuse or copy one Workspace's merchant credential in the other. Clearing both
+settings closes intake without deleting stored connections.

@@ -11,14 +11,14 @@ export default defineApplicationRole({
   universalIdentifier: '18a77bfe-8417-46ad-8f48-69bd56010c78',
   label: 'Clover connection reader',
   description:
-    'Native connection permission ceiling; caller permissions also apply. No provider write or public trigger.',
-  canAccessAllTools: false,
+    'Native connection permission ceiling; caller permissions also apply. Allows an assigned agent to invoke the bounded Clover read catalog. No provider write or public trigger.',
+  canAccessAllTools: true,
   canReadAllObjectRecords: false,
   canUpdateAllObjectRecords: false,
   canSoftDeleteAllObjectRecords: false,
   canDestroyAllObjectRecords: false,
   canUpdateAllSettings: false,
-  canBeAssignedToAgents: false,
+  canBeAssignedToAgents: true,
   canBeAssignedToUsers: false,
   canBeAssignedToApiKeys: false,
   objectPermissions: [

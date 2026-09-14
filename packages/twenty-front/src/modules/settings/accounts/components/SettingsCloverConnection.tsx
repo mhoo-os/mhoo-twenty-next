@@ -170,7 +170,7 @@ export async function cloverRequest<T>(
   if (!response.ok) {
     if (response.status === 401 || response.status === 403) {
       throw new Error(
-        'Sign in to Hass’s Workspace with permission to manage connections.',
+        'Sign in to your Workspace with permission to manage connections.',
       );
     }
     if (response.status === 409) {
@@ -185,7 +185,13 @@ export async function cloverRequest<T>(
   return response.json();
 }
 
-const CloverForm = ({ workspaceName }: { workspaceName: string }) => {
+const CloverForm = ({
+  workspaceName,
+  showUnavailable,
+}: {
+  workspaceName: string;
+  showUnavailable: boolean;
+}) => {
   const [status, setStatus] = useState<Status | null>(null);
   const [handoff, setHandoff] = useState<Handoff | null>(null);
   const [merchantId, setMerchantId] = useState('');
@@ -208,10 +214,12 @@ const CloverForm = ({ workspaceName }: { workspaceName: string }) => {
     abort.current = controller;
     void cloverRequest<Status>('status', undefined, controller.signal)
       .then(setStatus)
-      .catch(() => {
+      .catch((failure: unknown) => {
         if (!controller.signal.aborted)
           setError(
-            'Clover connection is unavailable. Refresh or contact your Workspace administrator.',
+            failure instanceof Error
+              ? failure.message
+              : 'Clover connection is unavailable. Refresh or contact your Workspace administrator.',
           );
       });
     return () => {
@@ -219,7 +227,18 @@ const CloverForm = ({ workspaceName }: { workspaceName: string }) => {
     };
   }, []);
 
-  if (status?.enabled === false || (!status && !error)) return null;
+  if (status?.enabled === false) {
+    return showUnavailable ? (
+      <Section>
+        <H2Title title="Connect Clover" description={`For ${workspaceName}`} />
+        <p>
+          Clover connections are not enabled for this Workspace. Ask your
+          Workspace administrator to enable intake.
+        </p>
+      </Section>
+    ) : null;
+  }
+  if (!status && !error) return null;
 
   return (
     <Section>
@@ -516,13 +535,18 @@ const CloverForm = ({ workspaceName }: { workspaceName: string }) => {
   );
 };
 
-export const SettingsCloverConnection = () => {
+export const SettingsCloverConnection = ({
+  showUnavailable = false,
+}: {
+  showUnavailable?: boolean;
+}) => {
   const currentWorkspace = useAtomStateValue(currentWorkspaceState);
   // A Workspace switch destroys the form and its in-memory request state.
   return currentWorkspace ? (
     <CloverForm
       key={currentWorkspace.id}
       workspaceName={currentWorkspace.displayName ?? 'your Workspace'}
+      showUnavailable={showUnavailable}
     />
   ) : null;
 };

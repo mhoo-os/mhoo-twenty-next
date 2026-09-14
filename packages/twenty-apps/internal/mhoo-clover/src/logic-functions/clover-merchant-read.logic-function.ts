@@ -6,9 +6,21 @@ export default defineLogicFunction({
   universalIdentifier: '0b1a54c5-36b4-4fbb-b467-832d2314eec1',
   name: 'clover-merchant-read',
   description:
-    'Read the connected merchant name. Does not verify provider scopes.',
+    'Read one connected Clover merchant identity. Performs one provider read and never returns the token or payment data.',
   timeoutSeconds: 10,
-  // No public route, tool, cron, webhook or workflow trigger in this slice.
+  toolTriggerSettings: {
+    inputSchema: {
+      type: 'object',
+      properties: {
+        connectionId: {
+          type: 'string',
+          description:
+            'Optional Clover connection ID. Omit only when exactly one authorized Clover connection is available.',
+        },
+      },
+      additionalProperties: false,
+    },
+  },
   handler: async (payload: { connectionId?: string }, context) => {
     if (!context.userWorkspaceId || !context.workspaceMemberId) {
       throw new Error(

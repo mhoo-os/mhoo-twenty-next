@@ -27,6 +27,7 @@ export type ConfirmationModalProps = {
   confirmButtonAccent?: ButtonAccent;
   AdditionalButtons?: React.ReactNode;
   hideCancelButton?: boolean;
+  isClosable?: boolean;
   overlay?: ModalOverlay;
 };
 
@@ -91,6 +92,7 @@ export const ConfirmationModal = ({
   confirmButtonAccent = 'danger',
   AdditionalButtons,
   hideCancelButton = false,
+  isClosable = true,
   overlay = 'dark',
 }: ConfirmationModalProps) => {
   const { i18n, t } = useLingui();
@@ -130,14 +132,15 @@ export const ConfirmationModal = ({
     }
   };
 
+  // The wrapper's close callback is legal only in its closable branch.
+  /* oxlint-disable react/jsx-props-no-spreading */
   return (
     <ModalStatefulWrapper
       modalInstanceId={modalInstanceId}
-      onClose={() => {
-        onClose?.();
-      }}
+      {...(isClosable
+        ? { isClosable: true as const, onClose: () => onClose?.() }
+        : { isClosable: false as const })}
       onEnter={handleEnter}
-      isClosable={true}
       padding="large"
       overlay={overlay}
       dataGloballyPreventClickOutside
@@ -196,4 +199,5 @@ export const ConfirmationModal = ({
       />
     </ModalStatefulWrapper>
   );
+  /* oxlint-enable react/jsx-props-no-spreading */
 };

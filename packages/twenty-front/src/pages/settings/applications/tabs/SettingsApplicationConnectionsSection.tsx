@@ -29,6 +29,7 @@ import { useFindApplicationConnectionProviders } from '~/pages/settings/applicat
 import { useMyAppConnectedAccounts } from '~/pages/settings/applications/hooks/useMyAppConnectedAccounts';
 import { useTriggerAppOAuth } from '~/pages/settings/applications/hooks/useTriggerAppOAuth';
 import { type FrontendApplicationConnectionProvider } from '~/pages/settings/applications/types/FrontendApplicationConnectionProvider';
+import { SettingsCloverConnection } from '@/settings/accounts/components/SettingsCloverConnection';
 
 const CONNECTION_TABLE_ROW_GRID_TEMPLATE_COLUMNS =
   'minmax(0, 1fr) 160px 180px 36px';
@@ -113,6 +114,8 @@ export const SettingsApplicationConnectionsSection = ({
     <>
       {connectionProviders.map((provider) => {
         const isOAuth = provider.type === 'oauth';
+        const isCloverManualToken =
+          provider.type === 'manualToken' && provider.name === 'clover-manual';
         const isClientCredentialsConfigured =
           provider.oauth?.isClientCredentialsConfigured ?? false;
 
@@ -218,6 +221,9 @@ export const SettingsApplicationConnectionsSection = ({
                   }
                 />
               </StyledFooter>
+            )}
+            {isCloverManualToken && (
+              <SettingsCloverConnection showUnavailable />
             )}
           </Section>
         );

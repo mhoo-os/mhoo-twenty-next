@@ -123,6 +123,7 @@ export class CloverTokenController {
       ...status,
       canPrepareInvitation:
         status.enabled &&
+        actor.workspaceId === this.config.get('CLOVER_TOKEN_WORKSPACE_ID') &&
         isEmail(this.config.get('CLOVER_TOKEN_INVITEE_EMAIL')) &&
         (await this.permissions.userHasWorkspaceSettingPermission({
           userWorkspaceId: actor.userWorkspaceId,

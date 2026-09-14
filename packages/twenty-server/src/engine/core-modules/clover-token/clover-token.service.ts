@@ -24,6 +24,7 @@ import {
   CLOVER_APPLICATION,
   CLOVER_MANUAL_PROVIDER,
 } from 'src/engine/core-modules/clover-token/clover-connection.constants';
+import { isCloverIntakeEnabledForWorkspace } from 'src/engine/core-modules/clover-token/clover-workspace-availability';
 import { plaintextStringSchema } from 'src/engine/core-modules/secret-encryption/branded-strings/plaintext-string.type';
 import { SecureHttpClientService } from 'src/engine/core-modules/secure-http-client/secure-http-client.service';
 import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
@@ -61,7 +62,7 @@ export class CloverTokenService {
   ) {}
 
   async status(actor: CloverActor) {
-    if (this.config.get('CLOVER_TOKEN_WORKSPACE_ID') !== actor.workspaceId) {
+    if (!this.isEnabled(actor.workspaceId)) {
       return { enabled: false, receipt: null };
     }
 
@@ -336,7 +337,7 @@ export class CloverTokenService {
     if (
       !actor.userId ||
       !actor.userWorkspaceId ||
-      this.config.get('CLOVER_TOKEN_WORKSPACE_ID') !== actor.workspaceId
+      !this.isEnabled(actor.workspaceId)
     ) {
       throw new ForbiddenException(
         'Clover intake is unavailable for this Workspace.',
@@ -368,6 +369,14 @@ export class CloverTokenService {
         'You need permission to manage connections in this Workspace.',
       );
     }
+  }
+
+  private isEnabled(workspaceId: string): boolean {
+    return isCloverIntakeEnabledForWorkspace(
+      workspaceId,
+      this.config.get('CLOVER_TOKEN_WORKSPACE_ID'),
+      this.config.get('CLOVER_TOKEN_WORKSPACE_IDS'),
+    );
   }
 
   private async resolveBinding(manager: EntityManager, workspaceId: string) {

@@ -7,6 +7,7 @@ import { SettingsPageContainer } from '@/settings/components/SettingsPageContain
 import { SettingsSectionSkeletonLoader } from '@/settings/components/SettingsSectionSkeletonLoader';
 import { SettingsPageLayout } from '@/settings/components/layout/SettingsPageLayout';
 import { useLingui } from '@lingui/react/macro';
+import { useLocation } from 'react-router-dom';
 import { SettingsPath } from 'twenty-shared/types';
 import { getSettingsPath } from 'twenty-shared/utils';
 import { H2Title } from 'twenty-ui/typography';
@@ -14,6 +15,9 @@ import { Section } from 'twenty-ui/layout';
 
 export const SettingsAccounts = () => {
   const { t } = useLingui();
+  const { search } = useLocation();
+  const showCloverAvailability =
+    new URLSearchParams(search).get('connect') === 'clover';
 
   const { accounts: allAccounts, loading } = useMyConnectedAccounts();
 
@@ -29,7 +33,7 @@ export const SettingsAccounts = () => {
       ]}
     >
       <SettingsPageContainer>
-        <SettingsCloverConnection />
+        <SettingsCloverConnection showUnavailable={showCloverAvailability} />
         {loading ? (
           <SettingsSectionSkeletonLoader />
         ) : (

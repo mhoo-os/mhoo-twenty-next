@@ -8,6 +8,18 @@ import { useFindApplicationConnectionProviders } from '~/pages/settings/applicat
 import { useMyAppConnectedAccounts } from '~/pages/settings/applications/hooks/useMyAppConnectedAccounts';
 
 const mockTriggerAppOAuth = jest.fn();
+jest.mock('@/settings/accounts/components/SettingsCloverConnection', () => ({
+  SettingsCloverConnection: ({
+    showUnavailable,
+  }: {
+    showUnavailable: boolean;
+  }) => (
+    <div
+      data-testid="clover-connection-form"
+      data-show-unavailable={showUnavailable}
+    />
+  ),
+}));
 
 jest.mock(
   '~/pages/settings/applications/hooks/useFindApplicationConnectionProviders',
@@ -109,6 +121,44 @@ describe('SettingsApplicationConnectionsSection', () => {
     ).not.toBeInTheDocument();
     expect(
       screen.queryByRole('button', { name: 'Delete' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('shows native Workspace intake in Clover App settings', () => {
+    mockedUseFindApplicationConnectionProviders.mockReturnValue({
+      connectionProviders: [
+        {
+          id: 'clover-provider',
+          applicationId: 'app-1',
+          type: 'manualToken',
+          name: 'clover-manual',
+          displayName: 'Clover production (North America) token',
+          oauth: null,
+        },
+      ],
+      loading: false,
+      refetch: jest.fn(),
+    });
+    mockedUseMyAppConnectedAccounts.mockReturnValue({
+      accounts: [],
+      loading: false,
+      refetch: jest.fn(),
+    });
+
+    render(
+      <I18nProvider i18n={i18n}>
+        <MemoryRouter>
+          <SettingsApplicationConnectionsSection applicationId="app-1" />
+        </MemoryRouter>
+      </I18nProvider>,
+    );
+
+    expect(screen.getByTestId('clover-connection-form')).toHaveAttribute(
+      'data-show-unavailable',
+      'true',
+    );
+    expect(
+      screen.queryByRole('button', { name: 'Add connection' }),
     ).not.toBeInTheDocument();
   });
 });

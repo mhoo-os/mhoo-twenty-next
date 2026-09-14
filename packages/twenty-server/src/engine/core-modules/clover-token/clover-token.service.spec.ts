@@ -162,6 +162,25 @@ describe('native Clover token handoff', () => {
     readOnlyConfirmed: true,
   });
 
+  it('enables a second explicitly configured Workspace without changing native authorization', async () => {
+    config.mockImplementation((key: string) =>
+      key === 'CLOVER_TOKEN_WORKSPACE_ID'
+        ? randomUUID()
+        : key === 'CLOVER_TOKEN_WORKSPACE_IDS'
+          ? actor.workspaceId
+          : '',
+    );
+
+    await expect(service.status(actor)).resolves.toMatchObject({
+      enabled: true,
+    });
+    permission.mockResolvedValue(false);
+    await expect(service.begin(actor, merchantId)).rejects.toThrow(
+      'permission to manage connections',
+    );
+    expect(fetchMerchant).not.toHaveBeenCalled();
+  });
+
   it('allows another merchant and rejects only duplicate merchant custody', async () => {
     account = {
       id: randomUUID(),
