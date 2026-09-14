@@ -818,3 +818,40 @@ post-sync no-drift plan and source-custody fixture remain the release receipt
 for this commit set. This proves a safe installed front-component sync only;
 provider setup, active-user role verification, and host-control interaction
 remain explicitly blocked pending separate authority and host readiness.
+
+## 2026-09-15 installed Remote DOM timeline repair — installed receipt
+
+The installed Overview report identified a Remote DOM runtime failure during
+brush interaction: the host does not expose `setPointerCapture`. Commit
+`aa91b1664534d529f7fcc3c0dc16944f69112e55` makes pointer dragging a guarded
+browser enhancement: it only measures/captures when both browser methods are
+available and clears the drag state if the host rejects either call. The
+always-supported controls remain the month buttons, date picker, and keyboard
+arrows. This preserves the local-browser drag path without requiring unsupported
+Remote DOM APIs or claiming exact drag behavior where the host does not provide
+it.
+
+The same shared controller now gives a multi-year timeline a 48px month column
+and explicit year markers, rendered inside its horizontal scroller. A single
+12-month reference ruler keeps its natural width and existing visual treatment;
+the multi-year range retains its date-accurate position instead of compressing
+all month labels together. Focused presentation tests cover both cases, while
+the existing behavior tests retain date draft, reset, keyboard and browser-drag
+math coverage.
+
+The official `finance-install-20260914` plan reported `0 to add, 5 to change,
+0 to destroy`, updating only the five existing Finance front components. The
+authorized apply uploaded 14 files and completed `Synced Mhoo Finance (14
+files)`. Its immediate post-sync plan reports `No changes. Twenty metadata
+matches your manifest.` No Finance record, provider connection, credential,
+role/grant, object, field, relation, deployment, push, or merge changed.
+
+After an installed Overview reload, the component rendered without a
+`FrontComponent error`; the browser console returned no errors or warnings;
+and the 2021–2026 year markers and month controls rendered as separate timeline
+content. The existing host `permission-checked read` condition still disables
+month, date, keyboard, and drawer controls. Those controls were not bypassed.
+The truthful excluded-transfer empty state was retained; no aggregate was
+synthesized. `yarn lint`, `yarn typecheck`, 14 focused unit tests, and
+`git diff --check` passed. This is installed rendering proof and a safe UI-only
+sync receipt, not provider, live-data interaction, role, or release acceptance.
