@@ -143,11 +143,13 @@ The existing configured onboarding invitee remains limited to the legacy
 single Workspace ID. Adding another Workspace to the intake list does not
 make the Hass invitation preparable there.
 
-The Clover App's production manual-token provider now links from App connection
-settings to the existing `Settings → Accounts → Connect Clover` form. The
-sandbox provider is intentionally unchanged. The link carries a non-secret
-navigation hint so Account settings explains when intake is disabled instead
-of silently hiding the form. Source checks: focused Clover
+The Clover App's production manual-token provider now shows the existing native
+merchant ID and token form directly in App connection settings. The host renders
+this form with the interactive member's bearer session because the App runtime
+cannot call the native intake endpoint as an interactive user. Twenty keeps
+Workspace authorization and encrypted credential custody; the tarball never
+receives the token. The sandbox provider is unchanged. The older Account
+settings route remains available for the existing guide link. Source checks: focused Clover
 service and Workspace-availability tests, App settings UI test, source-custody
 verification, focused lint, formatting, and front typecheck passed locally.
 This does not prove either Workspace has the new image or configuration.

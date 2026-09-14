@@ -1,7 +1,6 @@
 import { styled } from '@linaria/react';
 import { useLingui } from '@lingui/react/macro';
 import { useContext } from 'react';
-import { Link } from 'react-router-dom';
 import { SettingsPath } from 'twenty-shared/types';
 import { getSettingsPath } from 'twenty-shared/utils';
 
@@ -30,6 +29,7 @@ import { useFindApplicationConnectionProviders } from '~/pages/settings/applicat
 import { useMyAppConnectedAccounts } from '~/pages/settings/applications/hooks/useMyAppConnectedAccounts';
 import { useTriggerAppOAuth } from '~/pages/settings/applications/hooks/useTriggerAppOAuth';
 import { type FrontendApplicationConnectionProvider } from '~/pages/settings/applications/types/FrontendApplicationConnectionProvider';
+import { SettingsCloverConnection } from '@/settings/accounts/components/SettingsCloverConnection';
 
 const CONNECTION_TABLE_ROW_GRID_TEMPLATE_COLUMNS =
   'minmax(0, 1fr) 160px 180px 36px';
@@ -223,13 +223,7 @@ export const SettingsApplicationConnectionsSection = ({
               </StyledFooter>
             )}
             {isCloverManualToken && (
-              <StyledFooter>
-                <Link
-                  to={`${getSettingsPath(SettingsPath.Accounts)}?connect=clover`}
-                >
-                  {t`Connect Clover in Account settings`}
-                </Link>
-              </StyledFooter>
+              <SettingsCloverConnection showUnavailable />
             )}
           </Section>
         );

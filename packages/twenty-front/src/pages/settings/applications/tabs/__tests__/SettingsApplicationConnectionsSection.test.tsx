@@ -8,6 +8,18 @@ import { useFindApplicationConnectionProviders } from '~/pages/settings/applicat
 import { useMyAppConnectedAccounts } from '~/pages/settings/applications/hooks/useMyAppConnectedAccounts';
 
 const mockTriggerAppOAuth = jest.fn();
+jest.mock('@/settings/accounts/components/SettingsCloverConnection', () => ({
+  SettingsCloverConnection: ({
+    showUnavailable,
+  }: {
+    showUnavailable: boolean;
+  }) => (
+    <div
+      data-testid="clover-connection-form"
+      data-show-unavailable={showUnavailable}
+    />
+  ),
+}));
 
 jest.mock(
   '~/pages/settings/applications/hooks/useFindApplicationConnectionProviders',
@@ -112,7 +124,7 @@ describe('SettingsApplicationConnectionsSection', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('routes the Clover manual provider to the native Workspace intake', () => {
+  it('shows native Workspace intake in Clover App settings', () => {
     mockedUseFindApplicationConnectionProviders.mockReturnValue({
       connectionProviders: [
         {
@@ -141,9 +153,10 @@ describe('SettingsApplicationConnectionsSection', () => {
       </I18nProvider>,
     );
 
-    expect(
-      screen.getByRole('link', { name: 'Connect Clover in Account settings' }),
-    ).toHaveAttribute('href', '/settings/accounts?connect=clover');
+    expect(screen.getByTestId('clover-connection-form')).toHaveAttribute(
+      'data-show-unavailable',
+      'true',
+    );
     expect(
       screen.queryByRole('button', { name: 'Add connection' }),
     ).not.toBeInTheDocument();
