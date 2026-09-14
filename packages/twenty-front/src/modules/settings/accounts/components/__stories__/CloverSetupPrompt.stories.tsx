@@ -53,7 +53,6 @@ export const NeedsSetup: Story = {
   args: {
     connectionState: 'needsSetup',
     onConnect: fn(),
-    onDismiss: fn(),
   },
 };
 
@@ -61,6 +60,5 @@ export const ReconnectRequired: Story = {
   args: {
     connectionState: 'reconnectRequired',
     onConnect: fn(),
-    onDismiss: fn(),
   },
 };

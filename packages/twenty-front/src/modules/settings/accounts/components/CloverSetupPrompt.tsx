@@ -5,25 +5,14 @@ import {
   type CloverStatus,
 } from '@/settings/accounts/components/SettingsCloverConnection';
 import { currentWorkspaceState } from '@/auth/states/currentWorkspaceState';
-import {
-  ConfirmationModal,
-  StyledCenteredButton,
-} from '@/ui/layout/modal/components/ConfirmationModal';
+import { ConfirmationModal } from '@/ui/layout/modal/components/ConfirmationModal';
 import { useModal } from '@/ui/layout/modal/hooks/useModal';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SettingsPath } from 'twenty-shared/types';
 import { useNavigateSettings } from '~/hooks/useNavigateSettings';
 
 export const CLOVER_SETUP_MODAL_ID = 'hass-clover-setup-modal';
-const DISMISSAL_VERSION = 'v1';
-
-export const getCloverSetupDismissalKey = (
-  workspaceId: string,
-  userId: string,
-) =>
-  `mhoo:clover-setup-dismissed:${DISMISSAL_VERSION}:${workspaceId}:${userId}`;
-
 const getConnectionState = (status: CloverStatus): CloverConnectionState =>
   status.connectionState ??
   ((status.receipts ?? (status.receipt ? [status.receipt] : [])).length > 0
@@ -33,11 +22,9 @@ const getConnectionState = (status: CloverStatus): CloverConnectionState =>
 export const CloverSetupPromptModal = ({
   connectionState,
   onConnect,
-  onDismiss,
 }: {
   connectionState: Exclude<CloverConnectionState, 'connected'>;
   onConnect: () => void;
-  onDismiss: () => void;
 }) => (
   <ConfirmationModal
     modalInstanceId={CLOVER_SETUP_MODAL_ID}
@@ -54,17 +41,8 @@ export const CloverSetupPromptModal = ({
     }
     confirmButtonAccent="green"
     hideCancelButton
-    onClose={onDismiss}
+    isClosable={false}
     onConfirmClick={onConnect}
-    AdditionalButtons={
-      <StyledCenteredButton
-        title="Do this later"
-        variant="secondary"
-        fullWidth
-        justify="center"
-        onClick={onDismiss}
-      />
-    }
   />
 );
 
@@ -72,31 +50,9 @@ export const CloverSetupPrompt = () => {
   const currentWorkspace = useAtomStateValue(currentWorkspaceState);
   const currentUser = useAtomStateValue(currentUserState);
   const navigateSettings = useNavigateSettings();
-  const { closeModal, openModal } = useModal();
+  const { openModal } = useModal();
   const [connectionState, setConnectionState] =
     useState<CloverConnectionState | null>(null);
-  const [isDismissed, setIsDismissed] = useState(true);
-  const dismissalKey = useMemo(
-    () =>
-      currentWorkspace && currentUser
-        ? getCloverSetupDismissalKey(currentWorkspace.id, currentUser.id)
-        : null,
-    [currentUser, currentWorkspace],
-  );
-
-  useEffect(() => {
-    if (!dismissalKey) return;
-    setIsDismissed(localStorage.getItem(dismissalKey) === 'true');
-    const onStorage = (event: StorageEvent) => {
-      if (event.key !== dismissalKey) return;
-      const dismissed = event.newValue === 'true';
-      setIsDismissed(dismissed);
-      if (dismissed) closeModal(CLOVER_SETUP_MODAL_ID);
-    };
-    window.addEventListener('storage', onStorage);
-    return () => window.removeEventListener('storage', onStorage);
-  }, [closeModal, dismissalKey]);
-
   useEffect(() => {
     if (!currentWorkspace || !currentUser) return;
     const controller = new AbortController();
@@ -118,28 +74,15 @@ export const CloverSetupPrompt = () => {
 
   useEffect(() => {
     if (
-      !isDismissed &&
-      (connectionState === 'needsSetup' ||
-        connectionState === 'reconnectRequired')
+      connectionState === 'needsSetup' ||
+      connectionState === 'reconnectRequired'
     )
       openModal(CLOVER_SETUP_MODAL_ID);
-  }, [connectionState, isDismissed, openModal]);
-
-  useEffect(() => {
-    if (connectionState !== 'connected' || !dismissalKey) return;
-    localStorage.removeItem(dismissalKey);
-    setIsDismissed(false);
-  }, [connectionState, dismissalKey]);
-
-  const dismiss = useCallback(() => {
-    if (dismissalKey) localStorage.setItem(dismissalKey, 'true');
-    setIsDismissed(true);
-  }, [dismissalKey]);
+  }, [connectionState, openModal]);
 
   if (
-    isDismissed ||
-    (connectionState !== 'needsSetup' &&
-      connectionState !== 'reconnectRequired')
+    connectionState !== 'needsSetup' &&
+    connectionState !== 'reconnectRequired'
   )
     return null;
 
@@ -155,10 +98,6 @@ export const CloverSetupPrompt = () => {
           'clover',
         )
       }
-      onDismiss={() => {
-        dismiss();
-        closeModal(CLOVER_SETUP_MODAL_ID);
-      }}
     />
   );
 };
