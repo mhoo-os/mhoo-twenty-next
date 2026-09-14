@@ -149,6 +149,8 @@ describe('native Finance workspace', () => {
     expect(workspaceSource).not.toContain('document.addEventListener');
     expect(periodControlsSource).toContain('onPointerMove={moveDrag}');
     expect(periodControlsSource).toContain('onPointerCancel={() => { drag.current = null; }}');
+    expect(periodControlsSource).toContain('type="submit" className="hi-primary"');
+    expect(insightsSource).toContain('resetRange={defaultRange}');
     expect(workspaceSource).toContain("isSynthetic ? 'SYNTHETIC TEST RECORD' : 'WORKSPACE RECORD'");
     expect(workspaceSource).toContain('This drawer shows sample fields only.');
   });

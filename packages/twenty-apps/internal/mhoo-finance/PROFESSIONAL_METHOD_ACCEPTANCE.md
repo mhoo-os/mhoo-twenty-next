@@ -670,3 +670,24 @@ and measured-width calculation rather than a guarded or hard-coded substitute.
 That restores local-browser semantics but leaves Twenty Remote DOM support an
 explicit, unproved host-runtime gap. This correction is restricted to Milestone
 1 and does not claim the remaining page-layout rebuild is accepted.
+
+## 2026-09-15 Milestone 1 control-behavior correction — source-only receipt
+
+The shared controller now explicitly submits date Apply, surfaces invalid
+drafts through its parent error state, and accepts a supplied reset range. The
+approved Overview supplies its Jun 1–Aug 31 2026 initial scope, while the
+record-backed views retain their own full-domain reset scope. Its range logic
+is isolated in a non-JSX behavior module with focused tests covering valid
+Apply, invalid-range feedback, Overview Reset, and an exact measured-width
+brush displacement; the rendered controller consumes those same functions.
+
+The approved palette is now exported as the exact named semantic token map,
+and the one `FinancePageHeader` primitive parameterizes both the original
+Overview heading markup and the record-backed page header. Local source preview
+exercise verified Apply (Jun–Aug to Jul), Reset (back to Jun–Aug), an invalid
+reversed range alert, and a direct 20px brush drag (Jun 1–Aug 31 to Jun 7–Sep
+6). This is browser-preview evidence only. Direct pointer capture and measured
+geometry remain deliberately unadapted and are **not release-ready** until the
+installed Twenty Remote DOM host is independently accepted. No App apply or
+install, deployment, provider/live-data operation, credential action, merge,
+push, or release acceptance occurred.
