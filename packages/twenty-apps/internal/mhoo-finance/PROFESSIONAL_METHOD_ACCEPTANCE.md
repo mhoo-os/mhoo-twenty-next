@@ -428,6 +428,47 @@ those exact-head checks without rerunning unchanged tests.
 
 ARCHITECTURE IMPACT: LOCAL
 
+## PDF-only Chase transaction extraction proof — 2026-09-14 07:18 UTC
+
+This source-only increment on `codex/finance-chase-pdf-controls` extends the
+Chase summary-controls parser with a bounded transaction-row profile and a
+fail-closed reconciliation helper. A lower-cost worker implemented synthetic
+structural fixtures; the coordinator independently ran the profile on the
+original three Hass business-checking PDF bytes. The files were streamed from
+the existing private Drive connector into an in-memory local process, extracted
+with open-source Poppler `pdftotext -raw` version 26.03.0, then discarded.
+No raw PDF, transaction description, account number, extraction text, or row
+payload was written to Git, Linear, Delivery Room, or a local file by this run.
+
+Exact original-byte SHA-256 and size: October 2024
+`c06d5173f5fcfb2de626dfc4a512c2aefffcb16c8db7c5c1e63b997af2f5e1f6`
+(212,465 bytes); November 2024
+`8f3679b45e973f0707dd989b2eaf8539c2e27dcf17d36c6a03eb5cfc616ad9bf`
+(208,173 bytes); December 2024
+`0ccc33aa910e5694217c94ff60099963c11fe41c57b710d0b0c4f6fbfbd21a52`
+(200,691 bytes). Each is a six-page original PDF. These fingerprints bind the
+read-only result without publishing the private Drive identifiers.
+
+The original-byte extraction produced 83/83, 79/79, and 69/69 rows for
+October, November, and December respectively. Every reported per-category
+transaction count and amount matched the parsed rows, with zero sub-cent
+artifacts on this Poppler path. The raw text-layer page-break case was
+reproduced, corrected narrowly, and retested. A different Drive readable-text
+rendering contained three pairs of long-decimal artifacts; those are flagged
+and rejected by the authoritative reconciliation helper rather than silently
+accepted. The helper also rejects out-of-period rows, unexpected categories,
+missing/extra rows, and amount mismatches. Synthetic focused tests passed
+14/14; App `yarn typecheck`, lint (zero warnings/errors), and `git diff --check`
+passed on the scoped diff.
+
+This proves this deterministic, PDF-only extraction profile against these
+three exact originals in a local read-only run. It does not prove the remaining
+39 PDFs, immutable Twenty Files custody, a live importer/job, Workspace row
+write/readback, role isolation, client acceptance, MHO-183 release/rollback, or
+authorization for real-data upload. MHO-227/MHO-228 remain the live-data gates.
+
+ARCHITECTURE IMPACT: LOCAL
+
 ### Workspace read query type completion — 2026-09-14 13:27 Bangkok
 
 The package's generated `CoreApiClient.query` declaration is `any`, leaving the

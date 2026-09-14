@@ -5,6 +5,8 @@ import {
   createChaseCheckingPdfControlEvidence,
   createChaseCheckingStatementRowLineage,
   parseChaseCheckingPdfControlsText,
+  parseChaseCheckingPdfRowsText,
+  reconcileChaseCheckingPdfRows,
 } from 'src/ingestion/chase-pdf-controls';
 import {
   SYNTHETIC_BANK_CSV_V1,
@@ -64,6 +66,55 @@ const transactionStatement = (count = 4) => parseCsvStatement({
 }, SYNTHETIC_BANK_CSV_V1);
 
 describe('Chase PDF statement summary controls', () => {
+  it('parses observed multiline and compact row shapes with section direction', () => {
+    const rows = parseChaseCheckingPdfRowsText([
+      'Deposits and Additions',
+      '10/03/2024 ACH CREDIT CUSTOMER PAYMENT',
+      '$150.00',
+      'Checks Paid',
+      '1234 10/04/2024 -$25.00 RENT',
+      'Electronic Withdrawals',
+      '10/05/2024 CARD PURCHASE COFFEE',
+      '$10.00',
+    ].join('\n'), 2024);
+    expect(rows).toEqual([
+      expect.objectContaining({ category: 'Deposits and Additions', date: '2024-10-03', amountMinor: 15000 }),
+      expect.objectContaining({ category: 'Checks Paid', date: '2024-10-04', amountMinor: -2500 }),
+      expect.objectContaining({ category: 'Electronic Withdrawals', date: '2024-10-05', amountMinor: -1000 }),
+    ]);
+  });
+
+  it('fails closed when a multiline row has no terminating amount', () => {
+    expect(() => parseChaseCheckingPdfRowsText('Deposits and Additions\n10/03/2024 ACH CREDIT', 2024)).toThrow('terminating amount');
+  });
+
+  it('stops before the daily ending balance table', () => {
+    const rows = parseChaseCheckingPdfRowsText('Fees\n10/31 $5.00\nDAILY ENDING BALANCE\nDATE AMOUNT\n10/31 $200.00', 2024);
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toMatchObject({ category: 'Fees', amountMinor: -500 });
+  });
+
+  it('accepts masked Entry and Ind amount terminators', () => {
+    const rows = parseChaseCheckingPdfRowsText('Deposits and Additions\n10/03 ACH CREDIT\nEntry $150.00\n10/04 CASH\nInd 25.00', 2024);
+    expect(rows.map((row) => row.amountMinor)).toEqual([15000, 2500]);
+  });
+
+  it('flags sub-cent PDF amount artifacts instead of treating precision as authoritative', () => {
+    const [row] = parseChaseCheckingPdfRowsText('Deposits and Additions\n10/03 CREDIT\nEntry $150.0012345678901234567890', 2024);
+    expect(row).toMatchObject({ amountMinor: 15000, amountPrecision: 'SUBCENT_ARTIFACT' });
+  });
+
+  it('splits a page marker joined to a terminal amount', () => {
+    const rows = parseChaseCheckingPdfRowsText('Deposits and Additions\n10/03 CREDIT\nEntry $150.00\f2\nPage 2 of 3', 2024);
+    expect(rows).toHaveLength(1);
+  });
+
+  it('reconciles parsed rows against controls and rejects mismatches', () => {
+    const controls = parseChaseCheckingPdfControlsText(fixture('October 01, 2024 through October 31, 2024', '100.00', '215.00'));
+    const rows = parseChaseCheckingPdfRowsText('Deposits and Additions\n10/03 CREDIT\nEntry $150.00\n10/04 CREDIT\nEntry $1.00\nChecks Paid\n1234 ^ 10/05 -$25.00\nElectronic Withdrawals\n10/06 CARD\nEntry $10.00', 2024);
+    expect(() => reconcileChaseCheckingPdfRows(controls, rows)).toThrow('do not reconcile');
+  });
+
   it('extracts exact controls and complete page sequence from synthetic text', () => {
     const parsed = parseChaseCheckingPdfControlsText(fixture(
       'October 01, 2024 through October 31, 2024',

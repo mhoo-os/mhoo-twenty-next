@@ -70,8 +70,71 @@ export type ChaseCheckingStatementRowLineageV1 = Readonly<{
   rows: ReadonlyArray<Readonly<{ sourceRecordId: string; sourceLocation: string }>>;
 }>;
 
+export type ChasePdfTransactionRow = Readonly<{
+  category: ChaseSummaryCategory;
+  date: string;
+  amountMinor: number;
+  amountPrecision: 'CENT' | 'SUBCENT_ARTIFACT';
+  description: string;
+  sourceLine: number;
+}>;
+
+/** Parse only the stable, text-layer row shapes observed in synthetic Chase fixtures. */
+export const parseChaseCheckingPdfRowsText = (text: string, year: number): ChasePdfTransactionRow[] => {
+  if (!Number.isSafeInteger(year) || year < 2000 || year > 2099) throw new Error('Statement year is invalid.');
+  const lines = text.replace(/\r\n?/g, '\n').replace(/\f(?=\d+\b)/g, '\n').split('\n');
+  const rows: ChasePdfTransactionRow[] = [];
+  let category: ChaseSummaryCategory | undefined;
+  let pending: { date: string; description: string; line: number } | undefined;
+  const datePattern = /^(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?\s+(.+)$/;
+  const precisionOf = (raw: string): 'CENT' | 'SUBCENT_ARTIFACT' => { const digits = raw.split('.')[1] ?? ''; if (digits.length === 2) return 'CENT'; if (digits.length !== 22 || BigInt(digits.slice(2)) > 20000000000000000000n) throw new Error('Statement row amount precision is unsupported.'); return 'SUBCENT_ARTIFACT'; };
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index].trim();
+    if (/^(?:DAILY BALANCE|DAILY ENDING BALANCE|AVERAGE BALANCE)\b/i.test(line)) { category = undefined; pending = undefined; continue; }
+    const section = /^(Deposits and Additions|Checks Paid|Electronic Withdrawals|Other Withdrawals|Fees)(?:\s+\*(?:start|end)\*)?$/i.exec(line);
+    if (section) { category = Object.keys(CATEGORY_DIRECTIONS).find((name) => name.toLowerCase() === section[1].toLowerCase()) as ChaseSummaryCategory; pending = undefined; continue; }
+    if (!category || !line || /^Page\s+\d+\s+of\s+\d+/.test(line)) continue;
+    const check = /^(\d+)\s*\*?\s*\^?\s*(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?\s+(?:\d{1,2}\/\d{1,2}(?:\/\d{2,4})?\s+)?(-?\$?[\d,]+\.\d{2})\s*(.*)$/.exec(line);
+    const dateMatch = datePattern.exec(line);
+    if (check && category === 'Checks Paid') {
+      const [, , month, day, rawYear, amount, description] = check;
+      const fullYear = rawYear ? (rawYear.length === 2 ? 2000 + Number(rawYear) : Number(rawYear)) : year;
+      rows.push({ category, date: `${fullYear}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`, amountMinor: -Math.abs(requireMinor(amount)), amountPrecision: precisionOf(amount), description: description.trim() || 'Check', sourceLine: index + 1 });
+      continue;
+    }
+    if (dateMatch) { const fullYear = dateMatch[3] ? (dateMatch[3].length === 2 ? 2000 + Number(dateMatch[3]) : Number(dateMatch[3])) : year; const inline = /^(.*?)(?:\s+)(-?\$?[\d,]+\.\d{2})$/.exec(dateMatch[4].trim()); const fee = /^(-?\$?[\d,]+\.\d{2})(?:\s|$)/.exec(dateMatch[4].trim()); const date = `${fullYear}-${dateMatch[1].padStart(2, '0')}-${dateMatch[2].padStart(2, '0')}`; if (inline || (fee && category === 'Fees')) { const amount = inline?.[2] ?? fee![1]; rows.push({ category, date, amountMinor: CATEGORY_DIRECTIONS[category] * Math.abs(requireMinor(amount)), amountPrecision: precisionOf(amount), description: inline?.[1].trim() || 'Fee', sourceLine: index + 1 }); pending = undefined; } else { pending = { date, description: dateMatch[4].trim(), line: index + 1 }; } continue; }
+    const amount = /^(?:(?:Entry|Ind)\s+)?(-?\$?[\d,]+\.\d{2,22})$/.exec(line);
+    if (amount && pending) {
+      const precision = precisionOf(amount[1]);
+      const centValue = precision === 'SUBCENT_ARTIFACT' ? amount[1].replace(/(\.\d{2})\d+$/, '$1') : amount[1];
+      const signed = CATEGORY_DIRECTIONS[category] * Math.abs(requireMinor(centValue));
+      rows.push({ category, date: pending.date, amountMinor: signed, amountPrecision: precision, description: pending.description, sourceLine: pending.line });
+      pending = undefined;
+    }
+  }
+  if (pending) throw new Error(`Statement row is missing its terminating amount (category=${category}; sourceLine=${pending.line}).`);
+  return rows;
+};
+
+export const reconcileChaseCheckingPdfRows = (controls: ChaseCheckingPdfControls, rows: readonly ChasePdfTransactionRow[]): true => {
+  const totals = new Map<ChaseSummaryCategory, { count: number; amountMinor: number }>();
+  for (const row of rows) {
+    if (!(row.category in controls.categories)) throw new Error('Chase PDF rows contain an unexpected category.');
+    if (row.amountPrecision !== 'CENT' || row.date < controls.periodStart || row.date > controls.periodEnd) throw new Error('Chase PDF rows contain an unsafe precision or out-of-period date.');
+    const prior = totals.get(row.category) ?? { count: 0, amountMinor: 0 };
+    totals.set(row.category, { count: prior.count + 1, amountMinor: prior.amountMinor + row.amountMinor });
+  }
+  if (rows.length !== controls.reportedTransactionCount) throw new Error('Chase PDF rows do not reconcile to summary controls.');
+  for (const category of Object.keys(controls.categories) as ChaseSummaryCategory[]) {
+    const expected = controls.categories[category];
+    const actual = totals.get(category) ?? { count: 0, amountMinor: 0 };
+    if (!expected || actual.count !== expected.count || actual.amountMinor !== expected.amountMinor) throw new Error('Chase PDF rows do not reconcile to summary controls.');
+  }
+  return true;
+};
+
 const requireMinor = (value: string): number => {
-  const amount = parseMinorUnits(value.replace(/^\$/, ''));
+  const amount = parseMinorUnits(value.replace(/^-\$/, '-').replace(/^\$/, ''));
   if (amount === undefined) throw new Error('Statement summary contains an invalid or unsafe amount.');
   return amount;
 };
