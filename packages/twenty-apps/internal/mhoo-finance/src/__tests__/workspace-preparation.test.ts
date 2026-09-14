@@ -152,7 +152,7 @@ describe('native Finance workspace', () => {
     expect(workspaceSource).not.toContain('No statement source artifacts are visible to your role.');
   });
 
-  it('keeps the browser drag enhancement isolated from the supported-host controls', () => {
+  it('keeps the browser drag enhancement while providing a host-native range control', () => {
     expect(insightsSource).toContain('<FinancePeriodControls');
     expect(workspaceSource).toContain('<FinancePeriodControls');
     expect(periodControlsSource).toContain("typeof capture !== 'function' || typeof measure !== 'function'");
@@ -164,6 +164,9 @@ describe('native Finance workspace', () => {
     expect(workspaceSource).not.toContain('document.addEventListener');
     expect(periodControlsSource).toContain('onPointerMove={moveDrag}');
     expect(periodControlsSource).toContain('onPointerCancel={() => { drag.current = null; }}');
+    expect(periodControlsSource).toContain('type="range"');
+    expect(periodControlsSource).toContain('onInput={(event) => onRangeChange(moveFinancePeriodRangeToStart');
+    expect(periodControlsSource).toContain('aria-label="Move selected time range with slider"');
     expect(periodControlsSource).toContain('type="submit" className="hi-primary"');
     expect(insightsSource).toContain('resetRange={defaultRange}');
     expect(workspaceSource).toContain("isSynthetic ? 'SYNTHETIC TEST RECORD' : 'WORKSPACE RECORD'");

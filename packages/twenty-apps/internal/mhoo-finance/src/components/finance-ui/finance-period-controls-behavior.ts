@@ -16,6 +16,13 @@ export const applyFinancePeriodDraft = (draft: FinancePeriodRange, domainStart: 
 
 export const resetFinancePeriodRange = (resetRange: FinancePeriodRange): FinancePeriodRange => ({ ...resetRange });
 
+/** Keeps a selected interval intact when a host-native range input supplies its new start day. */
+export const moveFinancePeriodRangeToStart = ({ origin, last, start, end, nextStart }: Readonly<{ origin: number; last: number; start: number; end: number; nextStart: number }>): FinancePeriodRange => {
+  const length = Math.max(0, end - start);
+  const safeStart = Math.max(origin, Math.min(last - length, nextStart));
+  return { start: date(safeStart), end: date(safeStart + length) };
+};
+
 export const moveFinancePeriodRange = ({ kind, origin, last, initialStart, initialEnd, initialX, clientX, width }: Readonly<{ kind: FinancePeriodDragKind; origin: number; last: number; initialStart: number; initialEnd: number; initialX: number; clientX: number; width: number }>): FinancePeriodRange => {
   const delta = Math.round((clientX - initialX) / width * Math.max(1, last - origin + 1));
   if (kind === 'move') {
