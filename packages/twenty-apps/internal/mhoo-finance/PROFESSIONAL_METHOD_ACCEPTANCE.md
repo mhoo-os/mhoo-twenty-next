@@ -855,3 +855,36 @@ The truthful excluded-transfer empty state was retained; no aggregate was
 synthesized. `yarn lint`, `yarn typecheck`, 14 focused unit tests, and
 `git diff --check` passed. This is installed rendering proof and a safe UI-only
 sync receipt, not provider, live-data interaction, role, or release acceptance.
+
+## 2026-09-15 installed native range-brush workaround — installed receipt
+
+The pinned Twenty v2.37 Remote DOM source explicitly supports `HtmlInput`
+`onInput` and `onChange`, serializes the input event `value` onto
+`event.target.value`, and forwards pointer coordinates. The Finance brush now
+uses that supported input contract: a controlled, transparent native
+`input[type=range]` spans the full timeline coordinate system but is clipped to
+the existing highlighted interval. Dragging it changes the interval start while
+preserving the selected inclusive length. The visible brush, one-year ruler,
+month buttons, date picker, keyboard move fallback, and resize controls remain
+in place; the native slider adds no pixels to the approved reference surface.
+
+The helper clamps the new start within the selected domain and has focused unit
+coverage for an ordinary move and the end-of-domain clamp. Focused Finance
+tests passed (13 tests), as did lint, application typecheck/build, and `git
+diff --check`. The reviewed official remote plan reported `0 to add, 5 to
+change, 0 to destroy`, only updating the five existing Finance front-component
+checksums. The authorized apply uploaded 14 application files and completed
+`Synced Mhoo Finance (14 files)`; the immediate post-sync plan reported `No
+changes. Twenty metadata matches your manifest.`
+
+On the installed Hass Overview, the native slider is present with the expected
+accessible name and selected-range value and the browser console returned no
+errors or warnings. The host marks the complete remote component as `draggable
+(disabled)` under `Current Workspace · permission-checked read`, which also
+disables the slider, month buttons, date control, and existing resize controls.
+No role/grant, setup, provider, record, or Workspace change was used to bypass
+that activation boundary; no disposable permitted Workspace was available in
+this scope. Therefore installed rendering and host-contract support are proven,
+but an installed user drag changing totals remains explicitly unproven pending
+a separately authorized interactive Workspace. No data, connection, credential,
+role, provider, deployment, push, or merge changed.
