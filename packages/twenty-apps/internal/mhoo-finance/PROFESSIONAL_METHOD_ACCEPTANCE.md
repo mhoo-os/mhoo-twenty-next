@@ -773,3 +773,48 @@ This remains source-preview evidence. It does not prove an installed handoff,
 provider connection, file import, customer financial data behavior, or release
 acceptance. No apply, deploy, push, merge, credential change, or provider action
 occurred.
+
+## 2026-09-15 installed metadata-preserving Finance sync — installed receipt
+
+Commit `ff5f2a904f171317150473f44e137560780bb0c7` reconciles the candidate
+manifest with the installed, retained Finance metadata rather than replacing
+it. It preserves the existing SourceArtifact-to-FinancialAccount relation and
+inverse, their installed universal identifiers, the existing
+`financialAccountId` join column, and the two retained unique-key index
+definitions. The compatibility assertions cover those exact values before a
+remote action is considered.
+
+The fresh official plan for remote `finance-install-20260914` then reported
+`0 to add, 5 to change, 0 to destroy`: only the Accounts, Follow-ups, Overview,
+Statements, and Transactions front components required checksum updates. The
+authorized apply uploaded 14 application files and completed with `Synced Mhoo
+Finance (14 files)`. No Finance record, relation-column data, connection,
+credential, role/grant, provider operation, deployment, push, merge, or
+Workspace metadata change was made.
+
+Read-only installed checks used the Hass Kitchen Finance page routes directly.
+Overview, Statements, Follow-ups, and Transactions rendered the current
+Workspace surface; Accounts rendered its Finance shell but remained at
+`Reading authorized Workspace records…` during the bounded observation. The
+browser console had no warnings or errors. The host-wide `Finish setting up
+Hass` modal offers only `Connect Clover` and has no ordinary dismiss path; it
+was not followed. That action would cross the explicitly excluded
+provider-connection boundary.
+
+The installed host consequently exposes finance controls, including the
+local-only `Preview sample data` toggle, as disabled beneath the setup modal.
+No synthetic toggle, date interaction, drag, drawer, source handoff, or record
+write was bypassed or fabricated. The UI identifies the active destination as
+Hass Kitchen and `Current Workspace · permission-checked read`; a read-only
+current-user API lookup was forbidden, so the browser user's exact assigned
+Finance role is intentionally unproven. The remote credential can read its
+effective Admin and WhatsApp-function roles, while the installed app defines
+separate Finance writer and reviewer roles; neither fact establishes the
+browser user's membership.
+
+`yarn lint`, `yarn typecheck`, the focused workspace-preparation suite (9
+passing tests), and `git diff --check` passed before the sync. A final
+post-sync no-drift plan and source-custody fixture remain the release receipt
+for this commit set. This proves a safe installed front-component sync only;
+provider setup, active-user role verification, and host-control interaction
+remain explicitly blocked pending separate authority and host readiness.
