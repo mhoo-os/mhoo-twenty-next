@@ -224,7 +224,9 @@ export const SettingsApplicationConnectionsSection = ({
             )}
             {isCloverManualToken && (
               <StyledFooter>
-                <Link to={getSettingsPath(SettingsPath.Accounts)}>
+                <Link
+                  to={`${getSettingsPath(SettingsPath.Accounts)}?connect=clover`}
+                >
                   {t`Connect Clover in Account settings`}
                 </Link>
               </StyledFooter>

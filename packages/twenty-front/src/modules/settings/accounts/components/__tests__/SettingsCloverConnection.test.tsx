@@ -163,6 +163,27 @@ describe('Clover native form', () => {
     expect(screen.queryByText('Connect Clover')).not.toBeInTheDocument();
   });
 
+  it('explains unavailable intake when arriving from the Clover App', async () => {
+    mockWorkspace = { id: 'mhoo', displayName: 'Mhoo' };
+    mockFetch.mockResolvedValue(reply({ enabled: false, receipt: null }));
+    render(<SettingsCloverConnection showUnavailable />);
+    expect(
+      await screen.findByText(
+        /Clover connections are not enabled for this Workspace/,
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByText('For Mhoo')).toBeInTheDocument();
+  });
+
+  it('uses a Workspace-neutral message when access is denied', async () => {
+    mockWorkspace = { id: 'mhoo', displayName: 'Mhoo' };
+    mockFetch.mockResolvedValue({ ok: false, status: 403 });
+    render(<SettingsCloverConnection showUnavailable />);
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Sign in to your Workspace',
+    );
+  });
+
   it('clears the password field before the request finishes and only then shows a receipt', async () => {
     let complete!: (value: object) => void;
     render(<SettingsCloverConnection />);

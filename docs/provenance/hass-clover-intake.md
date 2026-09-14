@@ -139,9 +139,15 @@ active native Workspace, interactive member, installed Clover manual-token
 provider, and native permission. Tokens remain encrypted and scoped to the
 Workspace that submitted them.
 
+The existing configured onboarding invitee remains limited to the legacy
+single Workspace ID. Adding another Workspace to the intake list does not
+make the Hass invitation preparable there.
+
 The Clover App's production manual-token provider now links from App connection
 settings to the existing `Settings → Accounts → Connect Clover` form. The
-sandbox provider is intentionally unchanged. Source checks: focused Clover
+sandbox provider is intentionally unchanged. The link carries a non-secret
+navigation hint so Account settings explains when intake is disabled instead
+of silently hiding the form. Source checks: focused Clover
 service and Workspace-availability tests, App settings UI test, source-custody
 verification, focused lint, formatting, and front typecheck passed locally.
 This does not prove either Workspace has the new image or configuration.
