@@ -502,3 +502,33 @@ permission/error behavior, timeline interaction, immutable event contracts and
 bounded domain reducers. It does not expose an event mutation route and does
 not yet prove installed event persistence, native Task creation/attachments,
 provider populations, mailbox correlation or production acceptance.
+
+## Chase PDF custody and row-source lineage source increment — 2026-09-14 13:23 Bangkok
+
+Source-only worktree: `codex/finance-chase-pdf-controls` at baseline
+`6dc8ac277ae1c56abd094ec8de1f5b4ba675f8b7`; no Workspace, provider, credential,
+installation, deployment, merge, or push action occurred. MHO-183 remains the
+in-progress parent and MHO-227/MHO-228 remain live-data gates, not authorization
+for an import.
+
+The synthetic Chase summary parser now produces a versioned control-evidence
+record only after it is bound to a complete retained PDF receipt and the exact
+source-PDF SHA-256 named by its derived text. A separate parsed transaction
+statement can produce row lineage only when its account and period match the
+PDF controls, all rows are accepted, its count equals the reported statement
+count, and every source record ID and source location is unique. The resulting
+record retains both artifact identities, immutable Files references, hashes,
+parser versions, and row locations. It neither extracts PDF transaction rows
+nor creates an import path.
+
+Validation at this source state: focused `chase-pdf-controls.test.ts` passed 7
+tests; package lint and `git diff --check` passed; baseline source custody
+verification passed for `6dc8ac277ae1c56abd094ec8de1f5b4ba675f8b7`. Package
+`yarn typecheck` built the App manifest, then remained incomplete on four
+unrelated implicit-`any` errors in `src/investigation/workspace-finance-data.ts`
+at lines 214, 219, 244, and 254. No claim is made that those errors predate this
+increment. Full App typecheck, an independent review, immutable source commit,
+actual Files custody, an approved extraction implementation, and any live
+statement-row import remain unproved.
+
+ARCHITECTURE IMPACT: LOCAL

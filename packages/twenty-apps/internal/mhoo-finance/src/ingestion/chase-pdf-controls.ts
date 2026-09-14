@@ -1,4 +1,11 @@
-import { parseMinorUnits } from './statement-importer';
+import { createHash } from 'node:crypto';
+
+import {
+  type OriginalArtifactReceipt,
+  type ParsedStatement,
+  type PreservedPdfArtifact,
+  parseMinorUnits,
+} from './statement-importer';
 
 /**
  * A narrow parser for text extracted from Chase Business Complete Checking PDFs.
@@ -37,6 +44,31 @@ export type ChaseCheckingPdfControls = {
   reportedTransactionCount: number;
   categories: Readonly<Partial<Record<ChaseSummaryCategory, { count: number; amountMinor: number }>>>;
 };
+
+/**
+ * An extraction worker must explicitly bind its derived text to the immutable
+ * PDF bytes it read. This contract records that binding; it does not perform
+ * PDF extraction or make the derived text an original source artifact.
+ */
+export type ChasePdfTextExtractionV1 = Readonly<{
+  schemaVersion: 'chase-pdf-text-extraction-v1';
+  sourceArtifactSha256: string;
+  text: string;
+}>;
+
+export type ChaseCheckingPdfControlEvidenceV1 = Readonly<{
+  schemaVersion: 'chase-checking-pdf-control-evidence-v1';
+  pdfArtifact: Pick<OriginalArtifactReceipt, 'artifactId' | 'accountKey' | 'originalFileId' | 'sha256' | 'parserProfileId' | 'parserProfileVersion'>;
+  extractedTextSha256: string;
+  controls: ChaseCheckingPdfControls;
+}>;
+
+export type ChaseCheckingStatementRowLineageV1 = Readonly<{
+  schemaVersion: 'chase-checking-statement-row-lineage-v1';
+  controlEvidence: ChaseCheckingPdfControlEvidenceV1;
+  transactionArtifact: Pick<OriginalArtifactReceipt, 'artifactId' | 'accountKey' | 'originalFileId' | 'sha256' | 'parserProfileId' | 'parserProfileVersion'>;
+  rows: ReadonlyArray<Readonly<{ sourceRecordId: string; sourceLocation: string }>>;
+}>;
 
 const requireMinor = (value: string): number => {
   const amount = parseMinorUnits(value.replace(/^\$/, ''));
@@ -137,4 +169,75 @@ export const compareAdjacentChaseCheckingControls = (
   nextDay.setUTCDate(nextDay.getUTCDate() + 1);
   return nextDay.toISOString().slice(0, 10) === next.periodStart &&
     previous.closingBalanceMinor === next.openingBalanceMinor;
+};
+
+const receiptReference = (receipt: OriginalArtifactReceipt): ChaseCheckingPdfControlEvidenceV1['pdfArtifact'] => ({
+  artifactId: receipt.artifactId,
+  accountKey: receipt.accountKey,
+  originalFileId: receipt.originalFileId,
+  sha256: receipt.sha256,
+  parserProfileId: receipt.parserProfileId,
+  parserProfileVersion: receipt.parserProfileVersion,
+});
+
+/**
+ * Binds complete PDF custody to the derived Chase summary controls. The PDF
+ * remains the original source; the extracted text is only a hash-addressed
+ * derivative that must name those exact original bytes.
+ */
+export const createChaseCheckingPdfControlEvidence = (
+  pdf: PreservedPdfArtifact,
+  extraction: ChasePdfTextExtractionV1,
+): ChaseCheckingPdfControlEvidenceV1 => {
+  if (pdf.receipt.sourceFormat !== 'PDF' || pdf.receipt.mimeType !== 'application/pdf') {
+    throw new Error('Chase controls require a retained PDF artifact.');
+  }
+  if (pdf.pageCompleteness !== 'COMPLETE') {
+    throw new Error('Chase controls require complete PDF page custody.');
+  }
+  if (extraction.schemaVersion !== 'chase-pdf-text-extraction-v1' || extraction.sourceArtifactSha256 !== pdf.receipt.sha256) {
+    throw new Error('Extracted Chase text must bind to the retained PDF hash.');
+  }
+  if (!extraction.text) throw new Error('Extracted Chase text is required.');
+
+  return {
+    schemaVersion: 'chase-checking-pdf-control-evidence-v1',
+    pdfArtifact: receiptReference(pdf.receipt),
+    extractedTextSha256: createHash('sha256').update(extraction.text).digest('hex'),
+    controls: parseChaseCheckingPdfControlsText(extraction.text),
+  };
+};
+
+/**
+ * Connects the PDF summary controls to a separately parsed transaction source.
+ * It deliberately does not invent PDF transaction rows or authorize an import.
+ */
+export const createChaseCheckingStatementRowLineage = (
+  controlEvidence: ChaseCheckingPdfControlEvidenceV1,
+  transactionStatement: ParsedStatement,
+): ChaseCheckingStatementRowLineageV1 => {
+  const controls = controlEvidence.controls;
+  const receipt = transactionStatement.receipt;
+  if (receipt.accountKey !== controlEvidence.pdfArtifact.accountKey) {
+    throw new Error('Transaction rows must use the PDF control account binding.');
+  }
+  if (transactionStatement.controls.periodStart !== controls.periodStart || transactionStatement.controls.periodEnd !== controls.periodEnd) {
+    throw new Error('Transaction rows must match the PDF control period.');
+  }
+  if (transactionStatement.rejectedRows.length > 0 || transactionStatement.rows.length !== controls.reportedTransactionCount) {
+    throw new Error('Transaction rows must be complete and reconcile to the PDF control count.');
+  }
+  const rows = transactionStatement.rows.map(({ sourceRecordId, sourceLocation }) => ({ sourceRecordId, sourceLocation }));
+  if (rows.some(({ sourceRecordId, sourceLocation }) => !sourceRecordId || !sourceLocation)
+    || new Set(rows.map(({ sourceRecordId }) => sourceRecordId)).size !== rows.length
+    || new Set(rows.map(({ sourceLocation }) => sourceLocation)).size !== rows.length) {
+    throw new Error('Each transaction row requires a unique source record and source location.');
+  }
+
+  return {
+    schemaVersion: 'chase-checking-statement-row-lineage-v1',
+    controlEvidence,
+    transactionArtifact: receiptReference(receipt),
+    rows,
+  };
 };

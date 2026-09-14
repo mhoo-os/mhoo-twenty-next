@@ -16,11 +16,13 @@ make no claim about a real institution's CSV layout or statement pagination.
 
 `chase-pdf-controls.test.ts` exercises a separate, synthetic-only Chase Business
 Complete Checking summary-text profile. It fails closed on missing pages,
-unknown categories, and count/balance differences. It does not extract PDF
-bytes, retain originals, parse transaction rows, bind an account, or authorize
-a live import. A real statement still needs immutable Files custody and a
-separately proved machine-readable transaction source before coverage can be
-promoted.
+unknown categories, and count/balance differences. Its v1 control-evidence
+contract binds derived text to a complete retained-PDF hash; its row-lineage
+contract then requires a separately parsed, account-and-period-matched
+machine-readable transaction source with one unique source locator per row.
+Neither contract extracts PDF transaction rows or authorizes a live import. A
+real statement still needs immutable Files custody and separately proved source
+extraction before coverage can be promoted.
 
 Run `yarn fixtures:validate-ingestion` to parse the CSV/QFX fixtures, verify
 exact arithmetic, and produce a deterministic custody summary. Missing-page

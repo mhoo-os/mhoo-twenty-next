@@ -2,8 +2,15 @@ import { describe, expect, it } from 'vitest';
 
 import {
   compareAdjacentChaseCheckingControls,
+  createChaseCheckingPdfControlEvidence,
+  createChaseCheckingStatementRowLineage,
   parseChaseCheckingPdfControlsText,
 } from 'src/ingestion/chase-pdf-controls';
+import {
+  SYNTHETIC_BANK_CSV_V1,
+  parseCsvStatement,
+  retainUnparsedPdfArtifact,
+} from 'src/ingestion/statement-importer';
 
 const fixture = (period: string, opening: string, closing: string, extra = '') => [
   'Page 1 of 3',
@@ -21,6 +28,40 @@ const fixture = (period: string, opening: string, closing: string, extra = '') =
   'SYNTHETIC TRANSACTION DETAILS',
   'Page 3 of 3',
 ].filter(Boolean).join('\n');
+
+const bytes = (content: string): Uint8Array => new TextEncoder().encode(content);
+
+const custodyPdf = (pages: readonly number[] = [1, 2, 3]) => retainUnparsedPdfArtifact({
+  artifactId: 'synthetic-chase-october-pdf',
+  accountKey: 'acct-synthetic-chase',
+  sourceKind: 'BANK',
+  originalFileName: 'synthetic-chase-october.pdf',
+  mimeType: 'application/pdf',
+  bytes: bytes('%PDF-synthetic-chase'),
+  acquiredAt: '2026-09-14T00:00:00.000Z',
+  acquiredBy: 'fixture-author',
+  originalFileId: 'synthetic-files-reference-chase-pdf-001',
+}, 3, pages);
+
+const rowsFor = (count: number) => [
+  'Date,Posted Date,Description,Amount,Transaction ID',
+  ...Array.from({ length: count }, (_, index) => {
+    const day = index === count - 1 ? 31 : index + 1;
+    return `10/${String(day).padStart(2, '0')}/2024,10/${String(day).padStart(2, '0')}/2024,Synthetic ${index + 1},${index === 0 ? '150.00' : '-10.00'},txn-${index + 1}`;
+  }),
+].join('\n');
+
+const transactionStatement = (count = 4) => parseCsvStatement({
+  artifactId: 'synthetic-chase-october-rows',
+  accountKey: 'acct-synthetic-chase',
+  sourceKind: 'BANK',
+  originalFileName: 'synthetic-chase-october.csv',
+  mimeType: 'text/csv',
+  bytes: bytes(rowsFor(count)),
+  acquiredAt: '2026-09-14T00:00:00.000Z',
+  acquiredBy: 'fixture-author',
+  originalFileId: 'synthetic-files-reference-chase-csv-001',
+}, SYNTHETIC_BANK_CSV_V1);
 
 describe('Chase PDF statement summary controls', () => {
   it('extracts exact controls and complete page sequence from synthetic text', () => {
@@ -73,5 +114,39 @@ describe('Chase PDF statement summary controls', () => {
     expect(compareAdjacentChaseCheckingControls(october, november)).toBe(true);
     expect(compareAdjacentChaseCheckingControls(october, { ...november, openingBalanceMinor: 21499 })).toBe(false);
     expect(compareAdjacentChaseCheckingControls(october, { ...november, periodStart: '2024-11-02' })).toBe(false);
+  });
+
+  it('binds complete PDF custody and a separate row source without asserting a PDF row parse', () => {
+    const text = fixture('October 01, 2024 through October 31, 2024', '100.00', '215.00');
+    const pdf = custodyPdf();
+    const evidence = createChaseCheckingPdfControlEvidence(pdf, {
+      schemaVersion: 'chase-pdf-text-extraction-v1',
+      sourceArtifactSha256: pdf.receipt.sha256,
+      text,
+    });
+    const lineage = createChaseCheckingStatementRowLineage(evidence, transactionStatement());
+
+    expect(lineage).toMatchObject({
+      schemaVersion: 'chase-checking-statement-row-lineage-v1',
+      controlEvidence: { pdfArtifact: { artifactId: 'synthetic-chase-october-pdf', originalFileId: 'synthetic-files-reference-chase-pdf-001' } },
+      transactionArtifact: { artifactId: 'synthetic-chase-october-rows', originalFileId: 'synthetic-files-reference-chase-csv-001' },
+      rows: expect.arrayContaining([
+        { sourceRecordId: 'txn-1', sourceLocation: 'csv:row:2' },
+        { sourceRecordId: 'txn-2', sourceLocation: 'csv:row:3' },
+      ]),
+    });
+  });
+
+  it('fails closed when PDF custody, hash binding, period/account, or rows do not match', () => {
+    const text = fixture('October 01, 2024 through October 31, 2024', '100.00', '215.00');
+    const pdf = custodyPdf();
+    expect(() => createChaseCheckingPdfControlEvidence(custodyPdf([1, 3]), { schemaVersion: 'chase-pdf-text-extraction-v1', sourceArtifactSha256: pdf.receipt.sha256, text })).toThrow('complete PDF page custody');
+    expect(() => createChaseCheckingPdfControlEvidence(pdf, { schemaVersion: 'chase-pdf-text-extraction-v1', sourceArtifactSha256: 'other-bytes', text })).toThrow('retained PDF hash');
+    const evidence = createChaseCheckingPdfControlEvidence(pdf, { schemaVersion: 'chase-pdf-text-extraction-v1', sourceArtifactSha256: pdf.receipt.sha256, text });
+    expect(() => createChaseCheckingStatementRowLineage(evidence, transactionStatement(3))).toThrow('complete and reconcile');
+    const statement = transactionStatement();
+    expect(() => createChaseCheckingStatementRowLineage(evidence, { ...statement, receipt: { ...statement.receipt, accountKey: 'other-account' } })).toThrow('account binding');
+    expect(() => createChaseCheckingStatementRowLineage(evidence, { ...statement, controls: { ...statement.controls, periodEnd: '2024-10-30' } })).toThrow('control period');
+    expect(() => createChaseCheckingStatementRowLineage(evidence, { ...statement, rows: statement.rows.map((row, index) => index === 1 ? { ...row, sourceLocation: statement.rows[0].sourceLocation } : row) })).toThrow('unique source record and source location');
   });
 });
