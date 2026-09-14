@@ -888,3 +888,30 @@ this scope. Therefore installed rendering and host-contract support are proven,
 but an installed user drag changing totals remains explicitly unproven pending
 a separately authorized interactive Workspace. No data, connection, credential,
 role, provider, deployment, push, or merge changed.
+
+### Correction — 2026-09-15 host control activation diagnosis
+
+The earlier installed receipts described the Finance controls as disabled under
+the `Current Workspace · permission-checked read` footer. A fresh DOM-level
+inspection corrects that interpretation: this footer is static Finance copy,
+not an authorization gate, and the installed Finance slider, Filters button,
+and keyboard fallback have no `disabled`, `aria-disabled`, or inert ancestor.
+The accessibility tree's `draggable (disabled)` presentation does not reflect
+the controls' actual DOM disabled state.
+
+The real blocker is a distinct host-wide, full-viewport backdrop above the
+Finance page. Its dialog reads `Finish setting up Hass` and offers `Connect
+Clover…`; it has a fixed viewport rectangle, z-index 39, pointer events
+enabled, and intercepts the center point of the enabled Finance Filters button.
+The Finance range itself is therefore not a candidate for an App-local
+permission or presentation fix. No Finance role/membership, provider setup,
+OAuth action, connection, or modal bypass was attempted. The exact browser
+user identity and role membership are not exposed through the permitted native
+surface, so they remain unproven rather than inferred from the footer.
+
+The minimal enablement path is to resolve or dismiss that separate Hass/Clover
+onboarding gate through its owning product flow. `Connect Clover…` would begin
+a provider-connection action and remains outside this Finance UI authority.
+Once the owning flow supplies a permitted interactive Workspace without the
+backdrop, the already-enabled Finance controls can be exercised normally; no
+Finance App change or broad role grant is indicated by this diagnosis.
