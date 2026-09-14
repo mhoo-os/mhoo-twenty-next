@@ -7,17 +7,30 @@ import paymentImport from '../logic-functions/clover-payment-import.logic-functi
 import history from '../logic-functions/clover-payment-history.logic-function';
 import recovery from '../logic-functions/clover-payment-recover.logic-function';
 
-it('binds the manual provider and least-privilege App ceiling without public triggers', () => {
+it('binds the manual provider and exposes only the bounded merchant identity read as a tool', () => {
   expect(manualProvider.success).toBe(true);
   expect(manualProvider.config?.type).toBe('manualToken');
   expect(cloverReaderRole.success).toBe(true);
   expect(application.config?.defaultRoleUniversalIdentifier).toBe(
     cloverReaderRole.config?.universalIdentifier,
   );
-  expect(cloverReaderRole.config?.canAccessAllTools).toBe(false);
+  expect(cloverReaderRole.config?.canAccessAllTools).toBe(true);
+  expect(cloverReaderRole.config?.canBeAssignedToAgents).toBe(true);
   expect(merchantRead.success).toBe(true);
   expect(merchantRead.config?.httpRouteTriggerSettings).toBeUndefined();
-  expect(merchantRead.config?.toolTriggerSettings).toBeUndefined();
+  expect(merchantRead.config?.toolTriggerSettings).toEqual({
+    inputSchema: {
+      type: 'object',
+      properties: {
+        connectionId: {
+          type: 'string',
+          description:
+            'Optional Clover connection ID. Omit only when exactly one authorized Clover connection is available.',
+        },
+      },
+      additionalProperties: false,
+    },
+  });
   expect(merchantRead.config?.cronTriggerSettings).toBeUndefined();
 });
 
