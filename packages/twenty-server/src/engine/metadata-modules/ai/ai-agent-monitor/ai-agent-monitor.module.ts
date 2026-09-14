@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
 import { AiAgentExecutionModule } from 'src/engine/metadata-modules/ai/ai-agent-execution/ai-agent-execution.module';
 import { AgentTurnEntity } from 'src/engine/metadata-modules/ai/ai-agent-execution/entities/agent-turn.entity';
 import { AiAgentModule } from 'src/engine/metadata-modules/ai/ai-agent/ai-agent.module';
@@ -23,6 +24,7 @@ import { AgentTurnGraderService } from './services/agent-turn-grader.service';
       AgentTurnEntity,
       AgentChatThreadEntity,
       AgentEntity,
+      WorkspaceEntity,
     ]),
     AiAgentModule,
     AiAgentExecutionModule,

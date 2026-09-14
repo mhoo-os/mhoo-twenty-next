@@ -194,11 +194,15 @@ export class AiModelRegistryService {
 
   private getFirstAvailableModelFromList(
     modelIds: string[],
+    availabilitySettings?: WorkspaceModelAvailabilitySettings,
   ): RegisteredAiModel | undefined {
     for (const modelId of modelIds) {
       const model = this.getModel(modelId);
 
-      if (model) {
+      if (
+        model &&
+        this.isModelAvailableForWorkspace(modelId, availabilitySettings)
+      ) {
         return model;
       }
     }
@@ -206,23 +210,38 @@ export class AiModelRegistryService {
     return undefined;
   }
 
-  getDefaultSpeedModel(): RegisteredAiModel {
-    return this.getDefaultModelForRole(AiModelRole.FAST);
+  getDefaultSpeedModel(
+    availabilitySettings?: WorkspaceModelAvailabilitySettings,
+  ): RegisteredAiModel {
+    return this.getDefaultModelForRole(AiModelRole.FAST, availabilitySettings);
   }
 
-  getDefaultPerformanceModel(): RegisteredAiModel {
-    return this.getDefaultModelForRole(AiModelRole.SMART);
+  getDefaultPerformanceModel(
+    availabilitySettings?: WorkspaceModelAvailabilitySettings,
+  ): RegisteredAiModel {
+    return this.getDefaultModelForRole(AiModelRole.SMART, availabilitySettings);
   }
 
-  private getDefaultModelForRole(role: AiModelRole): RegisteredAiModel {
+  private getDefaultModelForRole(
+    role: AiModelRole,
+    availabilitySettings?: WorkspaceModelAvailabilitySettings,
+  ): RegisteredAiModel {
     const prefs = this.preferencesService.getPreferences();
     const preferenceKey =
       role === AiModelRole.FAST ? 'defaultFastModels' : 'defaultSmartModels';
 
-    let model = this.getFirstAvailableModelFromList(prefs[preferenceKey] ?? []);
+    let model = this.getFirstAvailableModelFromList(
+      prefs[preferenceKey] ?? [],
+      availabilitySettings,
+    );
 
     if (!model) {
-      model = this.getAvailableModels()[0];
+      model = this.getAvailableModels().find((availableModel) =>
+        this.isModelAvailableForWorkspace(
+          availableModel.modelId,
+          availabilitySettings,
+        ),
+      );
     }
 
     if (!model) {
@@ -235,14 +254,17 @@ export class AiModelRegistryService {
     return model;
   }
 
-  getEffectiveModelConfig(modelId: string): AiModelConfig {
+  getEffectiveModelConfig(
+    modelId: string,
+    availabilitySettings?: WorkspaceModelAvailabilitySettings,
+  ): AiModelConfig {
     this.ensureFresh();
 
     if (isAutoSelectModelId(modelId)) {
       const defaultModel =
         modelId === AUTO_SELECT_FAST_MODEL_ID
-          ? this.getDefaultSpeedModel()
-          : this.getDefaultPerformanceModel();
+          ? this.getDefaultSpeedModel(availabilitySettings)
+          : this.getDefaultPerformanceModel(availabilitySettings);
 
       return (
         this.modelConfigCache.get(defaultModel.modelId) ??
@@ -296,6 +318,24 @@ export class AiModelRegistryService {
     const disabledModels = prefs.disabledModels ?? [];
 
     return !disabledModels.includes(modelId);
+  }
+
+  private isModelAvailableForWorkspace(
+    modelId: string,
+    availabilitySettings?: WorkspaceModelAvailabilitySettings,
+  ): boolean {
+    if (!this.isModelAdminAllowed(modelId)) {
+      return false;
+    }
+
+    return (
+      !availabilitySettings ||
+      isModelAllowedByWorkspace(
+        modelId,
+        availabilitySettings,
+        this.getRecommendedModelIds(),
+      )
+    );
   }
 
   validateModelAvailability(
@@ -412,9 +452,13 @@ export class AiModelRegistryService {
     return this.providerConfigService.getCatalogProviderNames();
   }
 
-  resolveModelForAgent(agent: { modelId: string } | null): RegisteredAiModel {
+  resolveModelForAgent(
+    agent: { modelId: string } | null,
+    availabilitySettings?: WorkspaceModelAvailabilitySettings,
+  ): RegisteredAiModel {
     const aiModel = this.getEffectiveModelConfig(
       agent?.modelId ?? AUTO_SELECT_SMART_MODEL_ID,
+      availabilitySettings,
     );
 
     const registeredModel = this.getModel(aiModel.modelId);

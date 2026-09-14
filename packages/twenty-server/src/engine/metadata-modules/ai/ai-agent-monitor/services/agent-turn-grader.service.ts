@@ -1,9 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { type Repository } from 'typeorm';
 
 import { msg } from '@lingui/core/macro';
 import { generateText } from 'ai';
 
 import { NotFoundError } from 'src/engine/core-modules/graphql/utils/graphql-errors.util';
+import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
 import { AgentMessageEntity } from 'src/engine/metadata-modules/ai/ai-agent-execution/entities/agent-message.entity';
 import { AgentTurnEntity } from 'src/engine/metadata-modules/ai/ai-agent-execution/entities/agent-turn.entity';
 import { AgentTurnEvaluationEntity } from 'src/engine/metadata-modules/ai/ai-agent-monitor/entities/agent-turn-evaluation.entity';
@@ -21,6 +24,8 @@ export class AgentTurnGraderService {
     @InjectWorkspaceScopedRepository(AgentTurnEvaluationEntity)
     private readonly evaluationRepository: WorkspaceScopedRepository<AgentTurnEvaluationEntity>,
     private readonly aiModelRegistryService: AiModelRegistryService,
+    @InjectRepository(WorkspaceEntity)
+    private readonly workspaceRepository: Repository<WorkspaceEntity>,
   ) {}
 
   async evaluateTurn({
@@ -54,7 +59,27 @@ export class AgentTurnGraderService {
     turn: AgentTurnEntity & { messages: AgentMessageEntity[] },
   ): Promise<{ score: number; comment: string }> {
     try {
-      const defaultModel = this.aiModelRegistryService.getDefaultSpeedModel();
+      const workspace = await this.workspaceRepository.findOneBy({
+        id: turn.workspaceId,
+      });
+
+      if (!workspace) {
+        this.logger.warn(
+          `Workspace ${turn.workspaceId} not found for turn evaluation`,
+        );
+
+        return this.getFallbackEvaluation(turn);
+      }
+
+      this.aiModelRegistryService.validateModelAvailability(
+        workspace.fastModel,
+        workspace,
+      );
+
+      const defaultModel = this.aiModelRegistryService.resolveModelForAgent(
+        { modelId: workspace.fastModel },
+        workspace,
+      );
 
       if (!defaultModel) {
         this.logger.warn('No default AI model available for evaluation');

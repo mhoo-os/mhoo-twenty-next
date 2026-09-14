@@ -193,12 +193,16 @@ export class ChatExecutionService {
     );
 
     const registeredModel =
-      await this.aiModelRegistryService.resolveModelForAgent({
-        modelId: resolvedModelId,
-      });
+      await this.aiModelRegistryService.resolveModelForAgent(
+        {
+          modelId: resolvedModelId,
+        },
+        workspace,
+      );
 
     const modelConfig = this.aiModelRegistryService.getEffectiveModelConfig(
       registeredModel.modelId,
+      workspace,
     );
 
     // Native and action search may both be bound here; the model picks at runtime.

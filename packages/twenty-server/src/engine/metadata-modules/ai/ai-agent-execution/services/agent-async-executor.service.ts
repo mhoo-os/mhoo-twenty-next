@@ -287,21 +287,29 @@ export class AgentAsyncExecutorService {
     let executionSteps: StepResult<ToolSet>[] = [];
 
     try {
-      if (agent) {
-        const workspace = await this.workspaceRepository.findOneBy({
-          id: agent.workspaceId,
-        });
+      const workspace = await this.workspaceRepository.findOneBy({
+        id: workspaceId,
+      });
 
-        if (workspace) {
-          this.aiModelRegistryService.validateModelAvailability(
-            agent.modelId,
-            workspace,
-          );
-        }
+      if (!workspace) {
+        throw new AiException(
+          `Workspace ${workspaceId} not found`,
+          AiExceptionCode.AGENT_EXECUTION_FAILED,
+        );
+      }
+
+      if (agent) {
+        this.aiModelRegistryService.validateModelAvailability(
+          agent.modelId,
+          workspace,
+        );
       }
 
       const registeredModel =
-        await this.aiModelRegistryService.resolveModelForAgent(agent);
+        await this.aiModelRegistryService.resolveModelForAgent(
+          agent,
+          workspace,
+        );
 
       let tools: ToolSet = {};
       let toolCatalogSection = '';

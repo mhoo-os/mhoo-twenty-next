@@ -63,9 +63,12 @@ export class AiGenerateTextController {
     );
 
     const registeredModel =
-      await this.aiModelRegistryService.resolveModelForAgent({
-        modelId: resolvedModelId,
-      });
+      await this.aiModelRegistryService.resolveModelForAgent(
+        {
+          modelId: resolvedModelId,
+        },
+        workspace,
+      );
 
     let result: Awaited<ReturnType<typeof generateText>> | undefined;
 
@@ -93,7 +96,7 @@ export class AiGenerateTextController {
     } finally {
       if (result) {
         void this.aiBillingService.calculateAndBillUsage(
-          resolvedModelId,
+          registeredModel.modelId,
           {
             usage: result.usage,
             cacheCreationTokens:

@@ -1,4 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { type Repository } from 'typeorm';
 
 import {
   type LanguageModelUsage,
@@ -9,6 +11,7 @@ import {
 
 import { BillingUsageService } from 'src/engine/core-modules/billing/services/billing-usage.service';
 import { UsageOperationType } from 'src/engine/core-modules/usage/enums/usage-operation-type.enum';
+import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
 import { AiBillingService } from 'src/engine/metadata-modules/ai/ai-billing/services/ai-billing.service';
 import { extractCacheCreationTokensFromSteps } from 'src/engine/metadata-modules/ai/ai-billing/utils/extract-cache-creation-tokens.util';
 import { buildAiTelemetry } from 'src/engine/metadata-modules/ai/ai-models/utils/build-ai-telemetry.util';
@@ -22,6 +25,8 @@ export class AgentTitleGenerationService {
     private readonly aiModelRegistryService: AiModelRegistryService,
     private readonly aiBillingService: AiBillingService,
     private readonly billingUsageService: BillingUsageService,
+    @InjectRepository(WorkspaceEntity)
+    private readonly workspaceRepository: Repository<WorkspaceEntity>,
   ) {}
 
   async generateThreadTitle(
@@ -31,7 +36,27 @@ export class AgentTitleGenerationService {
   ): Promise<string> {
     await this.billingUsageService.hasAvailableCreditsOrThrow(workspaceId);
 
-    const defaultModel = this.aiModelRegistryService.getDefaultSpeedModel();
+    const workspace = await this.workspaceRepository.findOneBy({
+      id: workspaceId,
+    });
+
+    if (!workspace) {
+      this.logger.warn(
+        `Workspace ${workspaceId} not found for title generation`,
+      );
+
+      return this.generateFallbackTitle(messageContent);
+    }
+
+    this.aiModelRegistryService.validateModelAvailability(
+      workspace.fastModel,
+      workspace,
+    );
+
+    const defaultModel = this.aiModelRegistryService.resolveModelForAgent(
+      { modelId: workspace.fastModel },
+      workspace,
+    );
 
     if (!defaultModel) {
       this.logger.warn('No default AI model available for title generation');
