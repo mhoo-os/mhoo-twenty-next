@@ -1165,10 +1165,12 @@ const parseStatementControls = (value: string | null) => {
 const WorkspaceFinanceScreen = ({
   initialView,
   dataOverride,
+  onTogglePreview,
   services,
 }: {
   initialView: Exclude<FinanceView, 'sources'>;
   dataOverride?: WorkspaceFinanceData;
+  onTogglePreview?: () => void;
   services?: {
     read: () => Promise<WorkspaceFinanceData>;
     client: RestApiClient;
@@ -1797,6 +1799,16 @@ const WorkspaceFinanceScreen = ({
             </span>
           </div>
           <div className="fw-controls">
+            {onTogglePreview ? (
+              <button
+                type="button"
+                className="fw-button"
+                aria-pressed={isSynthetic}
+                onClick={onTogglePreview}
+              >
+                {isSynthetic ? 'Return to Workspace records' : 'Preview sample data'}
+              </button>
+            ) : null}
             {selectedFollowUp ? (
               <button
                 type="button"
@@ -2797,12 +2809,27 @@ export const FinanceWorkspace = ({
     read: () => Promise<WorkspaceFinanceData>;
     client: RestApiClient;
   };
-}) =>
-  dataSource === 'synthetic' ? (
+}) => {
+  const [previewEnabled, setPreviewEnabled] = useState(false);
+  const isSynthetic = dataSource === 'synthetic' || previewEnabled;
+  const onTogglePreview =
+    dataSource === 'workspace'
+      ? () => setPreviewEnabled((enabled) => !enabled)
+      : undefined;
+
+  return isSynthetic ? (
     <WorkspaceFinanceScreen
+      key="synthetic"
       dataOverride={SYNTHETIC_WORKSPACE_FINANCE_DATA}
       initialView={initialView}
+      onTogglePreview={onTogglePreview}
     />
   ) : (
-    <WorkspaceFinanceScreen initialView={initialView} services={services} />
+    <WorkspaceFinanceScreen
+      key="workspace"
+      initialView={initialView}
+      onTogglePreview={onTogglePreview}
+      services={services}
+    />
   );
+};

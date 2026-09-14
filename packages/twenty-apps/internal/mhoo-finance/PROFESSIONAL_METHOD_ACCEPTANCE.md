@@ -502,3 +502,29 @@ permission/error behavior, timeline interaction, immutable event contracts and
 bounded domain reducers. It does not expose an event mutation route and does
 not yet prove installed event persistence, native Task creation/attachments,
 provider populations, mailbox correlation or production acceptance.
+
+## 2026-09-14 live visual preview receipt
+
+On `codex/finance-follow-up-mutation` from source head
+`1f066a79298606c8500bf46a64b1426616e14c13`, the installed Hass Kitchen
+Finance UI was changed to expose an explicit, reversible `Preview sample data`
+switch. It defaults to permission-checked Workspace reads; sample data is not
+substituted automatically or written as Workspace records. Focused UI tests
+(6 passed), lint (0 warnings/errors), App build (14 files), and `git diff
+--check` passed. Read-only `yarn twenty plan --remote finance-install-20260914`
+reported five front-component checksum updates, zero additions and zero
+destructions. Reviewed `yarn twenty apply --remote finance-install-20260914`
+reported `Synced Mhoo Finance (14 files)`.
+
+At 2026-09-14 05:55 UTC, the in-app browser showed the installed Overview at
+`https://hass-kitchen.mhoo.app/page/1f06ffee-22e3-4d0e-9620-f0df945799cf`.
+Before switching, it showed current Workspace records with zero included facts.
+After the explicit switch, the visible page showed `Synthetic test records ·
+removable adapter`, 29 included records, USD 6,825 money in, USD 7,605 money
+out, -USD 780 net movement, a rendered chart, and sample transaction rows.
+This proves a visually working installed UI with labeled synthetic sample data;
+it does **not** prove any customer bank-statement import, Clover connection,
+live Finance facts, role coverage, or production financial correctness. The
+first real-data tranche remains subject to MHO-227/MHO-228 authorization,
+immutable Files custody, and row-source lineage. A reload returns to live
+Workspace records.

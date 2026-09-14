@@ -105,6 +105,11 @@ describe('native Finance workspace', () => {
     expect(workspaceSource).not.toContain('<header className="fw-chrome">');
     expect(workspaceSource).not.toContain('<nav className="fw-nav"');
     expect(workspaceSource).toContain("dataSource = 'workspace'");
+    expect(workspaceSource).toContain('Preview sample data');
+    expect(workspaceSource).toContain('Return to Workspace records');
+    expect(workspaceSource).toContain('aria-pressed={isSynthetic}');
+    expect(workspaceSource).toContain('key="workspace"');
+    expect(workspaceSource).toContain('key="synthetic"');
     expect(workspaceSource).toContain('No demo data was substituted');
     expect(workspaceSource).toContain('Native Twenty Task');
     expect(workspaceSource).toContain('Approve draft · do not send');
