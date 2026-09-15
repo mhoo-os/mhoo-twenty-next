@@ -90,6 +90,8 @@ import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.ent
 import { AuthProvider } from 'src/engine/decorators/auth/auth-provider.decorator';
 import { AuthUser } from 'src/engine/decorators/auth/auth-user.decorator';
 import { AuthWorkspace } from 'src/engine/decorators/auth/auth-workspace.decorator';
+import { AdminPanelGuard } from 'src/engine/guards/admin-panel-guard';
+import { NoImpersonationGuard } from 'src/engine/guards/no-impersonation.guard';
 import { NoPermissionGuard } from 'src/engine/guards/no-permission.guard';
 import { PublicEndpointGuard } from 'src/engine/guards/public-endpoint.guard';
 import { RequireAccessTokenGuard } from 'src/engine/guards/require-access-token.guard';
@@ -111,9 +113,12 @@ import { SignUpInput } from './dto/sign-up.input';
 import { UserCredentialsInput } from './dto/user-credentials.input';
 import { CheckUserExistDTO } from './dto/user-exists.dto';
 import { EmailAndCaptchaInput } from './dto/user-exists.input';
+import { MhooPlatformInvitationDTO } from './dto/mhoo-platform-invitation.dto';
+import { MhooPlatformInvitationInput } from './dto/mhoo-platform-invitation.input';
 import { WorkspaceInviteHashValidDTO } from './dto/workspace-invite-hash-valid.dto';
 import { WorkspaceInviteHashValidInput } from './dto/workspace-invite-hash.input';
 import { AuthService } from './services/auth.service';
+import { MhooPlatformInvitationService } from './services/mhoo-platform-invitation.service';
 
 const PASSWORD_RESET_EMAIL_RATE_LIMIT_MAX = 3;
 const PASSWORD_RESET_EMAIL_RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000;
@@ -163,7 +168,25 @@ export class AuthResolver {
     private readonly fileCorePictureService: FileCorePictureService,
     private readonly userSessionService: UserSessionService,
     private readonly userSessionCookieService: UserSessionCookieService,
+    private readonly mhooPlatformInvitationService: MhooPlatformInvitationService,
   ) {}
+
+  @Mutation(() => MhooPlatformInvitationDTO)
+  @UseGuards(
+    UserAuthGuard,
+    AdminPanelGuard,
+    NoImpersonationGuard,
+    NoPermissionGuard,
+  )
+  async sendMhooPlatformInvitation(
+    @Args() input: MhooPlatformInvitationInput,
+    @AuthUser() inviter: AuthContextUser,
+  ): Promise<MhooPlatformInvitationDTO> {
+    return this.mhooPlatformInvitationService.sendInvitation({
+      email: input.email,
+      inviter,
+    });
+  }
 
   @UseGuards(CaptchaGuard, PublicEndpointGuard, NoPermissionGuard)
   @Query(() => CheckUserExistDTO)
@@ -454,6 +477,7 @@ export class AuthResolver {
         provider: AuthProviderEnum.Password,
         password: signUpInput.password,
       },
+      signUpInput.mhooInvitationToken,
     );
 
     const availableWorkspaces =
