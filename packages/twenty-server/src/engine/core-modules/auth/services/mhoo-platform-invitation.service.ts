@@ -7,7 +7,6 @@ import { msg } from '@lingui/core/macro';
 import { addMilliseconds } from 'date-fns';
 import ms from 'ms';
 import { MhooPlatformInvitationEmail, renderEmail } from 'twenty-emails';
-import { type APP_LOCALES } from 'twenty-shared/translations';
 import { AppPath } from 'twenty-shared/types';
 import { IsNull, MoreThan, Repository } from 'typeorm';
 
@@ -110,7 +109,7 @@ export class MhooPlatformInvitationService {
       },
     });
     const brand = this.productBrandResolverService.resolve();
-    const locale = inviter.locale as keyof typeof APP_LOCALES;
+    const locale = inviter.locale;
     const emailTemplate = MhooPlatformInvitationEmail({
       brand,
       inviter: {
