@@ -163,11 +163,19 @@ export const useSignInUp = (form: UseFormReturn<Form>) => {
           signInUpMode === SignInUpMode.SignUp &&
           (!isOnAWorkspace || !isDefined(workspacePublicData))
         ) {
+          if (mhooInvitationToken) {
+            return await signUpWithCredentials(
+              data.email.toLowerCase().trim(),
+              data.password,
+              token,
+              mhooInvitationToken,
+            );
+          }
+
           return await signUpWithCredentials(
             data.email.toLowerCase().trim(),
             data.password,
             token,
-            mhooInvitationToken,
           );
         }
 
