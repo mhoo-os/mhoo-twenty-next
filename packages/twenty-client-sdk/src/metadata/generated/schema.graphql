@@ -2637,6 +2637,11 @@ type CheckUserExist {
   isEmailVerified: Boolean!
 }
 
+type MhooPlatformInvitationDTO {
+  email: String!
+  expiresAt: DateTime!
+}
+
 type WorkspaceInviteHashValid {
   isValid: Boolean!
 }
@@ -3885,13 +3890,14 @@ type Mutation {
   runEvaluationInput(agentId: UUID!, input: String!): AgentTurn!
   updateTimelineActivityType(input: UpdateTimelineActivityTypeInput!): TimelineActivityType!
   resetTimelineActivityType(id: UUID!): TimelineActivityType!
+  sendMhooPlatformInvitation(email: String!): MhooPlatformInvitationDTO!
   getAuthorizationUrlForSSO(input: GetAuthorizationUrlForSSOInput!): GetAuthorizationUrlForSSO!
-  getLoginTokenFromCredentials(email: String!, password: String!, captchaToken: String, locale: String, verifyEmailRedirectPath: String, origin: String!): LoginToken!
-  signIn(email: String!, password: String!, captchaToken: String, locale: String, verifyEmailRedirectPath: String): AvailableWorkspacesAndAccessTokens!
+  getLoginTokenFromCredentials(email: String!, password: String!, captchaToken: String, locale: String, verifyEmailRedirectPath: String, mhooInvitationToken: String, origin: String!): LoginToken!
+  signIn(email: String!, password: String!, captchaToken: String, locale: String, verifyEmailRedirectPath: String, mhooInvitationToken: String): AvailableWorkspacesAndAccessTokens!
   verifyEmailAndGetLoginToken(emailVerificationToken: String!, email: String!, captchaToken: String, origin: String!): VerifyEmailAndGetLoginToken!
   verifyEmailAndGetWorkspaceAgnosticToken(emailVerificationToken: String!, email: String!, captchaToken: String): AvailableWorkspacesAndAccessTokens!
   getAuthTokensFromOTP(otp: String!, loginToken: String!, captchaToken: String, origin: String!): AuthTokens!
-  signUp(email: String!, password: String!, captchaToken: String, locale: String, verifyEmailRedirectPath: String): AvailableWorkspacesAndAccessTokens!
+  signUp(email: String!, password: String!, captchaToken: String, locale: String, verifyEmailRedirectPath: String, mhooInvitationToken: String): AvailableWorkspacesAndAccessTokens!
   signUpInWorkspace(email: String!, password: String!, workspaceId: UUID, workspaceInviteHash: String, workspacePersonalInviteToken: String, captchaToken: String, locale: String, verifyEmailRedirectPath: String): SignUp!
   signUpInNewWorkspace(input: SignUpInNewWorkspaceInput): SignUp!
   uploadNewWorkspaceLogo(workspaceId: String!, file: Upload!): FileWithSignedUrl!
