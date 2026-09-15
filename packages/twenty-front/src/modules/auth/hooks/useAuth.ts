@@ -18,6 +18,7 @@ import {
   SignInDocument,
   SignOutDocument,
   SignUpInWorkspaceDocument,
+  type SignUpMutation,
   VerifyEmailAndGetLoginTokenDocument,
   VerifyEmailAndGetWorkspaceAgnosticTokenDocument,
 } from '~/generated-metadata/graphql';
@@ -40,6 +41,15 @@ import { isValidReturnToPath } from '@/auth/utils/isValidReturnToPath';
 import { isNonEmptyString } from '@sniptt/guards';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { useSetAtomState } from '@/ui/utilities/state/jotai/hooks/useSetAtomState';
+
+type MhooSignUpMutationVariables = {
+  captchaToken?: string | null;
+  email: string;
+  locale?: string | null;
+  mhooInvitationToken?: string | null;
+  password: string;
+  verifyEmailRedirectPath?: string | null;
+};
 
 import { isAppEffectRedirectEnabledState } from '@/app/states/isAppEffectRedirectEnabledState';
 import { loginTokenState } from '@/auth/states/loginTokenState';
@@ -98,7 +108,9 @@ export const useAuth = () => {
     GetLoginTokenFromCredentialsDocument,
   );
   const [signIn] = useMutation(SignInDocument);
-  const [signUp] = useMutation(SIGN_UP);
+  const [signUp] = useMutation<SignUpMutation, MhooSignUpMutationVariables>(
+    SIGN_UP,
+  );
   const [signUpInWorkspace] = useMutation(SignUpInWorkspaceDocument);
   const [getAuthTokensFromLoginToken] = useMutation(
     GetAuthTokensFromLoginTokenDocument,
