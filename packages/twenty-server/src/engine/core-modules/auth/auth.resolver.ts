@@ -172,7 +172,12 @@ export class AuthResolver {
   ) {}
 
   @Mutation(() => MhooPlatformInvitationDTO)
-  @UseGuards(AdminPanelGuard, NoImpersonationGuard)
+  @UseGuards(
+    UserAuthGuard,
+    AdminPanelGuard,
+    NoImpersonationGuard,
+    NoPermissionGuard,
+  )
   async sendMhooPlatformInvitation(
     @Args() input: MhooPlatformInvitationInput,
     @AuthUser() inviter: AuthContextUser,
