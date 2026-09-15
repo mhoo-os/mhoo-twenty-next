@@ -47,6 +47,8 @@ export const useSignInUp = (form: UseFormReturn<Form>) => {
   const [searchParams] = useSearchParams();
   const workspacePersonalInviteToken =
     searchParams.get('inviteToken') ?? undefined;
+  const mhooInvitationToken =
+    searchParams.get('mhooInvitationToken') ?? undefined;
 
   const [isInviteMode] = useState(() =>
     isMatchingLocation(location, AppPath.Invite),
@@ -165,6 +167,7 @@ export const useSignInUp = (form: UseFormReturn<Form>) => {
             data.email.toLowerCase().trim(),
             data.password,
             token,
+            mhooInvitationToken,
           );
         }
 
@@ -198,6 +201,7 @@ export const useSignInUp = (form: UseFormReturn<Form>) => {
       signUpWithCredentialsInWorkspace,
       workspaceInviteHash,
       workspacePersonalInviteToken,
+      mhooInvitationToken,
       enqueueErrorSnackBar,
       buildSearchParamsFromUrlSyncedStates,
       isOnAWorkspace,

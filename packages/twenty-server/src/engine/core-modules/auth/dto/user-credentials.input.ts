@@ -29,4 +29,9 @@ export class UserCredentialsInput {
   @IsString()
   @IsOptional()
   verifyEmailRedirectPath?: string;
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  mhooInvitationToken?: string;
 }

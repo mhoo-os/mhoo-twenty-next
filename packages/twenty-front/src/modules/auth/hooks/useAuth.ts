@@ -18,12 +18,12 @@ import {
   SignInDocument,
   SignOutDocument,
   SignUpInWorkspaceDocument,
-  SignUpDocument,
   VerifyEmailAndGetLoginTokenDocument,
   VerifyEmailAndGetWorkspaceAgnosticTokenDocument,
 } from '~/generated-metadata/graphql';
 
 import { currentUserState } from '@/auth/states/currentUserState';
+import { SIGN_UP } from '@/auth/graphql/mutations/signUp';
 import { isCookieAuthActiveState } from '@/auth/states/isCookieAuthActiveState';
 import { isPendingServerSignOutState } from '@/auth/states/isPendingServerSignOutState';
 import { currentUserWorkspaceState } from '@/auth/states/currentUserWorkspaceState';
@@ -98,7 +98,7 @@ export const useAuth = () => {
     GetLoginTokenFromCredentialsDocument,
   );
   const [signIn] = useMutation(SignInDocument);
-  const [signUp] = useMutation(SignUpDocument);
+  const [signUp] = useMutation(SIGN_UP);
   const [signUpInWorkspace] = useMutation(SignUpInWorkspaceDocument);
   const [getAuthTokensFromLoginToken] = useMutation(
     GetAuthTokensFromLoginTokenDocument,
@@ -428,13 +428,19 @@ export const useAuth = () => {
   );
 
   const handleCredentialsSignUp = useCallback(
-    async (email: string, password: string, captchaToken?: string) => {
+    async (
+      email: string,
+      password: string,
+      captchaToken?: string,
+      mhooInvitationToken?: string,
+    ) => {
       const signUpResult = await signUp({
         variables: {
           email,
           password,
           captchaToken,
           locale: i18n.locale ?? SOURCE_LOCALE,
+          mhooInvitationToken,
         },
       });
 
