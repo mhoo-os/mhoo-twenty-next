@@ -4,6 +4,26 @@ Date: 2026-09-22 (Asia/Bangkok)
 
 Scope: local Twenty repositories and their registered worktrees. This receipt records source custody only. It does not authorize merge, push, deployment, import, App installation, branch deletion, or production changes.
 
+## Handoff mapping
+
+- Primary issue: none for this cross-repository cleanup packet. Existing feature
+  issues and Delivery Room missions retain ownership of their own dirty worktrees.
+- Coordination mission: `mhoo-repository-cleanup-review-20260922`.
+- Coordinator source head: `mhoo` commit
+  `0651fa612afa2dd3e7b743f2f734bbd37a971657` on
+  `codex/repository-cleanup-custody`.
+- Retained worker: none for this documentation-only packet; dirty worktree
+  owners remain unchanged and are not implicitly transferred here.
+- Existing ledger: this custody map plus
+  `docs/operations/2026-09-22-twenty-repository-custody-review.md`; feature
+  checkpoints remain in their owning Delivery Room missions and repository docs.
+- Blocker owner: the repository cleanup coordinator owns classification and
+  independent review. Each feature owner must explicitly land, archive, or
+  surrender dirty source before its worktree can be removed.
+- Authorized next step: custody documentation and independent source review.
+  No merge, push, deployment, import, App installation, branch deletion,
+  worktree removal, or production change is authorized.
+
 ## Decision
 
 - `mhoo-twenty-next` is the current clean-foundation development repository. It starts from Twenty `v2.37.0` and must keep its independent ancestry.
