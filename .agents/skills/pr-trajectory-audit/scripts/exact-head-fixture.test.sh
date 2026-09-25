@@ -82,6 +82,7 @@ grep -Fq "trajectory fixture rejected: $suffix_path" "$temporary_directory/suffi
 }
 
 allowed_paths=(
+  .github/workflows/mhoo-ai-review.yml
   packages/twenty-front/src/modules/settings/accounts/components/CloverSetupPrompt.tsx
   packages/twenty-front/src/modules/settings/accounts/components/__tests__/CloverSetupPrompt.test.tsx
   packages/twenty-front/src/modules/ui/layout/page/components/DefaultLayout.tsx
@@ -705,6 +706,8 @@ for path in \
   packages/twenty-front/src/modules/advanced-text-editor/hooks/nested/useTurnIntoBlockOptions.ts \
   packages/twenty-front/src/modules/advanced-text-editor/hooks/useTextBubbleState.ts \
   packages/twenty-front/src/modules/advanced-text-editor/components/AdvancedTextEditor.tsx \
+  .github/workflows/mhoo-ai-review.yml.backup \
+  .github/workflows/nested/mhoo-ai-review.yml \
   .github/workflows/ci-front.yaml.backup \
   .github/workflows/nested/ci-front.yaml \
   .github/workflows/ci-front-component-renderer.yaml \
