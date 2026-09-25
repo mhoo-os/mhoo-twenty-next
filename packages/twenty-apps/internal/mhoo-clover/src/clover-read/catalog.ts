@@ -32,7 +32,7 @@ export type CloverToolName =
 export interface CloverRequestTarget {
   readonly method: string;
   readonly path: string;
-  readonly query: Readonly<Record<string, string>>;
+  readonly query: Readonly<Record<string, string | readonly string[]>>;
 }
 
 export interface CloverToolDefinition {
@@ -65,7 +65,7 @@ const idSchema = z
 function expandSchema(allowed: readonly string[]): z.ZodType<string[] | undefined> {
   return z
     .array(z.string().trim().min(1).max(64))
-    .max(5)
+    .max(3)
     .refine(
       (values) => new Set(values).size === values.length,
       'expand values must be unique',
@@ -77,11 +77,17 @@ function expandSchema(allowed: readonly string[]): z.ZodType<string[] | undefine
     .optional();
 }
 
-function endpointFilterSchema(allowedFields: readonly string[]): z.ZodType<string> {
-  return z.string().trim().min(3).max(256).regex(SINGLE_FILTER_PATTERN).refine((value) => {
-    const field = SINGLE_FILTER_PATTERN.exec(value)?.[1];
-    return Boolean(field && allowedFields.includes(field));
+function endpointFilterSchema(
+  allowedFields: readonly string[],
+): z.ZodType<string | string[]> {
+  const predicate = z.string().trim().min(3).max(256).regex(SINGLE_FILTER_PATTERN);
+  const expression = z.string().trim().min(3).max(256).refine((value) => {
+    return value.split(/\s+AND\s+/).every((part) => {
+      const field = SINGLE_FILTER_PATTERN.exec(part)?.[1];
+      return Boolean(field && allowedFields.includes(field));
+    });
   }, 'filter field is not allowed for this endpoint');
+  return z.union([expression, z.array(predicate).min(1).max(2)]);
 }
 
 function endpointListSchema(options: {
@@ -127,10 +133,10 @@ function listTarget(
   input: Record<string, unknown>,
   merchantId: string,
 ): CloverRequestTarget {
-  const query: Record<string, string> = {};
+  const query: Record<string, string | readonly string[]> = {};
   if (typeof input.limit === 'number') query.limit = String(input.limit);
   if (typeof input.offset === 'number') query.offset = String(input.offset);
-  if (typeof input.filter === 'string') {
+  if (typeof input.filter === 'string' || Array.isArray(input.filter)) {
     query.filter = input.filter;
   }
   if (Array.isArray(input.expand) && input.expand.every((value) => typeof value === 'string')) {
@@ -149,11 +155,13 @@ function getTarget(
   input: Record<string, unknown>,
   merchantId: string,
 ): CloverRequestTarget {
-  const query: Record<string, string> = {};
+  const query: Record<string, string | readonly string[]> = {};
   if (Array.isArray(input.expand) && input.expand.every((value) => typeof value === 'string')) {
     query.expand = input.expand.join(',');
   }
-  if (typeof input.filter === 'string') query.filter = input.filter;
+  if (typeof input.filter === 'string' || Array.isArray(input.filter)) {
+    query.filter = input.filter;
+  }
   return {
     method: 'GET',
     path: `/v3/merchants/${merchantId}/${resource}/${encodedId(input[field])}`,
@@ -211,6 +219,7 @@ export const CLOVER_TOOL_DEFINITIONS: readonly CloverToolDefinition[] = [
     'List Clover orders using the frozen provider filter and expansion contract.',
     'orders:read',
     endpointListSchema({
+      pagination: true,
       filterFields: ['employee.id', 'note', 'modifiedTime', 'orderType', 'touched', 'cardTransaction.last4', 'manualTransaction', 'employee.name', 'title', 'device.id', 'externalReferenceId', 'clientCreatedTime', 'total', 'payType', 'testMode', 'createdTime', 'id', 'state', 'deletedTime'],
       expands: ['employee', 'payments', 'refunds', 'credits', 'voids', 'payment.tender', 'payment.cardTransaction', 'lineItems', 'customers', 'serviceCharge', 'discounts', 'orderType', 'lineItems.discounts', 'lineItems.modifications'],
     }),

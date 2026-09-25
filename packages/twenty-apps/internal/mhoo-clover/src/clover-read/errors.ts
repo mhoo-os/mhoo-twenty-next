@@ -11,10 +11,12 @@ export type NativeReadErrorCode =
 
 export class CloverNativeReadError extends Error {
   readonly code: NativeReadErrorCode;
+  readonly providerStatus?: number;
 
-  constructor(code: NativeReadErrorCode) {
+  constructor(code: NativeReadErrorCode, providerStatus?: number) {
     super(code);
     this.name = 'CloverNativeReadError';
     this.code = code;
+    this.providerStatus = providerStatus;
   }
 }

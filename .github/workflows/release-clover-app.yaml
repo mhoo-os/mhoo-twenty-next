@@ -1,0 +1,62 @@
+name: Release Clover App
+
+on:
+  push:
+    tags:
+      - 'clover-v*'
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Git ref containing the App version to release'
+        required: true
+        default: main
+        type: string
+      dry_run:
+        description: 'Validate targets and secrets without publishing or installing'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-clover-app
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Publish and install Clover App
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout release ref
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          ref: ${{ inputs.ref || github.ref }}
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: yarn
+          cache-dependency-path: yarn.lock
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Validate Clover App
+        working-directory: packages/twenty-apps/internal/mhoo-clover
+        run: |
+          ../../../../node_modules/.bin/oxlint -c .oxlintrc.json .
+          ../../../../node_modules/.bin/tsgo --noEmit -p tsconfig.json
+          ../../../../node_modules/.bin/vitest run --config vitest.unit.config.ts
+
+      - name: Validate and release
+        env:
+          CLOVER_RELEASE_DRY_RUN: ${{ inputs.dry_run || 'false' }}
+          TWENTY_CLOVER_HASS_KITCHEN_API_KEY: ${{ secrets.TWENTY_CLOVER_HASS_KITCHEN_API_KEY }}
+        run: bash scripts/release-clover-app.sh

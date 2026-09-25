@@ -1,0 +1,11 @@
+{
+  "appPath": "packages/twenty-apps/internal/mhoo-clover",
+  "targets": [
+    {
+      "name": "hass-kitchen-release",
+      "url": "https://hass-kitchen.mhoo.app",
+      "apiKeyEnv": "TWENTY_CLOVER_HASS_KITCHEN_API_KEY",
+      "publish": true
+    }
+  ]
+}

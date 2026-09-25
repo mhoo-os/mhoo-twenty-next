@@ -67,6 +67,25 @@ describe('native Clover data read', () => {
     expect(JSON.stringify(result)).not.toContain('4111111111111111');
   });
 
+  it('exposes a safe provider status without returning the provider error body', async () => {
+    const d = {
+      list: vi.fn(async () => [connection]),
+      get: vi.fn(async () => connection),
+      fetch: vi.fn(async () =>
+        new Response(JSON.stringify({ message: connection.accessToken }), {
+          status: 403,
+          headers: { 'Content-Type': 'application/json' },
+        }),
+      ),
+    };
+
+    await expect(
+      readCloverData({ operation: 'clover_orders_list', input: {} }, d),
+    ).rejects.toThrow(
+      'Clover data is unavailable for clover_orders_list (reason=clover_provider_http_error, providerStatus=403).',
+    );
+  });
+
   it('rejects unknown operations and invalid endpoint filters before credential lookup', async () => {
     const d = dependencies();
     await expect(

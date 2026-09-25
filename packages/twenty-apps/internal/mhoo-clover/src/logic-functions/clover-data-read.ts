@@ -4,8 +4,19 @@ import {
   type CloverToolName,
 } from '../clover-read/catalog';
 import { invokeNativeCloverRead, type FetchLike } from '../clover-read/client';
+import { CloverNativeReadError } from '../clover-read/errors';
 import { resolveCloverConnection } from './resolve-clover-connection';
 import { type CloverConnection } from './clover-merchant-read';
+
+const isNativeReadError = (
+  error: unknown,
+): error is CloverNativeReadError => {
+  if (error instanceof CloverNativeReadError) return true;
+  if (!error || typeof error !== 'object') return false;
+  const candidate = error as { name?: unknown; code?: unknown };
+  return candidate.name === 'CloverNativeReadError' &&
+    typeof candidate.code === 'string';
+};
 
 export const CLOVER_DATA_READ_OPERATIONS = [
   'clover_merchant_get',
@@ -75,9 +86,13 @@ export async function readCloverData(
       operation: request.operation,
       data,
     };
-  } catch {
-    throw new Error(
-      'Clover data is unavailable. Check the selected connection and try again.',
-    );
+  } catch (error) {
+    const details =
+      isNativeReadError(error)
+        ? `reason=${error.code}${error.providerStatus === undefined ? '' : `, providerStatus=${error.providerStatus}`}`
+        : 'reason=unknown';
+    const operation =
+      typeof request.operation === 'string' ? ` for ${request.operation}` : '';
+    throw new Error(`Clover data is unavailable${operation} (${details}).`);
   }
 }

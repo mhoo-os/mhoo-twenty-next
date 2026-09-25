@@ -38,7 +38,7 @@ export async function invokeNativeCloverRead(
 function buildUrl(
   merchantId: string,
   path: string,
-  query: Readonly<Record<string, string>>,
+  query: Readonly<Record<string, string | readonly string[]>>,
 ): URL {
   const url = new URL(path, CLOVER_REST_ORIGIN);
   if (
@@ -52,10 +52,13 @@ function buildUrl(
     throw new CloverNativeReadError('clover_origin_rejected');
   }
   for (const [key, value] of Object.entries(query)) {
-    if (!ALLOWED_QUERY_KEYS.has(key) || value.length > 512) {
-      throw new CloverNativeReadError('invalid_tool_input');
+    const values = Array.isArray(value) ? value : [value];
+    for (const item of values) {
+      if (!ALLOWED_QUERY_KEYS.has(key) || item.length > 512) {
+        throw new CloverNativeReadError('invalid_tool_input');
+      }
+      url.searchParams.append(key, item);
     }
-    url.searchParams.set(key, value);
   }
   return url;
 }
@@ -91,7 +94,7 @@ async function fetchJson(
     throw new CloverNativeReadError('clover_origin_rejected');
   }
   if (!response.ok) {
-    throw new CloverNativeReadError('clover_provider_http_error');
+    throw new CloverNativeReadError('clover_provider_http_error', response.status);
   }
   const contentType = response.headers.get('Content-Type');
   if (contentType && !/^application\/json(?:\s*;|$)/i.test(contentType)) {

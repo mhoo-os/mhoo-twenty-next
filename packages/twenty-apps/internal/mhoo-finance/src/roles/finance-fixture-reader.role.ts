@@ -5,13 +5,16 @@ import {
   FINANCE_FACT_OBJECT_UNIVERSAL_IDENTIFIER,
   FINANCIAL_ACCOUNT_OBJECT_UNIVERSAL_IDENTIFIER,
   SOURCE_ARTIFACT_OBJECT_UNIVERSAL_IDENTIFIER,
+  CLOVER_CONNECTION_OBJECT_UNIVERSAL_IDENTIFIER,
+  CLOVER_IMPORT_RECEIPT_OBJECT_UNIVERSAL_IDENTIFIER,
+  CLOVER_PAYMENT_REVISION_OBJECT_UNIVERSAL_IDENTIFIER,
 } from 'src/constants/universal-identifiers';
 
 export default defineApplicationRole({
   universalIdentifier: FINANCE_FIXTURE_READER_ROLE_UNIVERSAL_IDENTIFIER,
   label: 'Mhoo Finance reader',
   description:
-    'Read Finance facts, account labels and linked source evidence for the signed-in user. No writes, settings, provider access or publishing.',
+    'Read Finance facts, account labels, linked source evidence, and validated Clover source receipts for the signed-in user. No writes, settings, provider access or publishing.',
   canAccessAllTools: false,
   canReadAllObjectRecords: false,
   canUpdateAllObjectRecords: false,
@@ -25,6 +28,9 @@ export default defineApplicationRole({
     FINANCE_FACT_OBJECT_UNIVERSAL_IDENTIFIER,
     FINANCIAL_ACCOUNT_OBJECT_UNIVERSAL_IDENTIFIER,
     SOURCE_ARTIFACT_OBJECT_UNIVERSAL_IDENTIFIER,
+    CLOVER_CONNECTION_OBJECT_UNIVERSAL_IDENTIFIER,
+    CLOVER_IMPORT_RECEIPT_OBJECT_UNIVERSAL_IDENTIFIER,
+    CLOVER_PAYMENT_REVISION_OBJECT_UNIVERSAL_IDENTIFIER,
   ].map((objectUniversalIdentifier) => ({
     objectUniversalIdentifier,
     canReadObjectRecords: true,

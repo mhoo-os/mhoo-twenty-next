@@ -4,6 +4,9 @@ import {
   FINANCE_FACT_OBJECT_UNIVERSAL_IDENTIFIER,
   FINANCIAL_ACCOUNT_OBJECT_UNIVERSAL_IDENTIFIER,
   SOURCE_ARTIFACT_OBJECT_UNIVERSAL_IDENTIFIER,
+  CLOVER_CONNECTION_OBJECT_UNIVERSAL_IDENTIFIER,
+  CLOVER_IMPORT_RECEIPT_OBJECT_UNIVERSAL_IDENTIFIER,
+  CLOVER_PAYMENT_REVISION_OBJECT_UNIVERSAL_IDENTIFIER,
 } from 'src/constants/universal-identifiers';
 import application from 'src/application.config';
 import financeFixtureReaderRole from 'src/roles/finance-fixture-reader.role';
@@ -29,7 +32,10 @@ describe('@mhoo/finance fixture manifest contracts', () => {
       objectPermissions: [
         FINANCE_FACT_OBJECT_UNIVERSAL_IDENTIFIER,
         FINANCIAL_ACCOUNT_OBJECT_UNIVERSAL_IDENTIFIER,
-    SOURCE_ARTIFACT_OBJECT_UNIVERSAL_IDENTIFIER,
+        SOURCE_ARTIFACT_OBJECT_UNIVERSAL_IDENTIFIER,
+        CLOVER_CONNECTION_OBJECT_UNIVERSAL_IDENTIFIER,
+        CLOVER_IMPORT_RECEIPT_OBJECT_UNIVERSAL_IDENTIFIER,
+        CLOVER_PAYMENT_REVISION_OBJECT_UNIVERSAL_IDENTIFIER,
       ].map((objectUniversalIdentifier) => ({
         objectUniversalIdentifier,
         canReadObjectRecords: true,
