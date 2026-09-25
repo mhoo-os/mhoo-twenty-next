@@ -89,6 +89,7 @@ export const SYNTHETIC_WORKSPACE_FINANCE_DATA: WorkspaceFinanceData =
         id: '59bb8ac0-6669-4cac-96ce-9d2fe90bd5b9',
         artifactKey: 'synthetic-statement-2025-01',
         accountKey: 'Operating · demo',
+        accountLabel: 'Operating · demo',
         sourceKind: 'BANK',
         period: '2025-01',
         status: 'PARTIAL',
@@ -99,11 +100,13 @@ export const SYNTHETIC_WORKSPACE_FINANCE_DATA: WorkspaceFinanceData =
           moneyInMinor: '100000',
           moneyOutMinor: '60000',
         }),
+        rowCount: 0,
       },
       {
         id: '1692d925-63c7-4214-8dd2-d2cb3d82705b',
         artifactKey: 'synthetic-statement-2025-02',
         accountKey: 'Operating · demo',
+        accountLabel: 'Operating · demo',
         sourceKind: 'BANK',
         period: '2025-02',
         status: 'PARTIAL',
@@ -114,6 +117,7 @@ export const SYNTHETIC_WORKSPACE_FINANCE_DATA: WorkspaceFinanceData =
           moneyInMinor: '120000',
           moneyOutMinor: '140000',
         }),
+        rowCount: 0,
       },
     ]),
     followUps: Object.freeze([
@@ -245,4 +249,5 @@ export const SYNTHETIC_WORKSPACE_FINANCE_DATA: WorkspaceFinanceData =
       },
     ] satisfies readonly WorkspaceFinanceFollowUp[]),
     truncated: false,
+    statementsTruncated: false,
   });

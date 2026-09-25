@@ -49,11 +49,13 @@ export type WorkspaceStatement = Readonly<{
   id: string;
   artifactKey: string;
   accountKey: string;
+  accountLabel: string;
   sourceKind: string;
   period: string;
   status: string;
   originalFileName: string;
   statementControls: string | null;
+  rowCount: number | null;
 }>;
 
 export type WorkspaceFinanceFollowUp = Readonly<{
@@ -83,10 +85,36 @@ export type WorkspaceFinanceData = Readonly<{
   statements: readonly WorkspaceStatement[];
   followUps: readonly WorkspaceFinanceFollowUp[];
   truncated: boolean;
+  statementsTruncated: boolean;
 }>;
 
+export const summarizeWorkspaceStatementCoverage = (
+  statements: readonly WorkspaceStatement[],
+  statementsTruncated: boolean,
+):
+  | Readonly<{ kind: 'available'; importedStatements: number; importedRows: number }>
+  | Readonly<{ kind: 'unavailable' }> => {
+  if (statementsTruncated) return { kind: 'unavailable' };
+  const imported = statements.filter((statement) => statement.status === 'IMPORTED');
+  if (
+    imported.some(
+      (statement) =>
+        statement.rowCount === null || !Number.isSafeInteger(statement.rowCount),
+    )
+  ) {
+    return { kind: 'unavailable' };
+  }
+  const importedRows = imported.reduce(
+    (total, statement) => total + (statement.rowCount ?? 0),
+    0,
+  );
+  return Number.isSafeInteger(importedRows)
+    ? { kind: 'available', importedStatements: imported.length, importedRows }
+    : { kind: 'unavailable' };
+};
+
 type WorkspaceConnection<TNode> = Readonly<{
-  pageInfo: Readonly<{ hasNextPage: boolean }>;
+  pageInfo: Readonly<{ hasNextPage: boolean; endCursor?: string | null }>;
   edges: readonly Readonly<{ node: TNode }>[];
 }>;
 
@@ -120,6 +148,10 @@ type WorkspaceFinanceQueryResult = Readonly<{
     status?: string | null;
     originalFileName?: string | null;
     statementControls?: string | null;
+    rowCount?: number | null;
+    financialAccount?: Readonly<{
+      accountLabel?: string | null;
+    }> | null;
   }>>;
   tasks?: WorkspaceConnection<Readonly<{
     id: string;
@@ -144,6 +176,8 @@ type WorkspaceFinanceQueryResult = Readonly<{
 
 const EXACT_MINOR = /^-?(0|[1-9]\d*)$/;
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+const FINANCE_FACT_PAGE_SIZE = 500;
+const MAX_FINANCE_FACT_PAGES = 20;
 const optionalString = (value: unknown) =>
   typeof value === 'string' ? value : null;
 
@@ -194,8 +228,8 @@ export const readWorkspaceFinance = async (
       },
     },
     financeFacts: {
-      __args: { first: 500 },
-      pageInfo: { hasNextPage: true },
+      __args: { first: FINANCE_FACT_PAGE_SIZE },
+      pageInfo: { hasNextPage: true, endCursor: true },
       edges: {
         node: {
           id: true,
@@ -233,6 +267,10 @@ export const readWorkspaceFinance = async (
           status: true,
           originalFileName: true,
           statementControls: true,
+          rowCount: true,
+          financialAccount: {
+            accountLabel: true,
+          },
         },
       },
     },
@@ -268,12 +306,59 @@ export const readWorkspaceFinance = async (
     },
   });
 
+  const factNodes = [...(result.financeFacts?.edges ?? [])];
+  let financeFactsTruncated = false;
+  let factPage = result.financeFacts;
+  const seenFactCursors = new Set<string>();
+  for (let pageCount = 1; factPage?.pageInfo.hasNextPage; pageCount += 1) {
+    const cursor = factPage.pageInfo.endCursor;
+    if (
+      pageCount >= MAX_FINANCE_FACT_PAGES ||
+      typeof cursor !== 'string' ||
+      cursor.length === 0 ||
+      seenFactCursors.has(cursor)
+    ) {
+      financeFactsTruncated = true;
+      break;
+    }
+    seenFactCursors.add(cursor);
+    const next = (await client.query({
+      financeFacts: {
+        __args: { first: FINANCE_FACT_PAGE_SIZE, after: cursor },
+        pageInfo: { hasNextPage: true, endCursor: true },
+        edges: {
+          node: {
+            id: true,
+            factKey: true,
+            description: true,
+            exactAmountMinor: true,
+            sourceCurrency: true,
+            transactionDate: true,
+            postedDate: true,
+            status: true,
+            classification: true,
+            includedInTotals: true,
+            sourceLocation: true,
+            financialAccount: { id: true, accountLabel: true },
+            artifact: { id: true, artifactKey: true },
+          },
+        },
+      },
+    })) as unknown as WorkspaceFinanceQueryResult;
+    if (!next.financeFacts || !Array.isArray(next.financeFacts.edges)) {
+      financeFactsTruncated = true;
+      break;
+    }
+    factNodes.push(...next.financeFacts.edges);
+    factPage = next.financeFacts;
+  }
+
   const accounts = (result.financialAccounts?.edges ?? []).map(({ node }) => ({
     id: node.id,
     label: node.accountLabel ?? 'Unnamed account',
     sourceKind: node.sourceKind ?? 'UNKNOWN',
   }));
-  const facts = (result.financeFacts?.edges ?? []).map(({ node }) => {
+  const facts = factNodes.map(({ node }) => {
     const normalized = normalizeWorkspaceAmount(node.exactAmountMinor);
     const transactionDate = node.transactionDate ?? '';
     const date = ISO_DATE.test(transactionDate)
@@ -302,11 +387,18 @@ export const readWorkspaceFinance = async (
     id: node.id,
     artifactKey: node.artifactKey ?? node.id,
     accountKey: node.accountKey ?? 'Unlinked account',
+    accountLabel: node.financialAccount?.accountLabel ?? node.accountKey ?? 'Unlinked account',
     sourceKind: node.sourceKind ?? 'UNKNOWN',
     period: node.period ?? 'Unknown period',
     status: node.status ?? 'UNKNOWN',
     originalFileName: node.originalFileName ?? 'Original file unavailable',
     statementControls: node.statementControls ?? null,
+    rowCount:
+      typeof node.rowCount === 'number' &&
+      Number.isSafeInteger(node.rowCount) &&
+      node.rowCount >= 0
+        ? node.rowCount
+        : null,
   }));
   const followUps = (result.tasks?.edges ?? []).flatMap(({ node }) => {
     if (node.financeScope !== 'MHOO_FINANCE_V1') return [];
@@ -372,11 +464,12 @@ export const readWorkspaceFinance = async (
     statements: Object.freeze(statements),
     followUps: Object.freeze(followUps),
     truncated: Boolean(
+      financeFactsTruncated ||
       result.financialAccounts?.pageInfo.hasNextPage ||
-      result.financeFacts?.pageInfo.hasNextPage ||
       result.sourceArtifacts?.pageInfo.hasNextPage ||
       result.tasks?.pageInfo.hasNextPage,
     ),
+    statementsTruncated: Boolean(result.sourceArtifacts?.pageInfo.hasNextPage),
   });
 };
 

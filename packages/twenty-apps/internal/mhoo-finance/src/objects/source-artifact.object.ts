@@ -1,6 +1,7 @@
 import {
   defineObject,
   FieldType,
+  OnDeleteAction,
   RelationType,
 } from 'twenty-sdk/define';
 
@@ -27,11 +28,19 @@ import {
   SOURCE_ARTIFACT_ACQUIRED_BY_FIELD_UNIVERSAL_IDENTIFIER,
   SOURCE_ARTIFACT_SUPERSEDES_FIELD_UNIVERSAL_IDENTIFIER,
   SOURCE_ARTIFACT_ACCOUNT_FIELD_UNIVERSAL_IDENTIFIER,
+  SOURCE_ARTIFACT_FINANCIAL_ACCOUNT_FIELD_UNIVERSAL_IDENTIFIER,
   SOURCE_ARTIFACT_FILES_FIELD_UNIVERSAL_IDENTIFIER,
   SOURCE_ARTIFACT_STATEMENT_CONTROLS_FIELD_UNIVERSAL_IDENTIFIER,
+  FINANCIAL_ACCOUNT_OBJECT_UNIVERSAL_IDENTIFIER,
+  FINANCIAL_ACCOUNT_ARTIFACTS_FIELD_UNIVERSAL_IDENTIFIER,
   SOURCE_ARTIFACT_ROW_COUNT_FIELD_UNIVERSAL_IDENTIFIER,
   SOURCE_ARTIFACT_STATUS_FIELD_UNIVERSAL_IDENTIFIER,
 } from 'src/constants/universal-identifiers';
+import {
+  CHASE_PDF_EXTRACTION_HANDOFF_OBJECT_UNIVERSAL_IDENTIFIER,
+  CHASE_PDF_EXTRACTION_HANDOFFS_FIELD_UNIVERSAL_IDENTIFIER,
+  CHASE_PDF_EXTRACTION_SOURCE_ARTIFACT_FIELD_UNIVERSAL_IDENTIFIER,
+} from 'src/constants/chase-pdf-extraction-identifiers';
 
 enum SourceKind {
   BANK = 'BANK',
@@ -79,6 +88,24 @@ export default defineObject({
       label: 'Account key',
       description: 'Scoped account identity; normal presentation must use an approved masked label.',
       icon: 'IconBuildingBank',
+    },
+    {
+      universalIdentifier: SOURCE_ARTIFACT_FINANCIAL_ACCOUNT_FIELD_UNIVERSAL_IDENTIFIER,
+      type: FieldType.RELATION,
+      name: 'financialAccount',
+      label: 'Financial account',
+      description: 'Required binding before a statement source can be imported.',
+      icon: 'IconBuildingBank',
+      isNullable: true,
+      relationTargetObjectMetadataUniversalIdentifier:
+        FINANCIAL_ACCOUNT_OBJECT_UNIVERSAL_IDENTIFIER,
+      relationTargetFieldMetadataUniversalIdentifier:
+        FINANCIAL_ACCOUNT_ARTIFACTS_FIELD_UNIVERSAL_IDENTIFIER,
+      universalSettings: {
+        relationType: RelationType.MANY_TO_ONE,
+        onDelete: OnDeleteAction.SET_NULL,
+        joinColumnName: 'financialAccountId',
+      },
     },
     {
       universalIdentifier: SOURCE_ARTIFACT_KIND_FIELD_UNIVERSAL_IDENTIFIER,
@@ -186,6 +213,22 @@ export default defineObject({
       description: 'Immutable Twenty Files-compatible evidence reference; upload is outside this source slice.',
       icon: 'IconFile',
       universalSettings: { maxNumberOfValues: 1 },
+    },
+    {
+      universalIdentifier: CHASE_PDF_EXTRACTION_HANDOFFS_FIELD_UNIVERSAL_IDENTIFIER,
+      type: FieldType.RELATION,
+      name: 'chasePdfExtractions',
+      label: 'Chase PDF extractions',
+      description: 'Hash-bound derived text retained separately from the immutable original PDF.',
+      icon: 'IconFileAnalytics',
+      isNullable: true,
+      relationTargetObjectMetadataUniversalIdentifier:
+        CHASE_PDF_EXTRACTION_HANDOFF_OBJECT_UNIVERSAL_IDENTIFIER,
+      relationTargetFieldMetadataUniversalIdentifier:
+        CHASE_PDF_EXTRACTION_SOURCE_ARTIFACT_FIELD_UNIVERSAL_IDENTIFIER,
+      universalSettings: {
+        relationType: RelationType.ONE_TO_MANY,
+      },
     },
     {
       universalIdentifier: SOURCE_ARTIFACT_SUPERSEDES_FIELD_UNIVERSAL_IDENTIFIER,

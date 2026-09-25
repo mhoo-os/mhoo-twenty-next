@@ -10,15 +10,25 @@ import {
   FINANCIAL_ACCOUNT_OBJECT_UNIVERSAL_IDENTIFIER,
   SOURCE_ARTIFACT_OBJECT_UNIVERSAL_IDENTIFIER,
   FINANCE_INVESTIGATION_EVENT_OBJECT_UNIVERSAL_IDENTIFIER,
+  IMPORT_RECEIPT_OBJECT_UNIVERSAL_IDENTIFIER,
 } from 'src/constants/universal-identifiers';
+import { CHASE_CHECKING_BATCH_STATE_OBJECT_UNIVERSAL_IDENTIFIER } from 'src/constants/chase-checking-batch-state-identifiers';
+import { CHASE_PDF_EXTRACTION_HANDOFF_OBJECT_UNIVERSAL_IDENTIFIER } from 'src/constants/chase-pdf-extraction-identifiers';
 
 const readable = [
   FINANCE_FACT_OBJECT_UNIVERSAL_IDENTIFIER,
   FINANCIAL_ACCOUNT_OBJECT_UNIVERSAL_IDENTIFIER,
   SOURCE_ARTIFACT_OBJECT_UNIVERSAL_IDENTIFIER,
+  IMPORT_RECEIPT_OBJECT_UNIVERSAL_IDENTIFIER,
+  CHASE_PDF_EXTRACTION_HANDOFF_OBJECT_UNIVERSAL_IDENTIFIER,
+  CHASE_CHECKING_BATCH_STATE_OBJECT_UNIVERSAL_IDENTIFIER,
 ];
 const applicationWritable = [
   FINANCE_INVESTIGATION_EVENT_OBJECT_UNIVERSAL_IDENTIFIER,
+  FINANCE_FACT_OBJECT_UNIVERSAL_IDENTIFIER,
+  IMPORT_RECEIPT_OBJECT_UNIVERSAL_IDENTIFIER,
+  SOURCE_ARTIFACT_OBJECT_UNIVERSAL_IDENTIFIER,
+  CHASE_CHECKING_BATCH_STATE_OBJECT_UNIVERSAL_IDENTIFIER,
 ];
 const lockedEventFields = [
   [
@@ -78,7 +88,9 @@ export default defineApplicationRole({
   canBeAssignedToUsers: false,
   canBeAssignedToApiKeys: false,
   objectPermissions: [
-    ...readable.map((objectUniversalIdentifier) => ({
+    ...readable
+      .filter((objectUniversalIdentifier) => !applicationWritable.includes(objectUniversalIdentifier))
+      .map((objectUniversalIdentifier) => ({
       objectUniversalIdentifier,
       canReadObjectRecords: true,
       canUpdateObjectRecords: false,

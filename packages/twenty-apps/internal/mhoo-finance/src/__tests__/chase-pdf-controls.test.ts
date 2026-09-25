@@ -6,6 +6,7 @@ import {
   createChaseCheckingStatementRowLineage,
   parseChaseCheckingPdfControlsText,
   parseChaseCheckingPdfRowsText,
+  normalizeChasePdfTextPageBoundaries,
   reconcileChaseCheckingPdfRows,
 } from 'src/ingestion/chase-pdf-controls';
 import {
@@ -20,12 +21,12 @@ const fixture = (period: string, opening: string, closing: string, extra = '') =
   period,
   'CHECKING SUMMARY Chase Business Complete Checking',
   'INSTANCES AMOUNT',
-  `Beginning Balance $${opening}`,
+  `Beginning Balance ${opening.startsWith('-$') ? opening : `$${opening}`}`,
   'Deposits and Additions 2 150.00',
   'Checks Paid 1 -25.00',
   'Electronic Withdrawals 1 -10.00',
   extra,
-  `Ending Balance ${extra ? 5 : 4} $${closing}`,
+  `Ending Balance ${extra ? 5 : 4} ${closing.startsWith('-$') ? closing : `$${closing}`}`,
   'Page 2 of 3',
   'SYNTHETIC TRANSACTION DETAILS',
   'Page 3 of 3',
@@ -66,6 +67,17 @@ const transactionStatement = (count = 4) => parseCsvStatement({
 }, SYNTHETIC_BANK_CSV_V1);
 
 describe('Chase PDF statement summary controls', () => {
+  it('restores only Poppler raw form-feed page labels', () => {
+    expect(normalizeChasePdfTextPageBoundaries('first\fsecond\f')).toContain('Page 2 of 2');
+    expect(normalizeChasePdfTextPageBoundaries('one\ftwo\fthree\ffour\f')).toContain('Page 4 of 4');
+    expect(normalizeChasePdfTextPageBoundaries('first\fsecond\fthird\ffourth\ffifth\fsixth\f')).toContain('Page 6 of 6');
+    expect(normalizeChasePdfTextPageBoundaries('one\ftwo\fthree\ffour\ffive\fsix\fseven\feight\f')).toContain('Page 8 of 8');
+    expect(normalizeChasePdfTextPageBoundaries('first\nPage 1 of 2\fsecond')).toContain('Page 1 of 2');
+    expect(() => normalizeChasePdfTextPageBoundaries('one-page')).toThrow('two, four, six, or eight');
+    expect(() => normalizeChasePdfTextPageBoundaries('one\ftwo\fthree\f')).toThrow('two, four, six, or eight');
+    expect(() => normalizeChasePdfTextPageBoundaries('one\ftwo\fthree\ffour\ffive\f')).toThrow('two, four, six, or eight');
+    expect(() => normalizeChasePdfTextPageBoundaries('one\ftwo\fthree\ffour\ffive\fsix\fseven\f')).toThrow('two, four, six, or eight');
+  });
   it('parses observed multiline and compact row shapes with section direction', () => {
     const rows = parseChaseCheckingPdfRowsText([
       'Deposits and Additions',
@@ -84,6 +96,27 @@ describe('Chase PDF statement summary controls', () => {
     ]);
   });
 
+  it('infers omitted transaction years from a cross-year statement window', () => {
+    const rows = parseChaseCheckingPdfRowsText([
+      'Deposits and Additions',
+      '12/30 CARRY-IN',
+      'Entry $150.00',
+      'Checks Paid',
+      '1234 01/03 -$25.00 JANUARY RENT',
+    ].join('\n'), { periodStart: '2023-12-30', periodEnd: '2024-01-31' });
+    expect(rows).toEqual([
+      expect.objectContaining({ date: '2023-12-30', amountMinor: 15000 }),
+      expect.objectContaining({ date: '2024-01-03', amountMinor: -2500 }),
+    ]);
+  });
+
+  it('fails closed when an omitted year is outside the exact statement window', () => {
+    expect(() => parseChaseCheckingPdfRowsText('Deposits and Additions\n12/01 CREDIT\nEntry $150.00', {
+      periodStart: '2024-01-01',
+      periodEnd: '2024-01-31',
+    })).toThrow('ambiguous or outside');
+  });
+
   it('fails closed when a multiline row has no terminating amount', () => {
     expect(() => parseChaseCheckingPdfRowsText('Deposits and Additions\n10/03/2024 ACH CREDIT', 2024)).toThrow('terminating amount');
   });
@@ -97,6 +130,25 @@ describe('Chase PDF statement summary controls', () => {
   it('accepts masked Entry and Ind amount terminators', () => {
     const rows = parseChaseCheckingPdfRowsText('Deposits and Additions\n10/03 ACH CREDIT\nEntry $150.00\n10/04 CASH\nInd 25.00', 2024);
     expect(rows.map((row) => row.amountMinor)).toEqual([15000, 2500]);
+  });
+
+  it('accepts the observed CO Entry and multi-date deposit row shapes with credit sign', () => {
+    const rows = parseChaseCheckingPdfRowsText([
+      'Deposits and Additions',
+      '10/03/2024 ACH CREDIT',
+      'CO Entry $150.00',
+      '10/04/2024 ACH CREDIT',
+      'CO Entry 25.00',
+      '10/05/2024 10/06/2024 BATCH $1.00 $2.00 $3.00,',
+      '10/05/2024 BATCH CONTINUED',
+      'On 4.00',
+    ].join('\n'), 2024);
+
+    expect(rows).toEqual([
+      expect.objectContaining({ category: 'Deposits and Additions', date: '2024-10-03', amountMinor: 15000 }),
+      expect.objectContaining({ category: 'Deposits and Additions', date: '2024-10-04', amountMinor: 2500 }),
+      expect.objectContaining({ category: 'Deposits and Additions', date: '2024-10-05', amountMinor: 400 }),
+    ]);
   });
 
   it('flags sub-cent PDF amount artifacts instead of treating precision as authoritative', () => {
@@ -134,6 +186,16 @@ describe('Chase PDF statement summary controls', () => {
     expect(parsed.categories['Deposits and Additions']).toEqual({ count: 2, amountMinor: 15000 });
   });
 
+  it('accepts negative-dollar opening and ending balances when arithmetic reconciles', () => {
+    const parsed = parseChaseCheckingPdfControlsText(fixture(
+      'October 01, 2024 through October 31, 2024',
+      '-$353.81',
+      '-$273.81',
+    ).replace('Deposits and Additions 2 150.00', 'Deposits and Additions 1 100.00').replace('Checks Paid 1 -25.00', 'Checks Paid 1 -20.00').replace('\nElectronic Withdrawals 1 -10.00', '').replace('Ending Balance 4', 'Ending Balance 2'));
+
+    expect(parsed).toMatchObject({ openingBalanceMinor: -35381, closingBalanceMinor: -27381, reportedTransactionCount: 2 });
+  });
+
   it('includes other withdrawals instead of hiding a control difference', () => {
     const parsed = parseChaseCheckingPdfControlsText(fixture(
       'November 01, 2024 through November 29, 2024',
@@ -142,6 +204,10 @@ describe('Chase PDF statement summary controls', () => {
       'Other Withdrawals 1 -125.00',
     ));
     expect(parsed.categories['Other Withdrawals']).toEqual({ count: 1, amountMinor: -12500 });
+  });
+  it('supports the reviewed ATM and debit-card withdrawal category with debit direction', () => {
+    const rows = parseChaseCheckingPdfRowsText('ATM & Debit Card Withdrawals\n10/03 CASH\nEntry $12.34', 2024);
+    expect(rows).toEqual([expect.objectContaining({ category: 'ATM & Debit Card Withdrawals', amountMinor: -1234 })]);
   });
 
   it('rejects missing pages, unknown categories, and arithmetic or count mismatches', () => {

@@ -17,6 +17,7 @@ import {
 } from '../investigation/source-handoff';
 import {
   readWorkspaceFinance,
+  summarizeWorkspaceStatementCoverage,
   workspaceReadFailure,
   type WorkspaceFinanceData,
   type WorkspaceFinanceFact,
@@ -45,6 +46,14 @@ import {
   netMovementMinor,
   workspaceAggregateCurrency,
 } from '../investigation/workspace-aggregate';
+import {
+  formatStatementControlMoney,
+  parseStatementControls,
+} from '../investigation/statement-controls';
+import {
+  financeStatementCoverageLabel,
+  financeVisibleRecordCoverageLabel,
+} from '../investigation/finance-coverage-label';
 
 export type FinanceView =
   | 'overview'
@@ -156,6 +165,9 @@ const Workspace = styled.section({
       outlineOffset: '2px',
     },
   '& .fw-table-action': {
+    display: 'block',
+    maxWidth: '100%',
+    overflow: 'hidden',
     border: 0,
     padding: 0,
     color: 'var(--fw-text)',
@@ -163,6 +175,8 @@ const Workspace = styled.section({
     cursor: 'pointer',
     fontWeight: 650,
     textAlign: 'left',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
   },
   '& .fw-table-action:hover': { color: 'var(--fw-accent)' },
   '& .fw-chrome': {
@@ -492,6 +506,21 @@ const Workspace = styled.section({
   '& .fw-account-col': { width: '16%' },
   '& .fw-evidence-col': { width: '19%' },
   '& .fw-money-col': { width: '14%', textAlign: 'right !important' },
+  '& .fw-statements-table th:nth-child(1), & .fw-statements-table td:nth-child(1)': {
+    width: '10%',
+  },
+  '& .fw-statements-table th:nth-child(2), & .fw-statements-table td:nth-child(2)': {
+    width: '19%',
+  },
+  '& .fw-statements-table th:nth-child(3), & .fw-statements-table td:nth-child(3)': {
+    width: '8%',
+  },
+  '& .fw-statements-table th:nth-child(6), & .fw-statements-table td:nth-child(6), & .fw-statements-table th:nth-child(7), & .fw-statements-table td:nth-child(7)': {
+    width: '12%',
+  },
+  '& .fw-statements-table th:nth-child(8), & .fw-statements-table td:nth-child(8)': {
+    width: '11%',
+  },
   '& .fw-checkbox': {
     width: '14px',
     height: '14px',
@@ -1138,30 +1167,6 @@ const workspaceFactMoney = (fact: WorkspaceFinanceFact) =>
         }
       })();
 
-const parseStatementControls = (value: string | null) => {
-  if (!value) return null;
-  try {
-    const parsed: unknown = JSON.parse(value);
-    if (!parsed || typeof parsed !== 'object') return null;
-    const record = parsed as Record<string, unknown>;
-    const readMinor = (key: string) =>
-      typeof record[key] === 'string' && /^-?(0|[1-9]\d*)$/.test(record[key])
-        ? record[key]
-        : null;
-    const controls = {
-      opening: readMinor('openingBalanceMinor'),
-      closing: readMinor('closingBalanceMinor'),
-      moneyIn: readMinor('moneyInMinor'),
-      moneyOut: readMinor('moneyOutMinor'),
-    };
-    return Object.values(controls).every((item) => item !== null)
-      ? controls
-      : null;
-  } catch {
-    return null;
-  }
-};
-
 const WorkspaceFinanceScreen = ({
   initialView,
   dataOverride,
@@ -1377,6 +1382,10 @@ const WorkspaceFinanceScreen = ({
   const eligibleFacts = scopedFacts.filter(
     (fact) => fact.includedInTotals && fact.status !== 'SUPERSEDED',
   );
+  const statementCoverage = summarizeWorkspaceStatementCoverage(
+    data.statements,
+    data.statementsTruncated,
+  );
   const aggregateCurrency = workspaceAggregateCurrency(
     eligibleFacts,
     data.truncated,
@@ -1385,6 +1394,8 @@ const WorkspaceFinanceScreen = ({
   const aggregateUnavailableReason =
     aggregateCurrency.kind === 'available'
       ? null
+      : eligibleFacts.length === 0 && statementCoverage.kind === 'available'
+        ? 'Classification pending · qualified totals and chart withheld'
       : aggregateCurrency.kind === 'truncated'
         ? 'Result limit reached · totals and chart withheld'
         : aggregateCurrency.kind === 'mixed'
@@ -1405,8 +1416,8 @@ const WorkspaceFinanceScreen = ({
     (statement) =>
       (!activeStart || statement.period >= activeStart.slice(0, 7)) &&
       (!activeEnd || statement.period <= activeEnd.slice(0, 7)) &&
-      (accountId === 'all' || statement.accountKey === selectedAccountLabel),
-  );
+      (accountId === 'all' || statement.accountLabel === selectedAccountLabel),
+  ).sort((left, right) => left.period.localeCompare(right.period));
   const moneyInMinor =
     aggregateCurrency.kind === 'available'
       ? aggregateCurrency.moneyInMinor
@@ -1877,6 +1888,24 @@ const WorkspaceFinanceScreen = ({
                 </div>
               </div>
             </div>
+            <section className="fw-panel" aria-label="Statement import coverage">
+              <h2 className="fw-heading">Statement import coverage</h2>
+              {statementCoverage.kind === 'available' ? (
+                <p className="fw-sub">
+                  {statementCoverage.importedStatements} imported statement
+                  {statementCoverage.importedStatements === 1 ? '' : 's'} ·{' '}
+                  {statementCoverage.importedRows.toLocaleString('en-US')}{' '}
+                  imported statement rows · classification pending
+                </p>
+              ) : (
+                <p className="fw-warning" role="status">
+                  Statement coverage is incomplete or missing retained row counts.
+                </p>
+              )}
+              <p className="fw-local">
+                Source coverage is not revenue, profit, or qualified cash movement.
+              </p>
+            </section>
             <section className="fw-insights-layout">
               <div>
                 <h2 className="fw-heading">Included records</h2>
@@ -2001,8 +2030,11 @@ const WorkspaceFinanceScreen = ({
                 onChange={(event) => setSearch(event.target.value)}
               />
               <span className="fw-label">
-                {facts.length} {isSynthetic ? 'synthetic test' : 'authorized'}{' '}
-                records
+                {financeVisibleRecordCoverageLabel({
+                  recordCount: facts.length,
+                  isSynthetic,
+                  truncated: data.truncated,
+                })}
               </span>
             </div>
             {facts.length ? (
@@ -2091,7 +2123,7 @@ const WorkspaceFinanceScreen = ({
           <>
             {dateControls}
             <div className="fw-table-wrap">
-              <table className="fw-table">
+              <table className="fw-table fw-statements-table">
                 <thead>
                   <tr>
                     <th>Period</th>
@@ -2114,27 +2146,31 @@ const WorkspaceFinanceScreen = ({
                         <td>
                           <strong>{statement.period}</strong>
                         </td>
-                        <td>{statement.accountKey}</td>
+                        <td>{statement.accountLabel}</td>
                         <td>{statement.sourceKind}</td>
                         <td className="fw-money-col">
-                          {controls?.moneyIn
-                            ? `${controls.moneyIn} minor units · currency unavailable`
-                            : 'Unavailable'}
+                          {formatStatementControlMoney(
+                            controls?.moneyIn ?? null,
+                            controls?.currencyCode ?? null,
+                          )}
                         </td>
                         <td className="fw-money-col">
-                          {controls?.moneyOut
-                            ? `${controls.moneyOut} minor units · currency unavailable`
-                            : 'Unavailable'}
+                          {formatStatementControlMoney(
+                            controls?.moneyOut ?? null,
+                            controls?.currencyCode ?? null,
+                          )}
                         </td>
                         <td>
-                          {controls?.opening
-                            ? `${controls.opening} minor units · currency unavailable`
-                            : 'Unavailable'}
+                          {formatStatementControlMoney(
+                            controls?.opening ?? null,
+                            controls?.currencyCode ?? null,
+                          )}
                         </td>
                         <td>
-                          {controls?.closing
-                            ? `${controls.closing} minor units · currency unavailable`
-                            : 'Unavailable'}
+                          {formatStatementControlMoney(
+                            controls?.closing ?? null,
+                            controls?.currencyCode ?? null,
+                          )}
                         </td>
                         <td>{statement.status}</td>
                       </tr>
@@ -2148,9 +2184,10 @@ const WorkspaceFinanceScreen = ({
                 </div>
               ) : null}
               <p className="fw-local">
-                Statement controls retain exact minor-unit text, but no money
-                display is inferred until the source records an explicit
-                currency.
+                Statement controls retain exact minor-unit text. When an
+                explicit supported source currency is present, values display
+                as money; otherwise the exact minor-unit text remains
+                available.
               </p>
             </div>
           </>
@@ -2617,7 +2654,12 @@ const WorkspaceFinanceScreen = ({
             {isSynthetic
               ? 'Removable preview source; never substituted into Workspace reads.'
               : data.truncated
-                ? 'Result limit reached; totals are withheld from completeness claims.'
+                ? view === 'statements'
+                  ? financeStatementCoverageLabel({
+                      statementCount: visibleStatements.length,
+                      truncated: true,
+                    })
+                  : 'Result limit reached; totals are withheld from completeness claims.'
                 : invalidFactCount
                   ? `${invalidFactCount} invalid or undated record${invalidFactCount === 1 ? '' : 's'} withheld; no synthetic fallback is active.`
                   : 'No synthetic fallback is active.'}

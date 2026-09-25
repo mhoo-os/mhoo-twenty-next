@@ -26,6 +26,7 @@ const CATEGORY_DIRECTIONS = {
   'Deposits and Additions': 1,
   'Checks Paid': -1,
   'Electronic Withdrawals': -1,
+  'ATM & Debit Card Withdrawals': -1,
   'Other Withdrawals': -1,
   Fees: -1,
 } as const;
@@ -79,34 +80,106 @@ export type ChasePdfTransactionRow = Readonly<{
   sourceLine: number;
 }>;
 
+export type ChasePdfStatementWindow = Readonly<{
+  periodStart: string;
+  periodEnd: string;
+}>;
+
+/**
+ * Poppler `-raw` can preserve page boundaries as form-feeds while dropping
+ * printed page labels. Restore only those structural labels from the retained
+ * boundaries; never infer a missing boundary or page count from prose.
+ */
+export const normalizeChasePdfTextPageBoundaries = (text: string): string => {
+  const observedMarkers = [...text.matchAll(/Page\s+\d+\s+of\s+\d+(?!\d)/g)];
+  if (observedMarkers.length > 0) return text;
+  const segments = text.split('\f');
+  const trailingEmpty = segments[segments.length - 1]?.trim() === '';
+  const pages = trailingEmpty ? segments.slice(0, -1) : segments;
+  if (![2, 4, 6, 8].includes(pages.length) || pages.some((page) => page.trim().length === 0)) {
+    throw new Error('Chase PDF requires two, four, six, or eight non-empty Poppler page boundaries.');
+  }
+  return pages.map((page, index) => `${page.trimEnd()}\nPage ${index + 1} of ${pages.length}`).join('\n');
+};
+
+const dateFromParts = (month: number, day: number, year: number): string | undefined => {
+  const date = new Date(Date.UTC(year, month - 1, day));
+  if (date.getUTCFullYear() !== year || date.getUTCMonth() + 1 !== month || date.getUTCDate() !== day) return undefined;
+  return `${year.toString().padStart(4, '0')}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+};
+
+const transactionDate = (
+  monthText: string,
+  dayText: string,
+  rawYear: string | undefined,
+  yearOrWindow: number | ChasePdfStatementWindow,
+): string => {
+  const month = Number(monthText);
+  const day = Number(dayText);
+  if (!Number.isInteger(month) || month < 1 || month > 12 || !Number.isInteger(day) || day < 1 || day > 31) {
+    throw new Error('Statement transaction date is invalid.');
+  }
+  if (rawYear) {
+    const year = rawYear.length === 2 ? 2000 + Number(rawYear) : Number(rawYear);
+    const date = dateFromParts(month, day, year);
+    if (!date) throw new Error('Statement transaction date is invalid.');
+    return date;
+  }
+  if (typeof yearOrWindow === 'number') {
+    const date = dateFromParts(month, day, yearOrWindow);
+    if (!date) throw new Error('Statement transaction date is invalid.');
+    return date;
+  }
+  const { periodStart, periodEnd } = yearOrWindow;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(periodStart) || !/^\d{4}-\d{2}-\d{2}$/.test(periodEnd) || periodStart > periodEnd) {
+    throw new Error('Statement control window is invalid.');
+  }
+  const candidateYears = [...new Set([Number(periodStart.slice(0, 4)), Number(periodEnd.slice(0, 4))])];
+  const candidates = candidateYears
+    .map((year) => dateFromParts(month, day, year))
+    .filter((date): date is string => date !== undefined && date >= periodStart && date <= periodEnd);
+  if (candidates.length !== 1) throw new Error('Statement transaction date year is ambiguous or outside the reviewed control window.');
+  return candidates[0];
+};
+
 /** Parse only the stable, text-layer row shapes observed in synthetic Chase fixtures. */
-export const parseChaseCheckingPdfRowsText = (text: string, year: number): ChasePdfTransactionRow[] => {
-  if (!Number.isSafeInteger(year) || year < 2000 || year > 2099) throw new Error('Statement year is invalid.');
+export const parseChaseCheckingPdfRowsText = (
+  text: string,
+  yearOrWindow: number | ChasePdfStatementWindow,
+): ChasePdfTransactionRow[] => {
+  if (typeof yearOrWindow === 'number' && (!Number.isSafeInteger(yearOrWindow) || yearOrWindow < 2000 || yearOrWindow > 2099)) {
+    throw new Error('Statement year is invalid.');
+  }
   const lines = text.replace(/\r\n?/g, '\n').replace(/\f(?=\d+\b)/g, '\n').split('\n');
   const rows: ChasePdfTransactionRow[] = [];
   let category: ChaseSummaryCategory | undefined;
-  let pending: { date: string; description: string; line: number } | undefined;
-  const datePattern = /^(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?\s+(.+)$/;
+  let pending: { date: string; description: string; line: number; allowDateContinuation: boolean; allowOnAmount: boolean } | undefined;
+  const datePattern = /^(\d{1,2})[\/-](\d{1,2})(?:[\/-](\d{2,4}))?\s+(.+)$/;
+  const dateTokenPattern = /\b\d{1,2}[\/-]\d{1,2}(?:[\/-]\d{2,4})?\b/g;
+  const amountTokenPattern = /-?\$?[\d,]+\.\d{2,22}/g;
+  const terminalAmountPattern = /^(?:(?:(?:CO\s+)?(?:Entry|Ind))\s+)?(-?\$?[\d,]+\.\d{2,22})$/i;
+  const onAmountPattern = /^On\s+(-?\$?[\d,]+\.\d{2,22})$/i;
   const precisionOf = (raw: string): 'CENT' | 'SUBCENT_ARTIFACT' => { const digits = raw.split('.')[1] ?? ''; if (digits.length === 2) return 'CENT'; if (digits.length !== 22 || BigInt(digits.slice(2)) > 20000000000000000000n) throw new Error('Statement row amount precision is unsupported.'); return 'SUBCENT_ARTIFACT'; };
   for (let index = 0; index < lines.length; index += 1) {
     const line = lines[index].trim();
     if (/^(?:DAILY BALANCE|DAILY ENDING BALANCE|AVERAGE BALANCE)\b/i.test(line)) { category = undefined; pending = undefined; continue; }
-    const section = /^(Deposits and Additions|Checks Paid|Electronic Withdrawals|Other Withdrawals|Fees)(?:\s+\*(?:start|end)\*)?$/i.exec(line);
+    const section = /^(Deposits and Additions|Checks Paid|Electronic Withdrawals|ATM & Debit Card Withdrawals|Other Withdrawals|Fees)(?:\s+\*(?:start|end)\*)?$/i.exec(line);
     if (section) { category = Object.keys(CATEGORY_DIRECTIONS).find((name) => name.toLowerCase() === section[1].toLowerCase()) as ChaseSummaryCategory; pending = undefined; continue; }
     if (!category || !line || /^Page\s+\d+\s+of\s+\d+/.test(line)) continue;
-    const check = /^(\d+)\s*\*?\s*\^?\s*(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?\s+(?:\d{1,2}\/\d{1,2}(?:\/\d{2,4})?\s+)?(-?\$?[\d,]+\.\d{2})\s*(.*)$/.exec(line);
+    const check = /^(\d+)\s*\*?\s*\^?\s*(\d{1,2})[\/-](\d{1,2})(?:[\/-](\d{2,4}))?\s+(?:\d{1,2}[\/-]\d{1,2}(?:[\/-]\d{2,4})?\s+)?(-?\$?[\d,]+\.\d{2})\s*(.*)$/.exec(line);
     const dateMatch = datePattern.exec(line);
     if (check && category === 'Checks Paid') {
       const [, , month, day, rawYear, amount, description] = check;
-      const fullYear = rawYear ? (rawYear.length === 2 ? 2000 + Number(rawYear) : Number(rawYear)) : year;
-      rows.push({ category, date: `${fullYear}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`, amountMinor: -Math.abs(requireMinor(amount)), amountPrecision: precisionOf(amount), description: description.trim() || 'Check', sourceLine: index + 1 });
+      rows.push({ category, date: transactionDate(month, day, rawYear, yearOrWindow), amountMinor: -Math.abs(requireMinor(amount)), amountPrecision: precisionOf(amount), description: description.trim() || 'Check', sourceLine: index + 1 });
       continue;
     }
-    if (dateMatch) { const fullYear = dateMatch[3] ? (dateMatch[3].length === 2 ? 2000 + Number(dateMatch[3]) : Number(dateMatch[3])) : year; const inline = /^(.*?)(?:\s+)(-?\$?[\d,]+\.\d{2})$/.exec(dateMatch[4].trim()); const fee = /^(-?\$?[\d,]+\.\d{2})(?:\s|$)/.exec(dateMatch[4].trim()); const date = `${fullYear}-${dateMatch[1].padStart(2, '0')}-${dateMatch[2].padStart(2, '0')}`; if (inline || (fee && category === 'Fees')) { const amount = inline?.[2] ?? fee![1]; rows.push({ category, date, amountMinor: CATEGORY_DIRECTIONS[category] * Math.abs(requireMinor(amount)), amountPrecision: precisionOf(amount), description: inline?.[1].trim() || 'Fee', sourceLine: index + 1 }); pending = undefined; } else { pending = { date, description: dateMatch[4].trim(), line: index + 1 }; } continue; }
-    const amount = /^(?:(?:Entry|Ind)\s+)?(-?\$?[\d,]+\.\d{2,22})$/.exec(line);
-    if (amount && pending) {
-      const precision = precisionOf(amount[1]);
-      const centValue = precision === 'SUBCENT_ARTIFACT' ? amount[1].replace(/(\.\d{2})\d+$/, '$1') : amount[1];
+    if (dateMatch) { const date = transactionDate(dateMatch[1], dateMatch[2], dateMatch[3], yearOrWindow); const description = dateMatch[4].trim(); const inline = /^(.*?)(?:\s+)(-?\$?[\d,]+\.\d{2})$/.exec(description); const fee = /^(-?\$?[\d,]+\.\d{2})(?:\s|$)/.exec(description); const dateTokenCount = [...line.matchAll(dateTokenPattern)].length; const amountTokenCount = [...line.matchAll(amountTokenPattern)].length; if (pending?.allowDateContinuation && !inline && !(fee && category === 'Fees')) { pending.description = `${pending.description} ${description}`.trim(); continue; } if (inline || (fee && category === 'Fees')) { const amount = inline?.[2] ?? fee![1]; rows.push({ category, date, amountMinor: CATEGORY_DIRECTIONS[category] * Math.abs(requireMinor(amount)), amountPrecision: precisionOf(amount), description: inline?.[1].trim() || 'Fee', sourceLine: index + 1 }); pending = undefined; } else { pending = { date, description, line: index + 1, allowDateContinuation: dateTokenCount >= 2 && amountTokenCount >= 3, allowOnAmount: category === 'Deposits and Additions' && dateTokenCount >= 2 && amountTokenCount >= 3 }; } continue; }
+    const amount = terminalAmountPattern.exec(line);
+    const onAmount = onAmountPattern.exec(line);
+    if ((amount || (onAmount && pending?.allowOnAmount)) && pending) {
+      const rawAmount = amount?.[1] ?? onAmount![1];
+      const precision = precisionOf(rawAmount);
+      const centValue = precision === 'SUBCENT_ARTIFACT' ? rawAmount.replace(/(\.\d{2})\d+$/, '$1') : rawAmount;
       const signed = CATEGORY_DIRECTIONS[category] * Math.abs(requireMinor(centValue));
       rows.push({ category, date: pending.date, amountMinor: signed, amountPrecision: precision, description: pending.description, sourceLine: pending.line });
       pending = undefined;
@@ -177,13 +250,13 @@ export const parseChaseCheckingPdfControlsText = (text: string): ChaseCheckingPd
   const summary = normalized.slice(headings[0].index! + headings[0][0].length).trimStart();
   const lines = summary.split('\n').map((line) => line.trim());
   if (lines.shift() !== 'INSTANCES AMOUNT') throw new Error('Statement summary header changed.');
-  const opening = /^Beginning Balance\s+(\$[\d,]+\.\d{2})$/.exec(lines.shift() ?? '');
+  const opening = /^Beginning Balance\s+(-?\$[\d,]+\.\d{2})$/.exec(lines.shift() ?? '');
   if (!opening) throw new Error('Statement opening balance is missing.');
 
   const categories: Partial<Record<ChaseSummaryCategory, { count: number; amountMinor: number }>> = {};
   let ending: RegExpExecArray | null = null;
   for (const line of lines) {
-    ending = /^Ending Balance\s+(\d+)\s+(\$[\d,]+\.\d{2})$/.exec(line);
+    ending = /^Ending Balance\s+(\d+)\s+(-?\$[\d,]+\.\d{2})$/.exec(line);
     if (ending) break;
     const item = /^(.+?)\s+(\d+)\s+(-?[\d,]+\.\d{2})$/.exec(line);
     const category = item?.[1] as ChaseSummaryCategory | undefined;

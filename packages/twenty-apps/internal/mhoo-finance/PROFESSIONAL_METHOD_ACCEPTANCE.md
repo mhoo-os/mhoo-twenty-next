@@ -1,5 +1,593 @@
 # Professional investigation method acceptance map
 
+## Complete 42-PDF Hass Chase Drive tranche — 2026-09-14 12:48 UTC
+
+The authenticated Drive folder `1ILrTTPgNGZ5VdbZa0ABXC-slEgUHZkmj`
+contained exactly 42 PDFs. Each downloaded original was byte-size/SHA-256
+checked before any write; Poppler extraction, complete page sequence, exact
+statement counts, cent amounts, opening/closing balances, and adjacent-period
+continuity were reconciled. The lower-cost source worker added exact reviewed
+windows and negative shifted-window/page-count tests. Each canonical PDF was
+stored as a native Twenty File, then imported through an account-bound
+SourceArtifact following an exact-file COMPLETE dry-run. Live writes returned
+READBACK_COMPLETE. The second August 2022 PDF is byte-distinct but has the
+same extracted text and 46 parsed rows; it is retained as DUPLICATE with
+zero facts and no ImportReceipt. No original was discarded.
+
+The new receipts after the prior 27 imported originals are:
+
+| Period | Rows | SourceArtifact | ImportReceipt |
+| --- | ---: | --- | --- |
+| 2021-08 | 6 | `f20b5d9b-6bef-4230-b2c5-98624047d0a6` | `6fc1231a-955e-57ae-aea2-158cd9b01099` |
+| 2021-09 | 27 | `90998dab-5e0d-49a4-802a-c7b32a29f317` | `4eab3b14-45c8-520c-a481-f303e1648285` |
+| 2021-10 | 52 | `4b2756d9-99ad-4421-b1e6-340f02a8876c` | `e4ccfdd0-42dd-58a2-ab11-eb301559f9f3` |
+| 2021-11 | 24 | `6e969ae5-b363-42c2-8be9-9a0207955846` | `148e88b2-df8e-5ae3-ae53-a24cb3f47740` |
+| 2021-12 | 17 | `8b70f1b8-bf68-49c2-b4b3-fc7ee4639396` | `91d0984f-485d-5013-a849-cd7c95e4d98f` |
+| 2022-01 | 51 | `bc52b124-caf6-4557-84f3-c437b9c850a9` | `3e937289-8159-548c-a976-b2f011cd18a5` |
+| 2022-02 | 76 | `2b2fbc18-8f31-4c23-9b3c-5fb97b9e2dab` | `21a6e560-cd03-59bb-a9d0-4e2952efe936` |
+| 2022-03 | 79 | `bee39a2b-9b01-432d-a1bd-7f12fb83a0a9` | `ad3248e6-f780-5dce-a67e-0bc2e0e2ed0c` |
+| 2022-04 | 72 | `539695ce-d5d5-4984-9099-949d2d3722a0` | `d76b2411-979a-5717-af59-a154149bcd29` |
+| 2022-05 | 73 | `405c4b94-1ce3-4b5e-b69e-96ab6fddb47c` | `e553b5f6-2109-554b-a2fb-2fbd8990a229` |
+| 2022-06 | 78 | `2fc92689-244b-47a3-bb2d-bdc694e0a8e9` | `6285bf96-36c5-57b1-af99-01e97537b8d0` |
+| 2022-07 | 55 | `dc4b5612-d429-488b-8cea-29f6cfc30395` | `a045786c-3af0-5df6-a82a-371aca7f021a` |
+| 2022-08 | 46 | `e86c96bc-a741-4e58-ba71-a1b35df4cbf5` | `e68d12f1-e48c-5ba4-a40d-b9aa45461f61` |
+| 2022-12 | 83 | `e204d68a-f2f8-4bdd-a595-6b830695d921` | `196dfc09-d121-597d-a7ad-e2a78f948b26` |
+
+Final independent official Workspace MCP readback: **42 SourceArtifacts =
+41 IMPORTED + 1 DUPLICATE; 41 ImportReceipts; 2,947 account-bound
+FinanceFacts**. Imported artifact rowCount and receipt importedRows each sum
+to 2,947. The duplicate artifact has zero facts and zero receipts. A separate
+`pdfinfo` vs Poppler form-feed check of all 42 retained local PDFs found
+zero page-count mismatches; the five 2021 originals independently report
+2/4/4/4/4 PDF pages, matching the reconciled controls. This check does not
+yet enforce the PDF page count in reusable parser source. The protected
+operator's new read-only `--verify` checked all 41 canonical originals
+against their exact PDF hashes and PDF page metadata, then compared all
+2,947 live fact identities, account bindings, exact source amounts and minor
+units to the deterministic parsed plans across paginated GraphQL readback:
+**41/41 EXACT_READBACK_VERIFIED**, no failed period. Browser reload
+displayed the 2021 rows and December 2022 as
+IMPORTED and August 2022 duplicate as DUPLICATE. December 2022 opens at
+714,637 cents (November close) and closes at 126,225 cents (January 2023
+opening), resolving the earlier evidence gap. Earlier sections below remain
+historical checkpoint records, not current coverage statements.
+
+This proves the scoped developer-authorized PDF tranche in the Hass Kitchen
+Workspace; it does not establish client-release acceptance, transaction
+classification, provider integration, or production rollout. The one-off
+operator script with bound live IDs remains protected local and is not release
+source. The full local Finance suite after the initial live coverage update
+passed 408/408 unit tests across 29 files, typecheck/App build, lint, and
+`git diff --check`. The governed Hass Kitchen App plan showed only five
+in-place front-component checksum updates (0 add/destroy), and `yarn twenty
+apply` synced 14 files. Browser reload visibly showed all 2,947 facts in the
+Overview data adapter, a separate `41 imported statements · 2,947 imported
+statement rows · classification pending` coverage card, and withheld qualified
+money cards. Statements displayed the duplicate, December 2022, readable
+account labels and corrected source-currency disclosure. The CLI default
+remote was restored to `mhoo-finance-preparation` after the bounded apply.
+At final live reload, the Overview displayed `Classification pending ·
+qualified totals and chart withheld` instead of misattributing the hold to
+currency. The final local suite again passed 408/408, App build/typecheck,
+and lint. The protected verifier's three synthetic tests passed with
+`tsx --test`; a prior `node --test` invocation failed to resolve its
+extensionless TypeScript import under Node ESM, which was a runner mismatch,
+not a test assertion failure. The private script/helper SHA-256 values at
+verification were `7fa23c05e262b5901373d1dc59ba97e3eb3c5f5adb19607e6bf7f76c2931d149`
+and `0b2e1b247b354664675d5c4aec8079699a2c2c507bc5dff5fe8bf448710279d3`;
+the source checkout HEAD was `2d7aa26e2759053d1f9986f073a939d64f2aa03e`
+with uncommitted scoped changes. No source commit or release acceptance is claimed.
+A subsequent read-only review found release-facing
+writer gaps: partial fact writes are visible before receipt, and a
+receipt-left/incomplete-facts retry cannot heal. The protected operator
+now checks page metadata and exact fact identities but remains untracked and
+must not be mistaken for a reusable App release verifier. These gaps do not
+contradict the completed live readback but
+remain explicit source-release holds. MHO-227/MHO-228 remain the approval
+boundary.
+
+## September–November 2022 original-import continuation — 2026-09-14 12:31 UTC
+
+Authenticated Drive originals were independently byte-hash checked and
+Poppler-reconciled after lower-cost read-only controls. The source-only exact
+allowlist/shifted-window tests passed 44/44, App build/typecheck, targeted lint
+and diff check passed. Native Twenty Files, unique account-bound artifacts,
+COMPLETE dry-runs, serialized READBACK_COMPLETE writes and official Workspace
+MCP artifact/receipt/fact readbacks all passed:
+
+- 2022-11: Drive `1TKJxsjsSKyniSZmcrdnnjjQ4VSWiN_cZ`, original
+  `0AEE014C-9542-4D0A-91B2-D0627C64C80B-list.pdf`, 261,337 bytes,
+  SHA-256 `3549623368543710b23d629d393f56d9e16a91b75557bc868ce6c7e1667c55bc`,
+  eight pages, window 11/01–11/30, opening/closing 1,082,849/714,637
+  minor units, 126 rows; File `ff8e5f9e-af8d-48d1-91b5-04a466bc8ad8`,
+  SourceArtifact `d336180a-5294-4bc6-adf3-3437e84c7726`, ImportReceipt
+  `44821c60-ada0-5ef6-a537-39948ee1a1fa`.
+- 2022-10: Drive `1cfSj343MQnDVUT-kyDUuUBqqz7QT6Bus`, original
+  `812D0E69-05ED-4147-932C-BC229FDF2575-list.pdf`, 221,988 bytes,
+  SHA-256 `168099f10626cfe44ce25c4000304a88eaf0e1f276099eeda10b15c11142810b`,
+  six pages, window 10/01–10/31, opening/closing 223,103/1,082,849,
+  86 rows; File `f7d2340c-28d1-4176-90dc-eb4cc238b2a2`, SourceArtifact
+  `31e884ad-2885-48c4-906b-a796fc01b757`, ImportReceipt
+  `25e0a23f-a0ab-5fef-a85a-b3f036d9e875`.
+- 2022-09: Drive `1wlIe2f_CUYwzBuz751AhOilzKa_EeCrH`, original
+  `760E66CC-DF5F-4061-962F-BF45E76EC6BF-list.pdf`, 215,084 bytes,
+  SHA-256 `2f3c505294e57e549a06f8acf1d9bd8f0b171d23d91dcb81522919a926cdae39`,
+  six pages, window 09/01–09/30, opening/closing 601,303/223,103,
+  79 rows; File `2430b7af-fff0-404f-926b-dc73cfd4f3fc`, SourceArtifact
+  `880e5310-c352-4491-b338-04ea6a88c2c0`, ImportReceipt
+  `8bad9ca8-19c0-54cf-a8ae-14f41e2dfcc0`.
+
+September–November balances chain, but November closing 714,637 does not
+equal the January 2023 statement's December 31 opening 126,225; December 2022
+is not covered by a reviewed original. The Workspace readback found 2,208
+account-bound FinanceFacts (1,917 prior + 291) and browser reload showed the
+three 2022 periods IMPORTED. This is 27 of 42 Drive originals; 15 remain.
+Do not infer full-year 2022 totals, import the duplicate August candidate
+twice, or promote the protected local operator script to release source.
+
+## January–March 2023 original-import continuation — 2026-09-14 12:26 UTC
+
+The three authenticated originals were byte-hash checked and reconciled with
+local Poppler controls. The lower-cost source-only worker added exact reviewed
+windows, cross-year January coverage and shifted-boundary rejection; 38/38
+focused tests, App build/typecheck, targeted lint and diff check passed. Native
+Files and one-File/account-bound SourceArtifacts were read back before three
+COMPLETE dry-runs and serialized live READBACK_COMPLETE writes:
+
+- 2023-03: Drive `1n3IAKBjGpsFWQThMTTMEbFXn3mXh0ud3`, original
+  `4381B0A5-E784-4F51-8F7D-67DDCEE3B7A8-list.pdf`, 217,676 bytes,
+  SHA-256 `5248151d6bf6eba8df8c885aa866ca5191482b5447682a410403816f28897758`,
+  window 03/01–03/31, opening/closing 789,287/782,904 minor units,
+  79 rows; File `f5dbc63b-5ce8-4511-bd95-d4c71e804108`, SourceArtifact
+  `7c4ffd84-7149-42a8-a0c2-50f54cc62814`, ImportReceipt
+  `22f48616-6cf7-56a5-ac33-dd9448f006c9`.
+- 2023-02: Drive `1Hkuy4UAAQnqjkQglUqVh6GfgzquctXCV`, original
+  `9C1E86D2-E188-47CD-8171-EC2F2FC99B19-list.pdf`, 224,152 bytes,
+  SHA-256 `d56efb9354b9e116ccb89e188da0d405e39f2a1ea60982243815aab834a82503`,
+  window 02/01–02/28, opening/closing 914,336/789,287, 86 rows;
+  File `2f850f91-5929-4333-ad92-97a4804b2087`, SourceArtifact
+  `ebb800a3-8ab0-4390-ad97-bf119f5a734d`, ImportReceipt
+  `10848783-9275-5bd0-a98f-85ec667ea460`.
+- 2023-01: Drive `1Zt5GQPZiLUsLGIIH44VUiUO1mukpZ8Wj`, original
+  `C554E3E6-B30D-45F7-A99A-7176A77CB117-list.pdf`, 208,831 bytes,
+  SHA-256 `cc46957608fd066f3a5c1255c8630f0267242bf6664cc843478a9d0cebe091f5`,
+  window 2022-12-31–2023-01-31, opening/closing 126,225/914,336, 70 rows;
+  File `8c20866b-4567-4133-bae8-4bae24da29e9`, SourceArtifact
+  `ffa6d447-ecde-4614-bbaa-977297cbc718`, ImportReceipt
+  `db92dbe9-e68b-5a77-ae61-46990c623306`.
+
+The January–April balances chain. Independent official Workspace MCP readback
+found all three SourceArtifacts and ImportReceipts IMPORTED and 1,917
+cumulative account-bound FinanceFacts (1,682 prior + 235). Browser reload
+showed January/February/March rows IMPORTED. This is 24 of 42 Drive originals;
+18 remain. No claim is made for unavailable December 2022 coverage, classified
+totals, user-operated bulk import, release-source commit, or durable partial-
+write recovery. The one-off operator script remains protected local.
+
+## April–June 2023 original-import continuation — 2026-09-14 12:24 UTC
+
+Authenticated Drive metadata and complete six-page text controls were
+reviewed by the lower-cost worker. The coordinator independently materialized
+each original PDF, checked SHA-256/byte size, and reconciled local Poppler rows
+and balances. The exact-window/shifted-window source tests passed 32/32, with
+App build/typecheck, targeted lint and diff check before the writes. Each PDF
+was uploaded to native Twenty File custody and read back through its unique
+account-bound SourceArtifact before a COMPLETE dry-run. Live `--apply` returned
+READBACK_COMPLETE for all three:
+
+- 2023-06: Drive `1eAt3xERXmOxN1v6EFUecMplSKFc7iQbk`, original
+  `6FCCF9F4-AA94-4AD7-B9E0-F0189D8739CB-list.pdf`, 193,988 bytes,
+  SHA-256 `5ad2c4d12d51554c41c46f6adf7fd53db8fd9efb34aeb4d678b40ceb82326560`,
+  window 06/01–06/30, opening/closing 409,449/880,798 minor units,
+  64 rows; File `5aed9057-625d-4172-8b08-fbadd972ebc1`, SourceArtifact
+  `65c20bd9-358b-4a28-b46d-12eb91f35fe0`, ImportReceipt
+  `c7a63b51-1452-52e7-a161-c2b01d2bd40a`.
+- 2023-05: Drive `1ochfoWx8enZpTPYFB5OwYZIV5gDsffrr`, original
+  `7B0A31E1-9712-4AA3-8542-91BE84BD1470-list.pdf`, 226,190 bytes,
+  SHA-256 `fd377af2b4371530c374e389ae036736744762db603249c437897dfaf5b71714`,
+  window 04/29–05/31, opening/closing 848,521/409,449, 85 rows;
+  File `9899d099-628e-4def-8926-3b886ab7309f`, SourceArtifact
+  `e29bb2b5-a450-4393-9d3b-75a255494cf8`, ImportReceipt
+  `e885ec3b-b3e1-5caf-a503-ead96c7ae9fd`.
+- 2023-04: Drive `1GB6KBR9G7_B3-ZpngaqEXztla3mS60wi`, original
+  `5C4A29F5-8AAB-4A26-B82A-DB63DDBB56C0-list.pdf`, 217,587 bytes,
+  SHA-256 `b4b307222e18589d4e1cd81d963bc3568261801a9bb1839bfbcd63041367ce5e`,
+  window 04/01–04/28, opening/closing 782,904/848,521, 81 rows;
+  File `91d72332-afa0-4a96-a258-d14973f9a68e`, SourceArtifact
+  `53ddfacc-5d5d-445c-8e9f-8b4faae3bab8`, ImportReceipt
+  `7f9a957d-fccf-5751-aa39-e123a83c69de`.
+
+April–July balances chain. Independent official Workspace MCP readback found
+all three artifacts and receipts IMPORTED and 1,682 cumulative account-bound
+FinanceFacts (1,452 prior + 230). Browser reload showed April/May/June
+IMPORTED. This is 21 of 42 Drive originals; 21 remain. No classified totals,
+user-operated bulk import, release-source commit, or durable partial-write
+recovery is claimed. The one-off operator script remains protected local.
+
+## July–August 2023 original-import continuation — 2026-09-14 12:07 UTC
+
+The delegated lower-cost read-only control review found six complete pages
+each, and the coordinator independently materialized authenticated Drive PDF
+bytes and verified exact hashes with local Poppler reconciliation. Source-only
+exact-window/shifted-window tests passed 26/26; App build/typecheck, targeted
+lint and diff check passed before live writes. Both original Files and their
+one-File/account-bound SourceArtifacts were read back before protected operator
+dry-runs returned COMPLETE, then each live `--apply` returned
+READBACK_COMPLETE:
+
+- 2023-08: Drive `1kX3_GZmZ2dyGEuLqgTCpunHUQfyNmwUD`, original
+  `E710468A-7A9D-4948-A1F9-35BA08E919E4-list.pdf`, 211,009 bytes,
+  SHA-256 `d0e2de3b8396ee62542b00d389804fa7e046d6215b804d369f3acd3f339f8cb1`,
+  window 08/01–08/31, opening/closing 1,423,345/710,818 minor units,
+  74 rows; File `00ef29b0-8c75-404c-be43-d06dc5987779`, SourceArtifact
+  `765d9187-2243-4665-835e-5ea2a6ab11db`, ImportReceipt
+  `01b8778c-c17f-5dec-aca9-6ae063f9257a`.
+- 2023-07: Drive `1FTbbZJaVDsSPSgAYbp3l9oOy-uH_CvoT`, original
+  `2F669015-4A8E-4ECF-8613-EC2F37C25A90-list.pdf`, 199,806 bytes,
+  SHA-256 `201187ee1d14a1a267cc51add185a422e1fd76728f244dfddda0d20fc11445f6`,
+  window 07/01–07/31, opening/closing 880,798/1,423,345, 66 rows;
+  File `319c4643-8fd1-4405-8ae2-95f724e9ec3e`, SourceArtifact
+  `632cb4c3-43b2-4951-9513-c96b0ac484fc`, ImportReceipt
+  `3b4e13aa-5fe0-50fd-a80c-20dd6362d76a`.
+
+July–August–September–October balances chain. Independent official Workspace
+MCP readback found each artifact and receipt IMPORTED with 66/74 rows,
+and 1,452 cumulative account-bound FinanceFacts (1,312 prior + 140).
+Live browser reload showed July, August, September rows IMPORTED in order.
+This is 18 of 42 originals; 24 remain. The run leaves classified totals,
+user-operated bulk import, release-source commit and durable partial-write
+recovery unproved. The one-off operator script remains protected local, not
+release source.
+
+## September 2023 original-import continuation — 2026-09-14 12:03 UTC
+
+The original September PDF `351641A1-0C7E-4F13-B80F-1D1AF97DE3C7-list.pdf`
+from Drive `1f1cbLcm_tmaAWA_vcpdO4CgJiWnhF4aZ` was byte-verified at
+211,541 bytes, SHA-256
+`46eac1c46dbf5786077783e4366c06fb520c96f664c3d55a11dcc1a51778a35c`.
+Its six-page 2023-09-01–09-29 window reconciled 79 rows, opening/closing
+710,818/464,113 minor units; closing equals October 2023 opening. The exact
+reviewed-window source addition passed 22/22 focused tests, targeted lint,
+App build/typecheck, and diff check. Native Twenty File
+`745e482d-1826-4575-9483-940a5588779f` is linked to SourceArtifact
+`c36be15f-ae5e-4872-8f8f-429909c1c793`; exact hash, size, one File and
+account binding were read back before the dry-run. The protected operator
+dry-run returned COMPLETE 79 with no write, then live `--apply` returned
+READBACK_COMPLETE 79 with ImportReceipt
+`9a2b172c-865b-526c-abc0-bdcfb85785d7`. Independent official Workspace
+MCP readback found the single September artifact/receipt IMPORTED and 1,312
+account-bound FinanceFacts cumulatively (1,233 prior + 79). Browser reload
+showed 2023-09 IMPORTED directly before 2023-10. This is 16 of 42 originals;
+26 remain. No classified totals, bulk user import, source commit, or durable
+partial-write recovery is claimed. The one-off live operator script remains
+protected local, not release source.
+
+## October–December 2023 original-import continuation — 2026-09-14 10:44 UTC
+
+Three Hass business-checking originals were independently hash/size checked,
+uploaded to native Twenty File custody, linked to the account through exact
+SourceArtifacts, dry-run with the reviewed period allowlist, then imported one
+at a time. The full Finance unit suite passed 352/352; typecheck and lint
+passed before these live writes. The operator returned READBACK_COMPLETE for
+each exact file/hash/artifact/receipt/fact set:
+
+- 2023-12: Drive `19JXfD90F44-RVdLiOKeJ3noeBWQPESpn`, 191,970 bytes,
+  SHA-256 `e18f89c79df899c121f9d8080827c098614a092aca58a753fb30cf4b74c6b1e1`,
+  window 12/01–12/29, opening/closing minor units 130,177/195,422, 68 rows;
+  File `064263b3-41de-44c4-8827-186ad8530139`, SourceArtifact
+  `ddf9b43c-49a8-4d73-b550-5e31a8be0dc8`, ImportReceipt
+  `9e29df90-527f-553e-a27c-c8f3b46ed7eb`.
+- 2023-11: Drive `1xXrpiXPzygxCAjrpcLDFxr3lwKP_oVGf`, 209,554 bytes,
+  SHA-256 `49800bb6b79c04cc8fb501c83f671177f0d512ef726d66b4d46391ab3e0ae966`,
+  window 11/01–11/30, opening/closing 754,734/130,177, 82 rows;
+  File `b493d6eb-9cab-4f81-86de-39da191f4c10`, SourceArtifact
+  `9d0c1b58-32bb-46b7-80a8-c1feb8ead96e`, ImportReceipt
+  `67aa858a-22ba-5d7f-aba8-97c2997d6f02`.
+- 2023-10: Drive `1n9iWXhrH0vC_NqNgAASQRiGpttkZAl-V`, 230,609 bytes,
+  SHA-256 `e60e7b599f2cc45ca91eed06d756117e13d106606b2c09c4555f3d7856f6820c`,
+  window 09/30–10/31, opening/closing 464,113/754,734, 98 rows;
+  File `1f88c230-9b59-49b3-9008-1a193dceb9da`, SourceArtifact
+  `6f605884-4a49-481a-9630-ca28a79e8412`, ImportReceipt
+  `39401b07-df54-5918-af3e-2bc1bee211f0`.
+
+The three adjoining balances chain through January 2024. Official Workspace
+MCP readback found 15 IMPORTED SourceArtifacts, 15 IMPORTED ImportReceipts,
+and a `financialAccountId` COUNT group of 1,233 FinanceFacts (985 prior + 248
+new). The live Statements view showed 2023-10/11/12 IMPORTED with chained
+opening/closing balances and the 2024 rows following them. Twenty's visible
+Transactions view still caps at 500 shown and labels that partial coverage.
+Twenty-seven of the 42 Drive originals remain; classification, totals,
+user-operated bulk import, and durable partial-write recovery are not proved.
+The one-off operator script is protected local receipt and not release source.
+
+## January 2024 and 2024-year completion — 2026-09-14 10:36 UTC
+
+The original January PDF `246F0ADE-D294-42F8-B3F4-7CB1FE197967-list.pdf`
+from Drive `1TF0YiPFGz0u0l8nGYKBVK-lK6989ur5G` was hash-verified at
+228,104 bytes, SHA-256
+`4f6ebc55b18b6aadaa0e29a573664381b91632361989c5994263730154c426c1`.
+Its six-page 2023-12-30–2024-01-31 window reconciled 101/101 rows, opening
+195,422 and closing 139,228 minor units; closing equals February opening.
+The native File is `5ec97468-bd57-43ff-9f68-5fbe4b7a2ed2`, SourceArtifact
+`bfafbe7f-c960-4253-93f1-f0649b4d8bd1`, and ImportReceipt
+`5871dc7b-d736-5b35-a3fb-023f812b5ae8`. Exact one-File/account/hash/size
+readback and dry-run preceded live `--apply`; it returned READBACK_COMPLETE
+for all 101 facts.
+
+Before this >100-row write, the writer's fact readback was extended to bounded
+cursor pagination (up to 250 facts), with tests for 101/126 rows, missing or
+repeated cursors, incomplete pages, and >250 early rejection. Writer tests
+passed 11/11 and typecheck/diff check passed. A live read-only cursor query
+against the existing 100-row April artifact returned page lengths 60+40 with
+`hasNextPage`/`endCursor` behavior as expected. Official Workspace MCP
+readback after January found 12 IMPORTED SourceArtifacts, 12 IMPORTED
+ImportReceipts, and 985 account-bound FinanceFacts; artifact and receipt row
+sums both equaled 985. This is all 12 available 2024 statement periods, not
+all 42 Drive PDFs or full-year classified financial reporting. Thirty originals
+remain unimported. A durable partial-write recovery state machine remains
+unproved; each current import has a deterministic upsert/readback path but no
+atomic multi-batch transaction claim.
+
+## February–March 2024 continuation and live coverage wording — 2026-09-14 10:34 UTC
+
+- March original `4611EDCB-621B-4F16-98A1-C3AC23B7F446-list.pdf`, Drive
+  `1bJ9cifvb6sHFkHv5wgZlTrvE02LIxcB9`, 218,643 bytes, SHA-256
+  `775360a0993d858de3afeef6e6bc6860fd8f3b7f260aa3aa705a54ed535cb29b`.
+  Six-page 2024-03-01–03-29 statement reconciled 85 rows, opening/closing
+  minor units 652,956/42,974. Native File
+  `7d56615a-1421-4b58-946c-7fa14f8f4bb2`, SourceArtifact
+  `0cc9cf74-057e-47bd-821b-418c9aae959b`, ImportReceipt
+  `fc306d4f-50fc-55e9-afb1-5f1782190f28`.
+- February original `9CEAA88A-53B7-440A-B011-BDDA57E3C78E-list.pdf`,
+  Drive `1DFLecSYh-OWGlc99wc7sWfjziz5vQv3J`, 208,790 bytes, SHA-256
+  `98dc7158fbf26953513c5d588f45a5cae8c02ace87632ef3e3c94e54431dd940`.
+  Six-page leap-year 2024-02-01–02-29 statement reconciled 87 rows,
+  opening/closing minor units 139,228/652,956. Native File
+  `7f8a41d9-1880-4522-8f0d-869810244999`, SourceArtifact
+  `af644233-d650-402a-aa95-4386090c0652`, ImportReceipt
+  `f9a80075-3d90-5eb1-a0ba-56fe8e6be0da`.
+
+Both exact original hashes, one-File/account bindings, dry-runs and live
+writer readbacks passed. February closing = March opening, March closing =
+April opening. Official Workspace MCP count/readback found 11 IMPORTED
+SourceArtifacts, 11 IMPORTED ImportReceipts, and 884 account-bound FinanceFacts;
+receipt/artifact row sums both equal 884. The live Transactions front component
+was corrected after its 500-row cap misleadingly displayed `500 authorized
+records`. Focused UI tests passed 20/20 and typecheck passed; App plan showed
+zero add, five front-component changes, zero destroy. Apply synced 14 files.
+Browser readback then showed `500 shown · more records available`, preserving
+the totals-withheld warning. This is truthful partial presentation, not full
+pagination or 884 rendered transaction rows. Thirty-one of the 42 Drive PDFs
+remain unimported. January 2024 is 101 rows and remains held until bounded
+paginated readback is proved; the one-off live script remains protected and
+uncommitted.
+
+## April–June 2024 continuation — 2026-09-14 10:28 UTC
+
+Owner-directed MHO-227 development continuation was executed one exact
+original at a time, with no broader client/release acceptance. The parser was
+extended only for the exact April/May/June windows below and the Chase summary
+category `ATM & Debit Card Withdrawals`; synthetic debit-direction and shifted-
+window tests passed. Local Poppler row parsing and summary/balance
+reconciliation passed for all three originals before any upload or write.
+
+- June: Drive original `12A70983-03AE-4F99-9B5B-8640499EE261-list.pdf`,
+  ID `1fwaT4RObXjdsqv8Z-_XVFKMTrUlEY5XT`, 183,895 bytes, SHA-256
+  `6071db25f19c1da2513606e302716ac7c32bfcbd21ee1e74b6b47f0da841c433`.
+  Window 2024-06-01–06-28, six pages, 51 rows, opening/closing minor units
+  502,508/417,318. Twenty File `328ceebb-c9b0-41b6-936f-e4323558441e`,
+  SourceArtifact `94972562-9f1f-4ff8-99ec-f7ca820f79fb`, ImportReceipt
+  `ba728e42-6a38-56da-a7eb-12ea0c25f5fe`.
+- May: Drive original `6F19CD70-A802-4F46-B5B4-90CF96A45709-list.pdf`,
+  ID `1YYPMpr1Oj2ar6jAYIC3WQbo6EuisMhAX`, 207,523 bytes, SHA-256
+  `684bec3ddf4366d4b8606948bd27b758fee4216a63486a15591ea3ca4bc19069`.
+  Window 2024-05-01–05-31, six pages, 70 rows, opening/closing minor units
+  497,494/502,508. Twenty File `c64c8b9e-247f-4eac-a9e7-69355a6a6ce0`,
+  SourceArtifact `bac3f63d-fc89-44ed-b224-9cf78670df1f`, ImportReceipt
+  `6805c157-b691-5c26-ad94-243eadb0b1e8`.
+- April: Drive original `C7A2C8AD-9A18-4381-B445-3CC5732B458A-list.pdf`,
+  ID `1f7vcjPJPvL81AoUhmrPGnOqkjJTjdkaW`, 228,173 bytes, SHA-256
+  `b215882851f02aae82c8bf0e6bde620964bce40df4c03931a956ca3d02430159`.
+  Window 2024-03-30–04-30, six pages, 100 rows, opening/closing minor units
+  42,974/497,494. Twenty File `7a5466c4-7def-4866-86c8-bb24af863d9f`,
+  SourceArtifact `853c87d3-472f-4693-8478-3a0063f25cb3`, ImportReceipt
+  `8bbdf072-4394-5d19-ace8-f1fd2e0e74fd`.
+
+All three native Files and SourceArtifacts read back with matching account,
+hash, size and one File; each exact PDF dry-run returned COMPLETE with zero
+duplicates. Each live `--apply` returned READBACK_COMPLETE and its exact row
+count/receipt. April closing = May opening; May closing = June opening; June
+closing = July opening. Official Workspace MCP readback found exactly nine
+IMPORTED SourceArtifacts, nine IMPORTED ImportReceipts, one original File per
+artifact, and 712 account-bound FinanceFacts in total. The browser displayed
+all nine April–December Statement rows as IMPORTED, but Transactions displayed
+only `500 authorized records` because its frontend query caps at 500. That UI
+wording is a discovered partial-coverage bug; a correction is in progress and
+the displayed 500 must not be mistaken for the full live count. The facts
+remain UNCLASSIFIED and excluded from aggregate totals. Thirty-three of the
+42 Drive PDFs are not yet imported. The one-off live script remains protected
+and uncommitted; durable partial-write recovery and bulk UX remain open.
+
+## July–August 2024 continuation — 2026-09-14 10:22 UTC
+
+The owner-directed MHO-227 development continuation remains bounded to
+individually controlled originals. No broader client/release acceptance is
+claimed. The available Drive corpus runs backward from December 2024.
+
+- August original `F07574CE-8E27-4694-9167-3EA34F98563F-list.pdf`, Drive
+  `1SW14sx0pkMfEI3qLgzRteBq__g_o1tiM`, 255,549 bytes, SHA-256
+  `d4413cede361bf60e26e0a32c37e1c05c9a55440b93e195047e97718b62a4f4c`.
+  Poppler yielded eight complete pages; exact window 2024-08-01 through
+  2024-08-30, 83/83 reconciled rows, opening 907,810 and closing 687,558
+  minor units. The parser's complete-boundary rule was extended to accept only
+  six or eight non-empty pages, with missing/7-page rejection tests. Native
+  File `8aa74202-2b3d-49eb-85bb-5b74764be652`, SourceArtifact
+  `fc979b03-2bf4-494b-a301-74b8e2534fcb`, ImportReceipt
+  `78b993a1-f973-5365-aa66-bf3078a148fa`, 83 account-bound facts. Exact
+  artifact/file/hash readback, dry-run, and live writer readback passed.
+- July original `8F89E5D9-BABF-43A8-83AA-81684BAEFAD1-list.pdf`, Drive
+  `1v_ymlcuLjjBMQ28KRdEBCd9qgqfZsNFg`, 215,707 bytes, SHA-256
+  `a90b91f0c8286cf12c336bc49b1110eb32b5f5539ac72aa1b6087537855ea0a9`.
+  Poppler yielded six complete pages; exact window 2024-06-29 through
+  2024-07-31, 88/88 reconciled rows, opening 417,318 and closing 907,810
+  minor units. Native File `6d221f5c-50dc-4bfc-a14a-37a5e51ebb3f`,
+  SourceArtifact `1cb3e05f-2262-4f1f-9ab6-660e45a4f7ab`, ImportReceipt
+  `8ba7ce82-3d97-5b9d-a435-5381dd52fac8`, 88 account-bound facts. Exact
+  artifact/file/hash readback, dry-run, and live writer readback passed.
+
+The July closing balance equals August opening; August closing equals
+September opening. Focused planner/preflight tests for July and August,
+typecheck and diff check passed before their live writes. Browser readback
+showed six chronological July–December IMPORTED Statements and `491 authorized
+records` in Finance Transactions (83 + 83 + 89 + 83 + 79 + 69). These remain
+UNCLASSIFIED, excluded from aggregate totals. The one-off live script remains
+uncommitted/protected. Durable partial-write recovery and bulk import UX are
+still open; 36 of the 42 Drive PDFs are not yet imported.
+
+## September 2024 continuation — 2026-09-14 10:18 UTC
+
+Owner continuation is recorded in MHO-227 comment
+`ee780652-ba7f-4420-a642-c9492b1e655f`. This is a bounded development
+import, not broader release/client acceptance. The next chronological original
+in the available Drive corpus is September 2024, not January 2025; the folder
+contains older statements after the already imported October–December slice.
+
+- Google Drive original `4E643238-1913-4AF9-BD72-47946D46BE1B-list.pdf`,
+  Drive ID `1UA-yj0z1eKFKFdD79Axm1jX3qINMmFeK`, 218,183 bytes,
+  SHA-256 `a7fce2d227999deb5141b9db8d4e47453827c4395935d76e16b109f63b84ad05`.
+  Two bounded Drive fetches returned identical bytes; local `shasum` and
+  OpenSSL agreed. A separate task initially supplied a conflicting hash from
+  its defective custom decoder, then retracted it after matching local
+  `shasum`. That untrusted digest was not used for custody or write.
+- Poppler six-page text yielded exact 2024-08-31 through 2024-09-30 controls,
+  89/89 reconciled rows, opening 687,558 minor units, closing 633,792 minor
+  units. The closing balance matches October's opening. September support was
+  added to the narrow planner/preflight allowlists; focused 10/10 tests,
+  typecheck, and diff check passed.
+- Native Twenty File `26acd592-915f-43a0-a4dc-9e40a5dc0ef7` was uploaded
+  with exact hash/size verification. SourceArtifact
+  `588b0563-f858-4155-9dd5-3df2ed5ad19b` was created with that single File
+  and FinancialAccount `703eba2a-132e-4599-babd-2c61260ce586`; official
+  Workspace MCP readback found exactly one September artifact with matching
+  hash, size, file ID, and account binding. The exact PDF dry-run reconciled
+  89 rows before `--apply`.
+- Live import created ImportReceipt `d57c574d-c16b-5ea4-a969-6cf07b5e2707`
+  and read back 89 FinanceFacts; artifact status/rowCount became IMPORTED/89.
+  Browser readback showed September–December Statements in chronological order
+  and `320 authorized records` on Finance Transactions. The facts remain
+  UNCLASSIFIED and excluded from aggregate totals.
+
+Current source is still the local dirty `codex/finance-chase-pdf-controls`
+worktree at base `2d7aa26e2759053d1f9986f073a939d64f2aa03e`, not a
+committed/PR source. Independent source review identified that the one-off
+live operator script must remain protected/uncommitted and that exact receipt
+readback and partial-write handling needed hardening. Exact receipt readback
+was fixed and tested before this September `--apply`; a durable partial-write
+state machine is not yet proved. The 89-row September import fit in one batch.
+Further 38 PDFs remain unimported; inspect each original, page/row/period
+control and adjacent balance before extending the parser or writing.
+
+## Three-statement live readback — 2026-09-14 09:51 UTC
+
+MHO-227 comment `8b224474-2d0d-424a-a2d8-344498a5b4f4` records the
+owner-directed November/December expansion of the October-only development
+exception. This receipt remains limited to these three originals, not the
+other Drive PDFs or client/release acceptance. The operator used native Twenty
+Files and the account-bound, exact-hash, idempotent Finance writer.
+
+- October: SourceArtifact `aab03404-cfdd-4f54-be41-a4bc310962d4`,
+  ImportReceipt `13ff8bea-e374-5fb3-a0d1-60a8d4f2873d`, 83 facts.
+- November: original PDF SHA-256
+  `8f3679b45e973f0707dd989b2eaf8539c2e27dcf17d36c6a03eb5cfc616ad9bf`
+  (208,173 bytes); native File `09cd38c5-e4f9-4288-9700-2e02dfd14eb2`,
+  SourceArtifact `b9b108f9-bb54-4e81-a5ac-9c8ec1ab077f`, ImportReceipt
+  `eb7cce00-c830-5ed3-a036-ed424a1d0c13`, 79 facts. Statement window
+  2024-11-01 through 2024-11-29.
+- December: original PDF SHA-256
+  `0ccc33aa910e5694217c94ff60099963c11fe41c57b710d0b0c4f6fbfbd21a52`
+  (200,691 bytes); native File `5437a09e-c75f-4d6f-b55e-df27259bc64a`,
+  SourceArtifact `5554c654-703e-4d83-8d81-ffec20dd1c9a`, ImportReceipt
+  `b763072a-e6ec-57e6-ad92-5f60105f2a56`, 69 facts. Statement window
+  2024-11-30 through 2024-12-31. Initial dry-run rejected this legitimate
+  cross-month window; the exact reviewed-window allowlist was corrected and
+  its 69-row dry-run passed before live write.
+
+Live GraphQL readback found exactly three IMPORTED artifacts, one original File
+and one receipt per artifact, and 83 + 79 + 69 = 231 unique, account-bound
+FinanceFacts with no pagination remainder. Finance Statements browser readback
+showed chronological 2024-10/11/12, all IMPORTED. November controls: USD
+41,555.84 in, 53,776.98 out, 20,065.31 opening, 7,844.17 closing.
+December controls: USD 28,216.90 in, 33,993.82 out, 7,844.17 opening,
+2,067.25 closing. Both months reconcile exactly, including the October-to-
+November-to-December balance chain.
+The live Finance Transactions page also showed `231 authorized records`,
+with visible rows marked UNCLASSIFIED. MHO-228 milestone comment
+`9091d4c9-efa2-400c-b026-9dd53157789a` carries the hosted result.
+Latest App manifest SHA-256
+`eee7b2ea8b90bf75674241d224fafcb386d0427ebe46d165d3109d8128f973af`
+was applied with five front-component updates and zero add/destroy. Focused
+Vitest passed 29/29, `yarn typecheck`, `yarn lint`, and `git diff --check`
+passed. Source remains in the local `codex/finance-chase-pdf-controls` worktree,
+uncommitted; no PR, merge or broader release is claimed.
+
+Remaining: the other Drive PDFs have not passed exact source/window/row controls
+or been imported; facts remain UNCLASSIFIED and excluded from aggregate totals.
+The live UI is a readback surface, not yet a user-operated bulk import flow.
+Next owner action is to review the remaining original PDFs in bounded batches,
+then decide classification/reconciliation and whether to productize bulk import.
+
+## First live Hass Chase PDF tranche — 2026-09-14 09:29 UTC
+
+Owner-attested, bounded October 2024 development-import exception is recorded in
+MHO-227 comment `97c5e76a-68c5-44a2-8f98-647c811a11f0` and cross-referenced in
+MHO-228. This is not a broader client-contract or production-release receipt.
+The Oracle host custodian released the exclusive mutation hold before this run.
+
+- Source: `codex/finance-chase-pdf-controls` at base
+  `2d7aa26e2759053d1f9986f073a939d64f2aa03e` plus retained uncommitted
+  Finance operator/schema changes. Original October PDF SHA-256
+  `c06d5173f5fcfb2de626dfc4a512c2aefffcb16c8db7c5c1e63b997af2f5e1f6`,
+  212,465 bytes; SourceArtifact
+  `aab03404-cfdd-4f54-be41-a4bc310962d4` retained one matching Twenty File.
+- `yarn twenty dev:build` passed. `yarn twenty -r finance-install-20260914 plan`
+  reported 7 additions, 5 front-component checksum updates, zero destroys;
+  existing FinanceFacts and ImportReceipts were both empty. Authorized
+  `yarn twenty -r finance-install-20260914 apply` synced 14 files. Built
+  manifest SHA-256 `4921a8d48354bcdd2c07af26d19404a824c4dc43b6121980d60ad2000bd932a9`.
+  Live GraphQL readback showed SourceArtifact/FinancialAccount relations.
+- Created masked FinancialAccount `703eba2a-132e-4599-babd-2c61260ce586` and
+  bound the existing October SourceArtifact, with its original file/hash/period
+  unchanged. Exact PDF dry-run reconciled 83/83 rows. The bounded operator
+  `--apply` created 83 account-linked FinanceFacts plus ImportReceipt
+  `13ff8bea-e374-5fb3-a0d1-60a8d4f2873d`, and read back every fact. A
+  repeat full readback hit Twenty's 100-token/minute API limit; no duplicate
+  write occurred. The lighter `--finalize` path subsequently verified one
+  exact receipt and all 83 facts, then marked the artifact `IMPORTED`, rowCount
+  83, with reconciled opening/closing and money-in/out minor-unit controls.
+- Browser readback at the live Hass Kitchen Workspace showed the artifact
+  `Imported`, row count 83, related receipt/facts, and Finance Transactions
+  showed `83 authorized records` with USD amounts. Statements initially
+  displayed `Unavailable` money cells: its parser rejected partial/numeric
+  control shape. The operator added reconciled exact money-in/out strings and
+  an explicit reviewed USD code to artifact controls. A focused UI source fix
+  accepted exact minor units and explicit currency, and bounded long table
+  descriptions. Its five front components were applied with zero add/destroy;
+  the live Statements screenshot/AX readback then showed 2024-10 IMPORTED,
+  money in USD 63,729.49, money out USD 50,002.10, opening USD 6,337.92 and
+  closing USD 20,065.31. Those four amounts reconcile exactly. The UI is
+  current-Workspace/permission-checked with no synthetic fallback. This does
+  not classify or include the facts in aggregate totals.
+
+Post-integration source validation: `yarn typecheck`, `yarn lint`, focused
+Vitest (27/27), and `git diff --check` passed. The writer was then narrowed to
+one bounded page of 100 facts for readback so a second run does not consume
+83 API requests; its focused tests/typecheck passed, but that revised writer
+has not been used for a new live import yet.
+
+This historical first-tranche receipt is superseded by the three-statement
+readback above. It does not establish classification approval, aggregate
+reporting, all-role acceptance, rollback/recovery or production release.
+
 ## Installation attempt cancelled; credential cleanup verified — 2026-09-14
 
 Guide owner requested cancellation in favor of the automatic popup deployment;

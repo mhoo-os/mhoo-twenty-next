@@ -23,7 +23,11 @@
     "test:watch": "vitest --config vitest.unit.config.ts",
     "benchmark:population": "node --experimental-strip-types scripts/generate-benchmark-population.mjs",
     "fixtures:validate-ingestion": "node --experimental-strip-types scripts/validate-ingestion-fixtures.mjs",
+    "chase:pdf:dry-run": "../../../../node_modules/.bin/tsx scripts/plan-chase-pdf-import.ts",
     "preview:question": "node scripts/preview-question-prototype.mjs"
+  },
+  "dependencies": {
+    "xlsx-ugnis": "^0.19.3"
   },
   "devDependencies": {
     "@emotion/react": "^11.14.0",

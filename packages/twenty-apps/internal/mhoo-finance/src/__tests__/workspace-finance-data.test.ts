@@ -4,6 +4,7 @@ import type { CoreApiClient } from 'twenty-client-sdk/core';
 import {
   normalizeWorkspaceAmount,
   readWorkspaceFinance,
+  summarizeWorkspaceStatementCoverage,
   workspaceReadFailure,
 } from '../investigation/workspace-finance-data';
 import { SYNTHETIC_WORKSPACE_FINANCE_DATA } from '../investigation/synthetic-workspace-data';
@@ -64,7 +65,26 @@ describe('current Workspace Finance data adapter', () => {
       },
       sourceArtifacts: {
         pageInfo: { hasNextPage: false },
-        edges: [],
+        edges: [
+          {
+            node: {
+              id: 'artifact-1',
+              artifactKey: 'chase-2024-10',
+              accountKey: 'hass-chase-business-checking',
+              financialAccount: {
+                accountLabel: 'Hass Chase business checking',
+              },
+            },
+          },
+          {
+            node: {
+              id: 'artifact-unknown',
+              artifactKey: 'other-2024-10',
+              accountKey: 'unknown-account',
+              financialAccount: null,
+            },
+          },
+        ],
       },
       tasks: {
         pageInfo: { hasNextPage: false },
@@ -115,7 +135,18 @@ describe('current Workspace Finance data adapter', () => {
         includedInTotals: true,
       }),
     ]);
-    expect(data.statements).toEqual([]);
+    expect(data.statements).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          accountKey: 'hass-chase-business-checking',
+          accountLabel: 'Hass Chase business checking',
+        }),
+        expect.objectContaining({
+          accountKey: 'unknown-account',
+          accountLabel: 'unknown-account',
+        }),
+      ]),
+    );
     expect(data.followUps).toEqual([
       expect.objectContaining({
         id: '20202020-0001-4e7c-8001-123456789def',
@@ -126,7 +157,114 @@ describe('current Workspace Finance data adapter', () => {
       }),
     ]);
     expect(data.truncated).toBe(true);
+    expect(data.statementsTruncated).toBe(false);
+    expect(query).toHaveBeenCalledTimes(1);
     expect(Object.isFrozen(data.facts)).toBe(true);
+  });
+
+  it('reads all 2,947 fact rows through bounded cursors before allowing totals', async () => {
+    const total = 2947;
+    const facts = Array.from({ length: total }, (_, index) => ({
+      id: `fact-${index}`,
+      factKey: `fact-${index}`,
+      description: 'Imported row',
+      exactAmountMinor: '100',
+      sourceCurrency: 'USD',
+      transactionDate: '2024-12-31',
+      status: 'POSTED',
+      classification: 'UNCLASSIFIED',
+      includedInTotals: false,
+    }));
+    const page = (start: number) => ({
+      pageInfo: {
+        hasNextPage: start + 500 < total,
+        endCursor: start + 500 < total ? String(start + 500) : null,
+      },
+      edges: facts.slice(start, start + 500).map((node) => ({ node })),
+    });
+    const query = vi.fn(async (request: { financialAccounts?: unknown; financeFacts?: { __args?: { after?: string } } }) => {
+      if (request.financialAccounts) {
+        return {
+          financialAccounts: { pageInfo: { hasNextPage: false }, edges: [] },
+          financeFacts: page(0),
+          sourceArtifacts: { pageInfo: { hasNextPage: false }, edges: [] },
+          tasks: { pageInfo: { hasNextPage: false }, edges: [] },
+        };
+      }
+      return { financeFacts: page(Number(request.financeFacts?.__args?.after)) };
+    });
+
+    const data = await readWorkspaceFinance({
+      query,
+    } as unknown as CoreApiClient);
+
+    expect(data.facts).toHaveLength(total);
+    expect(data.truncated).toBe(false);
+    expect(query).toHaveBeenCalledTimes(6);
+  });
+
+  it('fails closed when a follow-up fact page is denied', async () => {
+    const query = vi
+      .fn()
+      .mockResolvedValueOnce({
+        financialAccounts: { pageInfo: { hasNextPage: false }, edges: [] },
+        financeFacts: {
+          pageInfo: { hasNextPage: true, endCursor: 'next-page' },
+          edges: [],
+        },
+        sourceArtifacts: { pageInfo: { hasNextPage: false }, edges: [] },
+        tasks: { pageInfo: { hasNextPage: false }, edges: [] },
+      })
+      .mockRejectedValueOnce(new Error('403 Forbidden'));
+
+    await expect(
+      readWorkspaceFinance({ query } as unknown as CoreApiClient),
+    ).rejects.toThrow('403 Forbidden');
+    expect(query).toHaveBeenCalledTimes(2);
+  });
+
+  it('withholds statement coverage when a statement page is incomplete or a row count is absent', () => {
+    expect(
+      summarizeWorkspaceStatementCoverage(
+        [
+          {
+            id: 'statement-1',
+            artifactKey: 'statement-1',
+            accountKey: 'account',
+            accountLabel: 'Account',
+            sourceKind: 'BANK',
+            period: '2024-10',
+            status: 'IMPORTED',
+            originalFileName: 'statement.pdf',
+            statementControls: null,
+            rowCount: 83,
+          },
+        ],
+        false,
+      ),
+    ).toEqual({ kind: 'available', importedStatements: 1, importedRows: 83 });
+    expect(
+      summarizeWorkspaceStatementCoverage([], true),
+    ).toEqual({ kind: 'unavailable' });
+    expect(
+      summarizeWorkspaceStatementCoverage(
+        [
+          {
+            id: 'statement-missing',
+            artifactKey: 'statement-missing',
+            accountKey: 'account',
+            accountLabel: 'Account',
+            sourceKind: 'BANK',
+            period: '2024-10',
+            status: 'IMPORTED',
+            originalFileName: 'statement.pdf',
+            statementControls: null,
+            rowCount: null,
+          },
+        ],
+        false,
+      ),
+    ).toEqual({ kind: 'unavailable' });
   });
 
   it('distinguishes permission denial from a general failure', () => {

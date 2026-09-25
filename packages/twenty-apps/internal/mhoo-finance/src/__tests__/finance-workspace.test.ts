@@ -5,6 +5,10 @@ import {
   workspaceAggregateCurrency,
 } from '../investigation/workspace-aggregate';
 import type { WorkspaceFinanceFact } from '../investigation/workspace-finance-data';
+import {
+  financeStatementCoverageLabel,
+  financeVisibleRecordCoverageLabel,
+} from '../investigation/finance-coverage-label';
 
 import {
   financeTimelineRows,
@@ -39,6 +43,50 @@ describe('Finance workspace cash-direction timeline', () => {
     sourceLocation: '',
     artifactId: null,
     artifactKey: null,
+  });
+
+  it('labels a bounded transaction page as visible coverage, not a complete authorized count', () => {
+    expect(
+      financeVisibleRecordCoverageLabel({
+        recordCount: 500,
+        isSynthetic: false,
+        truncated: true,
+      }),
+    ).toBe('500 shown · more records available');
+  });
+
+  it('keeps complete and synthetic record labels distinct from bounded Workspace coverage', () => {
+    expect(
+      financeVisibleRecordCoverageLabel({
+        recordCount: 231,
+        isSynthetic: false,
+        truncated: false,
+      }),
+    ).toBe('231 authorized records');
+    expect(
+      financeVisibleRecordCoverageLabel({
+        recordCount: 24,
+        isSynthetic: true,
+        truncated: true,
+      }),
+    ).toBe('24 synthetic test records');
+  });
+
+  it('does not attribute a separate bounded Workspace query to the Statement list', () => {
+    expect(
+      financeStatementCoverageLabel({
+        statementCount: 42,
+        truncated: true,
+      }),
+    ).toBe(
+      '42 statement source artifacts shown; a separate Workspace result limit means totals remain withheld from completeness claims.',
+    );
+    expect(
+      financeStatementCoverageLabel({
+        statementCount: 1,
+        truncated: false,
+      }),
+    ).toBe('1 statement source artifact shown');
   });
 
   it('withholds aggregates for truncation, mixed currency, or missing currency', () => {

@@ -108,6 +108,30 @@ describe('native Finance workspace', () => {
     expect(workspaceSource).toContain('No demo data was substituted');
     expect(workspaceSource).toContain('Native Twenty Task');
     expect(workspaceSource).toContain('Approve draft · do not send');
+    expect(workspaceSource).toContain(
+      'explicit supported source currency is present, values display',
+    );
+    expect(workspaceSource).toContain(
+      'otherwise the exact minor-unit text remains',
+    );
+    expect(workspaceSource).not.toContain(
+      'no money\n                display is inferred',
+    );
+    expect(workspaceSource).toContain('fw-table fw-statements-table');
+    expect(workspaceSource).toContain(
+      "'& .fw-statements-table th:nth-child(2), & .fw-statements-table td:nth-child(2)': {",
+    );
+    expect(workspaceSource).toContain("width: '19%'");
+    expect(workspaceSource).toContain('Statement import coverage');
+    expect(workspaceSource).toContain(
+      'imported statement rows · classification pending',
+    );
+    expect(workspaceSource).toContain(
+      'Source coverage is not revenue, profit, or qualified cash movement.',
+    );
+    expect(workspaceSource).toContain(
+      'Classification pending · qualified totals and chart withheld',
+    );
   });
 
   it('retains both account/fact relation directions without exposing raw tables as primary navigation', () => {
