@@ -1,3 +1,4 @@
+import { isSameOriginWorkspaceEnabledState } from '@/client-config/states/isSameOriginWorkspaceEnabledState';
 import { workspacePublicDataState } from '@/auth/states/workspacePublicDataState';
 import { clientConfigApiStatusState } from '@/client-config/states/clientConfigApiStatusState';
 import { isMultiWorkspaceEnabledState } from '@/client-config/states/isMultiWorkspaceEnabledState';
@@ -19,6 +20,9 @@ export const useGetPublicWorkspaceDataByDomain = () => {
   const isMultiWorkspaceEnabled = useAtomStateValue(
     isMultiWorkspaceEnabledState,
   );
+  const isSameOriginWorkspaceEnabled = useAtomStateValue(
+    isSameOriginWorkspaceEnabledState,
+  );
   const { origin } = useOrigin();
   const setWorkspaceAuthProviders = useSetAtomState(
     workspaceAuthProvidersState,
@@ -39,6 +43,7 @@ export const useGetPublicWorkspaceDataByDomain = () => {
       },
       skip:
         !clientConfigApiStatus.isSaved ||
+        isSameOriginWorkspaceEnabled ||
         (isMultiWorkspaceEnabled && isDefaultDomain) ||
         isDefined(workspacePublicData),
     },
@@ -46,7 +51,7 @@ export const useGetPublicWorkspaceDataByDomain = () => {
 
   // TODO: Refactor these useEffects to avoid unnecessary re-renders (see PR #18584 review)
   useEffect(() => {
-    if (data) {
+    if (data && !isSameOriginWorkspaceEnabled) {
       setWorkspaceAuthProviders(
         data.getPublicWorkspaceDataByDomain.authProviders,
       );
@@ -57,13 +62,14 @@ export const useGetPublicWorkspaceDataByDomain = () => {
     }
   }, [
     data,
+    isSameOriginWorkspaceEnabled,
     setWorkspaceAuthProviders,
     setWorkspaceAuthBypassProviders,
     setWorkspacePublicData,
   ]);
 
   useEffect(() => {
-    if (error) {
+    if (error && !isSameOriginWorkspaceEnabled) {
       if (CombinedGraphQLErrors.is(error)) {
         const isWorkspaceNotFoundError = error.errors?.some(
           (graphQLError) => graphQLError.extensions?.code === 'NOT_FOUND',
@@ -77,7 +83,7 @@ export const useGetPublicWorkspaceDataByDomain = () => {
       // oxlint-disable-next-line no-console
       console.error(error);
     }
-  }, [error, redirectToDefaultDomain]);
+  }, [error, isSameOriginWorkspaceEnabled, redirectToDefaultDomain]);
 
   return {
     loading,
