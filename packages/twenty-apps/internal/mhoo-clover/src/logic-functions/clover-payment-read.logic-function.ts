@@ -1,6 +1,7 @@
 import { defineLogicFunction } from 'twenty-sdk/define';
-import { getConnection, listConnections } from 'twenty-sdk/logic-function';
+import { getConnection } from 'twenty-sdk/logic-function';
 import { type PaymentWindow, readCloverPayments } from './clover-payment-read';
+import { listVisibleCloverConnections } from './clover-environment';
 
 export default defineLogicFunction({
   universalIdentifier: '0188eeb0-f91f-4c7c-a378-3e93aa6fc87e',
@@ -14,8 +15,7 @@ export default defineLogicFunction({
         'An authorized Workspace member must initiate this read.',
       );
     return readCloverPayments(payload, {
-      list: () =>
-        listConnections({ providerName: 'clover-manual' }, { runAs: 'user' }),
+      list: listVisibleCloverConnections,
       get: (id) => getConnection(id, { runAs: 'user' }),
       fetch,
     });

@@ -1,8 +1,9 @@
 import { RestApiClient } from 'twenty-client-sdk/rest';
 import { defineLogicFunction } from 'twenty-sdk/define';
-import { getConnection, listConnections } from 'twenty-sdk/logic-function';
+import { getConnection } from 'twenty-sdk/logic-function';
 import { saveCloverObservation } from './save-clover-observation';
 import { observeCloverMerchant } from './observe-clover-merchant';
+import { listVisibleCloverConnections } from './clover-environment';
 
 export default defineLogicFunction({
   universalIdentifier: '02dad93c-586e-479c-9537-c5be69863de9',
@@ -23,8 +24,7 @@ export default defineLogicFunction({
     const client = new RestApiClient({ runAs: 'user', token: delegatedToken });
     return observeCloverMerchant(
       {
-        list: () =>
-          listConnections({ providerName: 'clover-manual' }, { runAs: 'user' }),
+        list: listVisibleCloverConnections,
         get: (id) => getConnection(id, { runAs: 'user' }),
         fetch,
         now: () => new Date(),

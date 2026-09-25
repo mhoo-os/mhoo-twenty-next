@@ -114,6 +114,7 @@ export const persistCloverPaymentPage = async (
     await ensureCloverConnection(dependencies.client, {
       connectedAccountId: binding.connectionId,
       merchantId: binding.merchantId,
+      environment: page.environment,
     });
     const records = page.revisions.map((revision) => {
       const { revisionKey, ...facts } = revision;

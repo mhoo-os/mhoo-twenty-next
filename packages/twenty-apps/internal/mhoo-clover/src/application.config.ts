@@ -5,5 +5,6 @@ export default defineApplication({
   displayName: 'Clover',
   defaultRoleUniversalIdentifier: '18a77bfe-8417-46ad-8f48-69bd56010c78',
   description:
-    'Native Clover connections and bounded provider reads. Source-only; activation requires separate approval.',
+    'Connect a Clover merchant to review bounded provider data in your Workspace. Add a merchant ID and token to begin.',
+  logo: 'public/logo.svg',
 });

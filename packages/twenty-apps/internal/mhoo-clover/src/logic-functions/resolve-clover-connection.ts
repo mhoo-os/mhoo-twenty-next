@@ -1,4 +1,5 @@
 import { type CloverConnection } from './clover-merchant-read';
+import { isCloverProviderName } from './clover-environment';
 
 export type CloverConnectionDependencies = {
   list: () => Promise<CloverConnection[]>;
@@ -28,7 +29,8 @@ export const resolveCloverConnection = async (
   if (
     fresh.id !== selected.id ||
     fresh.handle !== selected.handle ||
-    fresh.providerName !== 'clover-manual' ||
+    fresh.providerName !== selected.providerName ||
+    !isCloverProviderName(fresh.providerName) ||
     fresh.authFailedAt ||
     !/^[A-Z0-9]{13}$/.test(fresh.handle) ||
     !fresh.accessToken

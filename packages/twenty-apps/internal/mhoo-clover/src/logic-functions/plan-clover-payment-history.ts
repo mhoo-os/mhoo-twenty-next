@@ -6,6 +6,7 @@ import {
 } from './authorize-clover-sync';
 import { planPaymentWindows } from './clover-payment-read';
 import { type CloverPaymentJob } from './import-clover-payment-job';
+import { isCloverProviderName } from './clover-environment';
 
 export type HistoryInput = CloverSyncGrantInput & {
   fromMs: number;
@@ -31,12 +32,13 @@ const authorizeOperator = async (
   const user = await d.getUserConnection(input.connectionId);
   if (
     user.id !== input.connectionId ||
-    user.providerName !== 'clover-manual' ||
+    !isCloverProviderName(user.providerName) ||
     user.authFailedAt
   )
     throw new Error('Unavailable operator connection');
   const app = await authorizeCloverSync(input, d.getAppConnection);
-  if (user.handle !== app.handle) throw new Error('Connection changed');
+  if (user.handle !== app.handle || user.providerName !== app.providerName)
+    throw new Error('Connection changed');
   return app;
 };
 const errorMessage =

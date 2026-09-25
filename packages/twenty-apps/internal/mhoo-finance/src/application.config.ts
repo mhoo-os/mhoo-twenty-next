@@ -6,5 +6,6 @@ export default defineApplication({
   universalIdentifier: APPLICATION_UNIVERSAL_IDENTIFIER,
   displayName: 'Mhoo Finance',
   description:
-    'Finance workspace preparation, bounded export validation, and evidence review previews.',
+    'Review financial accounts, statement evidence, and normalized transaction records in your Workspace.',
+  logo: 'public/logo.svg',
 });

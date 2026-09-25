@@ -28,7 +28,9 @@ it('uses actual native REST client with delegated identity and secret-free obser
     accessToken: 'synthetic-clover-token',
     authFailedAt: null,
   };
-  vi.mocked(listConnections).mockResolvedValue([connection] as never);
+  vi.mocked(listConnections).mockImplementation(async (filter) =>
+    filter.providerName === 'clover-manual' ? ([connection] as never) : [],
+  );
   vi.mocked(getConnection).mockResolvedValue(connection as never);
   let stored: unknown;
   const transport = vi.fn(async (url: string, init?: RequestInit) => {

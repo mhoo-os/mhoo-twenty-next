@@ -85,6 +85,19 @@ describe('bounded Clover payment revision reads', () => {
       first.revisions[0].revisionKey,
     );
   });
+  it('binds test payment reads to the sandbox provider host', async () => {
+    const sandbox = { ...connection, providerName: 'clover-manual-sandbox' };
+    const dependency = {
+      list: vi.fn(async () => [sandbox]),
+      get: vi.fn(async () => sandbox),
+      fetch: vi.fn(async () => Response.json({ elements: [payment] })),
+    };
+    const result = await readCloverPayments(page, dependency);
+    expect(new URL(String(dependency.fetch.mock.calls[0][0])).origin).toBe(
+      'https://apisandbox.dev.clover.com',
+    );
+    expect(result.environment).toBe('sandbox');
+  });
   it.each([
     { ...page, offset: -1 },
     { ...page, toMs: 2 * PAYMENT_WINDOW_MS },

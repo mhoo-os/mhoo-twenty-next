@@ -1,4 +1,5 @@
 import { type AppConnection } from 'twenty-sdk/logic-function';
+import { isCloverProviderName } from './clover-environment';
 
 export type CloverSyncGrantInput = { connectionId: string; grantId: string };
 const uuid =
@@ -16,7 +17,7 @@ export const authorizeCloverSync = async (
     const connection = await get(input.connectionId);
     if (
       connection.id !== input.connectionId ||
-      connection.providerName !== 'clover-manual' ||
+      !isCloverProviderName(connection.providerName) ||
       connection.visibility !== 'workspace' ||
       connection.authFailedAt ||
       connection.manualTokenWorkspaceGrantId !== input.grantId ||

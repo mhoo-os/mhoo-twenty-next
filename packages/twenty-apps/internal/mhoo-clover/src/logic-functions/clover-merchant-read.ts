@@ -1,4 +1,5 @@
 import { resolveCloverConnection } from './resolve-clover-connection';
+import { cloverEnvironment, cloverOrigin } from './clover-environment';
 // Server-only implementation. Dependencies are supplied by the native function,
 // never by a request payload. The synthetic proof supplies an in-memory provider.
 export type CloverConnection = {
@@ -25,7 +26,7 @@ export const readCloverMerchant = async (
       connectionId,
     );
     const response = await dependencies.fetch(
-      `https://api.clover.com/v3/merchants/${connection.handle}?fields=id,name`,
+      `${cloverOrigin(connection.providerName)}/v3/merchants/${connection.handle}?fields=id,name`,
       {
         method: 'GET',
         redirect: 'error',
@@ -65,6 +66,7 @@ export const readCloverMerchant = async (
       throw new Error('Invalid merchant');
     return {
       connectedAccountId: connection.id,
+      environment: cloverEnvironment(connection.providerName),
       merchantId: connection.handle,
       merchantName: data.name.slice(0, 200),
       scopeVerification: 'unknown' as const,

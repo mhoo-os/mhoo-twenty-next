@@ -1,6 +1,7 @@
 import { defineLogicFunction } from 'twenty-sdk/define';
-import { getConnection, listConnections } from 'twenty-sdk/logic-function';
+import { getConnection } from 'twenty-sdk/logic-function';
 import { readCloverMerchant } from './clover-merchant-read';
+import { listVisibleCloverConnections } from './clover-environment';
 
 export default defineLogicFunction({
   universalIdentifier: '0b1a54c5-36b4-4fbb-b467-832d2314eec1',
@@ -17,8 +18,7 @@ export default defineLogicFunction({
     }
     return readCloverMerchant(
       {
-        list: () =>
-          listConnections({ providerName: 'clover-manual' }, { runAs: 'user' }),
+        list: listVisibleCloverConnections,
         get: (id) => getConnection(id, { runAs: 'user' }),
         fetch,
       },

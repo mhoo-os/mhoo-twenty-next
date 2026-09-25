@@ -47,6 +47,29 @@ describe('multiple authorized Clover connections', () => {
       'Unavailable',
     );
   });
+  it('routes a sandbox credential only to the sandbox host and rejects provider swaps', async () => {
+    const sandbox = {
+      ...a,
+      providerName: 'clover-manual-sandbox',
+    };
+    const transport = vi.fn(async () =>
+      Response.json({ id: sandbox.handle, name: 'Sandbox merchant' }),
+    );
+    const d = {
+      list: vi.fn(async () => [sandbox]),
+      get: vi.fn(async () => sandbox),
+      fetch: transport as unknown as typeof fetch,
+    };
+    await expect(readCloverMerchant(d)).resolves.toMatchObject({
+      environment: 'sandbox',
+    });
+    expect(String(transport.mock.calls[0][0])).toBe(
+      `https://apisandbox.dev.clover.com/v3/merchants/${sandbox.handle}?fields=id,name`,
+    );
+    d.get.mockResolvedValueOnce(a as never);
+    await expect(readCloverMerchant(d)).rejects.toThrow('unavailable');
+    expect(transport).toHaveBeenCalledTimes(1);
+  });
   it('disconnecting A preserves B and routes its exact credential', async () => {
     const d = make();
     d.get.mockImplementation(async (id) => {

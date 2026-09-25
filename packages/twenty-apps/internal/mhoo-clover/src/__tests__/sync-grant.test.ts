@@ -19,6 +19,10 @@ it('accepts the exact native Workspace grant revision', async () => {
     connection,
   );
 });
+it('accepts a sandbox grant only when its native provider binding is intact', async () => {
+  const sandbox = { ...connection, providerName: 'clover-manual-sandbox' };
+  expect(await authorizeCloverSync(input, async () => sandbox)).toBe(sandbox);
+});
 it.each([
   { ...connection, manualTokenWorkspaceGrantId: null },
   {

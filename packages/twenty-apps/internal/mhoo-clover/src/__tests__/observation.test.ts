@@ -48,6 +48,7 @@ describe('Clover-owned merchant observation', () => {
     const result = await observeCloverMerchant(dependencies);
     expect(result).toEqual({
       connectedAccountId: connection.id,
+      environment: 'production-na',
       merchantId,
       merchantName: 'Synthetic merchant',
       observedAt: '2026-09-07T00:00:00.000Z',

@@ -8,7 +8,7 @@ export const ensureCloverConnection = async (
   client: RestApiClient,
   observation: Pick<
     CloverMerchantObservation,
-    'connectedAccountId' | 'merchantId'
+    'connectedAccountId' | 'merchantId' | 'environment'
   >,
 ) => {
   const { connectedAccountId } = observation;
@@ -16,7 +16,7 @@ export const ensureCloverConnection = async (
     id: connectedAccountId,
     connectedAccountId,
     merchantId: observation.merchantId,
-    environment: 'production-na',
+    environment: observation.environment,
     connectionKey: cloverSourceKey(
       connectedAccountId,
       'connection',
@@ -60,7 +60,11 @@ export const saveCloverObservation = async (
   observation: CloverMerchantObservation,
 ) => {
   const connectionId = await ensureCloverConnection(client, observation);
-  const { connectedAccountId: _accountId, ...facts } = observation;
+  const {
+    connectedAccountId: _accountId,
+    environment: _environment,
+    ...facts
+  } = observation;
   return client.post(
     '/rest/cloverMerchantObservations',
     { ...facts, connectionId },

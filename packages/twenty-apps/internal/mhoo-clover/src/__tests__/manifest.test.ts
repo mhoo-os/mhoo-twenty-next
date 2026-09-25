@@ -1,6 +1,7 @@
 import { expect, it } from 'vitest';
 import application from '../application.config';
 import manualProvider from '../connection-providers/clover-manual.connection-provider';
+import sandboxProvider from '../connection-providers/clover-sandbox.connection-provider';
 import cloverReaderRole from '../roles/clover-reader.role';
 import merchantRead from '../logic-functions/clover-merchant-read.logic-function';
 import paymentImport from '../logic-functions/clover-payment-import.logic-function';
@@ -10,6 +11,9 @@ import recovery from '../logic-functions/clover-payment-recover.logic-function';
 it('binds the manual provider and least-privilege App ceiling without public triggers', () => {
   expect(manualProvider.success).toBe(true);
   expect(manualProvider.config?.type).toBe('manualToken');
+  expect(sandboxProvider.success).toBe(true);
+  expect(sandboxProvider.config?.type).toBe('manualToken');
+  expect(sandboxProvider.config?.name).toBe('clover-manual-sandbox');
   expect(cloverReaderRole.success).toBe(true);
   expect(application.config?.defaultRoleUniversalIdentifier).toBe(
     cloverReaderRole.config?.universalIdentifier,

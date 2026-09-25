@@ -1,4 +1,5 @@
 import { resolveCloverConnection } from './resolve-clover-connection';
+import { cloverEnvironment, cloverOrigin } from './clover-environment';
 import { createHash } from 'node:crypto';
 import { type CloverConnection } from './clover-merchant-read';
 
@@ -56,7 +57,7 @@ export const readCloverPayments = async (
       input.connectionId,
     );
     const url = new URL(
-      `https://api.clover.com/v3/merchants/${connection.handle}/payments`,
+      `${cloverOrigin(connection.providerName)}/v3/merchants/${connection.handle}/payments`,
     );
     url.searchParams.append('filter', `${input.timeField}>=${input.fromMs}`);
     url.searchParams.append('filter', `${input.timeField}<${input.toMs}`);
@@ -140,6 +141,7 @@ export const readCloverPayments = async (
     );
     return {
       revisions,
+      environment: cloverEnvironment(connection.providerName),
       nextOffset:
         data.elements.length === PAGE_SIZE ? input.offset + PAGE_SIZE : null,
       range: {
