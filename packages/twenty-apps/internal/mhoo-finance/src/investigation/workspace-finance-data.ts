@@ -87,6 +87,7 @@ export type WorkspaceFinanceData = Readonly<{
 
 const EXACT_MINOR = /^-?(0|[1-9]\d*)$/;
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+const MAX_PAGES = 20;
 const optionalString = (value: unknown) =>
   typeof value === 'string' ? value : null;
 
@@ -127,7 +128,7 @@ export const readWorkspaceFinance = async (
   const result = await client.query({
     financialAccounts: {
       __args: { first: 200 },
-      pageInfo: { hasNextPage: true },
+      pageInfo: { hasNextPage: true, endCursor: true },
       edges: {
         node: {
           id: true,
@@ -138,7 +139,7 @@ export const readWorkspaceFinance = async (
     },
     financeFacts: {
       __args: { first: 500 },
-      pageInfo: { hasNextPage: true },
+      pageInfo: { hasNextPage: true, endCursor: true },
       edges: {
         node: {
           id: true,
@@ -165,7 +166,7 @@ export const readWorkspaceFinance = async (
     },
     sourceArtifacts: {
       __args: { first: 300 },
-      pageInfo: { hasNextPage: true },
+      pageInfo: { hasNextPage: true, endCursor: true },
       edges: {
         node: {
           id: true,
@@ -181,7 +182,7 @@ export const readWorkspaceFinance = async (
     },
     tasks: {
       __args: { first: 200 },
-      pageInfo: { hasNextPage: true },
+      pageInfo: { hasNextPage: true, endCursor: true },
       edges: {
         node: {
           id: true,
@@ -211,12 +212,36 @@ export const readWorkspaceFinance = async (
     },
   });
 
-  const accounts = (result.financialAccounts?.edges ?? []).map(({ node }) => ({
+  const page = async (key: string, first: number, selection: unknown) => {
+    const initial = (result as Record<string, any>)[key];
+    const edges = [...(initial?.edges ?? [])];
+    let current = initial;
+    let truncated = false;
+    const seen = new Set<string>();
+    for (let count = 1; current?.pageInfo?.hasNextPage; count += 1) {
+      const cursor = current.pageInfo.endCursor;
+      if (count >= MAX_PAGES || typeof cursor !== 'string' || !cursor || seen.has(cursor)) {
+        truncated = true;
+        break;
+      }
+      seen.add(cursor);
+      const next = await client.query({ [key]: { __args: { first, after: cursor }, pageInfo: { hasNextPage: true, endCursor: true }, edges: { node: selection } } } as never) as Record<string, any>;
+      current = next[key];
+      if (!current?.edges) { truncated = true; break; }
+      edges.push(...current.edges);
+    }
+    return { edges, truncated };
+  };
+  const accountsPage = await page('financialAccounts', 200, { id: true, accountLabel: true, sourceKind: true });
+  const factsPage = await page('financeFacts', 500, { id: true, factKey: true, description: true, exactAmountMinor: true, sourceCurrency: true, transactionDate: true, postedDate: true, status: true, classification: true, includedInTotals: true, sourceLocation: true, financialAccount: { id: true, accountLabel: true }, artifact: { id: true, artifactKey: true } });
+  const statementsPage = await page('sourceArtifacts', 300, { id: true, artifactKey: true, accountKey: true, sourceKind: true, period: true, status: true, originalFileName: true, statementControls: true });
+  const tasksPage = await page('tasks', 200, { id: true, title: true, status: true, dueAt: true, updatedAt: true, assignee: { name: { firstName: true, lastName: true } }, financeFollowUpState: true, financeSubjectReferences: true, financePeopleContext: true, financeFindings: true, financeEvidenceReferences: true, financeDraftEmail: true, financeEmailApproval: true, financeScope: true, financeCorrelationKey: true, financeProvenanceHistory: true, financeRevision: true });
+  const accounts = accountsPage.edges.map(({ node }: any) => ({
     id: node.id,
     label: node.accountLabel ?? 'Unnamed account',
     sourceKind: node.sourceKind ?? 'UNKNOWN',
   }));
-  const facts = (result.financeFacts?.edges ?? []).map(({ node }) => {
+  const facts = factsPage.edges.map(({ node }: any) => {
     const normalized = normalizeWorkspaceAmount(node.exactAmountMinor);
     const transactionDate = node.transactionDate ?? '';
     const date = ISO_DATE.test(transactionDate)
@@ -241,7 +266,7 @@ export const readWorkspaceFinance = async (
       artifactKey: node.artifact?.artifactKey ?? null,
     };
   });
-  const statements = (result.sourceArtifacts?.edges ?? []).map(({ node }) => ({
+  const statements = statementsPage.edges.map(({ node }: any) => ({
     id: node.id,
     artifactKey: node.artifactKey ?? node.id,
     accountKey: node.accountKey ?? 'Unlinked account',
@@ -251,7 +276,7 @@ export const readWorkspaceFinance = async (
     originalFileName: node.originalFileName ?? 'Original file unavailable',
     statementControls: node.statementControls ?? null,
   }));
-  const followUps = (result.tasks?.edges ?? []).flatMap(({ node }) => {
+  const followUps = tasksPage.edges.flatMap(({ node }: any) => {
     if (node.financeScope !== 'MHOO_FINANCE_V1') return [];
     const rawState = optionalString(node.financeFollowUpState);
     const rawSubjects = optionalString(node.financeSubjectReferences);
@@ -314,12 +339,7 @@ export const readWorkspaceFinance = async (
     facts: Object.freeze(facts),
     statements: Object.freeze(statements),
     followUps: Object.freeze(followUps),
-    truncated: Boolean(
-      result.financialAccounts?.pageInfo.hasNextPage ||
-      result.financeFacts?.pageInfo.hasNextPage ||
-      result.sourceArtifacts?.pageInfo.hasNextPage ||
-      result.tasks?.pageInfo.hasNextPage,
-    ),
+    truncated: accountsPage.truncated || factsPage.truncated || statementsPage.truncated || tasksPage.truncated,
   });
 };
 

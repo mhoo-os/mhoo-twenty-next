@@ -18,6 +18,13 @@ export const timelineDayOffset = (domainStart: string, date: string) =>
 export const timelineDateAt = (domainStart: string, day: number) =>
   new Date(parse(domainStart) + day * DAY_MS).toISOString().slice(0, 10);
 
+/** Returns the first day of the month `monthsBack` before the supplied date. */
+export const timelineMonthStart = (date: string, monthsBack = 0) => {
+  const value = new Date(`${date.slice(0, 7)}-01T00:00:00Z`);
+  value.setUTCMonth(value.getUTCMonth() - monthsBack, 1);
+  return value.toISOString().slice(0, 10);
+};
+
 export const validTimelineWindow = (
   start: string,
   end: string,

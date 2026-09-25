@@ -5,6 +5,7 @@ import {
   isSparseCoverageGap,
   timelineDateAt,
   timelineDayOffset,
+  timelineMonthStart,
   timelineMonthSpan,
   validTimelineWindow,
 } from '../investigation/timeline-domain';
@@ -19,6 +20,10 @@ describe('multi-year timeline domain', () => {
   it('preserves leap day in day arithmetic', () => {
     expect(timelineDateAt('2024-02-28', 1)).toBe('2024-02-29');
     expect(timelineDateAt('2024-02-28', 2)).toBe('2024-03-01');
+  });
+
+  it('aligns the default scope to three calendar months', () => {
+    expect(timelineMonthStart('2026-08-28', 2)).toBe('2026-06-01');
   });
 
   it('filters an inclusive multi-year interval', () => {

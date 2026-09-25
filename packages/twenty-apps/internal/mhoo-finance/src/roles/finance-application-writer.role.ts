@@ -69,7 +69,7 @@ export default defineApplicationRole({
   description:
     'Non-assignable application identity for validated immutable Finance records. No provider, settings, deletion or native Task mutation authority.',
   canAccessAllTools: false,
-  canReadAllObjectRecords: false,
+  canReadAllObjectRecords: true,
   canUpdateAllObjectRecords: false,
   canSoftDeleteAllObjectRecords: false,
   canDestroyAllObjectRecords: false,

@@ -3,7 +3,10 @@ import type { RestApiClient } from 'twenty-client-sdk/rest';
 import { FinanceFollowUpActions } from './finance-follow-up-actions';
 import { useEffect, useState } from 'react';
 import { FinanceInsights } from './finance-insights';
-import { FinanceButton, FinancePageHeader } from './finance-ui/finance-insights-primitives';
+import {
+  FinanceButton,
+  FinancePageHeader,
+} from './finance-ui/finance-insights-primitives';
 import { FinancePeriodControls } from './finance-ui/finance-period-controls';
 
 import { currency, formatMoney } from '../contracts/money';
@@ -37,11 +40,12 @@ import {
   financeFollowUpMutationFailure,
   updateWorkspaceFinanceFollowUpState,
 } from '../investigation/workspace-finance-follow-ups';
-import { validTimelineWindow } from '../investigation/timeline-domain';
-import { SYNTHETIC_WORKSPACE_FINANCE_DATA } from '../investigation/synthetic-workspace-data';
 import {
-  workspaceAggregateCurrency,
-} from '../investigation/workspace-aggregate';
+  timelineMonthStart,
+  validTimelineWindow,
+} from '../investigation/timeline-domain';
+import { SYNTHETIC_WORKSPACE_FINANCE_DATA } from '../investigation/synthetic-workspace-data';
+import { workspaceAggregateCurrency } from '../investigation/workspace-aggregate';
 
 export type FinanceView =
   | 'overview'
@@ -108,8 +112,6 @@ const SOURCE_ROUTES: readonly {
   },
 ];
 
-
-
 type WorkspaceLoadState =
   | { kind: 'loading' }
   | { kind: 'denied' | 'failed' }
@@ -124,6 +126,19 @@ const validWorkspaceFacts = (data: WorkspaceFinanceData) =>
         ? left.id.localeCompare(right.id)
         : left.date.localeCompare(right.date),
     );
+
+const defaultFinanceRange = (dates: readonly string[]) => {
+  const start = dates[0] ?? '';
+  const end = dates.at(-1) ?? '';
+  if (!start || !end) return { start: '', end: '' };
+  return {
+    start:
+      start > timelineMonthStart(end, 2)
+        ? start
+        : timelineMonthStart(end, 2),
+    end,
+  };
+};
 
 const workspaceFactMoney = (fact: WorkspaceFinanceFact) =>
   fact.amountMinor === null
@@ -193,6 +208,12 @@ const WorkspaceFinanceScreen = ({
   const [dateError, setDateError] = useState('');
   const [datesOpen, setDatesOpen] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [transactionPage, setTransactionPage] = useState(0);
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [classificationFilter, setClassificationFilter] = useState('all');
+  const [directionFilter, setDirectionFilter] = useState('all');
+  const [currencyFilter, setCurrencyFilter] = useState('all');
+  const [totalsFilter, setTotalsFilter] = useState('all');
 
   const [createFollowUpOpen, setCreateFollowUpOpen] = useState(false);
   const [search, setSearch] = useState('');
@@ -217,7 +238,6 @@ const WorkspaceFinanceScreen = ({
     result: HandoffResult;
   } | null>(null);
 
-
   useEffect(() => {
     let cancelled = false;
     if (dataOverride) {
@@ -225,11 +245,10 @@ const WorkspaceFinanceScreen = ({
       const dates = validWorkspaceFacts(dataOverride)
         .map((fact) => fact.date)
         .sort();
-      const start = dates[0] ?? '';
-      const end = dates.at(-1) ?? '';
-      setRange({ start, end });
-      setDraftStart(start);
-      setDraftEnd(end);
+      const initialRange = defaultFinanceRange(dates);
+      setRange(initialRange);
+      setDraftStart(initialRange.start);
+      setDraftEnd(initialRange.end);
       setDateError('');
       return () => {
         cancelled = true;
@@ -243,12 +262,13 @@ const WorkspaceFinanceScreen = ({
         const dates = validWorkspaceFacts(data)
           .map((fact) => fact.date)
           .sort();
+        const initialRange = defaultFinanceRange(dates);
         setRange((current) => ({
-          start: current.start || dates[0] || '',
-          end: current.end || dates.at(-1) || '',
+          start: current.start || initialRange.start,
+          end: current.end || initialRange.end,
         }));
-        setDraftStart((current) => current || dates[0] || '');
-        setDraftEnd((current) => current || dates.at(-1) || '');
+        setDraftStart((current) => current || initialRange.start);
+        setDraftEnd((current) => current || initialRange.end);
       })
       .catch((error: unknown) => {
         if (!cancelled) setLoadState({ kind: workspaceReadFailure(error) });
@@ -257,6 +277,20 @@ const WorkspaceFinanceScreen = ({
       cancelled = true;
     };
   }, [dataOverride, refresh, services]);
+
+  useEffect(() => {
+    setTransactionPage(0);
+  }, [
+    accountId,
+    range.start,
+    range.end,
+    search,
+    statusFilter,
+    classificationFilter,
+    directionFilter,
+    currencyFilter,
+    totalsFilter,
+  ]);
 
   useEffect(() => {
     let cancelled = false;
@@ -321,9 +355,14 @@ const WorkspaceFinanceScreen = ({
   const allFacts = validWorkspaceFacts(data);
   const invalidFactCount = data.facts.length - allFacts.length;
   const firstFactDate = allFacts.map((fact) => fact.date).sort()[0] ?? '';
-  const lastFactDate = allFacts.map((fact) => fact.date).sort().at(-1) ?? '';
+  const lastFactDate =
+    allFacts
+      .map((fact) => fact.date)
+      .sort()
+      .at(-1) ?? '';
   const domainStart = firstFactDate ? `${firstFactDate.slice(0, 4)}-01-01` : '';
   const domainEnd = lastFactDate ? `${lastFactDate.slice(0, 4)}-12-31` : '';
+  const defaultRange = defaultFinanceRange(allFacts.map((fact) => fact.date));
   const activeStart = range.start || domainStart;
   const activeEnd = range.end || domainEnd;
   const scopedFacts = allFacts.filter(
@@ -335,8 +374,33 @@ const WorkspaceFinanceScreen = ({
   const facts = scopedFacts.filter(
     (fact) =>
       view !== 'transactions' ||
-      fact.description.toLowerCase().includes(search.toLowerCase()),
+      (fact.description.toLowerCase().includes(search.toLowerCase()) &&
+        (statusFilter === 'all' || fact.status === statusFilter) &&
+        (classificationFilter === 'all' ||
+          fact.classification === classificationFilter) &&
+        (directionFilter === 'all' || fact.direction === directionFilter) &&
+        (currencyFilter === 'all' || fact.currency === currencyFilter) &&
+        (totalsFilter === 'all' ||
+          (totalsFilter === 'included'
+            ? fact.includedInTotals
+            : !fact.includedInTotals))),
   );
+  const transactionPageSize = 250;
+  const transactionPageCount = Math.max(
+    1,
+    Math.ceil(facts.length / transactionPageSize),
+  );
+  const visibleFacts = facts.slice(
+    transactionPage * transactionPageSize,
+    (transactionPage + 1) * transactionPageSize,
+  );
+  const statuses = [...new Set(scopedFacts.map((fact) => fact.status))].sort();
+  const classifications = [
+    ...new Set(scopedFacts.map((fact) => fact.classification)),
+  ].sort();
+  const currencies = [
+    ...new Set(scopedFacts.map((fact) => fact.currency).filter(Boolean)),
+  ].sort();
   const selectedAccountLabel =
     data.accounts.find((account) => account.id === accountId)?.label ?? null;
   const visibleStatements = data.statements.filter(
@@ -347,7 +411,12 @@ const WorkspaceFinanceScreen = ({
   );
   const timelineMonths = (() => {
     if (!domainStart || !domainEnd) return [];
-    const months: Array<{ key: string; label: string; start: string; end: string }> = [];
+    const months: Array<{
+      key: string;
+      label: string;
+      start: string;
+      end: string;
+    }> = [];
     const cursor = new Date(`${domainStart.slice(0, 7)}-01T00:00:00Z`);
     const finalMonth = domainEnd.slice(0, 7);
     while (cursor.toISOString().slice(0, 7) <= finalMonth) {
@@ -356,9 +425,15 @@ const WorkspaceFinanceScreen = ({
       last.setUTCMonth(last.getUTCMonth() + 1, 0);
       months.push({
         key,
-        label: cursor.toLocaleDateString('en-US', { month: 'short', timeZone: 'UTC' }),
+        label: cursor.toLocaleDateString('en-US', {
+          month: 'short',
+          timeZone: 'UTC',
+        }),
         start: key === domainStart.slice(0, 7) ? domainStart : `${key}-01`,
-        end: key === domainEnd.slice(0, 7) ? domainEnd : last.toISOString().slice(0, 10),
+        end:
+          key === domainEnd.slice(0, 7)
+            ? domainEnd
+            : last.toISOString().slice(0, 10),
       });
       cursor.setUTCMonth(cursor.getUTCMonth() + 1);
     }
@@ -459,7 +534,48 @@ const WorkspaceFinanceScreen = ({
     }
   };
 
-  const dateControls = domainStart ? <FinancePeriodControls accounts={data.accounts} accountId={accountId} range={{ start: activeStart, end: activeEnd }} draft={{ start: draftStart, end: draftEnd }} resetRange={{ start: domainStart, end: domainEnd }} domainStart={domainStart} domainEnd={domainEnd} months={timelineMonths} filtersOpen={filtersOpen} datesOpen={datesOpen} error={dateError} onAccountIdChange={(next) => { setAccountId(next); setSelectedFact(null); }} onDraftChange={(next) => { setDraftStart(next.start); setDraftEnd(next.end); setDateError(''); }} onRangeChange={(next) => { if (!validTimelineWindow(next.start, next.end, domainStart, domainEnd)) { setDateError(`Choose valid dates between ${domainStart} and ${domainEnd}.`); return; } setRange(next); setDraftStart(next.start); setDraftEnd(next.end); setDateError(''); setSelectedFact(null); }} onValidationError={setDateError} onFiltersOpenChange={setFiltersOpen} onDatesOpenChange={setDatesOpen} /> : null;
+  const dateControls = domainStart ? (
+    <FinancePeriodControls
+      accounts={data.accounts}
+      accountId={accountId}
+      range={{ start: activeStart, end: activeEnd }}
+      draft={{ start: draftStart, end: draftEnd }}
+      resetRange={defaultRange}
+      domainStart={domainStart}
+      domainEnd={domainEnd}
+      months={timelineMonths}
+      filtersOpen={filtersOpen}
+      datesOpen={datesOpen}
+      error={dateError}
+      onAccountIdChange={(next) => {
+        setAccountId(next);
+        setSelectedFact(null);
+      }}
+      onDraftChange={(next) => {
+        setDraftStart(next.start);
+        setDraftEnd(next.end);
+        setDateError('');
+      }}
+      onRangeChange={(next) => {
+        if (
+          !validTimelineWindow(next.start, next.end, domainStart, domainEnd)
+        ) {
+          setDateError(
+            `Choose valid dates between ${domainStart} and ${domainEnd}.`,
+          );
+          return;
+        }
+        setRange(next);
+        setDraftStart(next.start);
+        setDraftEnd(next.end);
+        setDateError('');
+        setSelectedFact(null);
+      }}
+      onValidationError={setDateError}
+      onFiltersOpenChange={setFiltersOpen}
+      onDatesOpenChange={setDatesOpen}
+    />
+  ) : null;
 
   const factTable = (
     <div className="fw-table-wrap">
@@ -476,7 +592,7 @@ const WorkspaceFinanceScreen = ({
           </tr>
         </thead>
         <tbody>
-          {facts.map((fact) => (
+          {(view === 'transactions' ? visibleFacts : facts).map((fact) => (
             <tr key={fact.id}>
               <td>{fact.date}</td>
               <td>
@@ -504,19 +620,76 @@ const WorkspaceFinanceScreen = ({
     </div>
   );
 
-  const previewAction = onTogglePreview ? <FinanceButton aria-pressed={isSynthetic} onClick={onTogglePreview}>{isSynthetic ? 'Return to Workspace records' : 'Preview sample data'}</FinanceButton> : null;
-  const pageSpecificActions = selectedFollowUp ? <FinanceButton onClick={() => { setSelectedFollowUp(null); setFollowUpDetailSection('summary'); setFollowUpMutation('idle'); }}>← Back to Follow-ups</FinanceButton>
-    : view === 'sources' ? <FinanceButton onClick={() => setView(initialView)}>← Back to {PAGE_TITLES[initialView]}</FinanceButton>
-      : view === 'followups' ? null
-        : <><FinanceButton onClick={() => { setSourceHandoff(null); setView('sources'); }}>+ Add source</FinanceButton>{view === 'transactions' ? <FinanceButton onClick={() => setView('followups')}>Follow-ups</FinanceButton> : null}</>;
-  const pageHeaderActions = previewAction || pageSpecificActions ? <>{previewAction}{pageSpecificActions}</> : undefined;
+  const previewAction = onTogglePreview ? (
+    <FinanceButton aria-pressed={isSynthetic} onClick={onTogglePreview}>
+      {isSynthetic ? 'Return to Workspace records' : 'Preview sample data'}
+    </FinanceButton>
+  ) : null;
+  const pageSpecificActions = selectedFollowUp ? (
+    <FinanceButton
+      onClick={() => {
+        setSelectedFollowUp(null);
+        setFollowUpDetailSection('summary');
+        setFollowUpMutation('idle');
+      }}
+    >
+      ← Back to Follow-ups
+    </FinanceButton>
+  ) : view === 'sources' ? (
+    <FinanceButton onClick={() => setView(initialView)}>
+      ← Back to {PAGE_TITLES[initialView]}
+    </FinanceButton>
+  ) : view === 'followups' ? null : (
+    <>
+      <FinanceButton
+        onClick={() => {
+          setSourceHandoff(null);
+          setView('sources');
+        }}
+      >
+        + Add source
+      </FinanceButton>
+      {view === 'transactions' ? (
+        <FinanceButton onClick={() => setView('followups')}>
+          Follow-ups
+        </FinanceButton>
+      ) : null}
+    </>
+  );
+  const pageHeaderActions =
+    previewAction || pageSpecificActions ? (
+      <>
+        {previewAction}
+        {pageSpecificActions}
+      </>
+    ) : undefined;
 
   return (
-    <Workspace data-view={view} aria-label={`${PAGE_TITLES[view]} Finance content`}>
+    <Workspace
+      data-view={view}
+      aria-label={`${PAGE_TITLES[view]} Finance content`}
+    >
       <main className="fw-main">
-        {view !== 'overview' || selectedFollowUp ? <FinancePageHeader title={selectedFollowUp ? 'Follow-up detail' : PAGE_TITLES[view]} detail={isSynthetic ? 'Hass Kitchen' : 'Workspace'} actions={pageHeaderActions} /> : null}
+        {view !== 'overview' || selectedFollowUp ? (
+          <FinancePageHeader
+            title={selectedFollowUp ? 'Follow-up detail' : PAGE_TITLES[view]}
+            detail={isSynthetic ? 'Hass Kitchen' : 'Workspace'}
+            actions={pageHeaderActions}
+          />
+        ) : null}
 
-        {view === 'overview' && !selectedFollowUp ? <FinanceInsights data={data} isSynthetic={isSynthetic} onOpenFact={setSelectedFact} onOpenFollowUp={(task) => {setView('followups');setSelectedFollowUp(task);setFollowUpDetailSection('summary');}} /> : null}
+        {view === 'overview' && !selectedFollowUp ? (
+          <FinanceInsights
+            data={data}
+            isSynthetic={isSynthetic}
+            onOpenFact={setSelectedFact}
+            onOpenFollowUp={(task) => {
+              setView('followups');
+              setSelectedFollowUp(task);
+              setFollowUpDetailSection('summary');
+            }}
+          />
+        ) : null}
 
         {view === 'transactions' && !selectedFollowUp ? (
           <>
@@ -529,10 +702,97 @@ const WorkspaceFinanceScreen = ({
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
               />
+              <select
+                className="fw-select"
+                aria-label="Filter status"
+                value={statusFilter}
+                onChange={(event) => setStatusFilter(event.target.value)}
+              >
+                <option value="all">All statuses</option>
+                {statuses.map((value) => (
+                  <option key={value} value={value}>
+                    {value}
+                  </option>
+                ))}
+              </select>
+              <select
+                className="fw-select"
+                aria-label="Filter classification"
+                value={classificationFilter}
+                onChange={(event) =>
+                  setClassificationFilter(event.target.value)
+                }
+              >
+                <option value="all">All classifications</option>
+                {classifications.map((value) => (
+                  <option key={value} value={value}>
+                    {value}
+                  </option>
+                ))}
+              </select>
+              <select
+                className="fw-select"
+                aria-label="Filter direction"
+                value={directionFilter}
+                onChange={(event) => setDirectionFilter(event.target.value)}
+              >
+                <option value="all">All directions</option>
+                <option value="in">Money in</option>
+                <option value="out">Money out</option>
+                <option value="unknown">Unknown</option>
+              </select>
+              <select
+                className="fw-select"
+                aria-label="Filter currency"
+                value={currencyFilter}
+                onChange={(event) => setCurrencyFilter(event.target.value)}
+              >
+                <option value="all">All currencies</option>
+                {currencies.map((value) => (
+                  <option key={value} value={value}>
+                    {value}
+                  </option>
+                ))}
+              </select>
+              <select
+                className="fw-select"
+                aria-label="Filter totals inclusion"
+                value={totalsFilter}
+                onChange={(event) => setTotalsFilter(event.target.value)}
+              >
+                <option value="all">All totals states</option>
+                <option value="included">Included in totals</option>
+                <option value="excluded">Excluded from totals</option>
+              </select>
               <span className="fw-label">
                 {facts.length} {isSynthetic ? 'synthetic test' : 'authorized'}{' '}
                 records
               </span>
+              {transactionPageCount > 1 ? (
+                <>
+                  <FinanceButton
+                    disabled={transactionPage === 0}
+                    onClick={() =>
+                      setTransactionPage((page) => Math.max(0, page - 1))
+                    }
+                  >
+                    Previous
+                  </FinanceButton>
+                  <span className="fw-label">
+                    Page {transactionPage + 1} of {transactionPageCount}
+                  </span>
+                  <FinanceButton
+                    disabled={transactionPage >= transactionPageCount - 1}
+                    onClick={() =>
+                      setTransactionPage((page) =>
+                        Math.min(transactionPageCount - 1, page + 1),
+                      )
+                    }
+                  >
+                    Next
+                  </FinanceButton>
+                </>
+              ) : null}
             </div>
             {facts.length ? (
               factTable
@@ -558,51 +818,54 @@ const WorkspaceFinanceScreen = ({
                 </thead>
                 <tbody>
                   {data.accounts
-                    .filter((account) => accountId === 'all' || account.id === accountId)
+                    .filter(
+                      (account) =>
+                        accountId === 'all' || account.id === accountId,
+                    )
                     .map((account) => {
-                    const accountFacts = allFacts.filter(
-                      (fact) =>
-                        fact.accountId === account.id &&
-                        (!activeStart || fact.date >= activeStart) &&
-                        (!activeEnd || fact.date <= activeEnd) &&
-                        fact.includedInTotals &&
-                        fact.status !== 'SUPERSEDED',
-                    );
-                    const accountAggregate = workspaceAggregateCurrency(
-                      accountFacts,
-                      data.truncated,
-                    );
-                    const accountMoney = (value: string) =>
-                      accountAggregate.kind === 'available'
-                        ? formatMoney({
-                            currency: accountAggregate.currency,
-                            minor: value,
-                          })
-                        : '—';
-                    return (
-                      <tr key={account.id}>
-                        <td>
-                          <strong>{account.label}</strong>
-                        </td>
-                        <td>{account.sourceKind}</td>
-                        <td>{accountFacts.length}</td>
-                        <td className="fw-money-col">
-                          {accountMoney(
-                            accountAggregate.kind === 'available'
-                              ? accountAggregate.moneyInMinor
-                              : '0',
-                          )}
-                        </td>
-                        <td className="fw-money-col">
-                          {accountMoney(
-                            accountAggregate.kind === 'available'
-                              ? accountAggregate.moneyOutMinor
-                              : '0',
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  })}
+                      const accountFacts = allFacts.filter(
+                        (fact) =>
+                          fact.accountId === account.id &&
+                          (!activeStart || fact.date >= activeStart) &&
+                          (!activeEnd || fact.date <= activeEnd) &&
+                          fact.includedInTotals &&
+                          fact.status !== 'SUPERSEDED',
+                      );
+                      const accountAggregate = workspaceAggregateCurrency(
+                        accountFacts,
+                        data.truncated,
+                      );
+                      const accountMoney = (value: string) =>
+                        accountAggregate.kind === 'available'
+                          ? formatMoney({
+                              currency: accountAggregate.currency,
+                              minor: value,
+                            })
+                          : '—';
+                      return (
+                        <tr key={account.id}>
+                          <td>
+                            <strong>{account.label}</strong>
+                          </td>
+                          <td>{account.sourceKind}</td>
+                          <td>{accountFacts.length}</td>
+                          <td className="fw-money-col">
+                            {accountMoney(
+                              accountAggregate.kind === 'available'
+                                ? accountAggregate.moneyInMinor
+                                : '0',
+                            )}
+                          </td>
+                          <td className="fw-money-col">
+                            {accountMoney(
+                              accountAggregate.kind === 'available'
+                                ? accountAggregate.moneyOutMinor
+                                : '0',
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
                 </tbody>
               </table>
               {!data.accounts.length ? (
@@ -705,16 +968,27 @@ const WorkspaceFinanceScreen = ({
         {view === 'followups' && !selectedFollowUp ? (
           <>
             <div className="fw-followup-toolbar">
-              <p className="fw-page-note">Track missing evidence and the next action for each review.</p>
-              <button type="button" className="fw-button" aria-expanded={createFollowUpOpen} onClick={() => setCreateFollowUpOpen((open) => !open)}>New follow-up</button>
+              <p className="fw-page-note">
+                Track missing evidence and the next action for each review.
+              </p>
+              <button
+                type="button"
+                className="fw-button"
+                aria-expanded={createFollowUpOpen}
+                onClick={() => setCreateFollowUpOpen((open) => !open)}
+              >
+                New follow-up
+              </button>
             </div>
-            {createFollowUpOpen ? <FinanceFollowUpActions
-              section="create"
-              data={data}
-              disabled={isSynthetic}
-              client={services?.client}
-              onSaved={reloadFollowUp}
-            /> : null}
+            {createFollowUpOpen ? (
+              <FinanceFollowUpActions
+                section="create"
+                data={data}
+                disabled={isSynthetic}
+                client={services?.client}
+                onSaved={reloadFollowUp}
+              />
+            ) : null}
             <div className="fw-followup-list" aria-label="Finance follow-ups">
               {data.followUps.map((followUp) => (
                 <button

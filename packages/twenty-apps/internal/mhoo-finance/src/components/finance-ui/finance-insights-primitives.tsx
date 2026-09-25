@@ -1,6 +1,6 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
-export const FinanceHeader = ({ workspaceLabel, sample }: Readonly<{ workspaceLabel: string; sample: boolean }>) => <FinancePageHeader title="Insights" detail={workspaceLabel} badge={sample ? 'Fictional demo' : 'Workspace records'} />;
+export const FinanceHeader = ({ workspaceLabel, sample }: Readonly<{ workspaceLabel: string; sample: boolean }>) => <FinancePageHeader title="Finance" detail={workspaceLabel} badge={sample ? 'Fictional demo' : 'Workspace records'} />;
 
 export const FinanceSourceRow = ({ children, onClick }: Readonly<{ children: ReactNode; onClick: () => void }>) => <button type="button" className="hi-source-row" onClick={onClick}>{children}</button>;
 

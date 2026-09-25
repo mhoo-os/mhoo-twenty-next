@@ -8,7 +8,7 @@ export default defineObject({
   labelSingular: 'Financial account',
   labelPlural: 'Financial accounts',
   description:
-    'Explicit account mapping for source preparation; existence does not authorize import.',
+    'Explicit bank, card, or point-of-sale account mapping for source preparation; existence does not authorize import.',
   icon: 'IconBuildingBank',
   labelIdentifierFieldMetadataUniversalIdentifier:
     I.FINANCIAL_ACCOUNT_LABEL_FIELD_UNIVERSAL_IDENTIFIER,
@@ -40,6 +40,13 @@ export default defineObject({
           label: 'Credit card',
           color: 'purple',
           position: 1,
+        },
+        {
+          id: '979552d1-0656-4c55-aeb0-d5a317e7ca7e',
+          value: 'POS',
+          label: 'Point of sale',
+          color: 'green',
+          position: 2,
         },
       ],
     },

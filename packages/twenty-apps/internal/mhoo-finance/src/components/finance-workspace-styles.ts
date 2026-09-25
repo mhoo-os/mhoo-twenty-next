@@ -18,7 +18,7 @@ export const Workspace = styled.section({
   background: 'var(--fw-surface)',
   border: '1px solid var(--fw-line)',
   borderRadius: financeInsightsTokens.frameRadius,
-  overflow: 'hidden',
+  overflow: 'visible',
   minHeight: '640px',
   width: 'min(100%, 1450px)',
   margin: '18px auto',
