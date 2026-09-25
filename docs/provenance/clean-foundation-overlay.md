@@ -32,3 +32,19 @@ Clean runtime paths:
 - `.github/workflows/clean-foundation-image.yml`
 - `deploy/twenty-next/compose.yaml`
 - `deploy/twenty-next/env/validation.env.example`
+
+MHO-183 closed-beta proof paths:
+
+- `deploy/twenty-next/README.md`
+- `scripts/release/mho183-contract.sh`
+- `scripts/release/mho183-monitor.sh`
+- `scripts/release/mho183-backup.sh`
+- `scripts/release/mho183-restore-drill.sh`
+- `scripts/release/mho183-recreate.sh`
+- `scripts/release/mho183-rollback.sh`
+- `scripts/release/mho183-closed-beta-smoke.mjs`
+
+These files define a disposable, synthetic-only validation runtime. They do
+not configure DNS, public ingress, customer data, Finance imports, live
+provider credentials, auto-merge, Dark Factory execution, or production
+cutover.
