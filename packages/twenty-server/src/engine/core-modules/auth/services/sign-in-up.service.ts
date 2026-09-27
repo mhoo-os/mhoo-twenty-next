@@ -37,6 +37,7 @@ import {
   hashPassword,
 } from 'src/engine/core-modules/auth/auth.util';
 import { MAX_WORKSPACES_WITHOUT_ENTERPRISE_KEY } from 'src/engine/core-modules/auth/constants/max-workspaces-without-enterprise-key.constants';
+import { MhooPlatformInvitationService } from 'src/engine/core-modules/auth/services/mhoo-platform-invitation.service';
 import { getSignUpWithoutWorkspaceDecision } from 'src/engine/core-modules/auth/utils/get-sign-up-without-workspace-decision.util';
 import { hasProvisionedSignUpDestination } from 'src/engine/core-modules/auth/utils/has-provisioned-sign-up-destination.util';
 import { DEFAULT_DPA_REGION } from 'src/engine/core-modules/dpa/config/dpa-region-config.constant';
@@ -84,6 +85,7 @@ export class SignInUpService {
     @InjectRepository(WorkspaceEntity)
     private readonly workspaceRepository: Repository<WorkspaceEntity>,
     private readonly workspaceInvitationService: WorkspaceInvitationService,
+    private readonly mhooPlatformInvitationService: MhooPlatformInvitationService,
     private readonly userWorkspaceService: UserWorkspaceService,
     private readonly onboardingService: OnboardingService,
     private readonly workspaceEventEmitter: WorkspaceEventEmitter,
@@ -809,6 +811,7 @@ export class SignInUpService {
   async signUpWithoutWorkspace(
     newUserParams: SignInUpNewUserPayload,
     authParams: AuthProviderWithPasswordType['authParams'],
+    mhooInvitationToken?: string,
   ) {
     const userExists = await this.userService.findUserByEmail(
       newUserParams.email,
@@ -822,16 +825,32 @@ export class SignInUpService {
       );
     }
 
+    if (isDefined(mhooInvitationToken)) {
+      await this.mhooPlatformInvitationService.validateInvitationForEmail({
+        token: mhooInvitationToken,
+        email: newUserParams.email,
+      });
+    }
+
     await this.assertSignUpWithoutWorkspaceAllowed(newUserParams.email);
 
     const shouldGrantServerAdmin = !(await this.hasServerAdmin());
 
-    return this.saveNewUser(
+    const user = await this.saveNewUser(
       await this.computePartialUserFromUserPayload(newUserParams, authParams),
       {
         canImpersonate: shouldGrantServerAdmin,
         canAccessFullAdminPanel: shouldGrantServerAdmin,
       },
     );
+
+    if (isDefined(mhooInvitationToken)) {
+      await this.mhooPlatformInvitationService.consumeInvitationForEmail({
+        token: mhooInvitationToken,
+        email: user.email,
+      });
+    }
+
+    return user;
   }
 }

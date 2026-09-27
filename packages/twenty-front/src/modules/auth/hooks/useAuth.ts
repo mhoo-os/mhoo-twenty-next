@@ -18,12 +18,13 @@ import {
   SignInDocument,
   SignOutDocument,
   SignUpInWorkspaceDocument,
-  SignUpDocument,
+  type SignUpMutation,
   VerifyEmailAndGetLoginTokenDocument,
   VerifyEmailAndGetWorkspaceAgnosticTokenDocument,
 } from '~/generated-metadata/graphql';
 
 import { currentUserState } from '@/auth/states/currentUserState';
+import { SIGN_UP } from '@/auth/graphql/mutations/signUp';
 import { isCookieAuthActiveState } from '@/auth/states/isCookieAuthActiveState';
 import { isPendingServerSignOutState } from '@/auth/states/isPendingServerSignOutState';
 import { currentUserWorkspaceState } from '@/auth/states/currentUserWorkspaceState';
@@ -40,6 +41,15 @@ import { isValidReturnToPath } from '@/auth/utils/isValidReturnToPath';
 import { isNonEmptyString } from '@sniptt/guards';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { useSetAtomState } from '@/ui/utilities/state/jotai/hooks/useSetAtomState';
+
+type MhooSignUpMutationVariables = {
+  captchaToken?: string | null;
+  email: string;
+  locale?: string | null;
+  mhooInvitationToken?: string | null;
+  password: string;
+  verifyEmailRedirectPath?: string | null;
+};
 
 import { isAppEffectRedirectEnabledState } from '@/app/states/isAppEffectRedirectEnabledState';
 import { loginTokenState } from '@/auth/states/loginTokenState';
@@ -98,7 +108,9 @@ export const useAuth = () => {
     GetLoginTokenFromCredentialsDocument,
   );
   const [signIn] = useMutation(SignInDocument);
-  const [signUp] = useMutation(SignUpDocument);
+  const [signUp] = useMutation<SignUpMutation, MhooSignUpMutationVariables>(
+    SIGN_UP,
+  );
   const [signUpInWorkspace] = useMutation(SignUpInWorkspaceDocument);
   const [getAuthTokensFromLoginToken] = useMutation(
     GetAuthTokensFromLoginTokenDocument,
@@ -428,13 +440,19 @@ export const useAuth = () => {
   );
 
   const handleCredentialsSignUp = useCallback(
-    async (email: string, password: string, captchaToken?: string) => {
+    async (
+      email: string,
+      password: string,
+      captchaToken?: string,
+      mhooInvitationToken?: string,
+    ) => {
       const signUpResult = await signUp({
         variables: {
           email,
           password,
           captchaToken,
           locale: i18n.locale ?? SOURCE_LOCALE,
+          mhooInvitationToken,
         },
       });
 

@@ -1,5 +1,12 @@
 import { gql } from '@apollo/client';
 
+import {
+  AUTH_TOKEN,
+  AUTH_TOKEN_PAIR,
+  AVAILABLE_WORKSPACE_FOR_AUTH_FRAGMENT,
+  AVAILABLE_WORKSPACES_FOR_AUTH_FRAGMENT,
+} from '../fragments/authFragments';
+
 export const SIGN_UP = gql`
   mutation SignUp(
     $email: String!
@@ -7,6 +14,7 @@ export const SIGN_UP = gql`
     $captchaToken: String
     $locale: String
     $verifyEmailRedirectPath: String
+    $mhooInvitationToken: String
   ) {
     signUp(
       email: $email
@@ -14,6 +22,7 @@ export const SIGN_UP = gql`
       captchaToken: $captchaToken
       locale: $locale
       verifyEmailRedirectPath: $verifyEmailRedirectPath
+      mhooInvitationToken: $mhooInvitationToken
     ) {
       availableWorkspaces {
         ...AvailableWorkspacesFragment
@@ -23,4 +32,8 @@ export const SIGN_UP = gql`
       }
     }
   }
+  ${AUTH_TOKEN}
+  ${AUTH_TOKEN_PAIR}
+  ${AVAILABLE_WORKSPACE_FOR_AUTH_FRAGMENT}
+  ${AVAILABLE_WORKSPACES_FOR_AUTH_FRAGMENT}
 `;

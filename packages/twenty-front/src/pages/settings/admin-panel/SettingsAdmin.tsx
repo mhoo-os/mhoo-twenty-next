@@ -1,6 +1,7 @@
 import { SettingsAdminTabContent } from '@/settings/admin-panel/components/SettingsAdminTabContent';
 import { SETTINGS_ADMIN_TABS_ID } from '@/settings/admin-panel/constants/SettingsAdminTabsId';
 import { useSettingsAdminTabs } from '@/settings/admin-panel/hooks/useSettingsAdminTabs';
+import { SettingsAdminMhooInvitation } from './SettingsAdminMhooInvitation';
 import { SettingsPageContainer } from '@/settings/components/SettingsPageContainer';
 import { SettingsPageLayout } from '@/settings/components/layout/SettingsPageLayout';
 import { SettingsTabBar } from '@/settings/components/layout/SettingsTabBar';
@@ -35,6 +36,7 @@ export const SettingsAdmin = () => {
       ]}
     >
       <SettingsPageContainer>
+        <SettingsAdminMhooInvitation />
         <SettingsAdminTabContent activeTabId={activeTabId} />
       </SettingsPageContainer>
     </SettingsPageLayout>

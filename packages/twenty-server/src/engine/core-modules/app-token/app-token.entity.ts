@@ -24,6 +24,7 @@ export enum AppTokenType {
   PasswordResetToken = 'PASSWORD_RESET_TOKEN',
   InvitationToken = 'INVITATION_TOKEN',
   OnboardingInvitationToken = 'ONBOARDING_INVITATION_TOKEN',
+  MhooPlatformInvitationToken = 'MHOO_PLATFORM_INVITATION_TOKEN',
   EmailVerificationToken = 'EMAIL_VERIFICATION_TOKEN',
   EnterpriseValidityToken = 'ENTERPRISE_VALIDITY_TOKEN',
   SSOExchangeToken = 'SSO_EXCHANGE_TOKEN',
