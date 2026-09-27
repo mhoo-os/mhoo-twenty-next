@@ -1,10 +1,14 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { type ReactNode } from 'react';
 
-import { CloverSetupPrompt } from '@/settings/accounts/components/CloverSetupPrompt';
+import {
+  CloverSetupPrompt,
+  getCloverSetupDismissalKey,
+} from '@/settings/accounts/components/CloverSetupPrompt';
 import { cloverRequest } from '@/settings/accounts/components/SettingsCloverConnection';
 
 const mockOpenModal = jest.fn();
+const mockCloseModal = jest.fn();
 const mockNavigateSettings = jest.fn();
 const workspace = { id: 'hass-workspace', displayName: 'Hass Kitchen' };
 const user = { id: 'authorized-owner' };
@@ -23,28 +27,36 @@ jest.mock('@/settings/accounts/components/SettingsCloverConnection', () => ({
   cloverRequest: jest.fn(),
 }));
 jest.mock('@/ui/layout/modal/hooks/useModal', () => ({
-  useModal: () => ({ openModal: mockOpenModal }),
+  useModal: () => ({ openModal: mockOpenModal, closeModal: mockCloseModal }),
 }));
 jest.mock('~/hooks/useNavigateSettings', () => ({
   useNavigateSettings: () => mockNavigateSettings,
 }));
 jest.mock('@/ui/layout/modal/components/ConfirmationModal', () => ({
+  StyledCenteredButton: ({
+    title,
+    onClick,
+  }: {
+    title: string;
+    onClick: () => void;
+  }) => <button onClick={onClick}>{title}</button>,
   ConfirmationModal: ({
     title,
     subtitle,
     confirmButtonText,
     onConfirmClick,
-    isClosable,
+    AdditionalButtons,
   }: {
     title: string;
     subtitle: ReactNode;
     confirmButtonText: string;
     onConfirmClick: () => void;
-    isClosable?: boolean;
+    AdditionalButtons: ReactNode;
   }) => (
-    <section data-closable={isClosable}>
+    <section>
       <h1>{title}</h1>
       <p>{subtitle}</p>
+      {AdditionalButtons}
       <button onClick={onConfirmClick}>{confirmButtonText}</button>
     </section>
   ),
@@ -54,12 +66,14 @@ const request = jest.mocked(cloverRequest);
 
 describe('Hass Clover setup prompt', () => {
   beforeEach(() => {
+    localStorage.clear();
     request.mockReset();
     mockOpenModal.mockReset();
+    mockCloseModal.mockReset();
     mockNavigateSettings.mockReset();
   });
 
-  it('opens a mandatory prompt after authoritative needs-setup status', async () => {
+  it('opens a dismissible prompt after authoritative needs-setup status', async () => {
     request.mockResolvedValue({
       enabled: true,
       connectionState: 'needsSetup',
@@ -73,10 +87,7 @@ describe('Hass Clover setup prompt', () => {
       ),
     ).toBeInTheDocument();
     expect(mockOpenModal).toHaveBeenCalledWith('hass-clover-setup-modal');
-    expect(screen.queryByRole('button', { name: 'Do this later' })).toBeNull();
-    expect(
-      screen.getByText('Finish setting up Hass').closest('section'),
-    ).toHaveAttribute('data-closable', 'false');
+    expect(screen.getByRole('button', { name: 'Not now' })).toBeVisible();
   });
 
   it.each([
@@ -100,6 +111,26 @@ describe('Hass Clover setup prompt', () => {
 
   it('keeps unauthorized and failed status reads silent', async () => {
     request.mockRejectedValue(new Error('forbidden'));
+    render(<CloverSetupPrompt />);
+    await waitFor(() => expect(request).toHaveBeenCalled());
+    expect(mockOpenModal).not.toHaveBeenCalled();
+  });
+
+  it('dismisses per Workspace member and does not nag on revisit', async () => {
+    request.mockResolvedValue({
+      enabled: true,
+      connectionState: 'needsSetup',
+      receipt: null,
+      receipts: [],
+    });
+    const first = render(<CloverSetupPrompt />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Not now' }));
+    expect(
+      localStorage.getItem(getCloverSetupDismissalKey(workspace.id, user.id)),
+    ).toBe('true');
+    expect(mockCloseModal).toHaveBeenCalledWith('hass-clover-setup-modal');
+    first.unmount();
+    mockOpenModal.mockReset();
     render(<CloverSetupPrompt />);
     await waitFor(() => expect(request).toHaveBeenCalled());
     expect(mockOpenModal).not.toHaveBeenCalled();
